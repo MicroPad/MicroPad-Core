@@ -1,0 +1,8 @@
+body {
+	position: relative;
+	font-family: sans serif, Arial;
+}
+
+div, img {
+	position: absolute;
+}
