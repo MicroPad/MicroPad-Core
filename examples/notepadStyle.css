@@ -1,8 +1,22 @@
+header {
+	position: static;
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+	width: 30%;
+}
+
+header h1 {
+	display: inline;
+}
+
+header i {
+	font-size: 11px;
+}
+
 body {
-	position: relative;
-	font-family: sans serif, Arial;
+	position: static;
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
 }
 
 div, img {
-	position: absolute;
+	position: relative;
 }
