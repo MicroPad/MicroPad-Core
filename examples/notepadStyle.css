@@ -4,5 +4,5 @@ body {
 }
 
 div, img {
-	position: relative;
+	position: absolute;
 }
