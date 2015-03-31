@@ -24,7 +24,6 @@ To edit:
 	<section title="Random Notes"> <!-- Unlimited sections can be defined (including sections within sections) -->
 		<note title="Features" time="1427170412239"> <!-- Time is milliseconds since the UNIX epoch time -->
 			<addons>
-				<import>github_markdown</import>
 				<import>asciimath</import>
 			</addons> <!-- If an import in this list isn't supported in your application make sure to let the user know -->
 
@@ -60,7 +59,6 @@ To edit:
 
 		<note title="Credits" time="1427177063026">
 			<addons>
-				<import>github-markdown</import>
 			</addons>
 
 			<bibliography>
@@ -74,7 +72,17 @@ To edit:
 
 	<section title="More advanced layouts">
 		<note title="Drawing" time="14273220882000">
-			<markdown id="markdown1"
+			<addons>
+			</addons>
+
+			<bibliography>
+			</bibliography>
+
+			<markdown id="markdown1" x="10px" y="10px" height="auto" width="500px" fontSize="16px">
+				I can draw over this text.
+
+				Drawing is up to the application to implement. It should simply be placed as an image with a transparent background. It is **100%** okay to place images over text.
+			</markdown>
 		</note>
 	</section>
 </notepad>

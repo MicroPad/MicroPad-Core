@@ -6,3 +6,7 @@ body {
 div, img {
 	position: absolute;
 }
+
+span {
+	color: grey; !important
+}
