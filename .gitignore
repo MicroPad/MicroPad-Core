@@ -26,3 +26,5 @@ hs_err_pid*
 
 # sftp configuration file
 sftp-config.json
+
+testParsing.py
