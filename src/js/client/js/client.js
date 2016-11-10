@@ -43,7 +43,7 @@ function loadSection(id) {
 }
 
 function loadNote(id) {
-	// $('#sectionListHolder').hide();
+	$('#sectionListHolder').hide();
 	var note = parent.notes[id];
 	// console.log(note);
 
