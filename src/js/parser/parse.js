@@ -1,4 +1,16 @@
 var parseString = require('xml2js').parseString;
+// Thanks to http://stackoverflow.com/a/4673436/998467
+if (!String.prototype.format) {
+	String.prototype.format = function() {
+		var args = arguments;
+		return this.replace(/{(\d+)}/g, function(match, number) { 
+			return typeof args[number] != 'undefined'
+				? args[number]
+				: match
+			;
+		});
+	};
+}
 
 var Notepad = function(title) {
 	this.title = title;
@@ -34,8 +46,9 @@ Note.prototype.addSource = function(id, item, contents) {
 		contents: contents
 	});
 };
-Note.prototype.addElement = function(args, content) {
+Note.prototype.addElement = function(type, args, content) {
 	this.elements.push({
+		type: type,
 		args: args,
 		content: content
 	});
@@ -87,9 +100,18 @@ function parseSection(sectionXML, section, parent) {
 						if (noteXML.markdown) {
 							for (var i = 0; i < noteXML.markdown.length; i++) {
 								var element = noteXML.markdown[i];
-								note.addElement(element.$, element._);
+								note.addElement("markdown", element.$, element._);
 							}
 						}
+
+						if (noteXML.image) {
+							for (var i = 0; i < noteXML.image.length; i++) {
+								var element = noteXML.image[i];
+								note.addElement("image", element.$, element._);
+							}
+						}
+
+						//TODO: TABLES
 					}
 					section.addNote(note);
 					break;
@@ -107,4 +129,20 @@ function parseSection(sectionXML, section, parent) {
 function isCompatible(addonName) {
 	if (addonName == "asciimath") return true;
 	return false;
+}
+
+exports.noteToHTML = function (note) {
+	var outputHTML= '';
+	for (var i = 0; i < note.elements.length; i++) {
+		var element = note.elements[i];
+		switch (element.type) {
+			case "markdown":
+				outputHTML += '<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script src="addons/ASCIIMathML.js"></script><div style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, element.content);
+				break;
+			case "image":
+				outputHTML += '';
+				break;
+		}
+	}
+	return outputHTML;
 }

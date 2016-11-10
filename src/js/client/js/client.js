@@ -3,6 +3,7 @@ var parent;
 
 document.addEventListener("DOMContentLoaded", function(event) {
 	document.getElementById("upload").addEventListener("change", function(event) {
+		$('#upload').hide();
 		readFileInputEventAsText(event, function(text) {
 			parser.parse(text);
 			while (!parser.notepad) if (parser.notepad) break;
@@ -38,6 +39,23 @@ function loadSection(id) {
 	for (k in section.notes) {
 		var note = section.notes[k];
 		$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(k, note.title));
+	}
+}
+
+function loadNote(id) {
+	// $('#sectionListHolder').hide();
+	var note = parent.notes[id];
+	// console.log(note);
+
+	document.title = note.title+" - µPad";
+	// $('body').html(parser.noteToHTML(note));
+	for (var i = 0; i < note.elements.length; i++) {
+		var element = note.elements[i];
+		switch (element.type) {
+			case "markdown":
+				$('body').append('<div style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, element.content));
+				break;
+		}
 	}
 }
 

@@ -101,20 +101,18 @@ Drawing is up to the application to implement. It should simply be placed as an 
 			</bibliography>
 
 			<table id="table1" x="130px" y="10px" height="auto" width="200px">
-				<row>
-					<column>
-						<markdown><![CDATA[**Fav Image**]]></markdown>
-						<markdown><![CDATA[Nick]]></markdown>
-					</column>
-					<column>
-						<markdown><![CDATA[**Last Name**]]></markdown>
-						<markdown><![CDATA[Webster]]></markdown>
-					</column>
-					<column>
-						<markdown><![CDATA[**Email**]]></markdown>
-						<markdown><![CDATA[[nick@nick.geek.nz](mailto:nick@nick.geek.nz)]]></markdown>
-					</column>
-				</row>
+				<column>
+					<markdown><![CDATA[**Fav Image**]]></markdown>
+					<markdown><![CDATA[Nick]]></markdown>
+				</column>
+				<column>
+					<markdown><![CDATA[**Last Name**]]></markdown>
+					<markdown><![CDATA[Webster]]></markdown>
+				</column>
+				<column>
+					<markdown><![CDATA[**Email**]]></markdown>
+					<markdown><![CDATA[[nick@nick.geek.nz](mailto:nick@nick.geek.nz)]]></markdown>
+				</column>
 			</table>
 		</note>
 	</section>
