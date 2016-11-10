@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="notepad" type="notepadType">
+		<xs:annotation>
+			<xs:documentation>file.html = render of file.xml (for viewing)
+file.xml = uncompressed xml (for editing and storing)
+file.xml.gz = gziped xml
+
+Applications that read µPad files need to do the following to render:
+* Decompress *.xml.gz file
+* When a user wants to view a note
+	* Create an HTML file
+	* Import required addons (e.g. asciimath if maths is used, etc)
+	* Position all objects according to dimensions
+	* Substitute µPad XML tags for HTML tags where appropriate
+	* Turn markdown into HTML
+	* Any item that has a source in the bibliography should have a Wikipedia style citation next to it (hyperlinking is optional)
+
+To edit:
+* Uncompress xml.gz file
+
+Only ONE notepad should be defined per file. Applications that read µPad XML should ignore all other notepads in the file</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="markdownType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="id" use="required"/>
+				<xs:attribute type="xs:string" name="x" use="optional"/>
+				<xs:attribute type="xs:string" name="y" use="optional"/>
+				<xs:attribute type="xs:string" name="height" use="optional"/>
+				<xs:attribute type="xs:string" name="width" use="optional"/>
+				<xs:attribute type="xs:string" name="fontSize" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="columnType">
+		<xs:sequence>
+			<xs:element name="markdown" maxOccurs="unbounded" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="**Fav Image**"/>
+						<xs:enumeration value="Nick"/>
+						<xs:enumeration value="**Last Name**"/>
+						<xs:enumeration value="Webster"/>
+						<xs:enumeration value="**Email**"/>
+						<xs:enumeration value="[nick@nick.geek.nz](mailto:nick@nick.geek.nz)"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="rowType">
+		<xs:sequence>
+			<xs:element type="columnType" name="column" maxOccurs="unbounded" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="tableType">
+		<xs:sequence>
+			<xs:element type="rowType" name="row"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="id"/>
+		<xs:attribute type="xs:string" name="x"/>
+		<xs:attribute type="xs:string" name="y"/>
+		<xs:attribute type="xs:string" name="height"/>
+		<xs:attribute type="xs:string" name="width"/>
+	</xs:complexType>
+	<xs:complexType name="noteType" mixed="true">
+		<xs:sequence>
+			<xs:element type="addonsType" name="addons" minOccurs="0"/>
+			<xs:element type="bibliographyType" name="bibliography" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Should be listed at the bottom of the note - differentiate from rest of note (like using a light grey font)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element type="markdownType" name="markdown" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element type="imageType" name="image" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Images are encoded in base64</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element type="tableType" name="table" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="title" use="required"/>
+		<xs:attribute type="xs:dateTime" name="time" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="notepadType">
+		<xs:sequence>
+			<xs:element type="sectionType" name="section" maxOccurs="unbounded" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Unlimited sections can be defined (including sections within sections)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="title"/>
+	</xs:complexType>
+	<xs:complexType name="sourceType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="id" use="required"/>
+				<xs:attribute type="xs:string" name="item" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="addonsType" mixed="true">
+		<xs:sequence>
+			<xs:element type="xs:string" name="import" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If an import in this list isn't supported in your application make sure to let the user know</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="bibliographyType" mixed="true">
+		<xs:sequence>
+			<xs:element type="sourceType" name="source" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="sectionType" mixed="true">
+		<xs:choice maxOccurs="unbounded" minOccurs="0">
+			<xs:element type="noteType" name="note">
+				<xs:annotation>
+					<xs:documentation>Time is milliseconds since the UNIX epoch time</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element type="sectionType" name="section"/>
+		</xs:choice>
+		<xs:attribute type="xs:string" name="title" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="imageType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="id" use="required"/>
+				<xs:attribute type="xs:string" name="x" use="optional"/>
+				<xs:attribute type="xs:string" name="y" use="optional"/>
+				<xs:attribute type="xs:string" name="height" use="optional"/>
+				<xs:attribute type="xs:string" name="width" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+</xs:schema>
