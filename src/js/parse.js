@@ -50,6 +50,7 @@ exports.parse = function parse(xml) {
 
 			parseSection(sectionXML, section, notepad);
 		}
+		console.log(notepad);
 	});
 }
 
@@ -91,16 +92,17 @@ function parseSection(sectionXML, section, parent) {
 							}
 						}
 					}
+					section.addNote(note);
 					break;
 
 				case "section":
-					// console.log(v[0].$.title);
 					parseSection(v[0], new Section(v[0].$.title), section);
-					// console.log('-----------------')
 					break;
 			}
 		}
 	}
+
+	parent.addSection(section);
 }
 
 function isCompatible(addonName) {
