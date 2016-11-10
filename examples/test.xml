@@ -5,7 +5,7 @@ file.xml = uncompressed xml (for editing and storing)
 file.xml.gz = gziped xml
 
 Applications that read µPad files need to do the following to render:
-* Uncompress *.xml.gz file
+* Decompress *.xml.gz file
 * When a user wants to view a note
 	* Create an HTML file
 	* Import required addons (e.g. asciimath if maths is used, etc)
@@ -35,7 +35,7 @@ To edit:
 				This is some text! I can format this text using (a slightly modified version of) *GitHub markdown!*
 
 				#Random Heading
-				>I like using [GitHub](https://github.com).
+				> I like using [GitHub](https://github.com).
 
 				* Bullet lists are easy to create
 				* I can also do fancy mathy stuff!
@@ -46,7 +46,7 @@ To edit:
 			</markdown>
 
 			<markdown id="markdown2" x="950px" y="50px" height="auto" width="140px" fontSize="16px">
-				I like that you can place stuff **anywhere**7
+				I like that you can place stuff **anywhere**
 
 
 				~A = cos^-1 ((b^2+c^2-a^2)/(2bc))~
