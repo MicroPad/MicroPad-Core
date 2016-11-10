@@ -42,9 +42,9 @@ Only ONE notepad should be defined per file. Applications that read µPad XML sh
 
 				* Bullet lists are easy to create
 				* I can also do fancy mathy stuff!
-				    - =2Mg + O_2 -> 2MgO=
-				    - =a/sin (A) = b/sin(B) = c/sin(C)=
-				    - ~(-b +-sqrt(b^2-4ac))/(2a)~, easy as ~pi~!
+				    - ===2Mg + O_2 -> 2MgO===
+				    - ===a/sin (A) = b/sin(B) = c/sin(C)===
+				    - ===(-b +-sqrt(b^2-4ac))/(2a)===, easy as ===pi===!
 				        * As you can see math and science is easy with [AsciiMath](http://asciimath.org/). Just put tildes around your equation.]]>
 			</markdown>
 
@@ -52,7 +52,7 @@ Only ONE notepad should be defined per file. Applications that read µPad XML sh
 				I like that you can place stuff **anywhere**
 
 
-				~A = cos^-1 ((b^2+c^2-a^2)/(2bc))~]]>
+				===A = cos^-1 ((b^2+c^2-a^2)/(2bc))===]]>
 			</markdown>
 
 			<!-- Images are encoded in base64 -->
