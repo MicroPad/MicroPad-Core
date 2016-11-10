@@ -1,0 +1,22 @@
+{
+  "name": "upad",
+  "version": "0.1.0",
+  "description": "",
+  "main": "parse.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NickGeek/uPad.git"
+  },
+  "author": "Nick Webster",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/NickGeek/uPad/issues"
+  },
+  "homepage": "https://github.com/NickGeek/uPad",
+  "dependencies": {
+    "xml2js": "^0.4.17"
+  }
+}
