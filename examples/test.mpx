@@ -89,6 +89,8 @@ Only ONE notepad should be defined per file. Applications that read µPad XML sh
 		<section title="Section magic">
 			<section title="Sectionception">
 				<note title="Cool isn't it?!" time="2016-11-10T16:13:04+13:00">
+					<addons></addons>
+					<bibliography></bibliography>
 				</note>
 			</section>
 		</section>
