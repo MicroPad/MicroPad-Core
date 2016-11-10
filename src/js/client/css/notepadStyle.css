@@ -1,0 +1,12 @@
+body {
+	position: static;
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+div, img {
+	position: absolute;
+}
+
+span {
+	color: grey; !important
+}

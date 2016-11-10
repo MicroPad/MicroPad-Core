@@ -1,30 +1,27 @@
 <html>
 	<head>
-		<script src="parserBrowser.js"></script>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css" href="css/notepadStyle.css">
 	</head>
 	<body>
 		<input id="upload" type="file">
-		<script>
-			document.getElementById("upload").addEventListener("change", function(event) {
-				readFileInputEventAsText(event, function(text) {
-					parser.parse(text);
-					while (!parser.notepad) if (parser.notepad) break;
-					console.log(parser.notepad);
-				});
-			}, false);
+		<div id="sectionListHolder">
+			<h1 id="selectorTitle"></h1>
+			<h3>Selections</h3>
+			<ul id="sectionList"></ul>
 
-			function readFileInputEventAsText(event, callback) {
-				var file = event.target.files[0];
+			<h3>Notes</h3>
+			<ul id="noteList"></ul>
+		</div>
 
-				var reader = new FileReader();
-				
-				reader.onload = function() {
-					var text = reader.result;
-					callback(text);
-				};
-				
-				reader.readAsText(file);
-			}
-		</script>
+			
+		<script src="js/jquery-3.1.1.min.js"></script>
+		<!-- Addons -->
+		<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+		<script src="addons/ASCIIMathML.js"></script>
+		<!-- NPX Parser -->
+		<script src="js/parserBrowser.js"></script>
+
+		<script src="js/client.js"></script>
 	</body>
 </html>
