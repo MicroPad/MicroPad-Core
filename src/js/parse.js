@@ -43,14 +43,13 @@ Note.prototype.addElement = function(args, content) {
 
 exports.parse = function parse(xml) {
 	parseString(xml, function(e, res) {
-		var notepad = new Notepad(res.notepad.$.title);
+		exports.notepad = new Notepad(res.notepad.$.title);
 		for (var i = 0; i < res.notepad.section.length; i++) {
 			var sectionXML = res.notepad.section[i];
 			var section = new Section(sectionXML.$.title);
 
-			parseSection(sectionXML, section, notepad);
+			parseSection(sectionXML, section, exports.notepad);
 		}
-		console.log(notepad);
 	});
 }
 

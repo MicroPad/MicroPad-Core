@@ -1,0 +1,30 @@
+<html>
+	<head>
+		<script src="parserBrowser.js"></script>
+	</head>
+	<body>
+		<input id="upload" type="file">
+		<script>
+			document.getElementById("upload").addEventListener("change", function(event) {
+				readFileInputEventAsText(event, function(text) {
+					parser.parse(text);
+					while (!parser.notepad) if (parser.notepad) break;
+					console.log(parser.notepad);
+				});
+			}, false);
+
+			function readFileInputEventAsText(event, callback) {
+				var file = event.target.files[0];
+
+				var reader = new FileReader();
+				
+				reader.onload = function() {
+					var text = reader.result;
+					callback(text);
+				};
+				
+				reader.readAsText(file);
+			}
+		</script>
+	</body>
+</html>
