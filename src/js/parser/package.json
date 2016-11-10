@@ -1,7 +1,7 @@
 {
-  "name": "upad",
+  "name": "upad-parse",
   "version": "0.1.0",
-  "description": "",
+  "description": "µPad is a tiny open digital note taking app. µPad works with XML that anyone can implement into their software allowing a truly open and free experience.",
   "main": "parse.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,5 +18,13 @@
   "homepage": "https://github.com/NickGeek/uPad",
   "dependencies": {
     "xml2js": "^0.4.17"
-  }
+  },
+  "devDependencies": {},
+  "keywords": [
+    "uPad",
+    "µPad",
+    "parse",
+    "npx",
+    "parser"
+  ]
 }
