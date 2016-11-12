@@ -30,6 +30,30 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		});
 	}, false);
 
+	/** Creating elements */
+	var lastClick = {x: 0, y: 0};
+	$('body').click(function (e) { 
+		if (e.target == this && note) {
+			lastClick.x = e.pageX;
+			lastClick.y = e.pageY;
+			$('#insert').modal({fadeDuration: 250});
+		}
+	});
+
+	function insert(type) {
+		// var newElement = {
+		// 	args: {
+		// 		x: lastClick.x+'px',
+		// 		y: lastClick.y+'px',
+		// 		width: 'auto',
+		// 		height: 'auto'
+		// 	},
+		// 	content: '',
+		// 	type: ''
+		// }
+	}
+
+	/** Editing elements */
 	interact('.interact').draggable({
 		onmove: dragMoveListener,
 		onend: function (event) {
@@ -54,23 +78,32 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			if (element.args.id == event.currentTarget.id) {
 				switch (element.type) {
 					case "markdown":
-						$('#mdEditor > input').val('');
+						$('#mdEditor > input[name="source"]').val('');
 						var source = undefined;
 						for (var i = 0; i < note.bibliography.length; i++) {
 							var mSource = note.bibliography[i];
 							if (mSource.item == element.args.id) {
 								source = mSource;
-								$('#mdEditor > input').val(source.contents);
+								$('#mdEditor > input[name="source"]').val(source.contents);
 								break;
 							}
 						}
 
 						$('#mdEditor > textarea').val(element.content);
+						$('#mdEditor > input[name="font"]').val(element.args.fontSize);
 						$('#mdEditor > textarea').unbind();
 						$('#mdEditor > textarea').bind('input propertychange', function() {
 							element.content = $('#mdEditor > textarea').val();
 							currentTarget.html(md.makeHtml(element.content));
 						});
+
+						$('#mdEditor > input[name="font"]').val(element.args.fontSize);
+						$('#mdEditor > input[name="font"]').unbind();
+						$('#mdEditor > input[name="font"]').bind('input propertychange', function() {
+							element.args.fontSize = $('#mdEditor > input[name="font"]').val();
+							currentTarget.css('font-size', element.args.fontSize);
+						});
+
 
 
 						$('#mdEditor').one($.modal.BEFORE_CLOSE, function(event, modal) {
@@ -78,13 +111,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 							MathJax.Hub.Typeset();
 
 							if (source) {
-								source.contents = $('#mdEditor > input').val();
+								source.contents = $('#mdEditor > input[name="source"]').val();
 							}
 							else {
 								note.bibliography.push({
 									id: note.bibliography.length+1,
 									item: element.args.id,
-									contents: $('#mdEditor > input').val()
+									contents: $('#mdEditor > input[name="source"]').val()
 								});
 							}
 							updateBib();
@@ -196,6 +229,7 @@ function loadSection(id) {
 function loadNote(id) {
 	$('#sectionListHolder').hide();
 	$('#viewer').html('');
+	noteID = id;
 	note = parents[parents.length-1].notes[id];
 	document.title = note.title+" - µPad";
 
