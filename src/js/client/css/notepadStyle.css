@@ -6,3 +6,7 @@ body {
 div, img {
 	position: absolute;
 }
+
+.interact:hover {
+	border: 2px solid grey;
+}

@@ -47,7 +47,7 @@ Only ONE notepad should be defined per file. Applications that read µPad XML sh
 	- ===(-b +-sqrt(b^2-4ac))/(2a)===, easy as ===pi===!
 	* As you can see math and science is easy with [AsciiMath](http://asciimath.org/). Just put tildes around your equation.]]></markdown>
 
-			<markdown id="markdown2" x="950px" y="50px" height="auto" width="140px" fontSize="16px"><![CDATA[I like that you can place stuff **anywhere**
+			<markdown id="markdown2" x="950px" y="50px" height="auto" width="200px" fontSize="16px"><![CDATA[I like that you can place stuff **anywhere**
 
 
 ===A = cos^-1 ((b^2+c^2-a^2)/(2bc))===]]></markdown>

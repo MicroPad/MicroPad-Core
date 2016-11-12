@@ -17,6 +17,27 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			}
 		});
 	}, false);
+
+	interact('.interact').draggable({
+		onmove: dragMoveListener,
+		onend: function (event) {
+			//TODO: Update note object
+		},
+		inertia: false,
+		autoScroll: true
+	}).resizable({
+		preserveAspectRatio: false,
+		edges: {left: false, right: true, bottom: true, top: false}
+	}).on('resizemove', function(event) {
+		$(event.target).css('width', parseInt($(event.target).css('width'))+event.dx);
+		$(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
+	});
+
+	function dragMoveListener(event) {
+		$(event.target).css('left', parseInt($(event.target).css('left'))+event.dx);
+		$(event.target).css('top', parseInt($(event.target).css('top'))+event.dy);
+	}
+	window.dragMoveListener = dragMoveListener;
 });
 
 function clearSelector() {
@@ -43,7 +64,7 @@ function loadSection(id) {
 }
 
 function loadNote(id) {
-	$('#sectionListHolder').hide();
+	$('body').html('');
 	var note = parent.notes[id];
 	document.title = note.title+" - µPad";
 
@@ -60,15 +81,16 @@ function loadNote(id) {
 		var element = note.elements[i];
 		switch (element.type) {
 			case "markdown":
-				$('body').append('<div id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
+				$('body').append('<div class="interact" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
 				asciimath.translate(undefined, true);
 				MathJax.Hub.Typeset();
 				break;
 			case "image":
-				$('body').append('<img id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
+				$('body').append('<img class="interact" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
 				break;
 			case "table":
 				alert("Tables aren't supported yet");
+				break;
 		}
 	}
 
