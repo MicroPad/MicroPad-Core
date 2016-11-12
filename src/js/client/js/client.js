@@ -1,5 +1,8 @@
 var notepad;
-var parent;
+var parents = [];
+var note;
+var noteID;
+var sectionIDs = [];
 
 document.addEventListener("DOMContentLoaded", function(event) {
 	document.getElementById("upload").addEventListener("change", function(event) {
@@ -8,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			parser.parse(text);
 			while (!parser.notepad) if (parser.notepad) break;
 			notepad = parser.notepad;
-			parent = notepad;
+			parents.push(notepad);
 			
 			$('#selectorTitle').html(notepad.title);
 			for (k in notepad.sections) {
@@ -21,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	interact('.interact').draggable({
 		onmove: dragMoveListener,
 		onend: function (event) {
-			//TODO: Update note object
+			updateNote(event.target.id);
 		},
 		inertia: false,
 		autoScroll: true
@@ -31,6 +34,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	}).on('resizemove', function(event) {
 		$(event.target).css('width', parseInt($(event.target).css('width'))+event.dx);
 		$(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
+
+
 	});
 
 	function dragMoveListener(event) {
@@ -40,6 +45,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	window.dragMoveListener = dragMoveListener;
 });
 
+function updateNote(id) {
+	for (k in note.elements) {
+		var element = note.elements[k];
+		var sel = $('#'+id);
+		element.args.x = $('#'+id).css('left');
+		element.args.y = $('#'+id).css('top');
+		element.args.width = $('#'+id).css('width');
+		element.args.height = $('#'+id).css('height');
+	}
+	// parents[parents.length-1].notes[noteID] = note;
+	// parents[parents.length-2].sections[sectionIDs[sectionIDs.length-1]] = parents[parents.length-1];
+	// for (var i = parents.length-3; i >= 0; i--) {
+	// 	parents[i].sections[sectionIDs[i+1]] = parents[i+1];
+	// }
+	// notepad = parents[0];
+}
+
 function clearSelector() {
 	$('#selectorTitle').html('');
 	$('#sectionList').html('');
@@ -48,8 +70,9 @@ function clearSelector() {
 
 function loadSection(id) {
 	clearSelector();
-	var section = parent.sections[id];
-	parent = section;
+	var section = parents[parents.length-1].sections[id];
+	sectionIDs.push(id);
+	parents.push(section);
 
 	$('#selectorTitle').html(section.title);
 	for (k in section.sections) {
@@ -65,7 +88,7 @@ function loadSection(id) {
 
 function loadNote(id) {
 	$('body').html('');
-	var note = parent.notes[id];
+	note = parents[parents.length-1].notes[id];
 	document.title = note.title+" - µPad";
 
 	//Setup md parser
