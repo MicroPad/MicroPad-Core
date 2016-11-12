@@ -48,6 +48,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$(event.target).css('width', parseInt($(event.target).css('width'))+event.dx);
 		$(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
 	}).on('tap', function(event) {
+		var currentTarget = $('#'+event.currentTarget.id);
 		for (k in note.elements) {
 			var element = note.elements[k];
 			if (element.args.id == event.currentTarget.id) {
@@ -68,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						$('#mdEditor > textarea').unbind();
 						$('#mdEditor > textarea').bind('input propertychange', function() {
 							element.content = $('#mdEditor > textarea').val();
-							$('#'+event.currentTarget.id).html(md.makeHtml(element.content));
+							currentTarget.html(md.makeHtml(element.content));
 						});
 
 
@@ -90,6 +91,47 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						});
 
 						$('#mdEditor').modal({fadeDuration: 250});
+						break;
+
+					case "image":
+						var source = undefined;
+						for (var i = 0; i < note.bibliography.length; i++) {
+							var mSource = note.bibliography[i];
+							if (mSource.item == element.args.id) {
+								source = mSource;
+								$('#imageEditor > input[name="source"]').val(source.contents);
+								break;
+							}
+						}
+
+						$('#imageEditor > input[name="upload"]').unbind();
+						$('#imageEditor > input[name="upload"]').bind('change', function(event) {
+							var reader = new FileReader();
+							var file = event.target.files[0];
+							console.log(file);
+							reader.readAsDataURL(file);
+
+							reader.onload = function() {
+								element.content = reader.result;
+								currentTarget.attr('src', element.content);
+							}
+						});
+
+						$('#imageEditor').one($.modal.BEFORE_CLOSE, function(event, modal) {
+							if (source) {
+								source.contents = $('#imageEditor > input[name="source"]').val();
+							}
+							else {
+								note.bibliography.push({
+									id: note.bibliography.length+1,
+									item: element.args.id,
+									contents: $('#imageEditor > input[name="source"]').val()
+								});
+							}
+							updateBib();
+						});
+
+						$('#imageEditor').modal({fadeDuration: 250});
 						break;
 				}
 				break;
