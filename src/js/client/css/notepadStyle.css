@@ -10,3 +10,7 @@ div, img {
 .interact:hover {
 	border: 2px solid grey;
 }
+
+#modal {
+	display: none;
+}

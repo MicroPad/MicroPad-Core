@@ -2,6 +2,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>µPad</title>
+		<link rel="stylesheet" type="text/css" href="css/lib/jquery.modal.min.css">
 		<link rel="stylesheet" type="text/css" href="css/notepadStyle.css">
 	</head>
 	<body>
@@ -15,10 +16,18 @@
 			<ul id="noteList"></ul>
 		</div>
 
+		<div id="mdEditor" style="display: none">
+			<textarea style="height: 80%; width: 100%;" placeholder="Content (in Markdown)"></textarea>
+			<input style="margin-top: 15px;" placeholder="Source Website" />
+		</div>
+
+		<div id="viewer"></div>
+
 			
 		<script src="js/lib/jquery-3.1.1.min.js"></script>
 		<script src="js/lib/interact.min.js"></script>
 		<script src="js/lib/showdown.min.js"></script>
+		<script src="js/lib/jquery.modal.min.js"></script>
 		<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
 		<script type="text/javascript" async src="js/lib/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
 		<script src="js/lib/ASCIIMathML.js"></script>
