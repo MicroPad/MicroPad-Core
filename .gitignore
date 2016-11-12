@@ -1,6 +1,6 @@
 # Created by https://www.gitignore.io
 
-parserBrowser.js
+src/js/client/js/parser.js
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

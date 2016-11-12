@@ -83,7 +83,7 @@ function parseSection(sectionXML, section, parent) {
 						if (noteXML.addons[0].import) {
 							for (var j = noteXML.addons[0].import.length - 1; j >= 0; j--) {
 								var addon = noteXML.addons[0].import[j];
-								if (!isCompatible(addon)) console.log("Some features of this document are not supported");
+								if (!isCompatible(addon)) console.log("This notepad contains some features that aren't supported: "+addon);
 								addons.push(addon);
 							}
 						}
@@ -98,22 +98,22 @@ function parseSection(sectionXML, section, parent) {
 						}
 
 						if (noteXML.markdown) {
-							for (var i = 0; i < noteXML.markdown.length; i++) {
-								var element = noteXML.markdown[i];
+							for (var j = 0; j < noteXML.markdown.length; j++) {
+								var element = noteXML.markdown[j];
 								note.addElement("markdown", element.$, element._);
 							}
 						}
 
 						if (noteXML.image) {
-							for (var i = 0; i < noteXML.image.length; i++) {
-								var element = noteXML.image[i];
+							for (var j = 0; j < noteXML.image.length; j++) {
+								var element = noteXML.image[j];
 								note.addElement("image", element.$, element._);
 							}
 						}
 
 						//TODO: TABLES
+						section.addNote(note);
 					}
-					section.addNote(note);
 					break;
 
 				case "section":
@@ -132,17 +132,4 @@ function isCompatible(addonName) {
 }
 
 exports.noteToHTML = function (note) {
-	var outputHTML= '';
-	for (var i = 0; i < note.elements.length; i++) {
-		var element = note.elements[i];
-		switch (element.type) {
-			case "markdown":
-				outputHTML += '<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script src="addons/ASCIIMathML.js"></script><div style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, element.content);
-				break;
-			case "image":
-				outputHTML += '';
-				break;
-		}
-	}
-	return outputHTML;
 }

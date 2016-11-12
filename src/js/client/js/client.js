@@ -45,17 +45,37 @@ function loadSection(id) {
 function loadNote(id) {
 	$('#sectionListHolder').hide();
 	var note = parent.notes[id];
-	// console.log(note);
-
 	document.title = note.title+" - µPad";
-	// $('body').html(parser.noteToHTML(note));
+
+	//Setup md parser
+	var md = new showdown.Converter({
+		parseImgDimensions: true,
+		simplifiedAutoLink: true,
+		strikethrough: true,
+		tables: true,
+		tasklists: true
+	});
+
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
 		switch (element.type) {
 			case "markdown":
-				$('body').append('<div style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, element.content));
+				$('body').append('<div id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
+				asciimath.translate(undefined, true);
+				MathJax.Hub.Typeset();
 				break;
+			case "image":
+				$('body').append('<img id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
+				break;
+			case "table":
+				alert("Tables aren't supported yet");
 		}
+	}
+
+	for (var i = 0; i < note.bibliography.length; i++) {
+		var source = note.bibliography[i];
+		var item = $('#'+source.item);
+		$('body').append('<div style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.contents, parseInt(item.css('top')), parseInt(item.css('left'))+parseInt(item.css('width'))+10+"px"));
 	}
 }
 

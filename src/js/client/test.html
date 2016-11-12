@@ -3,9 +3,6 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>µPad</title>
 		<link rel="stylesheet" type="text/css" href="css/notepadStyle.css">
-		<!-- Addons -->
-		<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
-		<script src='addons/ASCIIMathML.js'></script>
 	</head>
 	<body>
 		<input id="upload" type="file">
@@ -14,14 +11,18 @@
 			<h3>Selections</h3>
 			<ul id="sectionList"></ul>
 
-			<h3>Notepad</h3>
+			<h3>Notes</h3>
 			<ul id="noteList"></ul>
 		</div>
 
 			
-		<script src="js/jquery-3.1.1.min.js"></script>
+		<script src="js/lib/jquery-3.1.1.min.js"></script>
+		<script src="js/lib/showdown.min.js"></script>
+		<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
+		<script type="text/javascript" async src="js/lib/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
+		<script src="js/lib/ASCIIMathML.js"></script>
 		<!-- NPX Parser -->
-		<script src="js/parserBrowser.js"></script>
+		<script src="js/parser.js"></script>
 
 		<script src="js/client.js"></script>
 	</body>
