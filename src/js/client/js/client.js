@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	document.getElementById("upload").addEventListener("change", function(event) {
 		$('#upload').hide();
 		readFileInputEventAsText(event, function(text) {
-			parser.parse(text);
+			parser.parse(text, ["asciimath"]);
 			while (!parser.notepad) if (parser.notepad) break;
 			notepad = parser.notepad;
 			parents.push(notepad);
@@ -347,7 +347,19 @@ function loadNote(id, delta) {
 				$('#viewer').append('<img class="interact" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
 				break;
 			case "table":
-				alert("Tables aren't supported yet");
+				$('#viewer').append('<table class="interact" id="{0}" style="top: {1}; left: {2}; height: auto; width: auto;"></table>'.format(element.args.id, element.args.y, element.args.x, element.args.height, element.args.width));
+				for (var j = 0; j < element.content.length; j++) {
+					var row = element.content[j];
+					var rowHTML = '<tr>';
+						for (var l = 0; l < row.length; l++) {
+							var cell = row[l];
+							rowHTML += '<td>{0}</td>'.format(md.makeHtml(cell));
+						}
+					rowHTML += '</tr>';
+					$('#'+element.args.id).append(rowHTML);
+				}
+				asciimath.translate(undefined, true);
+				MathJax.Hub.Typeset();
 				break;
 		}
 	}

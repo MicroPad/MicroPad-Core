@@ -106,6 +106,23 @@ function parseSection(sectionXML, section, parent) {
 							}
 						}
 
+						if (noteXML.table) {
+							for (var j = 0; j < noteXML.table.length; j++) {
+								var table = noteXML.table[j];
+								var content = [];
+								for (var n = 0; n < table.column[0].markdown.length; n++) content.push([]);
+								for (var l = 0; l < table.column.length; l++) {
+									var rows = table.column[l].markdown;
+									for (var m = 0; m < rows.length; m++) {
+										var cell = rows[m];
+										content[m].push(cell);
+									}
+								}
+
+								note.addElement("table", element.$, content);
+							}
+						}
+
 						if (noteXML.image) {
 							for (var j = 0; j < noteXML.image.length; j++) {
 								var element = noteXML.image[j];
@@ -113,7 +130,13 @@ function parseSection(sectionXML, section, parent) {
 							}
 						}
 
-						//TODO: TABLES
+						if (noteXML.file) {
+							for (var j = 0; j < noteXML.image.length; j++) {
+								var element = noteXML.image[j];
+								note.addElement("file", element.$, element._);
+							}
+						}
+
 						section.addNote(note);
 					}
 					break;

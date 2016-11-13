@@ -9,7 +9,7 @@ body {
 	height: 0px;
 }
 
-div, img {
+div, table, img {
 	position: absolute;
 }
 
@@ -24,4 +24,9 @@ div .interact {
 
 #modal {
 	display: none;
+}
+
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
 }
