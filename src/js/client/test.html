@@ -27,11 +27,19 @@
 			<input name="source" style="margin-top: 15px;" placeholder="Source Website" />
 		</div>
 
+		<div id="fileEditor" style="display: none">
+			<input name="upload" type="file"><br />
+			<input name="source" style="margin-top: 15px;" placeholder="Source Website" />
+		</div>
+
 		<div id="insert" style="display: none">
 			<h4>Insert</h4>
 			<ul>
-				<li><a href="javascript:insert('md');">Markdown-formatted Text</a></li>
+				<li><a href="javascript:insert('markdown');">Markdown-formatted Text</a></li>
+				<!-- <li><a href="javascript:insert('table');">Table</a></li> -->
 				<li><a href="javascript:insert('image');">Image</a></li>
+				<!-- <li><a href="javascript:insert('file');">File</a></li> -->
+				<!-- <li><a href="javascript:insert('recording');">Recording-Attached Note</a></li> -->
 			</ul>
 		</div>
 

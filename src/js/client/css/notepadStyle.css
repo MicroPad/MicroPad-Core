@@ -3,12 +3,23 @@ body {
 	font-family: "Trebuchet MS", Helvetica, sans-serif;
 }
 
+#viewer {
+	position: static;
+	width: 0px;
+	height: 0px;
+}
+
 div, img {
 	position: absolute;
 }
 
 .interact {
 	border: 1px solid grey;
+}
+
+div .interact {
+	min-width: 170px;
+	min-height: 50px;
 }
 
 #modal {

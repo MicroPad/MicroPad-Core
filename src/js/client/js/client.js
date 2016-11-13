@@ -3,6 +3,7 @@ var parents = [];
 var note;
 var noteID;
 var sectionIDs = [];
+var lastClick = {x: 0, y: 0};
 
 //Setup md parser
 var md = new showdown.Converter({
@@ -30,9 +31,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		});
 	}, false);
 
+	/** Listen for when new elements are added to #viewer */
+	var observer = new MutationObserver(function(mutations) {
+		mutations.forEach(function(mutation) {
+			for (k in mutation.addedNodes) {
+				var selElement = $('#'+mutation.addedNodes[k].id);
+				resizePage(selElement);
+			}
+		});
+	});
+	observer.observe(document.getElementById('viewer'), {attributes: true, attributeFilter: ["style"], childList: true, characterData: true});
+
 	/** Creating elements */
-	var lastClick = {x: 0, y: 0};
-	$('body').click(function (e) { 
+	$('#viewer').click(function (e) {
 		if (e.target == this && note) {
 			lastClick.x = e.pageX;
 			lastClick.y = e.pageY;
@@ -40,25 +51,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 	});
 
-	function insert(type) {
-		// var newElement = {
-		// 	args: {
-		// 		x: lastClick.x+'px',
-		// 		y: lastClick.y+'px',
-		// 		width: 'auto',
-		// 		height: 'auto'
-		// 	},
-		// 	content: '',
-		// 	type: ''
-		// }
-	}
-
 	/** Editing elements */
+	var justMoved = false;
 	interact('.interact').draggable({
 		onmove: dragMoveListener,
 		onend: function (event) {
 			updateNote(event.target.id);
-
+			justMoved = true;
 		},
 		inertia: false,
 		autoScroll: true
@@ -67,11 +66,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		edges: {left: false, right: true, bottom: true, top: false},
 		onend: function (event) {
 			updateNote(event.target.id);
+			justMoved = true;
 		}
 	}).on('resizemove', function(event) {
 		$(event.target).css('width', parseInt($(event.target).css('width'))+event.dx);
 		$(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
-	}).on('tap', function(event) {
+		resizePage($(event.target));
+		updateReference(event);
+	}).on('click', function(event) {
+		if (justMoved) {
+			justMoved = false;
+			return;
+		}
 		var currentTarget = $('#'+event.currentTarget.id);
 		for (k in note.elements) {
 			var element = note.elements[k];
@@ -95,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						$('#mdEditor > textarea').bind('input propertychange', function() {
 							element.content = $('#mdEditor > textarea').val();
 							currentTarget.html(md.makeHtml(element.content));
+							updateReference(event);
 						});
 
 						$('#mdEditor > input[name="font"]').val(element.args.fontSize);
@@ -102,6 +109,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						$('#mdEditor > input[name="font"]').bind('input propertychange', function() {
 							element.args.fontSize = $('#mdEditor > input[name="font"]').val();
 							currentTarget.css('font-size', element.args.fontSize);
+							updateReference(event);
 						});
 
 
@@ -126,6 +134,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						$('#mdEditor').modal({fadeDuration: 250});
 						break;
 
+					case "table":
+						alert("Tables are not supported yet");
+						break;
+
 					case "image":
 						var source = undefined;
 						for (var i = 0; i < note.bibliography.length; i++) {
@@ -141,12 +153,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						$('#imageEditor > input[name="upload"]').bind('change', function(event) {
 							var reader = new FileReader();
 							var file = event.target.files[0];
-							console.log(file);
+							if (!file) return;
 							reader.readAsDataURL(file);
 
 							reader.onload = function() {
 								element.content = reader.result;
 								currentTarget.attr('src', element.content);
+								updateReference(event);
 							}
 						});
 
@@ -166,6 +179,50 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 						$('#imageEditor').modal({fadeDuration: 250});
 						break;
+
+					case "file":
+						var source = undefined;
+						for (var i = 0; i < note.bibliography.length; i++) {
+							var mSource = note.bibliography[i];
+							if (mSource.item == element.args.id) {
+								source = mSource;
+								$('#fileEditor > input[name="source"]').val(source.contents);
+								break;
+							}
+						}
+
+						$('#fileEditor > input[name="upload"]').unbind();
+						$('#fileEditor > input[name="upload"]').bind('change', function(event) {
+							var reader = new FileReader();
+							var file = event.target.files[0];
+							console.log(file);
+							reader.readAsDataURL(file);
+
+							reader.onload = function() {
+								element.content = reader.result;
+								element.args.filename = $('#fileEditor > input[name="upload"]').val();
+								currentTarget.attr('href', element.content);
+								currentTarget.html(element.args.filename);
+								updateReference(event);
+							}
+						});
+
+						$('#fileEditor').one($.modal.BEFORE_CLOSE, function(event, modal) {
+							if (source) {
+								source.contents = $('#fileEditor > input[name="source"]').val();
+							}
+							else {
+								note.bibliography.push({
+									id: note.bibliography.length+1,
+									item: element.args.id,
+									contents: $('#fileEditor > input[name="source"]').val()
+								});
+							}
+							updateBib();
+						});
+
+						$('#fileEditor').modal({fadeDuration: 250});
+						break;
 				}
 				break;
 			}
@@ -176,7 +233,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$(event.target).css('left', parseInt($(event.target).css('left'))+event.dx);
 		$(event.target).css('top', parseInt($(event.target).css('top'))+event.dy);
 
-		//Update reference
+		updateReference(event);
+		resizePage($(event.target));
+	}
+
+	function updateReference(event) {
 		if ($('#source_'+event.target.id).length) {
 			$('#source_'+event.target.id).css('left', parseInt($('#'+event.target.id).css('left'))+parseInt($('#'+event.target.id).css('width'))+10+"px");
 			$('#source_'+event.target.id).css('top', $('#'+event.target.id).css('top'));
@@ -184,6 +245,42 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	}
 	window.dragMoveListener = dragMoveListener;
 });
+
+function insert(type) {
+	var newElement = {
+		args: {},
+		content: '',
+		type: type
+	}
+
+	//Get ID
+	var id = 1;
+	for (var i = 0; i < note.elements.length; i++) {
+		var element = note.elements[i];
+		if (element.type == type) id++;
+	}
+	newElement.args.id = type+id;
+
+	newElement.args.x = lastClick.x+'px';
+	newElement.args.y = lastClick.y+'px';
+	newElement.args.width = 'auto';
+	newElement.args.height = 'auto';
+
+	//Handle element specific args
+	switch (type) {
+		case "markdown":
+			newElement.args.fontSize = '16px';
+			break;
+	}
+
+	note.elements.push(newElement);
+
+	loadNote(noteID, true);
+	asciimath.translate(undefined, true);
+	MathJax.Hub.Typeset();
+	$('#'+newElement.args.id).trigger('click');
+}
+
 
 function updateNote(id) {
 	for (k in note.elements) {
@@ -193,6 +290,8 @@ function updateNote(id) {
 		element.args.y = $('#'+id).css('top');
 		element.args.width = $('#'+id).css('width');
 		element.args.height = $('#'+id).css('height');
+
+		resizePage($('#'+id));
 	}
 	// parents[parents.length-1].notes[noteID] = note;
 	// parents[parents.length-2].sections[sectionIDs[sectionIDs.length-1]] = parents[parents.length-1];
@@ -226,15 +325,18 @@ function loadSection(id) {
 	}
 }
 
-function loadNote(id) {
-	$('#sectionListHolder').hide();
-	$('#viewer').html('');
-	noteID = id;
-	note = parents[parents.length-1].notes[id];
-	document.title = note.title+" - µPad";
+function loadNote(id, delta) {
+	if (!delta) {
+		$('#sectionListHolder').hide();
+		$('#viewer').html('');
+		noteID = id;
+		note = parents[parents.length-1].notes[id];
+		document.title = note.title+" - µPad";
+	}
 
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
+		if (delta && $('#'+element.args.id).length) continue;
 		switch (element.type) {
 			case "markdown":
 				$('#viewer').append('<div class="interact" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
@@ -273,6 +375,12 @@ function readFileInputEventAsText(event, callback) {
 	};
 	
 	reader.readAsText(file);
+}
+
+/** Make sure the page is always larger than it's elements */
+function resizePage(selElement) {
+	if (parseInt(selElement.css('left'))+parseInt(selElement.css('width'))+1000 > parseInt($('#viewer').css('width'))) $('#viewer').css('width', parseInt(selElement.css('left'))+1000+'px');
+	if (parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000 > parseInt($('#viewer').css('height'))) $('#viewer').css('height', parseInt(selElement.css('top'))+1000+'px');
 }
 
 // Thanks to http://stackoverflow.com/a/4673436/998467
