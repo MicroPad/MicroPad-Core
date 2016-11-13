@@ -54,7 +54,9 @@ Note.prototype.addElement = function(type, args, content) {
 	});
 };
 
-exports.parse = function parse(xml) {
+var supportedAddons = [];
+exports.parse = function parse(xml, addons) {
+	supportedAddons = addons;
 	parseString(xml, function(e, res) {
 		exports.notepad = new Notepad(res.notepad.$.title);
 		for (var i = 0; i < res.notepad.section.length; i++) {
@@ -83,7 +85,7 @@ function parseSection(sectionXML, section, parent) {
 						if (noteXML.addons[0].import) {
 							for (var j = noteXML.addons[0].import.length - 1; j >= 0; j--) {
 								var addon = noteXML.addons[0].import[j];
-								if (!isCompatible(addon)) console.log("This notepad contains some features that aren't supported: "+addon);
+								if (supportedAddons.indexOf(addon) == -1) console.log("This notepad contains some features that aren't supported: "+addon);
 								addons.push(addon);
 							}
 						}
@@ -124,12 +126,4 @@ function parseSection(sectionXML, section, parent) {
 	}
 
 	parent.addSection(section);
-}
-
-function isCompatible(addonName) {
-	if (addonName == "asciimath") return true;
-	return false;
-}
-
-exports.noteToHTML = function (note) {
 }
