@@ -45,7 +45,7 @@ Only ONE notepad should be defined per file. Applications that read µPad XML sh
 	- ===2Mg + O_2 -> 2MgO===
 	- ===a/sin (A) = b/sin(B) = c/sin(C)===
 	- ===(-b +-sqrt(b^2-4ac))/(2a)===, easy as ===pi===!
-	* As you can see math and science is easy with [AsciiMath](http://asciimath.org/). Just put tildes around your equation.]]></markdown>
+	* As you can see math and science is easy with [AsciiMath](http://asciimath.org/). Just put three equal signs around your equation.]]></markdown>
 
 			<markdown id="markdown2" x="950px" y="50px" height="auto" width="200px" fontSize="16px"><![CDATA[I like that you can place stuff **anywhere**
 
