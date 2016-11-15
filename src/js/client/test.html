@@ -11,11 +11,29 @@
 			<div class="nav-wrapper">
 				<span class="brand-logo left">µPad</span>
 				<ul class="right">
+					<!-- <div class="col s12">
+						<a href="#!" class="breadcrumb">First</a>
+						<a href="#!" class="breadcrumb">First</a>
+						<a href="#!" class="breadcrumb">First</a>
+					</div> -->
+
 					<li><div style="top: 10px;" class="file-field input-field"><div class="waves-effect waves-light btn amber darken-1"><span>Upload Notepad</span><input id="upload" type="file"></div><div style="display: none;" class="file-path-wrapper"><input id="upload-name" class="file-path validate" type="text"></div></div></li>
+
 					<li><a class="dropdown-button" href="#!" data-activates="notepad-dropdown"><i class="material-icons left">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
 					<li><a class="dropdown-button" href="#!" data-activates="section-dropdown"><i class="material-icons left">book</i>Sections<i class="material-icons right">arrow_drop_down</i></a></li>
 					<li><a class="dropdown-button" href="#!" data-activates="notes-dropdown"><i class="material-icons left">note</i>Notes<i class="material-icons right">arrow_drop_down</i></a></li>
 				</ul>
+			</div>
+		</nav>
+
+		<!-- Breadcrumbs -->
+		<nav class="blue-grey">
+			<div class="nav-wrapper">
+				<div id="parents" class="col s12" style="padding-left: 10px;">
+					<a href="#!" class="breadcrumb">First</a>
+					<a href="#!" class="breadcrumb">First</a>
+					<span class="breadcrumb">First</span>
+				</div>
 			</div>
 		</nav>
 
@@ -30,6 +48,7 @@
 		<ul id="section-dropdown" class="dropdown-content">
 			<li><a href="javascript:newSectionDiag();"><i class="material-icons left">add</i>Section</a></li>
 			<li class="divider"></li>
+			<div id="sectionList"></div>
 		</ul>
 
 		<!-- Notes -->
@@ -54,6 +73,7 @@
 		<script src="js/libs/ASCIIMathML.js"></script>
 		
 		<script src="js/parser.js"></script>
+		<script src="js/chrome.js"></script>
 		<!-- <script src="js/client.js"></script> -->
 	</body>
 </html>
