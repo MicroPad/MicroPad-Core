@@ -417,7 +417,7 @@ function updateBib() {
 		if ($('#source_'+source.item).length) $('#source_'+source.item).remove();
 		if (source.contents.length < 1) continue;
 		var item = $('#'+source.item);
-		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.contents, parseInt(item.css('top')), parseInt(item.css('left'))+parseInt(item.css('width'))+10+"px", source.item));
+		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.contents, parseInt(item.css('top')), parseInt(item.css('left'))+parseInt(item.css('width'))+15+"px", source.item));
 	}
 	saveToBrowser();
 }
@@ -466,6 +466,7 @@ function saveToBrowser(retry) {
 function loadFromBrowser(title) {
 	storage.has(title).then(function(exists) {
 		if (exists) {
+			console.log("Loading: "+title)
 			storage.get(title).then(function(res) {
 				// notepad = JSON.parse(window.pako.inflate(res, {to: 'string'}));
 				notepad = JSON.parse(res);
