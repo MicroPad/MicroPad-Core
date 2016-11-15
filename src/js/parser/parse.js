@@ -119,7 +119,7 @@ function parseSection(sectionXML, section, parent) {
 									}
 								}
 
-								note.addElement("table", element.$, content);
+								note.addElement("table", table.$, content);
 							}
 						}
 
