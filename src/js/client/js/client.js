@@ -1,3 +1,4 @@
+var storage = navigator.storage || navigator.alsPolyfillStorage;
 var notepad;
 var parents = [];
 var note;
@@ -16,31 +17,38 @@ var md = new showdown.Converter({
 
 document.addEventListener("DOMContentLoaded", function(event) {
 	document.getElementById("upload").addEventListener("change", function(event) {
-		$('#upload').hide();
 		readFileInputEventAsText(event, function(text) {
 			parser.parse(text, ["asciimath"]);
 			while (!parser.notepad) if (parser.notepad) break;
 			notepad = parser.notepad;
-			parents.push(notepad);
-			
-			$('#selectorTitle').html(notepad.title);
-			for (k in notepad.sections) {
-				var section = notepad.sections[k];
-				$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
-			}
+
+			window.initNotepad();
+			saveToBrowser();
 		});
 	}, false);
+
+	window.initNotepad = function() {
+		$('#upload').hide();
+		parents.push(notepad);
+	
+		$('#selectorTitle').html(notepad.title);
+		for (k in notepad.sections) {
+			var section = notepad.sections[k];
+			$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
+		}
+	}
 
 	/** Listen for when new elements are added to #viewer */
 	var observer = new MutationObserver(function(mutations) {
 		mutations.forEach(function(mutation) {
+			saveToBrowser();
 			for (k in mutation.addedNodes) {
 				var selElement = $('#'+mutation.addedNodes[k].id);
 				resizePage(selElement);
 			}
 		});
 	});
-	observer.observe(document.getElementById('viewer'), {attributes: true, attributeFilter: ["style"], childList: true, characterData: true});
+	observer.observe(document.getElementById('viewer'), {attributes: false, childList: true, characterData: true});
 
 	/** Creating elements */
 	$('#viewer').click(function (e) {
@@ -73,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
 		resizePage($(event.target));
 		updateReference(event);
+		justMoved = true;
 	}).on('click', function(event) {
 		if (justMoved) {
 			justMoved = false;
@@ -96,7 +105,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						}
 
 						$('#mdEditor > textarea').val(element.content);
-						$('#mdEditor > input[name="font"]').val(element.args.fontSize);
 						$('#mdEditor > textarea').unbind();
 						$('#mdEditor > textarea').bind('input propertychange', function() {
 							element.content = $('#mdEditor > textarea').val();
@@ -105,6 +113,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						});
 
 						$('#mdEditor > input[name="font"]').val(element.args.fontSize);
+						$('#mdEditor > input[name="font"]').val(element.args.fontSize);
 						$('#mdEditor > input[name="font"]').unbind();
 						$('#mdEditor > input[name="font"]').bind('input propertychange', function() {
 							element.args.fontSize = $('#mdEditor > input[name="font"]').val();
@@ -112,7 +121,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
 							updateReference(event);
 						});
 
+						$('#mdEditor > input[name="width"]').val(element.args.width);
+						$('#mdEditor > input[name="width"]').val(element.args.width);
+						$('#mdEditor > input[name="width"]').unbind();
+						$('#mdEditor > input[name="width"]').bind('input propertychange', function() {
+							element.args.width = $('#mdEditor > input[name="width"]').val();
+							currentTarget.css('width', element.args.width);
+							updateReference(event);
+						});
 
+						$('#mdEditor > input[name="height"]').val(element.args.height);
+						$('#mdEditor > input[name="height"]').val(element.args.height);
+						$('#mdEditor > input[name="height"]').unbind();
+						$('#mdEditor > input[name="height"]').bind('input propertychange', function() {
+							element.args.height = $('#mdEditor > input[name="height"]').val();
+							currentTarget.css('height', element.args.height);
+							updateReference(event);
+						});
 
 						$('#mdEditor').one($.modal.BEFORE_CLOSE, function(event, modal) {
 							asciimath.translate(undefined, true);
@@ -161,6 +186,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
 								currentTarget.attr('src', element.content);
 								updateReference(event);
 							}
+						});
+
+						$('#imageEditor > input[name="width"]').val(element.args.width);
+						$('#imageEditor > input[name="width"]').val(element.args.width);
+						$('#imageEditor > input[name="width"]').unbind();
+						$('#imageEditor > input[name="width"]').bind('input propertychange', function() {
+							element.args.width = $('#imageEditor > input[name="width"]').val();
+							currentTarget.css('width', element.args.width);
+							updateReference(event);
+						});
+
+						$('#imageEditor > input[name="height"]').val(element.args.height);
+						$('#imageEditor > input[name="height"]').val(element.args.height);
+						$('#imageEditor > input[name="height"]').unbind();
+						$('#imageEditor > input[name="height"]').bind('input propertychange', function() {
+							element.args.height = $('#imageEditor > input[name="height"]').val();
+							currentTarget.css('height', element.args.height);
+							updateReference(event);
 						});
 
 						$('#imageEditor').one($.modal.BEFORE_CLOSE, function(event, modal) {
@@ -285,13 +328,14 @@ function insert(type) {
 function updateNote(id) {
 	for (k in note.elements) {
 		var element = note.elements[k];
-		var sel = $('#'+id);
-		element.args.x = $('#'+id).css('left');
-		element.args.y = $('#'+id).css('top');
-		element.args.width = $('#'+id).css('width');
-		element.args.height = $('#'+id).css('height');
+		var sel = $('#'+element.args.id);
+		element.args.x = $('#'+element.args.id).css('left');
+		element.args.y = $('#'+element.args.id).css('top');
+		element.args.width = $('#'+element.args.id).css('width');
+		element.args.height = $('#'+element.args.id).css('height');
 
-		resizePage($('#'+id));
+		resizePage($('#'+element.args.id));
+		saveToBrowser();
 	}
 	// parents[parents.length-1].notes[noteID] = note;
 	// parents[parents.length-2].sections[sectionIDs[sectionIDs.length-1]] = parents[parents.length-1];
@@ -328,6 +372,7 @@ function loadSection(id) {
 function loadNote(id, delta) {
 	if (!delta) {
 		$('#sectionListHolder').hide();
+		$('#viewer').show();
 		$('#viewer').html('');
 		noteID = id;
 		note = parents[parents.length-1].notes[id];
@@ -374,6 +419,7 @@ function updateBib() {
 		var item = $('#'+source.item);
 		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.contents, parseInt(item.css('top')), parseInt(item.css('left'))+parseInt(item.css('width'))+10+"px", source.item));
 	}
+	saveToBrowser();
 }
 
 function readFileInputEventAsText(event, callback) {
@@ -392,7 +438,55 @@ function readFileInputEventAsText(event, callback) {
 /** Make sure the page is always larger than it's elements */
 function resizePage(selElement) {
 	if (parseInt(selElement.css('left'))+parseInt(selElement.css('width'))+1000 > parseInt($('#viewer').css('width'))) $('#viewer').css('width', parseInt(selElement.css('left'))+1000+'px');
-	if (parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000 > parseInt($('#viewer').css('height'))) $('#viewer').css('height', parseInt(selElement.css('top'))+1000+'px');
+	if (parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000 > parseInt($('#viewer').css('height'))) $('#viewer').css('height', parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000+'px');
+}
+
+var tooBig = '';
+function saveToBrowser(retry) {
+	/*
+		I want to use the Filesystem and FileWriter API for this (https://www.html5rocks.com/en/tutorials/file/filesystem/)
+		but only Chrome and Opera support it. For now I'll use IndexedDB with a sneaky async library.
+	 */
+	// var compressedNotepad = window.pako.deflate(JSON.stringify(notepad), {to: 'string'});
+	try {
+		storage.set(notepad.title, JSON.stringify(notepad));
+	}
+	catch (e) {
+		if (retry && notepad.title != tooBig) {
+			alert("This notepad is too big to fit in your browser's storage. To keep changes make sure to download it.")
+			notepad.title = tooBig;
+		}
+		else if (notepad.title != tooBig) {
+			storage.clear();
+			saveToBrowser(true);
+		}
+	}
+}
+
+function loadFromBrowser(title) {
+	storage.has(title).then(function(exists) {
+		if (exists) {
+			storage.get(title).then(function(res) {
+				// notepad = JSON.parse(window.pako.inflate(res, {to: 'string'}));
+				notepad = JSON.parse(res);
+				parents = [];
+				note = undefined;
+				noteID = undefined;
+				sectionIDs = [];
+				lastClick = {x: 0, y: 0};
+				window.initNotepad();
+			});
+		}
+	});
+}
+
+/** Utility functions */
+function toBase64(str) {
+	return window.btoa(unescape(encodeURIComponent(str)));
+}
+
+function fromBase64(str) {
+	return decodeURIComponent(escape(window.atob(str)));
 }
 
 // Thanks to http://stackoverflow.com/a/4673436/998467
