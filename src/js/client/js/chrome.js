@@ -34,14 +34,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	}, false);
 
 	window.initNotepad = function() {
-		console.log(notepad);
-		parents.push(notepad);
-	
 		parents = [];
 		note;
 		noteID;
 		sectionIDs = [];
 		lastClick = {x: 0, y: 0};
+
+		parents.push(notepad);	
 
 		$('#parents').html('<span class="breadcrumb">{0}</span>'.format(notepad.title));
 		for (k in notepad.sections) {
@@ -53,17 +52,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 
-function clearSelector() {
-	$('#selectorTitle').html('');
+function updateSelector() {
+	//TODO: Loop through parents and make any <span> tags into <a> tags
+	$('#parents').append('<span class="breadcrumb">{0}</span>'.format(parents[parents.length-1].title));
 	$('#sectionList').html('');
 	$('#noteList').html('');
 }
 
 function loadSection(id) {
-	clearSelector();
 	var section = parents[parents.length-1].sections[id];
 	sectionIDs.push(id);
 	parents.push(section);
+	updateSelector();
 
 	$('#selectorTitle').html(section.title);
 	for (k in section.sections) {
@@ -78,45 +78,17 @@ function loadSection(id) {
 }
 
 function loadNote(id, delta) {
-	if (!delta) {
-		$('#sectionListHolder').hide();
-		$('#viewer').show();
-		$('#viewer').html('');
-		noteID = id;
-		note = parents[parents.length-1].notes[id];
-		document.title = note.title+" - µPad";
+	//TODO: Load note in viewer.html in the iframe
+	noteID = id;
+	oldNote = note;
+	note = parents[parents.length-1].notes[id];
+	var newBC = '<span class="breadcrumb">{0}</span>'.format(note.title);
+	if (!oldNote) {
+		$('#parents').append(newBC);
 	}
-
-	for (var i = 0; i < note.elements.length; i++) {
-		var element = note.elements[i];
-		if (delta && $('#'+element.args.id).length) continue;
-		switch (element.type) {
-			case "markdown":
-				$('#viewer').append('<div class="interact" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
-				asciimath.translate(undefined, true);
-				MathJax.Hub.Typeset();
-				break;
-			case "image":
-				$('#viewer').append('<img class="interact" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
-				break;
-			case "table":
-				$('#viewer').append('<table class="interact" id="{0}" style="top: {1}; left: {2}; height: auto; width: auto;"></table>'.format(element.args.id, element.args.y, element.args.x, element.args.height, element.args.width));
-				for (var j = 0; j < element.content.length; j++) {
-					var row = element.content[j];
-					var rowHTML = '<tr>';
-						for (var l = 0; l < row.length; l++) {
-							var cell = row[l];
-							rowHTML += '<td>{0}</td>'.format(md.makeHtml(cell));
-						}
-					rowHTML += '</tr>';
-					$('#'+element.args.id).append(rowHTML);
-				}
-				asciimath.translate(undefined, true);
-				MathJax.Hub.Typeset();
-				break;
-		}
+	else {
+		$('#parents span:last-child').html(newBC);
 	}
-	updateBib();
 }
 
 function updateBib() {
