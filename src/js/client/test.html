@@ -2,57 +2,48 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>µPad</title>
-		<link rel="stylesheet" type="text/css" href="css/lib/jquery.modal.min.css">
+		<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+		<link rel="stylesheet" type="text/css" href="css/libs/jquery.modal.min.css">
 		<link rel="stylesheet" type="text/css" href="css/notepadStyle.css">
 	</head>
 	<body>
-		<input id="upload" type="file">
-		<div id="sectionListHolder">
-			<h1 id="selectorTitle"></h1>
-			<h3>Selections</h3>
-			<ul id="sectionList"></ul>
+		<nav class="blue-grey">
+			<div class="nav-wrapper">
+				<span class="brand-logo left">µPad</span>
+				<ul class="right">
+					<li><div style="top: 10px;" class="file-field input-field"><div class="waves-effect waves-light btn amber darken-1"><span>Upload Notepad</span><input id="upload" type="file"></div><div style="display: none;" class="file-path-wrapper"><input id="upload-name" class="file-path validate" type="text"></div></div></li>
+					<li><a class="dropdown-button" href="#!" data-activates="notepad-dropdown"><i class="material-icons left">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
+					<li><a class="dropdown-button" href="#!" data-activates="section-dropdown"><i class="material-icons left">book</i>Sections<i class="material-icons right">arrow_drop_down</i></a></li>
+					<li><a class="dropdown-button" href="#!" data-activates="notes-dropdown"><i class="material-icons left">note</i>Notes<i class="material-icons right">arrow_drop_down</i></a></li>
+				</ul>
+			</div>
+		</nav>
 
-			<h3>Notes</h3>
-			<ul id="noteList"></ul>
-		</div>
+		<!-- Notepads -->
+		<ul id="notepad-dropdown" class="dropdown-content">
+			<li><a href="javascript:newNotepadDiag();"><i class="material-icons left">add</i>Notepad</a></li>
+			<li><a href="javascript:newNotepadDiag();"><i class="material-icons left">file_download</i>Export</a></li>
+			<li class="divider"></li>
+		</ul>
 
-		<div id="mdEditor" style="display: none">
-			<textarea style="height: 80%; width: 100%;" placeholder="Content (in Markdown)"></textarea>
-			<input name="font" style="margin-top: 15px;" placeholder="Font Size" value="16px" />
-			<input name="source" style="margin-top: 15px;" placeholder="Source Website" />
-			<br />
-			<input name="width" style="margin-top: 15px;" placeholder="Width" />
-			<input name="height" style="margin-top: 15px;" placeholder="Height" />
-		</div>
+		<!-- Sections -->
+		<ul id="section-dropdown" class="dropdown-content">
+			<li><a href="javascript:newSectionDiag();"><i class="material-icons left">add</i>Section</a></li>
+			<li class="divider"></li>
+		</ul>
 
-		<div id="imageEditor" style="display: none">
-			<input name="upload" type="file"><br />
-			<input name="source" style="margin-top: 15px;" placeholder="Source Website" />
-			<br />
-			<input name="width" style="margin-top: 15px;" placeholder="Width" />
-			<input name="height" style="margin-top: 15px;" placeholder="Height" />
-		</div>
+		<!-- Notes -->
+		<ul id="notes-dropdown" class="dropdown-content">
+			<li><a href="javascript:newNoteDiag();"><i class="material-icons left">note_add</i>Note</a></li>
+			<li class="divider"></li>
+		</ul>
 
-		<div id="fileEditor" style="display: none">
-			<input name="upload" type="file"><br />
-			<input name="source" style="margin-top: 15px;" placeholder="Source Website" />
-		</div>
-
-		<div id="insert" style="display: none">
-			<h4>Insert</h4>
-			<ul>
-				<li><a href="javascript:insert('markdown');">Markdown-formatted Text</a></li>
-				<!-- <li><a href="javascript:insert('table');">Table</a></li> -->
-				<li><a href="javascript:insert('image');">Image</a></li>
-				<!-- <li><a href="javascript:insert('file');">File</a></li> -->
-				<!-- <li><a href="javascript:insert('recording');">Recording-Attached Note</a></li> -->
-			</ul>
-		</div>
-
-		<div id="viewer"></div>
-
+		<!-- <input id="upload" type="file"> -->
+		
+		<!-- <iframe src=""></iframe> -->
 			
 		<script src="js/libs/jquery-3.1.1.min.js"></script>
+		<script src="js/libs/materialize.min.js"></script>
 		<script src="js/libs/interact.min.js"></script>
 		<script src="js/libs/showdown.min.js"></script>
 		<script src="js/libs/jquery.modal.min.js"></script>
@@ -61,9 +52,8 @@
 		<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
 		<script type="text/javascript" async src="js/libs/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
 		<script src="js/libs/ASCIIMathML.js"></script>
-		<!-- NPX Parser -->
+		
 		<script src="js/parser.js"></script>
-
-		<script src="js/client.js"></script>
+		<!-- <script src="js/client.js"></script> -->
 	</body>
 </html>
