@@ -1,4 +1,3 @@
-var storage = navigator.storage || navigator.alsPolyfillStorage;
 var notepad;
 var parents = [];
 var note;
@@ -6,13 +5,20 @@ var noteID;
 var sectionIDs = [];
 var lastClick = {x: 0, y: 0};
 
-//Setup md parser
+/** Setup md parser */
 var md = new showdown.Converter({
 	parseImgDimensions: true,
 	simplifiedAutoLink: true,
 	strikethrough: true,
 	tables: true,
 	tasklists: true
+});
+
+/** Setup localforage */
+localforage.config({
+	name: 'uPad',
+	version: 1.0,
+	storeName: 'notepads'
 });
 
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -417,7 +423,7 @@ function updateBib() {
 		if ($('#source_'+source.item).length) $('#source_'+source.item).remove();
 		if (source.contents.length < 1) continue;
 		var item = $('#'+source.item);
-		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.contents, parseInt(item.css('top')), parseInt(item.css('left'))+parseInt(item.css('width'))+15+"px", source.item));
+		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.contents, parseInt(item.css('top')), parseInt(item.css('left'))+parseInt(item.css('width'))+20+"px", source.item));
 	}
 	saveToBrowser();
 }
@@ -449,7 +455,7 @@ function saveToBrowser(retry) {
 	 */
 	// var compressedNotepad = window.pako.deflate(JSON.stringify(notepad), {to: 'string'});
 	try {
-		storage.set(notepad.title, JSON.stringify(notepad));
+		localforage.setItem(notepad.title, notepad);
 	}
 	catch (e) {
 		if (retry && notepad.title != tooBig) {
@@ -457,27 +463,24 @@ function saveToBrowser(retry) {
 			notepad.title = tooBig;
 		}
 		else if (notepad.title != tooBig) {
-			storage.clear();
+			localforage.clear();
 			saveToBrowser(true);
 		}
 	}
 }
 
 function loadFromBrowser(title) {
-	storage.has(title).then(function(exists) {
-		if (exists) {
-			console.log("Loading: "+title)
-			storage.get(title).then(function(res) {
-				// notepad = JSON.parse(window.pako.inflate(res, {to: 'string'}));
-				notepad = JSON.parse(res);
-				parents = [];
-				note = undefined;
-				noteID = undefined;
-				sectionIDs = [];
-				lastClick = {x: 0, y: 0};
-				window.initNotepad();
-			});
-		}
+	localforage.getItem(title, function(err, res) {
+		console.log("Loading: "+title);
+		console.log(res);
+		// notepad = JSON.parse(window.pako.inflate(res, {to: 'string'}));
+		notepad = res;
+		parents = [];
+		note = undefined;
+		noteID = undefined;
+		sectionIDs = [];
+		lastClick = {x: 0, y: 0};
+		window.initNotepad();
 	});
 }
 
