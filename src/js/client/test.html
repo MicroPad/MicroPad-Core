@@ -27,7 +27,7 @@
 		</nav>
 
 		<!-- Breadcrumbs -->
-		<nav id="breadcrumb-holder" class="blue-grey">
+		<nav id="breadcrumb-holder" class="blue-grey" style="top: 64px;">
 			<div class="nav-wrapper">
 				<div id="parents" class="col s12" style="padding-left: 10px;">
 					<span id="open-note" class="breadcrumb" style="display: none;"></span>
@@ -61,8 +61,10 @@
 		<div id="new-notepad" class="modal">
 			<div class="modal-content">
 				<h4>New Notepad</h4>
-				<label for="new-notepad-title">Notepad Title</label>
-				<input id="new-notepad-title" type="text" />
+				<div class="input-field">
+					<label for="new-notepad-title">Notepad Title</label>
+					<input id="new-notepad-title" type="text" autofocus />
+				</div>
 			</div>
 			<div class="modal-footer">
 				<a href="javascript:newNotepad();" class="modal-action modal-close waves-effect waves-green btn-flat"><i class="material-icons left">add</i>Create</a>
@@ -73,8 +75,10 @@
 		<div id="new-section" class="modal">
 			<div class="modal-content">
 				<h4>New Section</h4>
-				<label for="new-section-title">Section Title</label>
-				<input id="new-section-title" type="text" />
+				<div class="input-field">
+					<label for="new-section-title">Section Title</label>
+					<input id="new-section-title" type="text" autofocus />
+				</div>
 			</div>
 			<div class="modal-footer">
 				<a href="javascript:newSection();" class="modal-action modal-close waves-effect waves-green btn-flat"><i class="material-icons left">add</i>Create</a>
@@ -85,21 +89,62 @@
 		<div id="new-note" class="modal">
 			<div class="modal-content">
 				<h4>New Note</h4>
-				<label for="new-note-title">Note Title</label>
-				<input id="new-note-title" type="text" />
+				<div class="input-field">
+					<label for="new-note-title">Note Title</label>
+					<input id="new-note-title" type="text" autofocus />
+				</div>
 			</div>
 			<div class="modal-footer">
 				<a href="javascript:newNote();" class="modal-action modal-close waves-effect waves-green btn-flat"><i class="material-icons left">add</i>Create</a>
 			</div>
 		</div>
+
+		<!-- Markdown Editor -->
+		<div id="mdEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
+			<div class="modal-content">
+				<div class="row">
+					<div class="input-field col s8">
+						<label for="md-textarea">Content (in Markdown)</label>
+						<textarea id="md-textarea" class="materialize-textarea" style="height: 80%; width: 100%;" autofocus></textarea>
+					</div>
+
+					<div class="col s4">
+						<div class="input-field">
+							<label for="mdsw">Source Website</label>
+							<input id="mdsw" type="text" />
+						</div>
+						<div class="input-field">
+							<label for="mdfs">Font Size</label>
+							<input id="mdfs" type="text" value="16px" />
+						</div>
+						<div class="input-field">
+							<label for="mdw">Width</label>
+							<input id="mdw" type="text" />
+						</div>
+						<div class="input-field">
+							<label for="mdsw">Height</label>
+							<input id="mdh" type="text" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+			</div>
+		</div>
 		
-		<!-- <iframe src=""></iframe> -->
+		<div id="viewer"></div>
 			
 		<script src="js/libs/jquery-3.1.1.min.js"></script>
 		<script src="js/libs/materialize.min.js"></script>
-		<!-- <script src="js/libs/jquery.modal.min.js"></script> -->
-		<script src="js/libs/pako.min.js"></script>
+		<script src="js/libs/moment.js"></script>
 		<script src="js/libs/localforage.min.js"></script>
+
+		<script src="js/libs/interact.min.js"></script>
+		<script src="js/libs/showdown.min.js"></script>
+		<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
+		<script type="text/javascript" async src="js/libs/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
+		<script src="js/libs/ASCIIMathML.js"></script>
 		
 		<script src="js/parser.js"></script>
 		<script src="js/chrome.js"></script>

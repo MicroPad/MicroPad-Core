@@ -14,6 +14,10 @@ body {
 	/*font-family: "Trebuchet MS", Helvetica, sans-serif;*/
 }
 
+.nav-wrapper {
+	width: 100vw;
+}
+
 .brand-logo {
 	margin-left: 10px;
 }
@@ -23,20 +27,29 @@ body {
 	/*height: auto;*/
 }
 
+.time {
+	padding-left: 20px;
+	font-family: 'Roboto';
+	font-weight: 200;
+}
+
 #parents {
 	overflow-x: auto;
 	white-space: nowrap;
 }
 
 #viewer {
-	position: static;
+	position: relative;
 	width: 100%;
-	height: 100%;
-	display: none;
+	height: calc(100% - 128px);
 }
 
 .interact {
 	border: 1px solid grey;
+	position: absolute;
+}
+
+#viewer > div {
 	position: absolute;
 }
 
@@ -54,6 +67,10 @@ div .interact {
 table, th, td {
 	border: 1px solid black;
 	border-collapse: collapse;
+}
+
+#md-textarea {
+	min-height: 80%;
 }
 
 #MathJax_Message {
