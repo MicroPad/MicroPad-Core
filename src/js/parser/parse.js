@@ -68,6 +68,10 @@ exports.parse = function parse(xml, addons) {
 	});
 }
 
+exports.createNotepad = function createNotepad(title) {
+	return new Notepad(title);
+}
+
 function parseSection(sectionXML, section, parent) {
 	for (var k in sectionXML) {
 		if (typeof sectionXML[k] !== 'function') {

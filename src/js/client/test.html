@@ -3,7 +3,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>µPad</title>
 		<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
-		<link rel="stylesheet" type="text/css" href="css/libs/jquery.modal.min.css">
+		<!-- <link rel="stylesheet" type="text/css" href="css/libs/jquery.modal.min.css"> -->
 		<link rel="stylesheet" type="text/css" href="css/notepadStyle.css">
 	</head>
 	<body>
@@ -17,7 +17,7 @@
 						<a href="#!" class="breadcrumb">First</a>
 					</div> -->
 
-					<li><div style="top: 10px;" class="file-field input-field"><div class="waves-effect waves-light btn amber darken-1"><span>Upload Notepad</span><input id="upload" type="file"></div><div style="display: none;" class="file-path-wrapper"><input id="upload-name" class="file-path validate" type="text"></div></div></li>
+					<li><div style="top: 10px;" class="file-field input-field"><div class="waves-effect waves-light btn amber darken-1 tooltipped" data-position="left" data-delay="50" data-tooltip="Upload a .npx file or a .zip archive containing .npx files"><span>Upload Notepad</span><input id="upload" type="file"></div><div style="display: none;" class="file-path-wrapper"><input id="upload-name" class="file-path validate" type="text"></div></div></li>
 
 					<li><a class="dropdown-button" href="#!" data-activates="notepad-dropdown"><i class="material-icons left">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
 					<li><a class="dropdown-button" href="#!" data-activates="section-dropdown"><i class="material-icons left">book</i>Sections<i class="material-icons right">arrow_drop_down</i></a></li>
@@ -37,8 +37,8 @@
 
 		<!-- Notepads -->
 		<ul id="notepad-dropdown" class="dropdown-content">
-			<li><a href="javascript:newNotepadDiag();"><i class="material-icons left">add</i>New</a></li>
-			<li><a href="javascript:newNotepadDiag();"><i class="material-icons left">file_download</i>Export All</a></li>
+			<li><a class="modal-trigger" data-target="new-notepad"><i class="material-icons left">add</i>New</a></li>
+			<li><a class="tooltipped" data-position="left" data-delay="50" data-tooltip="Export all of your notepads to an archive of NPX files" href="javascript:exportNotepads();"><i class="material-icons left">file_download</i>Export All</a></li>
 			<li class="divider"></li>
 			<div id="notepadList"></div>
 		</ul>
@@ -56,19 +56,26 @@
 			<li class="divider"></li>
 			<div id="noteList"></div>
 		</ul>
+
+		<!-- New Notepad -->
+		<div id="new-notepad" class="modal">
+			<div class="modal-content">
+				<h4>New Notepad</h4>
+				<label for="new-notepad-title">Notepad Title</label>
+				<input id="new-notepad-title" type="text" />
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:newNotepad();" class="modal-action modal-close waves-effect waves-green btn-flat"><i class="material-icons left">add</i>Create</a>
+			</div>
+		</div>
 		
 		<!-- <iframe src=""></iframe> -->
 			
 		<script src="js/libs/jquery-3.1.1.min.js"></script>
 		<script src="js/libs/materialize.min.js"></script>
-		<script src="js/libs/interact.min.js"></script>
-		<script src="js/libs/showdown.min.js"></script>
-		<script src="js/libs/jquery.modal.min.js"></script>
+		<!-- <script src="js/libs/jquery.modal.min.js"></script> -->
 		<script src="js/libs/pako.min.js"></script>
 		<script src="js/libs/localforage.min.js"></script>
-		<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
-		<script type="text/javascript" async src="js/libs/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
-		<script src="js/libs/ASCIIMathML.js"></script>
 		
 		<script src="js/parser.js"></script>
 		<script src="js/chrome.js"></script>

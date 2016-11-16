@@ -5,15 +5,6 @@ var noteID;
 var sectionIDs = [];
 var lastClick = {x: 0, y: 0};
 
-/** Setup md parser */
-var md = new showdown.Converter({
-	parseImgDimensions: true,
-	simplifiedAutoLink: true,
-	strikethrough: true,
-	tables: true,
-	tasklists: true
-});
-
 /** Setup localforage */
 localforage.config({
 	name: 'uPad',
@@ -31,7 +22,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		parents.push(notepad);	
 
-		//Clear Breadcrumbs
+		//Clear old lists
+		$('#sectionList').html('');
+		$('#noteList').html('');
 		$('#parents > span:not(#open-note)').remove();
 		$('#open-note').hide();
 
@@ -43,9 +36,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	}
 
 	/** Get the open notepads */
-	localforage.iterate(function(value, key, i) {
-		$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(key));
-	});
+	updateNotepadList();
 
 	/** Handle Notepad Upload */
 	document.getElementById("upload").addEventListener("change", function(event) {
@@ -58,7 +49,25 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			saveToBrowser();
 		});
 	}, false);
+
+	$('.modal').modal();
 });
+
+function newNotepad() {
+	var title = $('#new-notepad-title').val();
+	notepad = parser.createNotepad(title);
+	window.initNotepad();
+	saveToBrowser();
+
+	$('#new-notepad-title').val('');
+}
+
+function updateNotepadList() {
+	$('#notepadList').html('');
+	localforage.iterate(function(value, key, i) {
+		$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(key));
+	});
+}
 
 
 function updateSelector() {
@@ -142,7 +151,9 @@ function saveToBrowser(retry) {
 	 */
 	// var compressedNotepad = window.pako.deflate(JSON.stringify(notepad), {to: 'string'});
 	try {
-		localforage.setItem(notepad.title, notepad);
+		localforage.setItem(notepad.title, notepad, function() {
+			updateNotepadList();
+		});
 	}
 	catch (e) {
 		if (retry && notepad.title != tooBig) {
