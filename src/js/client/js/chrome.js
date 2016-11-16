@@ -556,6 +556,12 @@ function saveToBrowser(retry) {
 		I want to use the Filesystem and FileWriter API for this (https://www.html5rocks.com/en/tutorials/file/filesystem/)
 		but only Chrome and Opera support it. For now I'll use IndexedDB with a sneaky async library.
 	 */
+	
+	$('#viewer ul').each(function(i) {
+		$(this).addClass('browser-default')
+	});
+
+
 	// var compressedNotepad = window.pako.deflate(JSON.stringify(notepad), {to: 'string'});
 	try {
 		localforage.setItem(notepad.title, notepad, function() {

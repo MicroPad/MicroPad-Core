@@ -105,26 +105,17 @@
 				<div class="row">
 					<div class="input-field col s8">
 						<label for="md-textarea">Content (in Markdown)</label>
-						<textarea id="md-textarea" class="materialize-textarea" style="height: 80%; width: 100%;" autofocus></textarea>
+						<textarea id="md-textarea" class="materialize-textarea" style="height: 80%; width: 100%;" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" autofocus></textarea>
 					</div>
 
 					<div class="col s4">
-						<div class="input-field">
-							<label for="mdsw">Source Website</label>
-							<input id="mdsw" type="text" />
-						</div>
-						<div class="input-field">
-							<label for="mdfs">Font Size</label>
-							<input id="mdfs" type="text" value="16px" />
-						</div>
-						<div class="input-field">
-							<label for="mdw">Width</label>
-							<input id="mdw" type="text" />
-						</div>
-						<div class="input-field">
-							<label for="mdsw">Height</label>
-							<input id="mdh" type="text" />
-						</div>
+							<input id="mdsw" type="text" placeholder="Source Website" />
+
+							<input id="mdfs" type="text" value="16px" placeholder="Font Size" />
+
+							<input id="mdw" type="text" placeholder="Width" />
+
+							<input id="mdh" type="text" placeholder="Height" />
 					</div>
 				</div>
 			</div>
