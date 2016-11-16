@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		parents.push(notepad);	
 
-		$('#parents').html('<span class="breadcrumb">{0}</span>'.format(notepad.title));
+		$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
 		for (k in notepad.sections) {
 			var section = notepad.sections[k];
 			$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 function updateSelector() {
 	//TODO: Loop through parents and make any <span> tags into <a> tags
-	$('#parents').append('<span class="breadcrumb">{0}</span>'.format(parents[parents.length-1].title));
+	$('<span class="breadcrumb">{0}</span>'.format(parents[parents.length-1].title)).insertBefore('#open-note');
 	$('#sectionList').html('');
 	$('#noteList').html('');
 }
@@ -63,6 +63,8 @@ function loadSection(id) {
 	var section = parents[parents.length-1].sections[id];
 	sectionIDs.push(id);
 	parents.push(section);
+	note = undefined;
+	$('#open-note').hide()
 	updateSelector();
 
 	$('#selectorTitle').html(section.title);
@@ -82,13 +84,15 @@ function loadNote(id, delta) {
 	noteID = id;
 	oldNote = note;
 	note = parents[parents.length-1].notes[id];
-	var newBC = '<span class="breadcrumb">{0}</span>'.format(note.title);
-	if (!oldNote) {
-		$('#parents').append(newBC);
-	}
-	else {
-		$('#parents span:last-child').html(newBC);
-	}
+	// var newBC = '<span class="breadcrumb">{0}</span>'.format(note.title);
+	// if (!oldNote) {
+	// 	$('#parents').append(newBC);
+	// }
+	// else {
+	// 	$('#parents span:last-child').html(newBC);
+	// }
+	$('#open-note').html(note.title);
+	$('#open-note').show();
 }
 
 function updateBib() {
