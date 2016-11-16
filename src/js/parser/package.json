@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/NickGeek/uPad",
   "dependencies": {
+    "moment": "^2.16.0",
     "xml2js": "^0.4.17"
   },
   "devDependencies": {},

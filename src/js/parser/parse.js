@@ -1,4 +1,5 @@
 var parseString = require('xml2js').parseString;
+var moment = require('moment');
 // Thanks to http://stackoverflow.com/a/4673436/998467
 if (!String.prototype.format) {
 	String.prototype.format = function() {
@@ -74,6 +75,10 @@ exports.createNotepad = function createNotepad(title) {
 
 exports.createSection = function createSection(title) {
 	return new Section(title);
+}
+
+exports.createNote = function createNote(title, addons) {
+	return new Note(title, moment().format(), addons);
 }
 
 function parseSection(sectionXML, section, parent) {
