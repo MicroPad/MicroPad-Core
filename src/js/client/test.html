@@ -45,14 +45,14 @@
 
 		<!-- Sections -->
 		<ul id="section-dropdown" class="dropdown-content">
-			<li><a href="javascript:newSectionDiag();"><i class="material-icons left">add</i>Section</a></li>
+			<li id="add-section-link" style="display: none"><a href="javascript:newSectionDiag();"><i class="material-icons left">add</i>Section</a></li>
 			<li class="divider"></li>
 			<div id="sectionList"></div>
 		</ul>
 
 		<!-- Notes -->
 		<ul id="notes-dropdown" class="dropdown-content">
-			<li><a href="javascript:newNoteDiag();"><i class="material-icons left">note_add</i>Note</a></li>
+			<li id="add-note-link" style="display: none"><a href="javascript:newNoteDiag();"><i class="material-icons left">note_add</i>Note</a></li>
 			<li class="divider"></li>
 			<div id="noteList"></div>
 		</ul>
@@ -66,6 +66,18 @@
 			</div>
 			<div class="modal-footer">
 				<a href="javascript:newNotepad();" class="modal-action modal-close waves-effect waves-green btn-flat"><i class="material-icons left">add</i>Create</a>
+			</div>
+		</div>
+
+		<!-- New Notepad -->
+		<div id="new-section" class="modal">
+			<div class="modal-content">
+				<h4>New Section</h4>
+				<label for="new-notepad-title">Section Title</label>
+				<input id="new-notepad-title" type="text" />
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:newSection();" class="modal-action modal-close waves-effect waves-green btn-flat"><i class="material-icons left">add</i>Create</a>
 			</div>
 		</div>
 		

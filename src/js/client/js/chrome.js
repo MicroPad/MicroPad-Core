@@ -33,6 +33,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			var section = notepad.sections[k];
 			$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
 		}
+		$('#add-section-link').css('display', 'block');
+		$('#add-note-link').css('display', 'none');
 	}
 
 	/** Get the open notepads */
@@ -75,6 +77,9 @@ function updateSelector() {
 	$('<span class="breadcrumb">{0}</span>'.format(parents[parents.length-1].title)).insertBefore('#open-note');
 	$('#sectionList').html('');
 	$('#noteList').html('');
+
+	if (parents.length > 0) $('#add-section-link').css('display', 'block');
+	if (parents.length > 1) $('#add-note-link').css('display', 'block');
 }
 
 function loadSection(id) {

@@ -72,6 +72,10 @@ exports.createNotepad = function createNotepad(title) {
 	return new Notepad(title);
 }
 
+exports.createSection = function createSection(title) {
+	return new Section(title);
+}
+
 function parseSection(sectionXML, section, parent) {
 	for (var k in sectionXML) {
 		if (typeof sectionXML[k] !== 'function') {
