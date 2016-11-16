@@ -22,6 +22,32 @@ localforage.config({
 });
 
 document.addEventListener("DOMContentLoaded", function(event) {
+	window.initNotepad = function() {
+		parents = [];
+		note;
+		noteID;
+		sectionIDs = [];
+		lastClick = {x: 0, y: 0};
+
+		parents.push(notepad);	
+
+		//Clear Breadcrumbs
+		$('#parents > span:not(#open-note)').remove();
+		$('#open-note').hide();
+
+		$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
+		for (k in notepad.sections) {
+			var section = notepad.sections[k];
+			$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
+		}
+	}
+
+	/** Get the open notepads */
+	localforage.iterate(function(value, key, i) {
+		$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(key));
+	});
+
+	/** Handle Notepad Upload */
 	document.getElementById("upload").addEventListener("change", function(event) {
 		readFileInputEventAsText(event, function(text) {
 			parser.parse(text, ["asciimath"]);
@@ -32,23 +58,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			saveToBrowser();
 		});
 	}, false);
-
-	window.initNotepad = function() {
-		parents = [];
-		note;
-		noteID;
-		sectionIDs = [];
-		lastClick = {x: 0, y: 0};
-
-		parents.push(notepad);	
-
-		$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
-		for (k in notepad.sections) {
-			var section = notepad.sections[k];
-			$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
-		}
-	}
-
 });
 
 
@@ -149,15 +158,8 @@ function saveToBrowser(retry) {
 
 function loadFromBrowser(title) {
 	localforage.getItem(title, function(err, res) {
-		console.log("Loading: "+title);
-		console.log(res);
 		// notepad = JSON.parse(window.pako.inflate(res, {to: 'string'}));
 		notepad = res;
-		parents = [];
-		note = undefined;
-		noteID = undefined;
-		sectionIDs = [];
-		lastClick = {x: 0, y: 0};
 		window.initNotepad();
 	});
 }
