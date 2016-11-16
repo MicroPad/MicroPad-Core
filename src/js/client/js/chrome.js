@@ -64,6 +64,27 @@ function newNotepad() {
 	$('#new-notepad-title').val('');
 }
 
+function newSection() {
+	var title = $('#new-section-title').val();
+	var index = parents[parents.length-1].sections.push(parser.createSection(title)) - 1;
+	loadSection(index);
+	saveToBrowser();
+
+	$('#new-section-title').val('');
+}
+
+function newNote() {
+	var title = $('#new-note-title').val();
+	var newNote = parser.createNote(title, ['asciimath']);
+	var notesInParent = parents[parents.length-1].notes;
+	var index = notesInParent.push(newNote) - 1;
+	$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(index, newNote.title));
+	loadNote(index);
+	saveToBrowser();
+
+	$('#new-note-title').val('');
+}
+
 function updateNotepadList() {
 	$('#notepadList').html('');
 	localforage.iterate(function(value, key, i) {
