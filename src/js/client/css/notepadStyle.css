@@ -11,11 +11,11 @@
 
 body {
 	position: static;
-	/*font-family: "Trebuchet MS", Helvetica, sans-serif;*/
+	/*background-color: #fcfcfc;*/
 }
 
 .nav-wrapper {
-	width: 100vw;
+	width: calc(100vw - 15px);
 }
 
 .brand-logo {
@@ -45,7 +45,7 @@ body {
 }
 
 .interact {
-	border: 1px solid grey;
+	/*border: 1px solid grey;*/
 	position: absolute;
 }
 
@@ -60,6 +60,10 @@ div .interact {
 	word-wrap: break-word;
 }
 
+img .interact {
+	/*opacity: 0;*/
+}
+
 #modal {
 	display: none;
 }
@@ -67,6 +71,7 @@ div .interact {
 table, th, td {
 	border: 1px solid black;
 	border-collapse: collapse;
+	background-color: #fff;
 }
 
 #md-textarea {
