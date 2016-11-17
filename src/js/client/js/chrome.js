@@ -32,8 +32,6 @@ showdown.extension('math', function() {
                     var pat = '%PLACEHOLDER' + i + '%';
                     text = text.replace(new RegExp(pat, 'gi'), matches[i]);
                 }
-                console.log(text);
-                console.log(matches);
                 //reset array
                 matches = [];
                 return text;
