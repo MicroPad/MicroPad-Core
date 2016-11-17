@@ -226,13 +226,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 							var mSource = note.bibliography[i];
 							if (mSource.item == element.args.id) {
 								source = mSource;
-								$('#imageEditor > input[name="source"]').val(source.contents);
+								$('#isw').val(source.contents);
 								break;
 							}
 						}
 
-						$('#imageEditor > input[name="upload"]').unbind();
-						$('#imageEditor > input[name="upload"]').bind('change', function(event) {
+						$('#image-upload-name').val('');
+						$('#image-upload').unbind();
+						$('#image-upload').bind('change', function(event) {
 							var reader = new FileReader();
 							var file = event.target.files[0];
 							if (!file) return;
@@ -245,83 +246,44 @@ document.addEventListener("DOMContentLoaded", function(event) {
 							}
 						});
 
-						$('#imageEditor > input[name="width"]').val(element.args.width);
-						$('#imageEditor > input[name="width"]').val(element.args.width);
-						$('#imageEditor > input[name="width"]').unbind();
-						$('#imageEditor > input[name="width"]').bind('input propertychange', function() {
-							element.args.width = $('#imageEditor > input[name="width"]').val();
+						$('#iw').val(element.args.width);
+						$('#iw').val(element.args.width);
+						$('#iw').unbind();
+						$('#iw').bind('input propertychange', function() {
+							element.args.width = $('#iw').val();
 							currentTarget.css('width', element.args.width);
 							updateReference(event);
 						});
 
-						$('#imageEditor > input[name="height"]').val(element.args.height);
-						$('#imageEditor > input[name="height"]').val(element.args.height);
-						$('#imageEditor > input[name="height"]').unbind();
-						$('#imageEditor > input[name="height"]').bind('input propertychange', function() {
-							element.args.height = $('#imageEditor > input[name="height"]').val();
+						$('#ih').val(element.args.height);
+						$('#ih').val(element.args.height);
+						$('#ih').unbind();
+						$('#ih').bind('input propertychange', function() {
+							element.args.height = $('#ih').val();
 							currentTarget.css('height', element.args.height);
 							updateReference(event);
 						});
 
-						$('#imageEditor').one($.modal.BEFORE_CLOSE, function(event, modal) {
-							if (source) {
-								source.contents = $('#imageEditor > input[name="source"]').val();
+						$('#imageEditor').modal({
+							complete: function() {
+								if (source) {
+									source.contents = $('#isw').val();
+								}
+								else {
+									note.bibliography.push({
+										id: note.bibliography.length+1,
+										item: element.args.id,
+										contents: $('#isw').val()
+									});
+								}
+								updateBib();
 							}
-							else {
-								note.bibliography.push({
-									id: note.bibliography.length+1,
-									item: element.args.id,
-									contents: $('#imageEditor > input[name="source"]').val()
-								});
-							}
-							updateBib();
 						});
-
-						$('#imageEditor').modal({fadeDuration: 250});
+						$('#imageEditor').modal('open');
 						break;
 
 					case "file":
-						var source = undefined;
-						for (var i = 0; i < note.bibliography.length; i++) {
-							var mSource = note.bibliography[i];
-							if (mSource.item == element.args.id) {
-								source = mSource;
-								$('#fileEditor > input[name="source"]').val(source.contents);
-								break;
-							}
-						}
-
-						$('#fileEditor > input[name="upload"]').unbind();
-						$('#fileEditor > input[name="upload"]').bind('change', function(event) {
-							var reader = new FileReader();
-							var file = event.target.files[0];
-							console.log(file);
-							reader.readAsDataURL(file);
-
-							reader.onload = function() {
-								element.content = reader.result;
-								element.args.filename = $('#fileEditor > input[name="upload"]').val();
-								currentTarget.attr('href', element.content);
-								currentTarget.html(element.args.filename);
-								updateReference(event);
-							}
-						});
-
-						$('#fileEditor').one($.modal.BEFORE_CLOSE, function(event, modal) {
-							if (source) {
-								source.contents = $('#fileEditor > input[name="source"]').val();
-							}
-							else {
-								note.bibliography.push({
-									id: note.bibliography.length+1,
-									item: element.args.id,
-									contents: $('#fileEditor > input[name="source"]').val()
-								});
-							}
-							updateBib();
-						});
-
-						$('#fileEditor').modal({fadeDuration: 250});
+						alert("Files are not supported yet");
 						break;
 				}
 				break;
@@ -377,14 +339,20 @@ function newNote() {
 }
 
 var isUpdating = false;
+var arrOfKeys = [];
 function updateNotepadList() {
 	if (isUpdating) return;
-	isUpdating = true;
-	$('#notepadList').html('');
-	localforage.iterate(function(value, key, i) {
-		$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(key));
-	}, function() {
-		isUpdating = false;
+	localforage.keys(function(keys) {
+		if (keys !== arrOfKeys) {
+			arrOfKeys = keys;
+			isUpdating = true;
+			$('#notepadList').html('');
+			localforage.iterate(function(value, key, i) {
+				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(key));
+			}, function() {
+				isUpdating = false;
+			});
+		}
 	});
 }
 
