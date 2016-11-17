@@ -95,13 +95,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	/** Handle Notepad Upload */
 	document.getElementById("upload").addEventListener("change", function(event) {
 		readFileInputEventAsText(event, function(text) {
-			parser.parse(text, ["asciimath"]);
-			while (!parser.notepad) if (parser.notepad) break;
-			notepad = parser.notepad;
+			var ext = $('#upload-name').val().split('.').pop();
+			switch (ext) {
+				case 'npx':
+					parser.parse(text, ["asciimath"]);
+					while (!parser.notepad) if (parser.notepad) break;
+					notepad = parser.notepad;
 
-			window.initNotepad();
-			saveToBrowser();
-			updateNotepadList();
+					window.initNotepad();
+					saveToBrowser();
+					updateNotepadList();
+					break;
+
+				case 'zip':
+					//TODO: allow archive uploading
+					break;
+			}
 		});
 	}, false);
 
