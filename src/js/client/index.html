@@ -9,7 +9,10 @@
 	<body>
 		<nav class="blue-grey" style="box-shadow: none;">
 			<div class="nav-wrapper">
-				<span class="brand-logo left">µPad</span>
+				<ul class="left">
+					<a id="menu-button" data-activates="menu" class="left"><i class="material-icons">menu</i></a>
+					<span class="brand-logo left">µPad</span>
+				</ul>
 				<ul class="right">
 					<!-- <div class="col s12">
 						<a href="#!" class="breadcrumb">First</a>
@@ -34,6 +37,16 @@
 				</div>
 			</div>
 		</nav>
+
+		<!-- Sidenav -->
+		<ul id="menu" class="side-nav">
+			<li><strong>Options</strong></li>
+			<li><input id="title-input" type="text" placeholder="Title" /></li>
+			<li><a href="javascript:updateTitle();" class="btn green waves-effect waves-light">Update Title</a></li>
+			<li><a href="javascript:deleteOpen();" class="btn red waves-effect waves-light"><i class="material-icons left" style="color: #fff;">delete_forever</i> Delete <span id="open-type"></a></li>
+			<li><div class="divider"></div></li>
+			<li><a href="javascript:exportOpen();" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">file_download</i> Export Notepad</a></li>
+		</ul>
 
 		<!-- Notepads -->
 		<ul id="notepad-dropdown" class="dropdown-content">

@@ -1,3 +1,4 @@
+var xml2js = require('xml2js');
 var parseString = require('xml2js').parseString;
 var moment = require('moment');
 // Thanks to http://stackoverflow.com/a/4673436/998467
@@ -40,25 +41,88 @@ var Note = function(title, time, addons) {
 	this.bibliography = [];
 	this.elements = [];
 };
-Note.prototype.addSource = function(id, item, contents) {
+Note.prototype.addSource = function(id, item, content) {
 	this.bibliography.push({
 		id: id,
 		item: item,
-		contents: contents
+		content: content
 	});
 };
 Note.prototype.addElement = function(type, args, content) {
+	if (!type) return;
 	this.elements.push({
 		type: type,
 		args: args,
 		content: content
 	});
 };
+Note.prototype.toXML = function() {
+	var parseableNote = {
+		note: {
+			$: {
+				title: this.title,
+				time: moment(this.time).format()
+			},
+			addons: [],
+			bibliography: []
+		}
+	}
+
+	var imports = {
+		import: []
+	};
+	for (k in this.addons) {
+		imports.import.push(this.addons[k]);
+	}
+	parseableNote.note.addons.push(imports);
+
+	var sources = {
+		source: []
+	};
+	for (k in this.bibliography) {
+		var source = this.bibliography[k];
+		sources.source.push({
+			_: source.content,
+			$: {
+				id: source.id,
+				item: source.item
+			}
+		});
+	}
+	parseableNote.note.bibliography.push(sources);
+
+	elements = {};
+	for (k in this.elements) {
+		var element = this.elements[k];
+		if (!elements[element.type]) elements[element.type] = [];
+		
+		var elementToPush = {
+			_: element.content,
+			$: {}
+		}
+
+		for (argName in element.args) {
+			elementToPush.$[argName] = element.args[argName];
+		}
+
+		elements[element.type].push(elementToPush);
+	}
+	for (k in elements) {
+		var elementGroup = elements[k];
+		parseableNote.note[k] = elementGroup;
+	}
+
+	var builder = new xml2js.Builder({
+		headless: true,
+		cdata: true
+	});
+	return builder.buildObject(parseableNote);
+}
 
 var supportedAddons = [];
 exports.parse = function parse(xml, addons) {
 	supportedAddons = addons;
-	parseString(xml, function(e, res) {
+	parseString(xml, {trim: true}, function(e, res) {
 		exports.notepad = new Notepad(res.notepad.$.title);
 		for (var i = 0; i < res.notepad.section.length; i++) {
 			var sectionXML = res.notepad.section[i];
@@ -94,7 +158,6 @@ function parseSection(sectionXML, section, parent) {
 						var title = noteXML.$.title;
 						var time = noteXML.$.time;
 						var addons = [];
-
 						if (noteXML.addons[0].import) {
 							for (var j = noteXML.addons[0].import.length - 1; j >= 0; j--) {
 								var addon = noteXML.addons[0].import[j];

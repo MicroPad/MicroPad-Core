@@ -27,6 +27,10 @@ body {
 	/*height: auto;*/
 }
 
+#menu {
+	padding: 10px;
+}
+
 .time {
 	padding-left: 20px;
 	font-family: 'Roboto';
@@ -42,6 +46,7 @@ body {
 	position: relative;
 	width: 100%;
 	height: calc(100% - 128px);
+	/*visibility: hidden;*/
 }
 
 .interact {

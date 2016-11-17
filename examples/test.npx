@@ -91,28 +91,5 @@ Drawing is up to the application to implement. It should simply be placed as an 
 				</note>
 			</section>
 		</section>
-
-		<note title="Tables" time="2016-11-10T16:13:04+13:00">
-			<addons>
-			</addons>
-
-			<bibliography>
-			</bibliography>
-
-			<table id="table1" x="130px" y="10px">
-				<column>
-					<markdown><![CDATA[**First Name**]]></markdown>
-					<markdown><![CDATA[Nick]]></markdown>
-				</column>
-				<column>
-					<markdown><![CDATA[**Last Name**]]></markdown>
-					<markdown><![CDATA[Webster]]></markdown>
-				</column>
-				<column>
-					<markdown><![CDATA[**Email**]]></markdown>
-					<markdown><![CDATA[[nick@nick.geek.nz](mailto:nick@nick.geek.nz)]]></markdown>
-				</column>
-			</table>
-		</note>
 	</section>
 </notepad>

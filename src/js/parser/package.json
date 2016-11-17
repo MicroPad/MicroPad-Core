@@ -1,7 +1,7 @@
 {
   "name": "upad-parse",
   "version": "0.3.0",
-  "description": "µPad is a tiny open digital note taking app. µPad works with XML that anyone can implement into their software allowing a truly open and free experience.",
+  "description": "This is a parser for the NPX file format that µPad uses",
   "main": "parse.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

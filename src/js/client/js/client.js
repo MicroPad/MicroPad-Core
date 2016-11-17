@@ -52,9 +52,16 @@ var md = new showdown.Converter({
 document.addEventListener("DOMContentLoaded", function(event) {
 	window.initNotepad = function() {
 		parents = [];
-		note;
-		noteID;
+		note = undefined;
+		noteID = undefined;
 		lastClick = {x: 0, y: 0};
+		$('#menu-button').show();
+		$('#open-type').html('Notepad')
+		$('#title-input').val(notepad.title);
+		// $('#title-input').bind('input propertychange', function() {
+		// 	notepad.title = $('#title-input').val();
+		// 	$('#parents > span:nth-last-child(2)').html(notepad.title);
+		// });
 
 		parents.push(notepad);	
 
@@ -72,12 +79,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 		$('#add-section-link').css('display', 'block');
 		$('#add-note-link').css('display', 'none');
+		$('#viewer').hide();
 	}
 
 	/** Get the open notepads */
 	updateNotepadList();
 	
 	$('.modal').modal();
+	$('#menu-button').sideNav({
+		closeOnClick: true
+	});
+	$('#menu-button').hide();
 
 	/** Handle Notepad Upload */
 	document.getElementById("upload").addEventListener("change", function(event) {
@@ -153,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 							var mSource = note.bibliography[i];
 							if (mSource.item == element.args.id) {
 								source = mSource;
-								$('#mdsw').val(source.contents);
+								$('#mdsw').val(source.content);
 								break;
 							}
 						}
@@ -199,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 								MathJax.Hub.Typeset();
 
 								if (source) {
-									source.contents = $('#mdsw').val();
+									source.content = $('#mdsw').val();
 								}
 								else {
 									note.bibliography.push({
@@ -224,7 +236,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 							var mSource = note.bibliography[i];
 							if (mSource.item == element.args.id) {
 								source = mSource;
-								$('#isw').val(source.contents);
+								$('#isw').val(source.content);
 								break;
 							}
 						}
@@ -265,7 +277,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						$('#imageEditor').modal({
 							complete: function() {
 								if (source) {
-									source.contents = $('#isw').val();
+									source.content = $('#isw').val();
 								}
 								else {
 									note.bibliography.push({
@@ -336,6 +348,50 @@ function newNote() {
 	$('#new-note-title').val('');
 }
 
+function deleteOpen() {
+	if (confirm("Are you sure you want to delete this?")) {
+		if (parents.length === 1) {
+			//Delete Notepad
+			localforage.removeItem(notepad.title, function() {
+				notepad = undefined;
+				location.reload();
+			});
+		}
+		else if (parents.length > 1 && !note) {
+			//Delete Section
+			parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) {return s !== parents[parents.length - 1]});
+			saveToBrowser();
+			loadParent(parents.length - 2)
+		}
+		else if (note) {
+			//Delete Note
+			parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) {return n !== note});
+			saveToBrowser();
+			loadParent(parents.length - 1);
+		}
+	}
+}
+
+function updateTitle() {
+	if (parents.length === 1) {
+		//Delete old Notepad
+		localforage.removeItem(notepad.title, function() {
+			notepad.title = $('#title-input').val();
+			$('#parents > span:nth-last-child(2)').html(notepad.title);
+			saveToBrowser();
+			setTimeout(function() {
+				location.reload();
+			}, 500);
+		});
+	}
+	else if (parents.length > 1 && !note) {
+		//Rename Section
+	}
+	else if (note) {
+		//Rename Note
+	}
+}
+
 var isUpdating = false;
 var arrOfKeys = [];
 function updateNotepadList() {
@@ -399,9 +455,17 @@ function loadSection(id, providedSection) {
 	if (providedSection) section = providedSection;
 	parents.push(section);
 	note = undefined;
+	$('#viewer').hide();
 	$('#viewer').html('');
 	$('#open-note').hide();
 	updateSelector();
+	$('#open-type').html('Section');
+	$('#title-input').val(section.title);
+	$('#title-input').unbind();
+	$('#title-input').bind('input propertychange', function() {
+		section.title = $('#title-input').val();
+		$('#parents > span:nth-last-child(2)').html(section.title);
+	});
 
 	$('#selectorTitle').html(section.title);
 	for (k in section.sections) {
@@ -425,7 +489,14 @@ function loadNote(id, delta) {
 		$('#open-note').html('{0} <span class="time">{1}</span>'.format(note.title, moment(note.time).format('dddd, D MMMM h:mm A')));
 		$('#open-note').show();
 		$('#viewer').html('');
+		$('#viewer').show();
 	}
+	$('#open-type').html('Note')
+	$('#title-input').val(note.title);
+	$('#title-input').bind('input propertychange', function() {
+		note.title = $('#title-input').val();
+		$('#parents > span:nth-last-child(2)').html(note.title);
+	});
 
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
@@ -517,9 +588,9 @@ function updateBib() {
 	for (var i = 0; i < note.bibliography.length; i++) {
 		var source = note.bibliography[i];
 		if ($('#source_'+source.item).length) $('#source_'+source.item).remove();
-		if (source.contents.length < 1) continue;
+		if (source.content.length < 1) continue;
 		var item = $('#'+source.item);
-		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.contents, item.css('top'), parseInt(item.css('left'))+parseInt(item.css('width'))+10+"px", source.item));
+		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.content, item.css('top'), parseInt(item.css('left'))+parseInt(item.css('width'))+10+"px", source.item));
 	}
 	saveToBrowser();
 }
