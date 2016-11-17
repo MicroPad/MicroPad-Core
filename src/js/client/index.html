@@ -100,14 +100,33 @@
 		</div>
 
 		<!-- Insert Elements -->
-		<div id="insert" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
+		<div id="insert" class="modal bottom-sheet modal-fixed-footer">
 			<div class="modal-content">
 				<h4>Insert</h4>
-				<div class="row">
-					<div class="input-field col s8">
+				<div class="row center-align">
+					<div class="col s2">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Markdown-formatted Text" onclick="insert('markdown');">edit</i>
 					</div>
 
-					<div class="col s4">
+					<div class="col s2">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Table" onclick="insert('markdown');">border_all</i>
+					</div>
+
+					<div class="col s2">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Image" onclick="insert('image');">photo</i>
+					</div>
+
+					<div class="col s2">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Video" onclick="insert('video');">ondemand_video</i>
+					</div>
+
+					<div class="col s2">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="File" onclick="insert('file');">attach_file</i>
+					</div>
+
+
+					<div class="col s2">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Recording-Attached Note" onclick="insert('recording');">record_voice_over</i>
 					</div>
 				</div>
 			</div>

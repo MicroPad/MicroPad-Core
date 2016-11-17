@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		if (e.target == this && note) {
 			lastClick.x = e.pageX;
 			lastClick.y = e.pageY;
-			// $('#insert').modal('open');
+			$('#insert').modal('open');
 		}
 	});
 
@@ -404,16 +404,16 @@ function loadNote(id, delta) {
 		if (delta && $('#'+element.args.id).length) continue;
 		switch (element.type) {
 			case "markdown":
-				$('#viewer').append('<div class="interact z-depth-2" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
+				$('#viewer').append('<div class="interact z-depth-2 hoverable" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
 				asciimath.translate(undefined, true);
 				MathJax.Hub.Typeset();
 				break;
 			case "image":
-				$('#viewer').append('<img class="interact z-depth-2" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
+				$('#viewer').append('<img class="interact z-depth-2 hoverable" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
 				// Materialize.fadeInImage('#'+element.args.id);
 				break;
 			case "table":
-				$('#viewer').append('<table class="interact z-depth-2" id="{0}" style="top: {1}; left: {2}; height: auto; width: auto;"></table>'.format(element.args.id, element.args.y, element.args.x, element.args.height, element.args.width));
+				$('#viewer').append('<table class="interact z-depth-2 hoverable" id="{0}" style="top: {1}; left: {2}; height: auto; width: auto;"></table>'.format(element.args.id, element.args.y, element.args.x, element.args.height, element.args.width));
 				for (var j = 0; j < element.content.length; j++) {
 					var row = element.content[j];
 					var rowHTML = '<tr>';
@@ -450,6 +450,7 @@ function updateNote(id) {
 }
 
 function insert(type) {
+	$('#insert').modal('close');
 	var newElement = {
 		args: {},
 		content: '',

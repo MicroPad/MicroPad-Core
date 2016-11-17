@@ -86,3 +86,11 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	border-color: #ffb300; !important;
 	box-shadow: 0 1px 0 0 #ffb300;
 }
+
+.insert-icon {
+	margin-left: calc(50% - 6rem);
+}
+
+.insert-text {
+	text-align: center;
+}
