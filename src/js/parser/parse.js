@@ -188,11 +188,13 @@ exports.parse = function parse(xml, addons) {
 	supportedAddons = addons;
 	parseString(xml, {trim: true}, function(e, res) {
 		exports.notepad = new Notepad(res.notepad.$.title);
-		for (var i = 0; i < res.notepad.section.length; i++) {
-			var sectionXML = res.notepad.section[i];
-			var section = new Section(sectionXML.$.title);
+		if (res.notepad.section) {
+			for (var i = 0; i < res.notepad.section.length; i++) {
+				var sectionXML = res.notepad.section[i];
+				var section = new Section(sectionXML.$.title);
 
-			parseSection(sectionXML, section, exports.notepad);
+				parseSection(sectionXML, section, exports.notepad);
+			}
 		}
 	});
 }
