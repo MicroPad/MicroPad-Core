@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$('#add-section-link').css('display', 'block');
 		$('#add-note-link').css('display', 'none');
 		$('#viewer').hide();
+		document.title = 'µPad';
 	}
 
 	/** Get the open notepads */
@@ -458,6 +459,7 @@ function loadSection(id, providedSection) {
 	parents.push(section);
 	note = undefined;
 	$('#viewer').hide();
+	document.title = 'µPad';
 	$('#viewer').html('');
 	$('#open-note').hide();
 	updateSelector();
