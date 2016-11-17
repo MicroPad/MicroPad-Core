@@ -21,6 +21,37 @@ var Notepad = function(title) {
 Notepad.prototype.addSection = function(section) {
 	this.sections.push(section);
 };
+Notepad.prototype.toXMLObject = function() {
+	var parseableNotepad = {
+		notepad: {
+			$: {
+				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+				'xsi:noNamespaceSchemaLocation': 'https://nick.geek.nz/projects/uPad/schema.xsd',
+				title: this.title
+			},
+			section: []
+		}
+	}
+
+	for (k in this.sections) {
+		parseableNotepad.notepad.section.push(this.sections[k].toXMLObject().section);
+	}
+
+	return parseableNotepad;
+}
+Notepad.prototype.toXML = function() {
+	var builder = new xml2js.Builder({
+		allowSurrogateChars: true,
+		headless: false,
+		xmldec: {
+			version: '1.0',
+			encoding: 'UTF-8',
+			'standalone': false
+		},
+		cdata: true
+	});
+	return builder.buildObject(this.toXMLObject());
+}
 
 var Section = function(title) {
 	this.title = title;
@@ -33,6 +64,35 @@ Section.prototype.addSection = function(section) {
 Section.prototype.addNote = function(note) {
 	this.notes.push(note);
 };
+Section.prototype.toXMLObject = function() {
+	var parseableSection = {
+		section: {
+			$: {
+				title: this.title
+			},
+			section: [],
+			note: []
+		}
+	}
+
+	for (k in this.sections) {
+		parseableSection.section.section.push(this.sections[k].toXMLObject().section);
+	}
+
+	for (k in this.notes) {
+		parseableSection.section.note.push(this.notes[k].toXMLObject().note);
+	}
+
+	return parseableSection;
+}
+Section.prototype.toXML = function() {
+	var builder = new xml2js.Builder({
+		allowSurrogateChars: true,
+		headless: true,
+		cdata: true
+	});
+	return builder.buildObject(this.toXMLObject());
+}
 
 var Note = function(title, time, addons) {
 	this.title = title;
@@ -56,7 +116,7 @@ Note.prototype.addElement = function(type, args, content) {
 		content: content
 	});
 };
-Note.prototype.toXML = function() {
+Note.prototype.toXMLObject = function() {
 	var parseableNote = {
 		note: {
 			$: {
@@ -112,11 +172,15 @@ Note.prototype.toXML = function() {
 		parseableNote.note[k] = elementGroup;
 	}
 
+	return parseableNote;
+}
+Note.prototype.toXML = function() {
 	var builder = new xml2js.Builder({
+		allowSurrogateChars: true,
 		headless: true,
 		cdata: true
 	});
-	return builder.buildObject(parseableNote);
+	return builder.buildObject(this.toXMLObject());
 }
 
 var supportedAddons = [];
@@ -143,6 +207,44 @@ exports.createSection = function createSection(title) {
 
 exports.createNote = function createNote(title, addons) {
 	return new Note(title, moment().format(), addons);
+}
+
+exports.restoreNotepad = function restoreNotepad(obj) {
+	var restoredNotepad = new Notepad(obj.title);
+	for (k in obj.sections) {
+		var section = obj.sections[k];
+		restoredNotepad.addSection(exports.restoreSection(section));
+	}
+
+	return restoredNotepad;
+}
+exports.restoreSection = function restoreSection(obj) {
+	var restoredSection = new Section(obj.title);
+	for (k in obj.sections) {
+		var section = obj.sections[k];
+		restoredSection.addSection(exports.restoreSection(section));
+	}
+
+	for (k in obj.notes) {
+		var note = obj.notes[k];
+		restoredSection.addNote(exports.restoreNote(note));
+	}
+
+	return restoredSection;
+}
+exports.restoreNote = function restoreNote(obj) {
+	var restoredNote = new Note(obj.title, moment(obj.time).format(), obj.addons);
+	for (k in obj.bibliography) {
+		var source = obj.bibliography[k];
+		restoredNote.addSource(source.id, source.item, source.content);
+	}
+
+	for (k in obj.elements) {
+		var element = obj.elements[k];
+		restoredNote.addElement(element.type, element.args, element.content);
+	}
+
+	return restoredNote;
 }
 
 function parseSection(sectionXML, section, parent) {

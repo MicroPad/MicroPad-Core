@@ -100,6 +100,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			window.initNotepad();
 			saveToBrowser();
+			updateNotepadList();
 		});
 	}, false);
 
@@ -213,12 +214,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 								if (source) {
 									source.content = $('#mdsw').val();
 								}
-								else {
-									note.bibliography.push({
-										id: note.bibliography.length+1,
-										item: element.args.id,
-										contents: $('#mdsw').val()
-									});
+								else if ($('#mdsw').val().length > 0) {
+									note.addSource(note.bibliography.length+1, element.args.id, $('#mdsw').val());
 								}
 								updateBib();
 							}
@@ -279,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 								if (source) {
 									source.content = $('#isw').val();
 								}
-								else {
+								else if ($('#isw').val().length > 0) {
 									note.bibliography.push({
 										id: note.bibliography.length+1,
 										item: element.args.id,
@@ -370,6 +367,11 @@ function deleteOpen() {
 			loadParent(parents.length - 1);
 		}
 	}
+}
+
+function exportOpen() {
+	var blob = new Blob([notepad.toXML()], {type: "text/xml;charset=utf-8"});
+	saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
 }
 
 function updateTitle() {
@@ -650,7 +652,7 @@ function saveToBrowser(retry) {
 function loadFromBrowser(title) {
 	localforage.getItem(title, function(err, res) {
 		// notepad = JSON.parse(window.pako.inflate(res, {to: 'string'}));
-		notepad = res;
+		notepad = parser.restoreNotepad(res);
 		window.initNotepad();
 	});
 }
