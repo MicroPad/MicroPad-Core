@@ -5,15 +5,6 @@ var noteID;
 var sectionIDs = [];
 var lastClick = {x: 0, y: 0};
 
-/** Setup md parser */
-var md = new showdown.Converter({
-	parseImgDimensions: true,
-	simplifiedAutoLink: true,
-	strikethrough: true,
-	tables: true,
-	tasklists: true
-});
-
 /** Setup localforage */
 localforage.config({
 	name: 'uPad',
@@ -21,7 +12,76 @@ localforage.config({
 	storeName: 'notepads'
 });
 
+/** Setup md parser */
+showdown.extension('math', function() {
+    var matches = [];
+    return [
+        { 
+            type: 'lang',
+            regex: /===([^]+?)===/gi,
+            replace: function(s, match) { 
+                matches.push('==='+match+'===');
+                var n = matches.length - 1;
+                return '%PLACEHOLDER' + n + '%';
+            }
+        },
+        {
+            type: 'output',
+            filter: function (text) {
+                for (var i=0; i< matches.length; ++i) {
+                    var pat = '%PLACEHOLDER' + i + '%';
+                    text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+                }
+                //reset array
+                matches = [];
+                return text;
+            }
+        }
+    ]
+});
+var md = new showdown.Converter({
+	parseImgDimensions: true,
+	simplifiedAutoLink: true,
+	strikethrough: true,
+	tables: true,
+	tasklists: true,
+	prefixHeaderId: 'mdheader',
+	smoothLivePreview: true,
+	extensions: ['math']
+});
+
 document.addEventListener("DOMContentLoaded", function(event) {
+	window.initNotepad = function() {
+		parents = [];
+		note;
+		noteID;
+		sectionIDs = [];
+		lastClick = {x: 0, y: 0};
+
+		parents.push(notepad);	
+
+		//Clear old lists
+		$('#sectionList').html('');
+		$('#noteList').html('');
+		$('#viewer').html('');
+		$('#parents > span:not(#open-note)').remove();
+		$('#open-note').hide();
+
+		$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
+		for (k in notepad.sections) {
+			var section = notepad.sections[k];
+			$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
+		}
+		$('#add-section-link').css('display', 'block');
+		$('#add-note-link').css('display', 'none');
+	}
+
+	/** Get the open notepads */
+	updateNotepadList();
+	
+	$('.modal').modal();
+
+	/** Handle Notepad Upload */
 	document.getElementById("upload").addEventListener("change", function(event) {
 		readFileInputEventAsText(event, function(text) {
 			parser.parse(text, ["asciimath"]);
@@ -33,16 +93,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		});
 	}, false);
 
-	window.initNotepad = function() {
-		$('#upload').hide();
-		parents.push(notepad);
-	
-		$('#selectorTitle').html(notepad.title);
-		for (k in notepad.sections) {
-			var section = notepad.sections[k];
-			$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
-		}
-	}
 
 	/** Listen for when new elements are added to #viewer */
 	var observer = new MutationObserver(function(mutations) {
@@ -61,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		if (e.target == this && note) {
 			lastClick.x = e.pageX;
 			lastClick.y = e.pageY;
-			$('#insert').modal({fadeDuration: 250});
+			// $('#insert').modal('open');
 		}
 	});
 
@@ -99,70 +149,71 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			if (element.args.id == event.currentTarget.id) {
 				switch (element.type) {
 					case "markdown":
-						$('#mdEditor > input[name="source"]').val('');
+						$('#mdsw').val('');
 						var source = undefined;
 						for (var i = 0; i < note.bibliography.length; i++) {
 							var mSource = note.bibliography[i];
 							if (mSource.item == element.args.id) {
 								source = mSource;
-								$('#mdEditor > input[name="source"]').val(source.contents);
+								$('#mdsw').val(source.contents);
 								break;
 							}
 						}
 
-						$('#mdEditor > textarea').val(element.content);
-						$('#mdEditor > textarea').unbind();
-						$('#mdEditor > textarea').bind('input propertychange', function() {
-							element.content = $('#mdEditor > textarea').val();
+						$('#md-textarea').val(element.content);
+						$('#md-textarea').unbind();
+						$('#md-textarea').bind('input propertychange', function() {
+							element.content = $('#md-textarea').val();
 							currentTarget.html(md.makeHtml(element.content));
 							updateReference(event);
 						});
 
-						$('#mdEditor > input[name="font"]').val(element.args.fontSize);
-						$('#mdEditor > input[name="font"]').val(element.args.fontSize);
-						$('#mdEditor > input[name="font"]').unbind();
-						$('#mdEditor > input[name="font"]').bind('input propertychange', function() {
-							element.args.fontSize = $('#mdEditor > input[name="font"]').val();
+						$('#mdfs').val(element.args.fontSize);
+						$('#mdfs').val(element.args.fontSize);
+						$('#mdfs').unbind();
+						$('#mdfs').bind('input propertychange', function() {
+							element.args.fontSize = $('#mdfs').val();
 							currentTarget.css('font-size', element.args.fontSize);
 							updateReference(event);
 						});
 
-						$('#mdEditor > input[name="width"]').val(element.args.width);
-						$('#mdEditor > input[name="width"]').val(element.args.width);
-						$('#mdEditor > input[name="width"]').unbind();
-						$('#mdEditor > input[name="width"]').bind('input propertychange', function() {
-							element.args.width = $('#mdEditor > input[name="width"]').val();
+						$('#mdw').val(element.args.width);
+						$('#mdw').val(element.args.width);
+						$('#mdw').unbind();
+						$('#mdw').bind('input propertychange', function() {
+							element.args.width = $('#mdw').val();
 							currentTarget.css('width', element.args.width);
 							updateReference(event);
 						});
 
-						$('#mdEditor > input[name="height"]').val(element.args.height);
-						$('#mdEditor > input[name="height"]').val(element.args.height);
-						$('#mdEditor > input[name="height"]').unbind();
-						$('#mdEditor > input[name="height"]').bind('input propertychange', function() {
-							element.args.height = $('#mdEditor > input[name="height"]').val();
+						$('#mdh').val(element.args.height);
+						$('#mdh').val(element.args.height);
+						$('#mdh').unbind();
+						$('#mdh').bind('input propertychange', function() {
+							element.args.height = $('#mdh').val();
 							currentTarget.css('height', element.args.height);
 							updateReference(event);
 						});
 
-						$('#mdEditor').one($.modal.BEFORE_CLOSE, function(event, modal) {
-							asciimath.translate(undefined, true);
-							MathJax.Hub.Typeset();
+						$('#mdEditor').modal({
+							complete: function() {
+								asciimath.translate(undefined, true);
+								MathJax.Hub.Typeset();
 
-							if (source) {
-								source.contents = $('#mdEditor > input[name="source"]').val();
+								if (source) {
+									source.contents = $('#mdsw').val();
+								}
+								else {
+									note.bibliography.push({
+										id: note.bibliography.length+1,
+										item: element.args.id,
+										contents: $('#mdsw').val()
+									});
+								}
+								updateBib();
 							}
-							else {
-								note.bibliography.push({
-									id: note.bibliography.length+1,
-									item: element.args.id,
-									contents: $('#mdEditor > input[name="source"]').val()
-								});
-							}
-							updateBib();
 						});
-
-						$('#mdEditor').modal({fadeDuration: 250});
+						$('#mdEditor').modal('open');
 						break;
 
 					case "table":
@@ -295,6 +346,140 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	window.dragMoveListener = dragMoveListener;
 });
 
+function newNotepad() {
+	var title = $('#new-notepad-title').val();
+	notepad = parser.createNotepad(title);
+	window.initNotepad();
+	saveToBrowser();
+
+	$('#new-notepad-title').val('');
+}
+
+function newSection() {
+	var title = $('#new-section-title').val();
+	var index = parents[parents.length-1].sections.push(parser.createSection(title)) - 1;
+	loadSection(index);
+	saveToBrowser();
+
+	$('#new-section-title').val('');
+}
+
+function newNote() {
+	var title = $('#new-note-title').val();
+	var newNote = parser.createNote(title, ['asciimath']);
+	var notesInParent = parents[parents.length-1].notes;
+	var index = notesInParent.push(newNote) - 1;
+	$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(index, newNote.title));
+	loadNote(index);
+	saveToBrowser();
+
+	$('#new-note-title').val('');
+}
+
+var isUpdating = false;
+function updateNotepadList() {
+	if (isUpdating) return;
+	isUpdating = true;
+	$('#notepadList').html('');
+	localforage.iterate(function(value, key, i) {
+		$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(key));
+	}, function() {
+		isUpdating = false;
+	});
+}
+
+
+function updateSelector() {
+	//TODO: Loop through parents and make any <span> tags into <a> tags
+	$('<span class="breadcrumb">{0}</span>'.format(parents[parents.length-1].title)).insertBefore('#open-note');
+	$('#sectionList').html('');
+	$('#noteList').html('');
+
+	if (parents.length > 0) $('#add-section-link').css('display', 'block');
+	if (parents.length > 1) $('#add-note-link').css('display', 'block');
+}
+
+function loadSection(id) {
+	var section = parents[parents.length-1].sections[id];
+	sectionIDs.push(id);
+	parents.push(section);
+	note = undefined;
+	$('#viewer').html('');
+	$('#open-note').hide()
+	updateSelector();
+
+	$('#selectorTitle').html(section.title);
+	for (k in section.sections) {
+		var mSection = section.sections[k];
+		$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, mSection.title));
+	}
+
+	for (k in section.notes) {
+		var note = section.notes[k];
+		$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(k, note.title));
+	}
+}
+
+function loadNote(id, delta) {
+	if (!delta) {
+		noteID = id;
+		oldNote = note;
+		note = parents[parents.length-1].notes[id];
+		document.title = note.title+" - µPad";
+		$('#open-note').html('{0} <span class="time">{1}</span>'.format(note.title, moment(note.time).format('dddd, D MMMM h:mm A')));
+		$('#open-note').show();
+		$('#viewer').html('');
+	}
+
+	for (var i = 0; i < note.elements.length; i++) {
+		var element = note.elements[i];
+		if (delta && $('#'+element.args.id).length) continue;
+		switch (element.type) {
+			case "markdown":
+				$('#viewer').append('<div class="interact" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
+				asciimath.translate(undefined, true);
+				MathJax.Hub.Typeset();
+				break;
+			case "image":
+				$('#viewer').append('<img class="interact" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
+				break;
+			case "table":
+				$('#viewer').append('<table class="interact" id="{0}" style="top: {1}; left: {2}; height: auto; width: auto;"></table>'.format(element.args.id, element.args.y, element.args.x, element.args.height, element.args.width));
+				for (var j = 0; j < element.content.length; j++) {
+					var row = element.content[j];
+					var rowHTML = '<tr>';
+						for (var l = 0; l < row.length; l++) {
+							var cell = row[l];
+							rowHTML += '<td>{0}</td>'.format(md.makeHtml(cell));
+						}
+					rowHTML += '</tr>';
+					$('#'+element.args.id).append(rowHTML);
+				}
+				asciimath.translate(undefined, true);
+				MathJax.Hub.Typeset();
+				break;
+		}
+	}
+	updateBib();
+	setTimeout(function() {
+		MathJax.Hub.Reprocess();
+	}, 1000);
+}
+
+function updateNote(id) {
+	for (k in note.elements) {
+		var element = note.elements[k];
+		var sel = $('#'+element.args.id);
+		element.args.x = $('#'+element.args.id).css('left');
+		element.args.y = $('#'+element.args.id).css('top');
+		element.args.width = $('#'+element.args.id).css('width');
+		element.args.height = $('#'+element.args.id).css('height');
+
+		resizePage($('#'+element.args.id));
+		saveToBrowser();
+	}
+}
+
 function insert(type) {
 	var newElement = {
 		args: {},
@@ -330,100 +515,13 @@ function insert(type) {
 	$('#'+newElement.args.id).trigger('click');
 }
 
-
-function updateNote(id) {
-	for (k in note.elements) {
-		var element = note.elements[k];
-		var sel = $('#'+element.args.id);
-		element.args.x = $('#'+element.args.id).css('left');
-		element.args.y = $('#'+element.args.id).css('top');
-		element.args.width = $('#'+element.args.id).css('width');
-		element.args.height = $('#'+element.args.id).css('height');
-
-		resizePage($('#'+element.args.id));
-		saveToBrowser();
-	}
-	// parents[parents.length-1].notes[noteID] = note;
-	// parents[parents.length-2].sections[sectionIDs[sectionIDs.length-1]] = parents[parents.length-1];
-	// for (var i = parents.length-3; i >= 0; i--) {
-	// 	parents[i].sections[sectionIDs[i+1]] = parents[i+1];
-	// }
-	// notepad = parents[0];
-}
-
-function clearSelector() {
-	$('#selectorTitle').html('');
-	$('#sectionList').html('');
-	$('#noteList').html('');
-}
-
-function loadSection(id) {
-	clearSelector();
-	var section = parents[parents.length-1].sections[id];
-	sectionIDs.push(id);
-	parents.push(section);
-
-	$('#selectorTitle').html(section.title);
-	for (k in section.sections) {
-		var mSection = section.sections[k];
-		$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, mSection.title));
-	}
-
-	for (k in section.notes) {
-		var note = section.notes[k];
-		$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(k, note.title));
-	}
-}
-
-function loadNote(id, delta) {
-	if (!delta) {
-		$('#sectionListHolder').hide();
-		$('#viewer').show();
-		$('#viewer').html('');
-		noteID = id;
-		note = parents[parents.length-1].notes[id];
-		document.title = note.title+" - µPad";
-	}
-
-	for (var i = 0; i < note.elements.length; i++) {
-		var element = note.elements[i];
-		if (delta && $('#'+element.args.id).length) continue;
-		switch (element.type) {
-			case "markdown":
-				$('#viewer').append('<div class="interact" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
-				asciimath.translate(undefined, true);
-				MathJax.Hub.Typeset();
-				break;
-			case "image":
-				$('#viewer').append('<img class="interact" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
-				break;
-			case "table":
-				$('#viewer').append('<table class="interact" id="{0}" style="top: {1}; left: {2}; height: auto; width: auto;"></table>'.format(element.args.id, element.args.y, element.args.x, element.args.height, element.args.width));
-				for (var j = 0; j < element.content.length; j++) {
-					var row = element.content[j];
-					var rowHTML = '<tr>';
-						for (var l = 0; l < row.length; l++) {
-							var cell = row[l];
-							rowHTML += '<td>{0}</td>'.format(md.makeHtml(cell));
-						}
-					rowHTML += '</tr>';
-					$('#'+element.args.id).append(rowHTML);
-				}
-				asciimath.translate(undefined, true);
-				MathJax.Hub.Typeset();
-				break;
-		}
-	}
-	updateBib();
-}
-
 function updateBib() {
 	for (var i = 0; i < note.bibliography.length; i++) {
 		var source = note.bibliography[i];
 		if ($('#source_'+source.item).length) $('#source_'+source.item).remove();
 		if (source.contents.length < 1) continue;
 		var item = $('#'+source.item);
-		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.contents, parseInt(item.css('top')), parseInt(item.css('left'))+parseInt(item.css('width'))+20+"px", source.item));
+		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.contents, item.css('top'), parseInt(item.css('left'))+parseInt(item.css('width'))+10+"px", source.item));
 	}
 	saveToBrowser();
 }
@@ -443,7 +541,10 @@ function readFileInputEventAsText(event, callback) {
 
 /** Make sure the page is always larger than it's elements */
 function resizePage(selElement) {
-	if (parseInt(selElement.css('left'))+parseInt(selElement.css('width'))+1000 > parseInt($('#viewer').css('width'))) $('#viewer').css('width', parseInt(selElement.css('left'))+1000+'px');
+	if (parseInt(selElement.css('left'))+parseInt(selElement.css('width'))+1000 > parseInt($('#viewer').css('width'))) {
+		$('#viewer').css('width', parseInt(selElement.css('left'))+1000+'px');
+		if ($('#viewer').width() > $('nav').width()) $('nav').css('width', parseInt(selElement.css('left'))+1000+'px');
+	}
 	if (parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000 > parseInt($('#viewer').css('height'))) $('#viewer').css('height', parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000+'px');
 }
 
@@ -453,9 +554,17 @@ function saveToBrowser(retry) {
 		I want to use the Filesystem and FileWriter API for this (https://www.html5rocks.com/en/tutorials/file/filesystem/)
 		but only Chrome and Opera support it. For now I'll use IndexedDB with a sneaky async library.
 	 */
+	
+	$('#viewer ul').each(function(i) {
+		$(this).addClass('browser-default')
+	});
+
+
 	// var compressedNotepad = window.pako.deflate(JSON.stringify(notepad), {to: 'string'});
 	try {
-		localforage.setItem(notepad.title, notepad);
+		localforage.setItem(notepad.title, notepad, function() {
+			updateNotepadList();
+		});
 	}
 	catch (e) {
 		if (retry && notepad.title != tooBig) {
@@ -471,15 +580,8 @@ function saveToBrowser(retry) {
 
 function loadFromBrowser(title) {
 	localforage.getItem(title, function(err, res) {
-		console.log("Loading: "+title);
-		console.log(res);
 		// notepad = JSON.parse(window.pako.inflate(res, {to: 'string'}));
 		notepad = res;
-		parents = [];
-		note = undefined;
-		noteID = undefined;
-		sectionIDs = [];
-		lastClick = {x: 0, y: 0};
 		window.initNotepad();
 	});
 }
