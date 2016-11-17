@@ -2,7 +2,6 @@ var notepad;
 var parents = [];
 var note;
 var noteID;
-var sectionIDs = [];
 var lastClick = {x: 0, y: 0};
 
 /** Setup localforage */
@@ -55,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		parents = [];
 		note;
 		noteID;
-		sectionIDs = [];
 		lastClick = {x: 0, y: 0};
 
 		parents.push(notepad);	
@@ -356,9 +354,38 @@ function updateNotepadList() {
 	});
 }
 
+function loadParent(index) {
+	if (index === 0) {
+		initNotepad();
+		return;
+	}
+
+	var oldParents = parents.slice(0, index+1);
+	parents = parents.slice(0, index);
+
+	//Reset breadcrumbs
+	$('#parents').children().each(function(i) {
+		if(this.id == "open-note") return false;
+		$(this).remove();
+	});
+	for (k in parents) {
+		var p = parents[k];
+		$('<span class="breadcrumb">{0}</span>'.format(p.title)).insertBefore('#open-note');
+	}
+
+	loadSection(undefined, oldParents[oldParents.length-1]);
+}
+
+function linkBreadcrumbs() {
+	$('#parents').children().each(function(i) {
+		if (this.id == "open-note") return false;
+
+		$(this).attr('onclick', 'loadParent('+i+');');
+	});
+}
 
 function updateSelector() {
-	//TODO: Loop through parents and make any <span> tags into <a> tags
+	linkBreadcrumbs();
 	$('<span class="breadcrumb">{0}</span>'.format(parents[parents.length-1].title)).insertBefore('#open-note');
 	$('#sectionList').html('');
 	$('#noteList').html('');
@@ -367,13 +394,13 @@ function updateSelector() {
 	if (parents.length > 1) $('#add-note-link').css('display', 'block');
 }
 
-function loadSection(id) {
+function loadSection(id, providedSection) {
 	var section = parents[parents.length-1].sections[id];
-	sectionIDs.push(id);
+	if (providedSection) section = providedSection;
 	parents.push(section);
 	note = undefined;
 	$('#viewer').html('');
-	$('#open-note').hide()
+	$('#open-note').hide();
 	updateSelector();
 
 	$('#selectorTitle').html(section.title);
@@ -394,6 +421,7 @@ function loadNote(id, delta) {
 		oldNote = note;
 		note = parents[parents.length-1].notes[id];
 		document.title = note.title+" - µPad";
+		linkBreadcrumbs();
 		$('#open-note').html('{0} <span class="time">{1}</span>'.format(note.title, moment(note.time).format('dddd, D MMMM h:mm A')));
 		$('#open-note').show();
 		$('#viewer').html('');
