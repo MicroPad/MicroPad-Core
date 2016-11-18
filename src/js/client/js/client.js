@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			updateNote(event.target.id);
 			justMoved = true;
 		}
-	}).on('resize', function(event) {
+	}).on('resizemove', function(event) {
 		$(event.target).css('width', parseInt($(event.target).css('width'))+event.dx);
 		$(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
 		resizePage($(event.target));
@@ -583,8 +583,9 @@ function updateNote(id) {
 		var sel = $('#'+element.args.id);
 		element.args.x = $('#'+element.args.id).css('left');
 		element.args.y = $('#'+element.args.id).css('top');
-		element.args.width = $('#'+element.args.id).css('width');
-		element.args.height = $('#'+element.args.id).css('height');
+		element.args.width = $('#'+element.args.id)[0].style.width;
+		console.log(element.args.width);
+		element.args.height = $('#'+element.args.id)[0].style.height;
 
 		resizePage($('#'+element.args.id));
 		saveToBrowser();
