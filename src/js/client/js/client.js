@@ -428,9 +428,11 @@ function updateTitle() {
 	}
 	else if (parents.length > 1 && !note) {
 		//Rename Section
+		saveToBrowser();
 	}
 	else if (note) {
 		//Rename Note
+		saveToBrowser();
 	}
 }
 
