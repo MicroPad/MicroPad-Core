@@ -94,10 +94,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	/** Handle Notepad Upload */
 	document.getElementById("upload").addEventListener("change", function(event) {
-		readFileInputEventAsText(event, function(text) {
-			var ext = $('#upload-name').val().split('.').pop();
-			switch (ext) {
-				case 'npx':
+		var ext = $('#upload').val().split('.').pop().toLowerCase();
+		console.log(ext);
+		switch (ext) {
+			case "npx":
+				readFileInputEventAsText(event, function(text) {
 					parser.parse(text, ["asciimath"]);
 					while (!parser.notepad) if (parser.notepad) break;
 					notepad = parser.notepad;
@@ -105,13 +106,32 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					window.initNotepad();
 					saveToBrowser();
 					updateNotepadList();
-					break;
+				});
+				break;
 
-				case 'zip':
-					//TODO: allow archive uploading
-					break;
-			}
-		});
+			case "zip":
+				readFileInputEventAsArrayBuffer(event, function(arrayBuffer) {
+					var zip = new JSZip();
+					zip.loadAsync(arrayBuffer).then(function() {
+						for (k in zip.files) {
+							if (k.split('.').pop().toLowerCase() === 'npx') {
+								zip.file(k).async('string').then(function success(text) {
+									console.log(text);
+									parser.parse(text, ["asciimath"]);
+									while (!parser.notepad) if (parser.notepad) break;
+									notepad = parser.notepad;
+
+									window.initNotepad();
+									saveToBrowser();
+									updateNotepadList();
+								});
+							}
+						}
+					});
+				});
+				break;
+
+		}
 	}, false);
 
 
@@ -631,6 +651,19 @@ function readFileInputEventAsText(event, callback) {
 	};
 	
 	reader.readAsText(file);
+}
+
+function readFileInputEventAsArrayBuffer(event, callback) {
+	var file = event.target.files[0];
+
+	var reader = new FileReader();
+	
+	reader.onload = function(loadEvent) {
+		var arrayBuffer = loadEvent.target.result;
+		callback(arrayBuffer);
+	};
+	
+	reader.readAsArrayBuffer(file);
 }
 
 /** Make sure the page is always larger than it's elements */
