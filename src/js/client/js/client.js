@@ -104,7 +104,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 					window.initNotepad();
 					saveToBrowser();
-					updateNotepadList();
 				});
 				break;
 
@@ -121,7 +120,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 									window.initNotepad();
 									saveToBrowser();
-									updateNotepadList();
 								});
 							}
 						}
@@ -440,8 +438,8 @@ var isUpdating = false;
 var arrOfKeys = [];
 function updateNotepadList() {
 	if (isUpdating) return;
-	localforage.keys(function(keys) {
-		if (keys !== arrOfKeys) {
+	localforage.keys().then(function(keys) {
+		if (JSON.stringify(keys) !== JSON.stringify(arrOfKeys)) {
 			arrOfKeys = keys;
 			isUpdating = true;
 			$('#notepadList').html('');
