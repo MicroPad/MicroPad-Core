@@ -95,7 +95,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	/** Handle Notepad Upload */
 	document.getElementById("upload").addEventListener("change", function(event) {
 		var ext = $('#upload').val().split('.').pop().toLowerCase();
-		console.log(ext);
 		switch (ext) {
 			case "npx":
 				readFileInputEventAsText(event, function(text) {
@@ -116,7 +115,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						for (k in zip.files) {
 							if (k.split('.').pop().toLowerCase() === 'npx') {
 								zip.file(k).async('string').then(function success(text) {
-									console.log(text);
 									parser.parse(text, ["asciimath"]);
 									while (!parser.notepad) if (parser.notepad) break;
 									notepad = parser.notepad;
@@ -173,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			updateNote(event.target.id);
 			justMoved = true;
 		}
-	}).on('resizemove', function(event) {
+	}).on('resize', function(event) {
 		$(event.target).css('width', parseInt($(event.target).css('width'))+event.dx);
 		$(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
 		resizePage($(event.target));
