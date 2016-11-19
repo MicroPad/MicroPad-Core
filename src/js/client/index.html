@@ -122,7 +122,7 @@
 					</div>
 
 					<div class="col s2">
-						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Drawing Mode">gesture</i>
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Drawing Mode" onclick="insert('drawing');">gesture</i>
 					</div>
 
 					<div class="col s2">
@@ -163,6 +163,17 @@
 							<input id="mdh" type="text" placeholder="Height" />
 					</div>
 				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
+			</div>
+		</div>
+
+		<!-- Drawing Editor -->
+		<div id="drawingEditor" class="modal modal-fixed-footer">
+			<div id="canvas-holder" class="modal-content">
+					<canvas id="drawing-viewer" width="1000" height="1000" class="col s8" style="border:solid black 1px; touch-action:none"></canvas>
 			</div>
 			<div class="modal-footer">
 				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>

@@ -4,6 +4,7 @@ var note;
 var noteID;
 var lastEditedElement = undefined;
 var lastClick = {x: 0, y: 0};
+var ctx = undefined;
 
 /** Setup localforage */
 localforage.config({
@@ -252,8 +253,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						$('#mdEditor').modal('open');
 						break;
 
-					case "table":
-						alert("Tables are not supported yet");
+					case "drawing":
+						$('#drawingEditor').modal('open');
 						break;
 
 					case "image":
@@ -344,6 +345,67 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 	}
 	window.dragMoveListener = dragMoveListener;
+
+	/** Pen Input Handler */
+	ctx = $('#drawing-viewer')[0].getContext("2d");
+	resizeCanvas();
+	ctx.strokeStyle = "#000000";
+	var ongoingTouches = new Array();
+	$('#drawing-viewer')[0].onpointerdown = function(event) {
+		if (true) {
+			ongoingTouches.push(copyTouch(event));
+			ctx.beginPath();
+
+		}
+	}
+	$('#drawing-viewer')[0].onpointermove = function(event) {
+		if (event.pressure > 0) {
+		console.log(event);
+			if (event.buttons === 32) {
+				ctx.clearRect(event.clientX - 10, event.clientY - 10, 20, 20)
+			}
+			else {
+				var idx = ongoingTouchIndexById(event.pointerId);
+
+				ctx.beginPath();
+				ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
+				ctx.lineTo(event.clientX, event.clientY);
+				ctx.lineWidth = event.pressure*10;
+				ctx.stroke();
+
+				ongoingTouches.splice(idx, 1, copyTouch(event));
+			}
+		}
+	}
+	$('#drawing-viewer')[0].onpointerup = function(event) {
+		var idx = ongoingTouchIndexById(event.pointerId);
+		if (idx >= 0 && event.buttons !== 32) {
+			ctx.lineWidth = event.pressure*10;
+			ctx.fillStyle = "#000000";
+			ctx.beginPath();
+			ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
+			ctx.lineTo(event.clientX, event.clientY);
+
+			ongoingTouches.splice(idx, 1);
+		}
+	}
+	$('#drawing-viewer')[0].onpointercancel = function(event) {
+		var idx = ongoingTouchIndexById(evt.pointerId);
+		ongoingTouches.splice(idx, 1);
+	}
+	function copyTouch(touch) {
+		return { identifier: touch.pointerId, pageX: touch.clientX, pageY: touch.clientY };
+	}
+	function ongoingTouchIndexById(idToFind) {
+		for (var i = 0; i < ongoingTouches.length; i++) {
+			var id = ongoingTouches[i].identifier;
+			
+			if (id == idToFind) {
+				return i;
+			}
+		}
+		return -1;
+	}
 });
 
 function newNotepad() {
@@ -567,20 +629,8 @@ function loadNote(id, delta) {
 				$('#viewer').append('<img class="interact z-depth-2 hoverable" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
 				// Materialize.fadeInImage('#'+element.args.id);
 				break;
-			case "table":
-				$('#viewer').append('<table class="interact z-depth-2 hoverable" id="{0}" style="top: {1}; left: {2}; height: auto; width: auto;"></table>'.format(element.args.id, element.args.y, element.args.x, element.args.height, element.args.width));
-				for (var j = 0; j < element.content.length; j++) {
-					var row = element.content[j];
-					var rowHTML = '<tr>';
-						for (var l = 0; l < row.length; l++) {
-							var cell = row[l];
-							rowHTML += '<td>{0}</td>'.format(md.makeHtml(cell));
-						}
-					rowHTML += '</tr>';
-					$('#'+element.args.id).append(rowHTML);
-				}
-				asciimath.translate(undefined, true);
-				MathJax.Hub.Typeset();
+			case "drawing":
+				$('#viewer').append('<img class="interact z-depth-2 hoverable" id="{0}" style="top: {1}; left: {1}; height: {3}; width: {4};" />'.format(element.args.id, element.args.y, element.args.left, element.args.height, element.args.width));
 				break;
 		}
 	}
@@ -629,6 +679,9 @@ function insert(type) {
 	switch (type) {
 		case "markdown":
 			newElement.args.fontSize = '16px';
+			break;
+		case "drawing":
+			newElement.args.width = '500px'
 			break;
 	}
 
@@ -683,7 +736,9 @@ function resizePage(selElement) {
 		$('#viewer').css('width', parseInt(selElement.css('left'))+1000+'px');
 		if ($('#viewer').width() > $('nav').width()) $('nav').css('width', parseInt(selElement.css('left'))+1000+'px');
 	}
-	if (parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000 > parseInt($('#viewer').css('height'))) $('#viewer').css('height', parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000+'px');
+	if (parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000 > parseInt($('#viewer').css('height'))){
+		$('#viewer').css('height', parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000+'px');
+	}
 }
 
 var tooBig = '';
@@ -722,6 +777,15 @@ function loadFromBrowser(title) {
 		notepad = parser.restoreNotepad(res);
 		window.initNotepad();
 	});
+}
+
+function resizeCanvas() {
+	var canvas = $('#drawing-viewer');
+	var canvasHolder = $('#canvas-holder');
+	canvas.css('width', canvasHolder.width()+'px');
+	canvas.css('height', canvasHolder.height()+'px');
+	ctx.canvas.width = canvasHolder.width();
+	ctx.canvas.height = canvasHolder.height();
 }
 
 /** Utility functions */
