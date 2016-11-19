@@ -322,6 +322,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				break;
 			}
 		}
+	}).on('tap', function(event) {
+		$('#'+event.currentTarget.id).trigger('click');
 	});
 
 	function dragMoveListener(event) {
