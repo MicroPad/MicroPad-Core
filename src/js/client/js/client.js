@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 	}
 	$('#drawing-viewer')[0].onpointermove = function(event) {
-      var pos = realPos(event);
+	  var pos = realPos(event);
 		if (event.pressure > 0) {
 		console.log(event);
 			if (event.buttons === 32) {
@@ -369,11 +369,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				var idx = ongoingTouchIndexById(event.pointerId);
 
 				ctx.beginPath();
-          ongoingPos = realPos(ongoingTouches[idx]);
-			    ctx.moveTo(ongoingPos.x, ongoingPos.y);
+		  ongoingPos = realPos(ongoingTouches[idx]);
+				ctx.moveTo(ongoingPos.x, ongoingPos.y);
 				ctx.lineTo(pos.x, pos.y);
 				ctx.lineWidth = event.pressure*10;
-          ctx.lineCap = "round";
+		  ctx.lineCap = "round";
 				ctx.stroke();
 
 				ongoingTouches.splice(idx, 1, copyTouch(event));
@@ -381,13 +381,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 	}
 	$('#drawing-viewer')[0].onpointerup = function(event) {
-      var pos = realPos(event);
+	  var pos = realPos(event);
 		var idx = ongoingTouchIndexById(event.pointerId);
 		if (idx >= 0 && event.buttons !== 32) {
 			ctx.lineWidth = event.pressure*10;
 			ctx.fillStyle = "#000000";
 			ctx.beginPath();
-        ongoingPos = realPos(ongoingTouches[idx]);
+		ongoingPos = realPos(ongoingTouches[idx]);
 			  ctx.moveTo(ongoingPos.x, ongoingPos.y);
 			ctx.lineTo(pos.x, pos.y);
 
@@ -402,10 +402,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		return { identifier: touch.pointerId, pageX: touch.pageX, pageY: touch.pageY };
 	}
 
-    function realPos(touchEvent) {
-        return { x: touchEvent.pageX - canvasOffset.left,
-                 y: touchEvent.pageY - canvasOffset.top };
-    }
+	function realPos(touchEvent) {
+		return { x: touchEvent.pageX - canvasOffset.left,
+				 y: touchEvent.pageY - canvasOffset.top };
+	}
 	function ongoingTouchIndexById(idToFind) {
 		for (var i = 0; i < ongoingTouches.length; i++) {
 			var id = ongoingTouches[i].identifier;
@@ -796,7 +796,7 @@ function resizeCanvas() {
 	var canvasHolder = $('#canvas-holder');
 	ctx.canvas.width = canvasHolder.width();
 	ctx.canvas.height = canvasHolder.height();
-    canvasOffset = canvas.offset();
+	canvasOffset = canvas.offset();
 }
 
 /** Utility functions */
