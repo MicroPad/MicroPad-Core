@@ -586,7 +586,6 @@ function updateNote(id) {
 		element.args.x = $('#'+element.args.id).css('left');
 		element.args.y = $('#'+element.args.id).css('top');
 		element.args.width = $('#'+element.args.id)[0].style.width;
-		console.log(element.args.width);
 		element.args.height = $('#'+element.args.id)[0].style.height;
 
 		resizePage($('#'+element.args.id));
