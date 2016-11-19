@@ -266,7 +266,7 @@ function parseSection(sectionXML, section, parent) {
 						if (noteXML.addons[0].import) {
 							for (var j = noteXML.addons[0].import.length - 1; j >= 0; j--) {
 								var addon = noteXML.addons[0].import[j];
-								if (supportedAddons.indexOf(addon) == -1) console.log("This notepad contains some features that aren't supported: "+addon);
+								if (supportedAddons.indexOf(addon) == -1) console.log("This note contains some features that aren't supported: "+addon);
 								addons.push(addon);
 							}
 						}
