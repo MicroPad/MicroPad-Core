@@ -359,18 +359,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 	}
 	$('#drawing-viewer')[0].onpointermove = function(event) {
+      var pos = realPos(event);
 		if (event.pressure > 0) {
 		console.log(event);
 			if (event.buttons === 32) {
-				ctx.clearRect(event.clientX - 10, event.clientY - 10, 20, 20)
+				ctx.clearRect(pos.x - 10, pos.y - 10, 20, 20)
 			}
 			else {
 				var idx = ongoingTouchIndexById(event.pointerId);
 
 				ctx.beginPath();
-				ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
-				ctx.lineTo(event.clientX, event.clientY);
+          ongoingPos = realPos(ongoingTouches[idx]);
+			    ctx.moveTo(ongoingPos.x, ongoingPos.y);
+				ctx.lineTo(pos.x, pos.y);
 				ctx.lineWidth = event.pressure*10;
+          ctx.lineCap = "round";
 				ctx.stroke();
 
 				ongoingTouches.splice(idx, 1, copyTouch(event));
@@ -378,24 +381,31 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 	}
 	$('#drawing-viewer')[0].onpointerup = function(event) {
+      var pos = realPos(event);
 		var idx = ongoingTouchIndexById(event.pointerId);
 		if (idx >= 0 && event.buttons !== 32) {
 			ctx.lineWidth = event.pressure*10;
 			ctx.fillStyle = "#000000";
 			ctx.beginPath();
-			ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
-			ctx.lineTo(event.clientX, event.clientY);
+        ongoingPos = realPos(ongoingTouches[idx]);
+			  ctx.moveTo(ongoingPos.x, ongoingPos.y);
+			ctx.lineTo(pos.x, pos.y);
 
 			ongoingTouches.splice(idx, 1);
 		}
 	}
 	$('#drawing-viewer')[0].onpointercancel = function(event) {
-		var idx = ongoingTouchIndexById(evt.pointerId);
+		var idx = ongoingTouchIndexById(event.pointerId);
 		ongoingTouches.splice(idx, 1);
 	}
 	function copyTouch(touch) {
-		return { identifier: touch.pointerId, pageX: touch.clientX, pageY: touch.clientY };
+		return { identifier: touch.pointerId, pageX: touch.pageX, pageY: touch.pageY };
 	}
+
+    function realPos(touchEvent) {
+        return { x: touchEvent.pageX - canvasOffset.left,
+                 y: touchEvent.pageY - canvasOffset.top };
+    }
 	function ongoingTouchIndexById(idToFind) {
 		for (var i = 0; i < ongoingTouches.length; i++) {
 			var id = ongoingTouches[i].identifier;
@@ -779,13 +789,14 @@ function loadFromBrowser(title) {
 	});
 }
 
+var canvasOffset = null;
+
 function resizeCanvas() {
 	var canvas = $('#drawing-viewer');
 	var canvasHolder = $('#canvas-holder');
-	canvas.css('width', canvasHolder.width()+'px');
-	canvas.css('height', canvasHolder.height()+'px');
 	ctx.canvas.width = canvasHolder.width();
 	ctx.canvas.height = canvasHolder.height();
+    canvasOffset = canvas.offset();
 }
 
 /** Utility functions */
