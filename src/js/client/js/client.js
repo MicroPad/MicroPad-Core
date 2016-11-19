@@ -661,7 +661,7 @@ function loadNote(id, delta) {
 				break;
 			case "drawing":
 				//NOTE: Drawings don't have .z-depth-2 because it would be distracting when placed over other items
-				$('#viewer').append('<img class="interact hoverable" id="{0}" style="top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
+				$('#viewer').append('<img class="interact hoverable drawing" id="{0}" style="z-index: 10; top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
 				break;
 		}
 	}

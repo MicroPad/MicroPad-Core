@@ -63,10 +63,15 @@ div .interact {
 	min-height: 50px;
 	padding: 5px;
 	word-wrap: break-word;
+	z-index: 20;
 }
 
 img .interact {
-	/*opacity: 0;*/
+	z-index: 20;
+}
+
+.drawing {
+	z-index: 10;
 }
 
 #modal {
