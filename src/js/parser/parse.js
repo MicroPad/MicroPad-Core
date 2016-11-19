@@ -110,6 +110,7 @@ Note.prototype.addSource = function(id, item, content) {
 };
 Note.prototype.addElement = function(type, args, content) {
 	if (!type) return;
+	if (!content || content.length === 0) return;
 	this.elements.push({
 		type: type,
 		args: args,
