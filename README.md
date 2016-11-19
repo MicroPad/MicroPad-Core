@@ -4,3 +4,5 @@
 ## How to use the JS client
 
 Before you can use the JS client (found in src/js/client/index.html), you'll need to compile the npx parser with [browserify](http://browserify.org/): `browserify --s parser src/js/parser/parse.js --o src/js/client/js/parser.js`
+
+Note: You will also need to `npm install` in `src/js/parser` before you run broserify.
