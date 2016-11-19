@@ -2,6 +2,7 @@ var notepad;
 var parents = [];
 var note;
 var noteID;
+var lastEditedElement = undefined;
 var lastClick = {x: 0, y: 0};
 
 /** Setup localforage */
@@ -164,14 +165,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		autoScroll: true
 	}).resizable({
 		preserveAspectRatio: false,
-		edges: {left: false, right: true, bottom: true, top: false},
+		edges: {left: false, right: true, bottom: false, top: false},
 		onend: function (event) {
 			updateNote(event.target.id);
 			justMoved = true;
 		}
 	}).on('resizemove', function(event) {
 		$(event.target).css('width', parseInt($(event.target).css('width'))+event.dx);
-		$(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
+		// $(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
+		$(event.target).css('height', 'auto');
 		resizePage($(event.target));
 		updateReference(event);
 		justMoved = true;
@@ -184,6 +186,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		for (k in note.elements) {
 			var element = note.elements[k];
 			if (element.args.id == event.currentTarget.id) {
+				lastEditedElement = element;
 				switch (element.type) {
 					case "markdown":
 						$('#mdsw').val('');
@@ -394,6 +397,14 @@ function deleteOpen() {
 			saveToBrowser();
 			loadParent(parents.length - 1);
 		}
+	}
+}
+
+function deleteElement() {
+	if (confirm("Are you sure you want to delete this?") && lastEditedElement) {
+		lastEditedElement.content = undefined;
+		note = parser.restoreNote(note);
+		$('#'+lastEditedElement.args.id).remove();
 	}
 }
 
