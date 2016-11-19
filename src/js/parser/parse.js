@@ -323,7 +323,10 @@ function parseSection(sectionXML, section, parent) {
 					break;
 
 				case "section":
-					parseSection(v[0], new Section(v[0].$.title), section);
+					for (var i = 0; i < v.length; i++) {
+						var subsectionXML = v[i];
+						parseSection(subsectionXML, new Section(subsectionXML.$.title), section);
+					}
 					break;
 			}
 		}
