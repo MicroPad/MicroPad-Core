@@ -287,20 +287,10 @@ function parseSection(sectionXML, section, parent) {
 							}
 						}
 
-						if (noteXML.table) {
-							for (var j = 0; j < noteXML.table.length; j++) {
-								var table = noteXML.table[j];
-								var content = [];
-								for (var n = 0; n < table.column[0].markdown.length; n++) content.push([]);
-								for (var l = 0; l < table.column.length; l++) {
-									var rows = table.column[l].markdown;
-									for (var m = 0; m < rows.length; m++) {
-										var cell = rows[m];
-										content[m].push(cell);
-									}
-								}
-
-								note.addElement("table", table.$, content);
+						if (noteXML.drawing) {
+							for (var j = 0; j < noteXML.drawing.length; j++) {
+								var element = noteXML.drawing[j];
+								note.addElement("drawing", element.$, element._);
 							}
 						}
 

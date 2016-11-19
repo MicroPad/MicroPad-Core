@@ -14,9 +14,6 @@ Applications that read µPad files need to do the following to render:
 	* Turn markdown into HTML
 	* Any item that has a source in the bibliography should have a Wikipedia style citation next to it (hyperlinking is optional)
 
-To edit:
-* Uncompress xml.gz file
-
 Only ONE notepad should be defined per file. Applications that read µPad XML should ignore all other notepads in the file
 -->
 

@@ -254,6 +254,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						break;
 
 					case "drawing":
+						$('#drawingEditor').modal({
+							ready: function() {
+								resizeCanvas();
+								if (element.content) {
+									var img = new Image();
+									img.onload = function() {
+										ctx.drawImage(img, 0, 0);
+									}
+									img.src = element.content;
+								}
+							},
+							complete: function() {
+								element.content = $('#drawing-viewer')[0].toDataURL();
+
+								currentTarget.attr('src', element.content);
+								saveToBrowser();
+							}
+						});
 						$('#drawingEditor').modal('open');
 						break;
 
@@ -347,6 +365,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	window.dragMoveListener = dragMoveListener;
 
 	/** Pen Input Handler */
+	$(window).resize(function() {
+		resizeCanvas();
+	});
 	ctx = $('#drawing-viewer')[0].getContext("2d");
 	resizeCanvas();
 	ctx.strokeStyle = "#000000";
@@ -355,25 +376,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		if (true) {
 			ongoingTouches.push(copyTouch(event));
 			ctx.beginPath();
-
 		}
 	}
 	$('#drawing-viewer')[0].onpointermove = function(event) {
 	  var pos = realPos(event);
 		if (event.pressure > 0) {
-		console.log(event);
 			if (event.buttons === 32) {
-				ctx.clearRect(pos.x - 10, pos.y - 10, 20, 20)
+				ctx.clearRect(pos.x - 10, pos.y - 10, 20, 20);
 			}
 			else {
 				var idx = ongoingTouchIndexById(event.pointerId);
 
 				ctx.beginPath();
-		  ongoingPos = realPos(ongoingTouches[idx]);
+				ongoingPos = realPos(ongoingTouches[idx]);
 				ctx.moveTo(ongoingPos.x, ongoingPos.y);
 				ctx.lineTo(pos.x, pos.y);
 				ctx.lineWidth = event.pressure*10;
-		  ctx.lineCap = "round";
+				ctx.lineCap = "round";
 				ctx.stroke();
 
 				ongoingTouches.splice(idx, 1, copyTouch(event));
@@ -387,8 +406,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			ctx.lineWidth = event.pressure*10;
 			ctx.fillStyle = "#000000";
 			ctx.beginPath();
-		ongoingPos = realPos(ongoingTouches[idx]);
-			  ctx.moveTo(ongoingPos.x, ongoingPos.y);
+			ongoingPos = realPos(ongoingTouches[idx]);
+			ctx.moveTo(ongoingPos.x, ongoingPos.y);
 			ctx.lineTo(pos.x, pos.y);
 
 			ongoingTouches.splice(idx, 1);
@@ -477,6 +496,7 @@ function deleteElement() {
 		lastEditedElement.content = undefined;
 		note = parser.restoreNote(note);
 		$('#'+lastEditedElement.args.id).remove();
+		saveToBrowser();
 	}
 }
 
@@ -640,7 +660,8 @@ function loadNote(id, delta) {
 				// Materialize.fadeInImage('#'+element.args.id);
 				break;
 			case "drawing":
-				$('#viewer').append('<img class="interact z-depth-2 hoverable" id="{0}" style="top: {1}; left: {1}; height: {3}; width: {4};" />'.format(element.args.id, element.args.y, element.args.left, element.args.height, element.args.width));
+				//NOTE: Drawings don't have .z-depth-2 because it would be distracting when placed over other items
+				$('#viewer').append('<img class="interact hoverable" id="{0}" style="top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
 				break;
 		}
 	}
