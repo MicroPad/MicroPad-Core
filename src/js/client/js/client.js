@@ -15,30 +15,30 @@ localforage.config({
 
 /** Setup md parser */
 showdown.extension('math', function() {
-    var matches = [];
-    return [
-        { 
-            type: 'lang',
-            regex: /===([^]+?)===/gi,
-            replace: function(s, match) { 
-                matches.push('==='+match+'===');
-                var n = matches.length - 1;
-                return '%PLACEHOLDER' + n + '%';
-            }
-        },
-        {
-            type: 'output',
-            filter: function (text) {
-                for (var i=0; i< matches.length; ++i) {
-                    var pat = '%PLACEHOLDER' + i + '%';
-                    text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-                }
-                //reset array
-                matches = [];
-                return text;
-            }
-        }
-    ]
+	var matches = [];
+	return [
+		{ 
+			type: 'lang',
+			regex: /===([^]+?)===/gi,
+			replace: function(s, match) { 
+				matches.push('==='+match+'===');
+				var n = matches.length - 1;
+				return '%PLACEHOLDER' + n + '%';
+			}
+		},
+		{
+			type: 'output',
+			filter: function (text) {
+				for (var i=0; i< matches.length; ++i) {
+					var pat = '%PLACEHOLDER' + i + '%';
+					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+				}
+				//reset array
+				matches = [];
+				return text;
+			}
+		}
+	]
 });
 var md = new showdown.Converter({
 	parseImgDimensions: true,
