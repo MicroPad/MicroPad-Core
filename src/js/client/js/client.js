@@ -4,7 +4,7 @@ var note;
 var noteID;
 var lastEditedElement = undefined;
 var lastClick = {x: 0, y: 0};
-var ctx = undefined;
+var canvasCtx = undefined;
 
 /** Setup localforage */
 localforage.config({
@@ -260,16 +260,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
 								if (element.content) {
 									var img = new Image();
 									img.onload = function() {
-										ctx.drawImage(img, 0, 0);
+										canvasCtx.drawImage(img, 0, 0);
 									}
 									img.src = element.content;
 								}
 							},
 							complete: function() {
-								element.content = $('#drawing-viewer')[0].toDataURL();
+								if (!isCanvasBlank($('#drawing-viewer')[0])) {
+									element.content = $('#drawing-viewer')[0].toDataURL();
+									
+									var trimmed = trim($('#drawing-viewer')[0]).toDataURL();
+									currentTarget.attr('src', trimmed);
 
-								currentTarget.attr('src', element.content);
-								saveToBrowser();
+									saveToBrowser();
+								}
 							}
 						});
 						$('#drawingEditor').modal('open');
@@ -368,32 +372,32 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	$(window).resize(function() {
 		resizeCanvas();
 	});
-	ctx = $('#drawing-viewer')[0].getContext("2d");
+	canvasCtx = $('#drawing-viewer')[0].getContext("2d");
 	resizeCanvas();
-	ctx.strokeStyle = "#000000";
+	canvasCtx.strokeStyle = "#000000";
 	var ongoingTouches = new Array();
 	$('#drawing-viewer')[0].onpointerdown = function(event) {
 		if (true) {
 			ongoingTouches.push(copyTouch(event));
-			ctx.beginPath();
+			canvasCtx.beginPath();
 		}
 	}
 	$('#drawing-viewer')[0].onpointermove = function(event) {
 	  var pos = realPos(event);
 		if (event.pressure > 0) {
 			if (event.buttons === 32) {
-				ctx.clearRect(pos.x - 10, pos.y - 10, 20, 20);
+				canvasCtx.clearRect(pos.x - 10, pos.y - 10, 20, 20);
 			}
 			else {
 				var idx = ongoingTouchIndexById(event.pointerId);
 
-				ctx.beginPath();
+				canvasCtx.beginPath();
 				ongoingPos = realPos(ongoingTouches[idx]);
-				ctx.moveTo(ongoingPos.x, ongoingPos.y);
-				ctx.lineTo(pos.x, pos.y);
-				ctx.lineWidth = event.pressure*10;
-				ctx.lineCap = "round";
-				ctx.stroke();
+				canvasCtx.moveTo(ongoingPos.x, ongoingPos.y);
+				canvasCtx.lineTo(pos.x, pos.y);
+				canvasCtx.lineWidth = event.pressure*10;
+				canvasCtx.lineCap = "round";
+				canvasCtx.stroke();
 
 				ongoingTouches.splice(idx, 1, copyTouch(event));
 			}
@@ -403,12 +407,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	  var pos = realPos(event);
 		var idx = ongoingTouchIndexById(event.pointerId);
 		if (idx >= 0 && event.buttons !== 32) {
-			ctx.lineWidth = event.pressure*10;
-			ctx.fillStyle = "#000000";
-			ctx.beginPath();
+			canvasCtx.lineWidth = event.pressure*10;
+			canvasCtx.fillStyle = "#000000";
+			canvasCtx.beginPath();
 			ongoingPos = realPos(ongoingTouches[idx]);
-			ctx.moveTo(ongoingPos.x, ongoingPos.y);
-			ctx.lineTo(pos.x, pos.y);
+			canvasCtx.moveTo(ongoingPos.x, ongoingPos.y);
+			canvasCtx.lineTo(pos.x, pos.y);
 
 			ongoingTouches.splice(idx, 1);
 		}
@@ -493,8 +497,8 @@ function deleteOpen() {
 
 function deleteElement() {
 	if (confirm("Are you sure you want to delete this?") && lastEditedElement) {
-		lastEditedElement.content = undefined;
-		note = parser.restoreNote(note);
+		// lastEditedElement.content = undefined;
+		note.elements = note.elements.filter(function(e) {return (e !== lastEditedElement);});
 		$('#'+lastEditedElement.args.id).remove();
 		saveToBrowser();
 	}
@@ -660,12 +664,12 @@ function loadNote(id, delta) {
 				// Materialize.fadeInImage('#'+element.args.id);
 				break;
 			case "drawing":
-				//NOTE: Drawings don't have .z-depth-2 because it would be distracting when placed over other items
-				$('#viewer').append('<img class="interact hoverable drawing" id="{0}" style="z-index: 10; top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
+				$('#viewer').append('<img class="interact hoverable drawing" id="{0}" style="top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
 				break;
 		}
 	}
 	updateBib();
+	initDrawings();
 	setTimeout(function() {
 		MathJax.Hub.Reprocess();
 	}, 1000);
@@ -677,8 +681,10 @@ function updateNote(id) {
 		var sel = $('#'+element.args.id);
 		element.args.x = $('#'+element.args.id).css('left');
 		element.args.y = $('#'+element.args.id).css('top');
-		element.args.width = $('#'+element.args.id)[0].style.width;
-		element.args.height = $('#'+element.args.id)[0].style.height;
+		if ($('#'+element.args.id)[0]) {
+			element.args.width = $('#'+element.args.id)[0].style.width;
+			element.args.height = $('#'+element.args.id)[0].style.height;
+		}
 
 		resizePage($('#'+element.args.id));
 		saveToBrowser();
@@ -694,11 +700,18 @@ function insert(type) {
 	}
 
 	//Get ID
-	var id = 1;
+	var id = undefined;
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
-		if (element.type == type) id++;
+		if (element.type == type && !id){
+			id = parseInt(element.args.id.split(element.type)[1]);
+		}
+		
+		if (element.type == type) {
+			id++;
+		}
 	}
+	if (!id) id = 1;
 	newElement.args.id = type+id;
 
 	newElement.args.x = lastClick.x+'px';
@@ -712,7 +725,7 @@ function insert(type) {
 			newElement.args.fontSize = '16px';
 			break;
 		case "drawing":
-			newElement.args.width = '500px'
+			newElement.content = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAQAAADa613fAAAAaElEQVR42u3PQREAAAwCoNm/9CL496ABuREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREWkezG8AZQ6nfncAAAAASUVORK5CYII=";
 			break;
 	}
 
@@ -733,6 +746,19 @@ function updateBib() {
 		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.content, item.css('top'), parseInt(item.css('left'))+parseInt(item.css('width'))+10+"px", source.item));
 	}
 	saveToBrowser();
+}
+
+function initDrawings() {
+	$('.drawing').each(function (i) {
+		var img = $(this)[0];
+		var tmpCanvas = $('<canvas width="{0}" height="{1}"></canvas>'.format(img.naturalWidth, img.naturalHeight))[0];
+		var tmpCtx = tmpCanvas.getContext('2d');
+		tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+		tmpCtx.drawImage(img, 0, 0);
+
+		var trimmed = trim(tmpCanvas).toDataURL();
+		$(this).attr('src', trimmed);
+	});
 }
 
 function readFileInputEventAsText(event, callback) {
@@ -815,8 +841,8 @@ var canvasOffset = null;
 function resizeCanvas() {
 	var canvas = $('#drawing-viewer');
 	var canvasHolder = $('#canvas-holder');
-	ctx.canvas.width = canvasHolder.width();
-	ctx.canvas.height = canvasHolder.height();
+	canvasCtx.canvas.width = canvasHolder.width();
+	canvasCtx.canvas.height = canvasHolder.height();
 	canvasOffset = canvas.offset();
 }
 
@@ -829,7 +855,7 @@ function fromBase64(str) {
 	return decodeURIComponent(escape(window.atob(str)));
 }
 
-// Thanks to http://stackoverflow.com/a/4673436/998467
+//Thanks to http://stackoverflow.com/a/4673436/998467
 if (!String.prototype.format) {
 	String.prototype.format = function() {
 		var args = arguments;
@@ -841,3 +867,13 @@ if (!String.prototype.format) {
 		});
 	};
 }
+
+//Thanks to http://stackoverflow.com/a/17386803/998467
+function isCanvasBlank(canvas) {
+	var blank = document.createElement('canvas');
+	blank.width = canvas.width;
+	blank.height = canvas.height;
+
+	return canvas.toDataURL() == blank.toDataURL();
+}
+
