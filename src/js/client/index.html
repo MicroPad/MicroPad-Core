@@ -33,7 +33,7 @@
 		<nav id="breadcrumb-holder" class="blue-grey" style="top: 64px;">
 			<div class="nav-wrapper">
 				<div id="parents" class="col s12" style="padding-left: 10px;">
-					<span id="open-note" class="breadcrumb" style="display: none;"></span>
+					<span id="open-note" class="breadcrumb display-with-note" style="display: none;"></span>
 				</div>
 			</div>
 		</nav>
@@ -122,15 +122,15 @@
 					</div>
 
 					<div class="col s2">
+						<img class="insert-icon tooltipped" style="width: 6rem; height: auto" data-position="bottom" data-delay="50" data-tooltip="Microsoft Word Document (docx)" onclick="uploadDocx();" src="fonts/MSWord.svg" />
+					</div>
+
+					<div class="col s2">
 						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Drawing Mode" onclick="insert('drawing');">gesture</i>
 					</div>
 
 					<div class="col s2">
-						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Image" onclick="insert('image');">photo</i>
-					</div>
-
-					<div class="col s2">
-						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Video">ondemand_video</i>
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Image" onclick="insert('image');">insert_photo</i>
 					</div>
 
 					<div class="col s2">
@@ -146,6 +146,7 @@
 				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
 			</div>
 		</div>
+		<a class="modal-trigger btn-floating btn-large waves-effect waves-light red display-with-note" style="position: fixed; right: 20px; bottom: 20px;" data-target="insert"><i class="material-icons">add</i></a>
 
 		<!-- Markdown Editor -->
 		<div id="mdEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
@@ -153,7 +154,7 @@
 				<div class="row">
 					<div class="input-field col s8">
 						<label for="md-textarea">Content (in Markdown)</label>
-						<textarea id="md-textarea" class="materialize-textarea" style="height: 80%; width: 100%;" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" autofocus></textarea>
+						<textarea id="md-textarea" style="height: calc(90% - 10px); width: 100%; margin-top: 10px;" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" autofocus></textarea>
 					</div>
 
 					<div class="col s4">
@@ -161,6 +162,32 @@
 							<input id="mdfs" type="text" value="16px" placeholder="Font Size" />
 							<input id="mdw" type="text" placeholder="Width" />
 							<input id="mdh" type="text" placeholder="Height" />
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
+			</div>
+		</div>
+
+		<!-- Docx Editor -->
+		<div id="docxEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
+			<div class="modal-content">
+				<div class="row">
+					<div class="file-field input-field col s8">
+						<div class="waves-effect waves-light btn amber darken-1">
+							<span>Upload a Word Document (docx)</span>
+							<input id="docx-upload" type="file">
+						</div>
+						<div class="file-path-wrapper"><input id="docx-upload-name" class="file-path validate" type="text"></div>
+					</div>
+
+					<div class="col s4">
+							<p>
+								This will take your document and convert it to the 
+								'Markdown-formatted' text that µPad understands.
+							</p>
 					</div>
 				</div>
 			</div>
@@ -206,7 +233,7 @@
 			</div>
 		</div>
 		
-		<div id="viewer"></div>
+		<div id="viewer" class="display-with-note"></div>
 			
 		<script src="js/libs/jquery-3.1.1.min.js"></script>
 		<script src="js/libs/materialize.min.js"></script>
@@ -215,6 +242,7 @@
 		<script src="js/libs/FileSaver.min.js"></script>
 		<script src="js/libs/jszip.min.js"></script>
 		<script src="js/libs/trim-canvas.js"></script>
+		<script src="js/libs/mammoth.browser.min.js"></script>
 
 		<script src="js/libs/interact.min.js"></script>
 		<script src="js/libs/showdown.min.js"></script>

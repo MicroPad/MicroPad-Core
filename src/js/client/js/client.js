@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 		$('#add-section-link').css('display', 'block');
 		$('#add-note-link').css('display', 'none');
-		$('#viewer').hide();
+		$('.display-with-note').hide();
 		document.title = 'µPad';
 	}
 
@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		closeOnClick: true
 	});
 	$('#menu-button').hide();
+	$('.display-with-note').hide();
 
 	/** Handle Notepad Upload */
 	document.getElementById("upload").addEventListener("change", function(event) {
@@ -606,7 +607,7 @@ function loadSection(id, providedSection) {
 	if (providedSection) section = providedSection;
 	parents.push(section);
 	note = undefined;
-	$('#viewer').hide();
+	$('.display-with-note').hide();
 	document.title = 'µPad';
 	$('#viewer').html('');
 	$('#open-note').hide();
@@ -639,9 +640,8 @@ function loadNote(id, delta) {
 		document.title = note.title+" - µPad";
 		linkBreadcrumbs();
 		$('#open-note').html('{0} <span class="time">{1}</span>'.format(note.title, moment(note.time).format('dddd, D MMMM h:mm A')));
-		$('#open-note').show();
 		$('#viewer').html('');
-		$('#viewer').show();
+		$('.display-with-note').show();
 	}
 	$('#open-type').html('Note')
 	$('#title-input').val(note.title);
@@ -691,12 +691,14 @@ function updateNote(id) {
 	}
 }
 
-function insert(type) {
+function insert(type, newElement) {
 	$('#insert').modal('close');
-	var newElement = {
-		args: {},
-		content: '',
-		type: type
+	if (!newElement){
+		var newElement = {
+			args: {},
+			content: '',
+			type: type
+		}
 	}
 
 	//Get ID
@@ -735,6 +737,29 @@ function insert(type) {
 	asciimath.translate(undefined, true);
 	MathJax.Hub.Typeset();
 	$('#'+newElement.args.id).trigger('click');
+	return newElement.args.id;
+}
+
+function uploadDocx() {
+	$('#docx-upload-name').val('');
+	$('#docx-upload').unbind();
+	$('#docx-upload').bind('change', function(event) {
+		var file = event.target.files[0];
+		if (!file) return;
+		readFileInputEventAsArrayBuffer(event, function(arrayBuffer) {
+			mammoth.convertToMarkdown({arrayBuffer: arrayBuffer}).then(function(res) {
+				$('#docxEditor').modal('close');
+				insert('markdown', {
+					args: {},
+					content: res.value,
+					type: 'markdown'
+				});
+			});
+		});
+	});
+
+	$('#insert').modal('close');
+	$('#docxEditor').modal('open');
 }
 
 function updateBib() {
