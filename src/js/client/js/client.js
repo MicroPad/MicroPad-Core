@@ -448,20 +448,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	}
 
 	/** Restore to previous state */
-	appStorage.getItem('lastSavedState', function(e, value) {
-		if (value == null || e) return;
+	// appStorage.getItem('lastSavedState', function(e, value) {
+	// 	if (value == null || e) return;
 
-		notepad = parser.restoreNotepad(value.notepad);
-		initNotepad();
-		var prevParents = value.parents;
-		for (var i = 0; i < prevParents.length-1; i++) {
-			var prevParent = prevParents[i+1];
-			loadSection(undefined, prevParent);
-		}
-		setTimeout(function() {
-			loadNote(value.noteID);
-		}, 1000);
-	});
+	// 	notepad = parser.restoreNotepad(value.notepad);
+	// 	initNotepad();
+	// 	var prevParents = value.parents;
+	// 	for (var i = 0; i < prevParents.length-1; i++) {
+	// 		var prevParent = prevParents[i+1];
+	// 		loadSection(undefined, prevParent);
+	// 	}
+	// 	setTimeout(function() {
+	// 		loadNote(value.noteID);
+	// 	}, 1000);
+	// });
 });
 
 function newNotepad() {
