@@ -549,7 +549,7 @@ function updateTitle() {
 		//Delete old Notepad
 		notepadStorage.removeItem(notepad.title, function() {
 			notepad.title = $('#title-input').val();
-			$('#parents > span:nth-last-child(2)').html(notepad.title);
+			$('#parents > span:nth-child(1)').html(notepad.title);
 			saveToBrowser();
 			setTimeout(function() {
 				location.reload();
@@ -558,10 +558,14 @@ function updateTitle() {
 	}
 	else if (parents.length > 1 && !note) {
 		//Rename Section
+		parents[parents.length - 1].title = $('#title-input').val();
+		$('#parents > span:nth-last-child(2)').html(parents[parents.length - 1].title);
 		saveToBrowser();
 	}
 	else if (note) {
 		//Rename Note
+		note.title = $('#title-input').val();
+		$('#open-note').html(note.title);
 		saveToBrowser();
 	}
 }
@@ -636,12 +640,6 @@ function loadSection(id, providedSection) {
 	updateSelector();
 	$('#open-type').html('Section');
 	$('#title-input').val(section.title);
-	$('#title-input').unbind();
-	$('#title-input').bind('input propertychange', function() {
-		if (note) return;
-		section.title = $('#title-input').val();
-		$('#parents > span:nth-last-child(2)').html(section.title);
-	});
 
 	$('#selectorTitle').html(section.title);
 	for (k in section.sections) {
@@ -674,12 +672,7 @@ function loadNote(id, delta) {
 		});
 	}
 	$('#open-type').html('Note')
-	$('#title-input').unbind();
 	$('#title-input').val(note.title);
-	$('#title-input').bind('input propertychange', function() {
-		note.title = $('#title-input').val();
-		$('#parents > span:nth-last-child(2)').html(note.title);
-	});
 
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
