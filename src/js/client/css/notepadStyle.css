@@ -97,6 +97,12 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	box-shadow: 0 1px 0 0 #ffb300;
 }
 
+[type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+	position: static;
+	left: 0px;
+	opacity: 1;
+}
+
 .insert-icon {
 	margin-left: calc(50% - 6rem);
 }

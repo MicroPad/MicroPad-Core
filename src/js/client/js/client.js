@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	$('#viewer').click(function (e) {
 		if (e.target == this && note) {
 			lastClick.x = e.pageX;
-			lastClick.y = e.pageY;
+			lastClick.y = e.pageY-128;
 			$('#insert').modal('open');
 		}
 	});
@@ -638,6 +638,7 @@ function loadSection(id, providedSection) {
 	$('#title-input').val(section.title);
 	$('#title-input').unbind();
 	$('#title-input').bind('input propertychange', function() {
+		if (note) return;
 		section.title = $('#title-input').val();
 		$('#parents > span:nth-last-child(2)').html(section.title);
 	});
@@ -673,6 +674,7 @@ function loadNote(id, delta) {
 		});
 	}
 	$('#open-type').html('Note')
+	$('#title-input').unbind();
 	$('#title-input').val(note.title);
 	$('#title-input').bind('input propertychange', function() {
 		note.title = $('#title-input').val();
@@ -862,7 +864,6 @@ function saveToBrowser(retry) {
 	$('#viewer ul').each(function(i) {
 		$(this).addClass('browser-default')
 	});
-
 
 	// var compressedNotepad = window.pako.deflate(JSON.stringify(notepad), {to: 'string'});
 	try {
