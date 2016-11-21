@@ -7,10 +7,16 @@ var lastClick = {x: 0, y: 0};
 var canvasCtx = undefined;
 
 /** Setup localforage */
-localforage.config({
+var notepadStorage = localforage.createInstance({
 	name: 'uPad',
 	version: 1.0,
 	storeName: 'notepads'
+});
+
+var appStorage = localforage.createInstance({
+	name: 'uPad',
+	version: 1.0,
+	storeName: 'app'
 });
 
 /** Setup md parser */
@@ -440,6 +446,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 		return -1;
 	}
+
+	/** Restore to previous state */
+	appStorage.getItem('lastSavedState', function(e, value) {
+		if (value == null || e) return;
+
+		notepad = parser.restoreNotepad(value.notepad);
+		initNotepad();
+		var prevParents = value.parents;
+		for (var i = 0; i < prevParents.length-1; i++) {
+			var prevParent = prevParents[i+1];
+			loadSection(undefined, prevParent);
+		}
+		setTimeout(function() {
+			loadNote(value.noteID);
+		}, 1000);
+	});
 });
 
 function newNotepad() {
@@ -476,7 +498,7 @@ function deleteOpen() {
 	if (confirm("Are you sure you want to delete this?")) {
 		if (parents.length === 1) {
 			//Delete Notepad
-			localforage.removeItem(notepad.title, function() {
+			notepadStorage.removeItem(notepad.title, function() {
 				notepad = undefined;
 				location.reload();
 			});
@@ -512,7 +534,7 @@ function exportOpen() {
 
 function exportNotepads() {
 	var zip = new JSZip();
-	localforage.iterate(function(value, key, i) {
+	notepadStorage.iterate(function(value, key, i) {
 		var blob = new Blob([parser.restoreNotepad(value).toXML()], {type: "text/xml;charset=utf-8"});
 		zip.file(key.replace(/[^a-z0-9 ]/gi, '')+'.npx', blob);
 	}, function() {
@@ -525,7 +547,7 @@ function exportNotepads() {
 function updateTitle() {
 	if (parents.length === 1) {
 		//Delete old Notepad
-		localforage.removeItem(notepad.title, function() {
+		notepadStorage.removeItem(notepad.title, function() {
 			notepad.title = $('#title-input').val();
 			$('#parents > span:nth-last-child(2)').html(notepad.title);
 			saveToBrowser();
@@ -548,12 +570,12 @@ var isUpdating = false;
 var arrOfKeys = [];
 function updateNotepadList() {
 	if (isUpdating) return;
-	localforage.keys().then(function(keys) {
+	notepadStorage.keys().then(function(keys) {
 		if (JSON.stringify(keys) !== JSON.stringify(arrOfKeys)) {
 			arrOfKeys = keys;
 			isUpdating = true;
 			$('#notepadList').html('');
-			localforage.iterate(function(value, key, i) {
+			notepadStorage.iterate(function(value, key, i) {
 				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(key));
 			}, function() {
 				isUpdating = false;
@@ -642,6 +664,13 @@ function loadNote(id, delta) {
 		$('#open-note').html('{0} <span class="time">{1}</span>'.format(note.title, moment(note.time).format('dddd, D MMMM h:mm A')));
 		$('#viewer').html('');
 		$('.display-with-note').show();
+
+		/** Save state */
+		appStorage.setItem('lastSavedState', {
+			notepad: notepad,
+			parents: parents,
+			noteID: noteID
+		});
 	}
 	$('#open-type').html('Note')
 	$('#title-input').val(note.title);
@@ -837,7 +866,7 @@ function saveToBrowser(retry) {
 
 	// var compressedNotepad = window.pako.deflate(JSON.stringify(notepad), {to: 'string'});
 	try {
-		localforage.setItem(notepad.title, notepad, function() {
+		notepadStorage.setItem(notepad.title, notepad, function() {
 			updateNotepadList();
 		});
 	}
@@ -847,14 +876,14 @@ function saveToBrowser(retry) {
 			notepad.title = tooBig;
 		}
 		else if (notepad.title != tooBig) {
-			localforage.clear();
+			notepadStorage.clear();
 			saveToBrowser(true);
 		}
 	}
 }
 
 function loadFromBrowser(title) {
-	localforage.getItem(title, function(err, res) {
+	notepadStorage.getItem(title, function(err, res) {
 		// notepad = JSON.parse(window.pako.inflate(res, {to: 'string'}));
 		notepad = parser.restoreNotepad(res);
 		window.initNotepad();
