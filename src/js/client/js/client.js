@@ -462,6 +462,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	// 		loadNote(value.noteID);
 	// 	}, 1000);
 	// });
+	 
+	/** Search Notes */
+	$('search').modal({
+		complete: function() {
+			$('#search-input').val('');
+		}
+	});
+	$('#search-input').bind('input propertychange', function(event) {
+		console.log("Search Input");
+	});
 });
 
 function newNotepad() {

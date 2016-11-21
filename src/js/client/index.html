@@ -20,7 +20,7 @@
 					<li><a class="dropdown-button" href="#!" data-activates="notepad-dropdown"><i class="material-icons left">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
 					<li><a class="dropdown-button" href="#!" data-activates="section-dropdown"><i class="material-icons left">book</i>Sections<i class="material-icons right">arrow_drop_down</i></a></li>
 					<li><a class="dropdown-button" href="#!" data-activates="notes-dropdown"><i class="material-icons left">note</i>Notes<i class="material-icons right">arrow_drop_down</i></a></li>
-					<li><a href="#!"><i class="material-icons left">search</i>Search</a></li>
+					<li><a href="#!" class="modal-trigger" data-target="search"><i class="material-icons left">search</i>Search</a></li>
 				</ul>
 			</div>
 		</nav>
@@ -65,6 +65,19 @@
 			<li class="divider"></li>
 			<div id="noteList"></div>
 		</ul>
+
+		<!-- Search -->
+		<div id="search" class="modal modal-fixed-footer">
+			<div class="modal-content">
+				<div class="input-field">
+					<input id="search-text" placeholder="Search Notes" autocomplete="off" autofocus />
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
+			</div>
+		</div>
 
 		<!-- New Notepad -->
 		<div id="new-notepad" class="modal">
