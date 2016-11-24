@@ -239,6 +239,13 @@ function parseSection(sectionXML, section, parent) {
 							}
 						}
 
+						if (noteXML.recording) {
+							for (var j = 0; j < noteXML.image.length; j++) {
+								var element = noteXML.image[j];
+								note.addElement("recording", element.$, element._);
+							}
+						}
+
 						section.addNote(note);
 					}
 					break;
