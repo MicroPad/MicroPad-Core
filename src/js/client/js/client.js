@@ -5,6 +5,7 @@ var noteID;
 var lastEditedElement = undefined;
 var lastClick = {x: 0, y: 0};
 var canvasCtx = undefined;
+var rec = new Recorder();
 
 /** Setup localforage */
 var notepadStorage = localforage.createInstance({
@@ -110,6 +111,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	});
 	$('#menu-button').hide();
 	$('#search-button').hide();
+	$('#stop-recording-btn').hide();
 	$('.display-with-note').hide();
 
 	/** Handle Notepad Upload */
@@ -520,7 +522,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 		if (latestResults.length > 0) Materialize.showStaggeredList('#search-results');
 	});
+
+	/** Recording Stuff */
+	interact('#stop-recording-btn').on('tap', function(event) {
+		rec.stop();
+		$('#stop-recording-btn').hide();
+	});
 });
+
 var latestResults = [];
 function loadSearchResult(resID) {
 	$('#search').modal('close');
@@ -794,6 +803,9 @@ function loadNote(id, delta) {
 			case "file":
 				$('#viewer').append('<div class="interact z-depth-2 hoverable fileHolder" id="{5}" style="top: {0}; left: {1}; height: {2}; width: {3};"><a href="javascript:downloadFile(\'{5}\');">{4}</a></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.args.id));
 				break;
+			case "recording":
+				$('#viewer').append('<div class="interact z-depth-2 hoverable recording" id="{5}" style="top: {0}; left: {1}; height: {2}; width: {3};"><audio controls="true" src="{5}"></audio><p><em>{4}</em></p></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.args.id));
+				break;
 		}
 	}
 	updateBib();
@@ -859,6 +871,9 @@ function insert(type, newElement) {
 			break;
 		case "file":
 			newElement.args.filename = "File";
+			break;
+		case "recording":
+			newElement.args.filename = note.title.replace(/[^a-z0-9 ]/gi, '')+' '+new Date().toISOString() + ".ogg";
 			break;
 	}
 
@@ -1002,6 +1017,23 @@ function resizeCanvas() {
 	canvasCtx.canvas.height = canvasHolder.height();
 	canvasOffset = canvas.offset();
 }
+
+/** Recording Stuff */
+function audiotest() {
+	rec.initStream();
+	$('#insert').modal('close');
+}
+rec.addEventListener('streamReady', function(event) {
+	rec.start();
+	$('#stop-recording-btn').show();
+});
+rec.addEventListener( "dataAvailable", function(e) {
+	var blob = new Blob([e.detail], { type: 'audio/ogg' } );
+	var url = URL.createObjectURL(blob);
+
+	var id = insert('recording');
+	$('#'+id+' > audio').attr('src', url);
+});
 
 /** Utility functions */
 function toBase64(str) {

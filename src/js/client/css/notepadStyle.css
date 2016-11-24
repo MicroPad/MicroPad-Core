@@ -63,6 +63,7 @@ div .interact {
 	min-height: 50px;
 	padding: 5px;
 	word-wrap: break-word;
+	overflow: auto;
 	/*z-index: 20;*/
 }
 

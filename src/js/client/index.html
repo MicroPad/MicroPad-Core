@@ -147,7 +147,7 @@
 					</div>
 
 					<div class="col s2">
-						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Recording-Attached Note">record_voice_over</i>
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Recording-Attached Note" onclick="audiotest();">record_voice_over</i>
 					</div>
 				</div>
 			</div>
@@ -157,6 +157,8 @@
 			</div>
 		</div>
 		<a class="modal-trigger btn-floating btn-large waves-effect waves-light red display-with-note" style="position: fixed; right: 20px; bottom: 20px;" data-target="insert"><i class="material-icons">add</i></a>
+
+		<a id="stop-recording-btn" class="btn red waves-effect waves-light" style="position: fixed; left: 20px; bottom: 20px;"><i class="material-icons left">stop</i>Stop Recording</a>
 
 		<!-- Markdown Editor -->
 		<div id="mdEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
@@ -276,6 +278,7 @@
 		<script src="js/libs/jszip.min.js"></script>
 		<script src="js/libs/trim-canvas.js"></script>
 		<script src="js/libs/mammoth.browser.min.js"></script>
+		<script src="js/libs/recorderjs/recorder.min.js"></script>
 
 		<script src="js/libs/interact.min.js"></script>
 		<script src="js/libs/showdown.min.js"></script>
