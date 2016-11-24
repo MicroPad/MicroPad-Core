@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 								if (!isCanvasBlank($('#drawing-viewer')[0])) {
 									element.content = $('#drawing-viewer')[0].toDataURL();
 									
-									var trimmed = trim($('#drawing-viewer')[0]).toDataURL();
+									var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
 									currentTarget.attr('src', trimmed);
 
 									saveToBrowser();
@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 							reader.onload = function() {
 								element.content = reader.result;
-								currentTarget.attr('src', element.content);
+								currentTarget.attr('src', URL.createObjectURL(dataURItoBlob(element.content)));
 								updateReference(event);
 							}
 						});
@@ -527,6 +527,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	interact('#stop-recording-btn').on('tap', function(event) {
 		rec.stop();
 		$('#stop-recording-btn').hide();
+	});
+	$('#viewer').on('click', '.recording-text', function(event) {
+		if (justMoved) {
+			justMoved = false;
+			return;
+		}
+
+		var id = $(this).parent().attr('id');
+		for (var i = 0; i < note.elements.length; i++) {
+			var element = note.elements[i];
+			if (element.args.id === id) {
+				lastEditedElement = element;
+				deleteElement();
+				break;
+			}
+		}
 	});
 });
 
@@ -804,7 +820,7 @@ function loadNote(id, delta) {
 				$('#viewer').append('<div class="interact z-depth-2 hoverable fileHolder" id="{5}" style="top: {0}; left: {1}; height: {2}; width: {3};"><a href="javascript:downloadFile(\'{5}\');">{4}</a></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.args.id));
 				break;
 			case "recording":
-				$('#viewer').append('<div class="interact z-depth-2 hoverable recording" id="{5}" style="top: {0}; left: {1}; height: {2}; width: {3};"><audio controls="true" src="{5}"></audio><p><em>{4}</em></p></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.args.id));
+				$('#viewer').append('<div class="interact z-depth-2 hoverable recording" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3};"><audio controls="true" src="{5}"></audio><p class="recording-text"><em>{4}</em></p></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.content, element.args.id));
 				break;
 		}
 	}
@@ -886,6 +902,33 @@ function insert(type, newElement) {
 	return newElement.args.id;
 }
 
+/** Recording Stuff */
+function audiotest() {
+	rec.initStream();
+	$('#insert').modal('close');
+}
+rec.addEventListener('streamReady', function(event) {
+	rec.start();
+	$('#stop-recording-btn').show();
+});
+rec.addEventListener( "dataAvailable", function(e) {
+	var blob = new Blob([e.detail], { type: 'audio/ogg' } );
+	var url = URL.createObjectURL(blob);
+
+	var id = insert('recording');
+	for (var i = 0; i < note.elements.length; i++) {
+		var element = note.elements[i];
+		if (id === element.args.id) {
+			blobToDataURL(blob, function(dataURI) {
+				element.content = dataURI;
+				saveToBrowser();
+			});
+			break;
+		}
+	}
+	$('#'+id+' > audio').attr('src', url);
+});
+
 function uploadDocx() {
 	$('#docx-upload-name').val('');
 	$('#docx-upload').unbind();
@@ -927,7 +970,7 @@ function initDrawings() {
 		tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
 		tmpCtx.drawImage(img, 0, 0);
 
-		var trimmed = trim(tmpCanvas).toDataURL();
+		var trimmed = URL.createObjectURL(dataURItoBlob(trim(tmpCanvas).toDataURL()));
 		$(this).attr('src', trimmed);
 	});
 }
@@ -1018,23 +1061,6 @@ function resizeCanvas() {
 	canvasOffset = canvas.offset();
 }
 
-/** Recording Stuff */
-function audiotest() {
-	rec.initStream();
-	$('#insert').modal('close');
-}
-rec.addEventListener('streamReady', function(event) {
-	rec.start();
-	$('#stop-recording-btn').show();
-});
-rec.addEventListener( "dataAvailable", function(e) {
-	var blob = new Blob([e.detail], { type: 'audio/ogg' } );
-	var url = URL.createObjectURL(blob);
-
-	var id = insert('recording');
-	$('#'+id+' > audio').attr('src', url);
-});
-
 /** Utility functions */
 function toBase64(str) {
 	return window.btoa(unescape(encodeURIComponent(str)));
@@ -1085,4 +1111,10 @@ function dataURItoBlob(dataURI) {
 	// write the ArrayBuffer to a blob, and you're done
 	var blob = new Blob([ab], {type: mimeString});
 	return blob;
+}
+
+function blobToDataURL(blob, callback) {
+	var a = new FileReader();
+	a.onload = function(e) {callback(e.target.result);}
+	a.readAsDataURL(blob);
 }
