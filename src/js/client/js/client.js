@@ -466,11 +466,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	/** Search Notes */
 	$('search').modal({
 		complete: function() {
-			$('#search-input').val('');
+			$('#search-text').val('');
 		}
 	});
-	$('#search-input').bind('input propertychange', function(event) {
-		console.log("Search Input");
+	$('#search-text').bind('input propertychange', function(event) {
+		var query = $('#search-text').val();
 	});
 });
 
