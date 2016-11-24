@@ -903,7 +903,7 @@ function insert(type, newElement) {
 }
 
 /** Recording Stuff */
-function audiotest() {
+function insertRecording() {
 	rec.initStream();
 	$('#insert').modal('close');
 }
