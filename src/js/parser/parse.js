@@ -240,8 +240,8 @@ function parseSection(sectionXML, section, parent) {
 						}
 
 						if (noteXML.recording) {
-							for (var j = 0; j < noteXML.image.length; j++) {
-								var element = noteXML.image[j];
+							for (var j = 0; j < noteXML.recording.length; j++) {
+								var element = noteXML.recording[j];
 								note.addElement("recording", element.$, element._);
 							}
 						}
