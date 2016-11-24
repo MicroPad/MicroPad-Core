@@ -67,10 +67,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$('#search-button').show();
 		$('#open-type').html('Notepad')
 		$('#title-input').val(notepad.title);
-		// $('#title-input').bind('input propertychange', function() {
-		// 	notepad.title = $('#title-input').val();
-		// 	$('#parents > span:nth-last-child(2)').html(notepad.title);
-		// });
 
 		parents.push(notepad);	
 
@@ -90,10 +86,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$('#add-note-link').css('display', 'none');
 		$('.display-with-note').hide();
 		document.title = 'µPad';
+
+		appStorage.setItem('lastNotepadTitle', notepad.title);
 	}
 
 	/** Get the open notepads */
 	updateNotepadList();
+
+	/** Restore to previous notepad */
+	appStorage.getItem('lastNotepadTitle', function(e, title) {
+		if (title == null || e) return;
+		notepadStorage.iterate(function(value, key, i) {
+			if (title === key) {
+				notepad = parser.restoreNotepad(value);
+				initNotepad();
+			}
+		});
+	});
 	
 	$('.modal').modal();
 	$('#menu-button').sideNav({
@@ -448,22 +457,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}
 		return -1;
 	}
-
-	/** Restore to previous state */
-	// appStorage.getItem('lastSavedState', function(e, value) {
-	// 	if (value == null || e) return;
-
-	// 	notepad = parser.restoreNotepad(value.notepad);
-	// 	initNotepad();
-	// 	var prevParents = value.parents;
-	// 	for (var i = 0; i < prevParents.length-1; i++) {
-	// 		var prevParent = prevParents[i+1];
-	// 		loadSection(undefined, prevParent);
-	// 	}
-	// 	setTimeout(function() {
-	// 		loadNote(value.noteID);
-	// 	}, 1000);
-	// });
 	 
 	/** Search Notes */
 	$('#search').modal({
@@ -719,13 +712,6 @@ function loadNote(id, delta) {
 		$('#open-note').html('{0} <span class="time">{1}</span>'.format(note.title, moment(note.time).format('dddd, D MMMM h:mm A')));
 		$('#viewer').html('');
 		$('.display-with-note').show();
-
-		/** Save state */
-		appStorage.setItem('lastSavedState', {
-			notepad: notepad,
-			parents: parents,
-			noteID: noteID
-		});
 	}
 	$('#open-type').html('Note')
 	$('#title-input').val(note.title);
@@ -919,6 +905,8 @@ function saveToBrowser(retry) {
 		notepadStorage.setItem(notepad.title, notepad, function() {
 			updateNotepadList();
 		});
+
+		appStorage.setItem('lastNotepadTitle', notepad.title);
 	}
 	catch (e) {
 		if (retry && notepad.title != tooBig) {
