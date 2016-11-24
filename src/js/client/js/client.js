@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		noteID = undefined;
 		lastClick = {x: 0, y: 0};
 		$('#menu-button').show();
+		$('#search-button').show();
 		$('#open-type').html('Notepad')
 		$('#title-input').val(notepad.title);
 		// $('#title-input').bind('input propertychange', function() {
@@ -99,6 +100,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		closeOnClick: true
 	});
 	$('#menu-button').hide();
+	$('#search-button').hide();
 	$('.display-with-note').hide();
 
 	/** Handle Notepad Upload */
@@ -464,15 +466,48 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	// });
 	 
 	/** Search Notes */
-	$('search').modal({
+	$('#search').modal({
 		complete: function() {
 			$('#search-text').val('');
+			$('#search-results').html('');
 		}
 	});
 	$('#search-text').bind('input propertychange', function(event) {
+		$('#search-results').html('');
+
 		var query = $('#search-text').val();
+		if (query.length < 1) return;
+		latestResults = notepad.search(query);
+		for (k in latestResults) {
+			var result = latestResults[k];
+			$('#search-results').append('<li style="opacity: 0;"><h4><a href="javascript:loadSearchResult({1});">{0}</a></h4></li>'.format(result.title, k));
+		}
+		if (latestResults.length > 0) Materialize.showStaggeredList('#search-results');
 	});
 });
+var latestResults = [];
+function loadSearchResult(resID) {
+	$('#search').modal('close');
+	parents = [];
+	var result = latestResults[resID];
+	recalculateParents(result);
+
+	for (var i = 0; i < parents[parents.length - 1].notes.length; i++) {
+		var n = parents[parents.length - 1].notes[i];
+		if (n === result) {
+			loadNote(i);
+			break;
+		}
+	}
+	latestResults = [];
+}
+
+function recalculateParents(baseObj) {
+	parents.unshift(baseObj.parent);
+	if (parents[0].parent) {
+		recalculateParents(parents[0]);
+	}
+}
 
 function newNotepad() {
 	var title = $('#new-notepad-title').val();
