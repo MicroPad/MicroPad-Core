@@ -507,6 +507,17 @@ function recalculateParents(baseObj) {
 	if (parents[0].parent) {
 		recalculateParents(parents[0]);
 	}
+
+	//Reset breadcrumbs
+	$('#parents').children().each(function(i) {
+		if(this.id == "open-note") return false;
+		$(this).remove();
+	});
+	for (k in parents) {
+		var p = parents[k];
+		$('<span class="breadcrumb">{0}</span>'.format(p.title)).insertBefore('#open-note');
+	}
+	linkBreadcrumbs();
 }
 
 function newNotepad() {
