@@ -1,4 +1,4 @@
-var parser = require('./parse.js');
+var parser = require('../parse.js');
 var fs = require('fs');
 var path = require('path');
 

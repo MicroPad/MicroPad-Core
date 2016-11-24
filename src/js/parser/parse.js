@@ -1,26 +1,28 @@
 var xml2js = require('xml2js');
 var parseString = require('xml2js').parseString;
 var moment = require('moment');
-// Thanks to http://stackoverflow.com/a/4673436/998467
-if (!String.prototype.format) {
-	String.prototype.format = function() {
-		var args = arguments;
-		return this.replace(/{(\d+)}/g, function(match, number) { 
-			return typeof args[number] != 'undefined'
-				? args[number]
-				: match
-			;
-		});
-	};
-}
+
+var Note = require('./Note.js').Note;
+
+var searchResults = [];
 
 var Notepad = function(title) {
 	this.title = title;
 	this.sections = [];
-};
+}
 Notepad.prototype.addSection = function(section) {
+	section.parent = this;
 	this.sections.push(section);
-};
+}
+Notepad.prototype.search = function(query) {
+	searchResults = [];
+	for (s in this.sections) {
+		var section = this.sections[s];
+		Array.prototype.push.apply(searchResults, section.search(query));
+	}
+
+	return searchResults;
+}
 Notepad.prototype.toXMLObject = function() {
 	var parseableNotepad = {
 		notepad: {
@@ -54,16 +56,35 @@ Notepad.prototype.toXML = function() {
 }
 
 var Section = function(title) {
+	this.parent = undefined;
 	this.title = title;
 	this.sections = [];
 	this.notes = [];
 };
 Section.prototype.addSection = function(section) {
+	section.parent = this;
 	this.sections.push(section);
 };
 Section.prototype.addNote = function(note) {
+	note.parent = this;
 	this.notes.push(note);
 };
+Section.prototype.search = function(query) {
+	var res = [];
+	for (n in this.notes) {
+		var note = this.notes[n];
+		var searchRes = note.search(query);
+		if (searchRes) {
+			res.push(searchRes);
+		}
+	}
+
+	for (s in this.sections) {
+		Array.prototype.push.apply(searchResults, this.sections[s].search(query));
+	}
+
+	return res;
+}
 Section.prototype.toXMLObject = function() {
 	var parseableSection = {
 		section: {
@@ -86,96 +107,6 @@ Section.prototype.toXMLObject = function() {
 	return parseableSection;
 }
 Section.prototype.toXML = function() {
-	var builder = new xml2js.Builder({
-		allowSurrogateChars: true,
-		headless: true,
-		cdata: true
-	});
-	return builder.buildObject(this.toXMLObject());
-}
-
-var Note = function(title, time, addons) {
-	this.title = title;
-	this.time = Date.parse(time);
-	this.addons = addons;
-	this.bibliography = [];
-	this.elements = [];
-};
-Note.prototype.addSource = function(id, item, content) {
-	this.bibliography.push({
-		id: id,
-		item: item,
-		content: content
-	});
-};
-Note.prototype.addElement = function(type, args, content) {
-	if (!type) return;
-	if (!content || content.length === 0) return;
-	this.elements.push({
-		type: type,
-		args: args,
-		content: content
-	});
-};
-Note.prototype.toXMLObject = function() {
-	var parseableNote = {
-		note: {
-			$: {
-				title: this.title,
-				time: moment(this.time).format()
-			},
-			addons: [],
-			bibliography: []
-		}
-	}
-
-	var imports = {
-		import: []
-	};
-	for (k in this.addons) {
-		imports.import.push(this.addons[k]);
-	}
-	parseableNote.note.addons.push(imports);
-
-	var sources = {
-		source: []
-	};
-	for (k in this.bibliography) {
-		var source = this.bibliography[k];
-		sources.source.push({
-			_: source.content,
-			$: {
-				id: source.id,
-				item: source.item
-			}
-		});
-	}
-	parseableNote.note.bibliography.push(sources);
-
-	elements = {};
-	for (k in this.elements) {
-		var element = this.elements[k];
-		if (!elements[element.type]) elements[element.type] = [];
-		
-		var elementToPush = {
-			_: element.content,
-			$: {}
-		}
-
-		for (argName in element.args) {
-			elementToPush.$[argName] = element.args[argName];
-		}
-
-		elements[element.type].push(elementToPush);
-	}
-	for (k in elements) {
-		var elementGroup = elements[k];
-		parseableNote.note[k] = elementGroup;
-	}
-
-	return parseableNote;
-}
-Note.prototype.toXML = function() {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
 		headless: true,
@@ -323,4 +254,17 @@ function parseSection(sectionXML, section, parent) {
 	}
 
 	parent.addSection(section);
+}
+
+// Thanks to http://stackoverflow.com/a/4673436/998467
+if (!String.prototype.format) {
+	String.prototype.format = function() {
+		var args = arguments;
+		return this.replace(/{(\d+)}/g, function(match, number) { 
+			return typeof args[number] != 'undefined'
+				? args[number]
+				: match
+			;
+		});
+	};
 }
