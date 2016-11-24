@@ -201,6 +201,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			justMoved = false;
 			return;
 		}
+
 		var currentTarget = $('#'+event.currentTarget.id);
 		for (k in note.elements) {
 			var element = note.elements[k];
@@ -350,7 +351,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 									note.bibliography.push({
 										id: note.bibliography.length+1,
 										item: element.args.id,
-										contents: $('#isw').val()
+										content: $('#isw').val()
 									});
 								}
 								updateBib();
@@ -360,7 +361,49 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						break;
 
 					case "file":
-						alert("Files are not supported yet");
+						source = undefined;
+						$('#fsw').val('');
+						for (var i = 0; i < note.bibliography.length; i++) {
+							var mSource = note.bibliography[i];
+							if (mSource.item == element.args.id) {
+								source = mSource;
+								$('#fsw').val(source.content);
+								break;
+							}
+						}
+
+						$('#file-upload-name').val('');
+						$('#file-upload').unbind();
+						$('#file-upload').bind('change', function(event) {
+							var reader = new FileReader();
+							var file = event.target.files[0];
+							element.args.filename = file.name;
+							if (!file) return;
+							reader.readAsDataURL(file);
+
+							reader.onload = function() {
+								element.content = reader.result;
+								$('#'+element.args.id+' > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
+								$('#'+element.args.id+' > a').html(element.args.filename);
+							}
+						});
+
+						$('#fileEditor').modal({
+							complete: function() {
+								if (source) {
+									source.content = $('#fsw').val();
+								}
+								else if ($('#fsw').val().length > 0) {
+									note.bibliography.push({
+										id: note.bibliography.length+1,
+										item: element.args.id,
+										content: $('#fsw').val()
+									});
+								}
+								updateBib();
+							}
+						});
+						$('#fileEditor').modal('open');
 						break;
 				}
 				break;
@@ -593,6 +636,22 @@ function exportNotepads() {
 	});
 }
 
+function downloadFile(elementID) {
+	var selElement;
+	for (var i = 0; i < note.elements.length; i++) {
+		element = note.elements[i];
+		if (element.args.id === elementID) {
+			selElement = element;
+			break;
+		}
+	}
+	var dataURI = selElement.content;
+	var filename = selElement.args.filename;
+	var blob = dataURItoBlob(dataURI);
+	saveAs(blob, filename);
+	$('#fileEditor').modal('close');
+}
+
 function updateTitle() {
 	if (parents.length === 1) {
 		//Delete old Notepad
@@ -725,12 +784,15 @@ function loadNote(id, delta) {
 				asciimath.translate(undefined, true);
 				MathJax.Hub.Typeset();
 				break;
+			case "drawing":
+				$('#viewer').append('<img class="interact hoverable drawing" id="{0}" style="top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
+				break;
 			case "image":
 				$('#viewer').append('<img class="interact z-depth-2 hoverable" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
 				// Materialize.fadeInImage('#'+element.args.id);
 				break;
-			case "drawing":
-				$('#viewer').append('<img class="interact hoverable drawing" id="{0}" style="top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
+			case "file":
+				$('#viewer').append('<div class="interact z-depth-2 hoverable fileHolder" id="{5}" style="top: {0}; left: {1}; height: {2}; width: {3};"><a href="javascript:downloadFile(\'{5}\');">{4}</a></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.args.id));
 				break;
 		}
 	}
@@ -794,6 +856,9 @@ function insert(type, newElement) {
 			break;
 		case "drawing":
 			newElement.content = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAQAAADa613fAAAAaElEQVR42u3PQREAAAwCoNm/9CL496ABuREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREWkezG8AZQ6nfncAAAAASUVORK5CYII=";
+			break;
+		case "file":
+			newElement.args.filename = "File";
 			break;
 	}
 
@@ -969,3 +1034,23 @@ function isCanvasBlank(canvas) {
 	return canvas.toDataURL() == blank.toDataURL();
 }
 
+//Thanks to http://stackoverflow.com/a/12300351/998467
+function dataURItoBlob(dataURI) {
+	// convert base64 to raw binary data held in a string
+	// doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+	var byteString = atob(dataURI.split(',')[1]);
+
+	// separate out the mime component
+	var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+	// write the bytes of the string to an ArrayBuffer
+	var ab = new ArrayBuffer(byteString.length);
+	var ia = new Uint8Array(ab);
+	for (var i = 0; i < byteString.length; i++) {
+		ia[i] = byteString.charCodeAt(i);
+	}
+
+	// write the ArrayBuffer to a blob, and you're done
+	var blob = new Blob([ab], {type: mimeString});
+	return blob;
+}

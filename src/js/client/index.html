@@ -15,7 +15,7 @@
 				</ul>
 
 				<ul class="right">
-					<li><div style="top: 10px;" class="file-field input-field"><div class="waves-effect waves-light btn amber darken-1 tooltipped" data-position="left" data-delay="50" data-tooltip="Upload a .npx file or a .zip archive containing .npx files"><span>Upload Notepad</span><input id="upload" type="file"></div><div style="display: none;" class="file-path-wrapper"><input id="upload-name" class="file-path validate" type="text"></div></div></li>
+					<li><div style="top: 10px;" class="file-field input-field"><div class="waves-effect waves-light btn amber darken-1 tooltipped" data-position="left" data-delay="50" data-tooltip="Upload a .npx file or a .zip archive containing .npx files"><span>Upload Notepads</span><input id="upload" type="file"></div><div style="display: none;" class="file-path-wrapper"><input id="upload-name" class="file-path validate" type="text"></div></div></li>
 
 					<li><a class="dropdown-button" href="#!" data-activates="notepad-dropdown"><i class="material-icons left">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
 					<li><a class="dropdown-button" href="#!" data-activates="section-dropdown"><i class="material-icons left">book</i>Sections<i class="material-icons right">arrow_drop_down</i></a></li>
@@ -143,7 +143,7 @@
 					</div>
 
 					<div class="col s2">
-						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="File">attach_file</i>
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="File" onclick="insert('file');">attach_file</i>
 					</div>
 
 					<div class="col s2">
@@ -234,6 +234,29 @@
 							<input id="isw" type="text" placeholder="Source Website" />
 							<input id="iw" type="text" placeholder="Width" />
 							<input id="ih" type="text" placeholder="Height" />
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
+			</div>
+		</div>
+
+		<!-- File Editor -->
+		<div id="fileEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
+			<div class="modal-content">
+				<div class="row">
+					<div class="file-field input-field col s8">
+						<div class="waves-effect waves-light btn amber darken-1">
+							<span>Upload File</span>
+							<input id="file-upload" type="file">
+						</div>
+						<div class="file-path-wrapper"><input id="file-upload-name" class="file-path validate" type="text"></div>
+					</div>
+
+					<div class="col s4">
+							<input id="fsw" type="text" placeholder="Source Website" />
 					</div>
 				</div>
 			</div>
