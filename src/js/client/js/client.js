@@ -820,7 +820,8 @@ function loadNote(id, delta) {
 				$('#viewer').append('<div class="interact z-depth-2 hoverable fileHolder" id="{5}" style="top: {0}; left: {1}; height: {2}; width: {3};"><a href="javascript:downloadFile(\'{5}\');">{4}</a></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.args.id));
 				break;
 			case "recording":
-				$('#viewer').append('<div class="interact z-depth-2 hoverable recording" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3};"><audio controls="true" src="{5}"></audio><p class="recording-text"><em>{4}</em></p></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.content, element.args.id));
+				$('#viewer').append('<div class="z-depth-2 hoverable recording" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3};"><audio controls="true" src="{5}"></audio><p class="recording-text"><em>{4}</em></p></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.content, element.args.id));
+				edgeFix(dataURItoBlob(element.content), element.args.id);
 				break;
 		}
 	}
@@ -926,8 +927,67 @@ rec.addEventListener( "dataAvailable", function(e) {
 			break;
 		}
 	}
+
 	$('#'+id+' > audio').attr('src', url);
+	edgeFix(blob, id);
 });
+
+function edgeFix(blob, id) {
+	if (window.navigator.userAgent.indexOf("Edge") > -1) {
+		//MS Edge & IE suck and can't opus. For them we'll use .wav
+		var fileReader = new FileReader();
+		fileReader.onload = function() {
+			var arrayBuffer = this.result;
+			var typedArray = new Uint8Array(arrayBuffer);
+			var decoderWorker = new Worker('js/libs/recorderjs/decoderWorker.min.js');
+			var wavWorker = new Worker('js/libs/recorderjs/waveWorker.min.js');
+			var desiredSampleRate = 8000;
+
+			decoderWorker.postMessage({
+				command:'init',
+				decoderSampleRate: desiredSampleRate,
+				outputBufferSampleRate: desiredSampleRate
+			});
+
+			wavWorker.postMessage({ 
+				command:'init',
+				bitDepth: 16,
+				sampleRate: desiredSampleRate
+			});
+
+			decoderWorker.onmessage = function(e) {
+				if (e.data === null) {
+					wavWorker.postMessage({ command: 'done' });
+				}
+				else {
+					wavWorker.postMessage({
+						command: 'record',
+						buffers: e.data
+					}, e.data.map(function(typedArray){
+						return typedArray.buffer;
+					}));
+				}
+			};
+
+			wavWorker.onmessage = function(e) {
+				var blob = new Blob([e.data], {type: "audio/wav"});
+				var url = URL.createObjectURL(blob);
+
+				$('#'+id+' > audio').attr('src', url);
+			};
+
+			decoderWorker.postMessage({
+				command: 'decode',
+				pages: typedArray
+			}, [typedArray.buffer]);
+
+			decoderWorker.postMessage({
+				command: 'done'
+			});
+		};
+		fileReader.readAsArrayBuffer(blob);
+	}
+}
 
 function uploadDocx() {
 	$('#docx-upload-name').val('');

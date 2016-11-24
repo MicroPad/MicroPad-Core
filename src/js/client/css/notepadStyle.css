@@ -56,23 +56,11 @@ body {
 
 #viewer > div {
 	position: absolute;
-}
-
-div .interact {
 	min-width: 170px;
 	min-height: 50px;
 	padding: 5px;
 	word-wrap: break-word;
 	overflow: auto;
-	/*z-index: 20;*/
-}
-
-img .interact {
-	/*z-index: 20;*/
-}
-
-.drawing {
-	/*z-index: 10;*/
 }
 
 #modal {
