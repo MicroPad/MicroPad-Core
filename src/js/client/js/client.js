@@ -240,7 +240,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						});
 
 						$('#mdw').val(element.args.width);
-						$('#mdw').val(element.args.width);
 						$('#mdw').unbind();
 						$('#mdw').bind('input propertychange', function() {
 							element.args.width = $('#mdw').val();
@@ -248,7 +247,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 							updateReference(event);
 						});
 
-						$('#mdh').val(element.args.height);
 						$('#mdh').val(element.args.height);
 						$('#mdh').unbind();
 						$('#mdh').bind('input propertychange', function() {
@@ -327,7 +325,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 						});
 
 						$('#iw').val(element.args.width);
-						$('#iw').val(element.args.width);
 						$('#iw').unbind();
 						$('#iw').bind('input propertychange', function() {
 							element.args.width = $('#iw').val();
@@ -335,7 +332,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 							updateReference(event);
 						});
 
-						$('#ih').val(element.args.height);
 						$('#ih').val(element.args.height);
 						$('#ih').unbind();
 						$('#ih').bind('input propertychange', function() {
@@ -533,16 +529,33 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			justMoved = false;
 			return;
 		}
-
-		var id = $(this).parent().attr('id');
+		
+		var currentTarget = $(event.currentTarget).parent();
+		var id = currentTarget.attr('id');
 		for (var i = 0; i < note.elements.length; i++) {
 			var element = note.elements[i];
 			if (element.args.id === id) {
 				lastEditedElement = element;
-				deleteElement();
 				break;
 			}
 		}
+
+
+		$('#rposl').val(lastEditedElement.args.x);
+		$('#rposl').unbind();
+		$('#rposl').bind('input propertychange', function() {
+			lastEditedElement.args.x = $('#rposl').val();
+			currentTarget.css('left', lastEditedElement.args.x);
+		});
+
+		$('#rpost').val(lastEditedElement.args.y);
+		$('#rpost').unbind();
+		$('#rpost').bind('input propertychange', function() {
+			lastEditedElement.args.y = $('#rpost').val();
+			currentTarget.css('top', lastEditedElement.args.y);
+		});
+		
+		$('#recordingEditor').modal('open');
 	});
 });
 
@@ -813,15 +826,15 @@ function loadNote(id, delta) {
 				$('#viewer').append('<img class="interact hoverable drawing" id="{0}" style="top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
 				break;
 			case "image":
-				$('#viewer').append('<img class="interact z-depth-2 hoverable" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, element.content));
-				// Materialize.fadeInImage('#'+element.args.id);
+				var src = URL.createObjectURL(dataURItoBlob(element.content));
+				$('#viewer').append('<img class="interact z-depth-2 hoverable" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, src));
 				break;
 			case "file":
 				$('#viewer').append('<div class="interact z-depth-2 hoverable fileHolder" id="{5}" style="top: {0}; left: {1}; height: {2}; width: {3};"><a href="javascript:downloadFile(\'{5}\');">{4}</a></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.args.id));
 				break;
 			case "recording":
 				$('#viewer').append('<div class="z-depth-2 hoverable recording" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3};"><audio controls="true" src="{5}"></audio><p class="recording-text"><em>{4}</em></p></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.content, element.args.id));
-				edgeFix(dataURItoBlob(element.content), element.args.id);
+				if (!delta) edgeFix(dataURItoBlob(element.content), element.args.id);
 				break;
 		}
 	}
@@ -934,7 +947,7 @@ rec.addEventListener( "dataAvailable", function(e) {
 
 function edgeFix(blob, id) {
 	if (window.navigator.userAgent.indexOf("Edge") > -1) {
-		//MS Edge & IE suck and can't opus. For them we'll use .wav
+		//MS Edge sucks and can't opus. For them we'll use .wav
 		var fileReader = new FileReader();
 		fileReader.onload = function() {
 			var arrayBuffer = this.result;
