@@ -18,6 +18,7 @@ body {
 #loadedContent {
 	opacity: 0;
 	transition: opacity 500ms linear;
+	position: relative;
 }
 
 #preloader {
