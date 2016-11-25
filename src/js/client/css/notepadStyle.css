@@ -14,6 +14,16 @@ body {
 	/*background-color: #fcfcfc;*/
 }
 
+#loadedContent {
+	visibility: hidden;
+}
+
+#preloader {
+	position: fixed;
+	left: calc(50% - 64px);
+	top: calc(50% - 64px);
+}
+
 .nav-wrapper {
 	width: calc(100vw - 15px);
 }

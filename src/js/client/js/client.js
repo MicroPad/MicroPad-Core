@@ -58,7 +58,7 @@ var md = new showdown.Converter({
 	extensions: ['math']
 });
 
-document.addEventListener("DOMContentLoaded", function(event) {
+window.onload = function() {
 	window.initNotepad = function() {
 		parents = [];
 		note = undefined;
@@ -559,7 +559,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		
 		$('#recordingEditor').modal('open');
 	});
-});
+
+	setTimeout(function() {
+		$('#preloader').hide();
+		$('#loadedContent').css('visibility', 'visible');
+	}, 500);
+};
 
 var latestResults = [];
 function loadSearchResult(resID) {
