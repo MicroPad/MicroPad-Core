@@ -826,7 +826,8 @@ function loadNote(id, delta) {
 				$('#viewer').append('<img class="interact hoverable drawing" id="{0}" style="top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
 				break;
 			case "image":
-				var src = URL.createObjectURL(dataURItoBlob(element.content));
+				src = element.content;
+				if (!delta) src = URL.createObjectURL(dataURItoBlob(element.content));
 				$('#viewer').append('<img class="interact z-depth-2 hoverable" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, src));
 				break;
 			case "file":
