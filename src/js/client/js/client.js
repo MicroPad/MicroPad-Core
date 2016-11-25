@@ -520,7 +520,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	});
 
 	/** Recording Stuff */
-	interact('#stop-recording-btn').on('tap', function(event) {
+	$('#stop-recording-btn').on('click', function(event) {
 		rec.stop();
 		$('#stop-recording-btn').hide();
 	});
