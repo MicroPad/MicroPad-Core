@@ -203,6 +203,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			justMoved = false;
 			return;
 		}
+		if (event.originalEvent.path[0].tagName.toLowerCase() === 'a') return;
 
 		var currentTarget = $('#'+event.currentTarget.id);
 		for (k in note.elements) {
@@ -408,12 +409,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			}
 		}
 	}).on('tap', function(event) {
+		if (event.originalEvent.path[0].tagName.toLowerCase() === 'a') return;
 		$('#'+event.currentTarget.id).trigger('click');
 	});
 
 	function dragMoveListener(event) {
-		$(event.target).css('left', parseInt($(event.target).css('left'))+event.dx);
-		$(event.target).css('top', parseInt($(event.target).css('top'))+event.dy);
+		$(event.target).css('left', Math.max(parseInt($(event.target).css('left'))+event.dx, 0));
+		$(event.target).css('top', Math.max(parseInt($(event.target).css('top'))+event.dy, 0));
 
 		updateReference(event);
 		resizePage($(event.target));
@@ -810,7 +812,7 @@ function loadNote(id, delta) {
 		$('#viewer').html('');
 		$('.display-with-note').show();
 	}
-	$('#open-type').html('Note')
+	$('#open-type').html('Note');
 	$('#title-input').val(note.title);
 
 	for (var i = 0; i < note.elements.length; i++) {
@@ -834,15 +836,16 @@ function loadNote(id, delta) {
 				$('#viewer').append('<div class="interact z-depth-2 hoverable fileHolder" id="{5}" style="top: {0}; left: {1}; height: {2}; width: {3};"><a href="javascript:downloadFile(\'{5}\');">{4}</a></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.args.id));
 				break;
 			case "recording":
-				$('#viewer').append('<div class="z-depth-2 hoverable recording" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3};"><audio controls="true" src="{5}"></audio><p class="recording-text"><em>{4}</em></p></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.content, element.args.id));
+				$('#viewer').append('<div class="z-depth-2 hoverable interact recording" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3};"><audio controls="true" src="{5}"></audio><p class="recording-text"><em>{4}</em></p></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.content, element.args.id));
 				if (!delta) edgeFix(dataURItoBlob(element.content), element.args.id);
+				if (window.navigator.userAgent.indexOf("Edge") > -1) $('#'+element.args.id).removeClass('interact');
 				break;
 		}
 	}
 	updateBib();
-	initDrawings();
 	setTimeout(function() {
 		MathJax.Hub.Reprocess();
+		initDrawings();
 	}, 1000);
 }
 
