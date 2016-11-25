@@ -561,8 +561,9 @@ window.onload = function() {
 	});
 
 	setTimeout(function() {
-		$('#preloader').hide();
-		$('#loadedContent').css('visibility', 'visible');
+		$('#preloader').css('opacity', '0');
+		$('body').css('background-color', '#fff');
+		$('#loadedContent').css('opacity', '1');
 	}, 500);
 };
 

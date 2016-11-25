@@ -11,17 +11,20 @@
 
 body {
 	position: static;
-	/*background-color: #fcfcfc;*/
+	background-color: #455A64;
+	transition: background-color 500ms linear;
 }
 
 #loadedContent {
-	visibility: hidden;
+	opacity: 0;
+	transition: opacity 500ms linear;
 }
 
 #preloader {
 	position: fixed;
 	left: calc(50% - 64px);
 	top: calc(50% - 64px);
+	transition: opacity 200ms linear;
 }
 
 .nav-wrapper {
