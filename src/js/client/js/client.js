@@ -576,6 +576,17 @@ function loadSearchResult(resID) {
 	var result = latestResults[resID];
 	recalculateParents(result);
 
+	$('#selectorTitle').html(parents[parents.length - 1].title);
+	for (k in parents[parents.length - 1].sections) {
+		var mSection = parents[parents.length - 1].sections[k];
+		$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, mSection.title));
+	}
+
+	for (k in parents[parents.length - 1].notes) {
+		var note = parents[parents.length - 1].notes[k];
+		$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(k, note.title));
+	}
+
 	for (var i = 0; i < parents[parents.length - 1].notes.length; i++) {
 		var n = parents[parents.length - 1].notes[i];
 		if (n === result) {
