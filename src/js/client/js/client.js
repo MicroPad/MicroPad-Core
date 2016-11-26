@@ -576,12 +576,13 @@ function loadSearchResult(resID) {
 	var result = latestResults[resID];
 	recalculateParents(result);
 
-	$('#selectorTitle').html(parents[parents.length - 1].title);
+	$('#sectionList').html('');
 	for (k in parents[parents.length - 1].sections) {
 		var mSection = parents[parents.length - 1].sections[k];
 		$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, mSection.title));
 	}
 
+	$('#noteList').html('');
 	for (k in parents[parents.length - 1].notes) {
 		var note = parents[parents.length - 1].notes[k];
 		$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(k, note.title));
