@@ -13,6 +13,8 @@ body {
 	position: static;
 	background-color: #455A64;
 	transition: background-color 500ms linear;
+	width: 100%;
+	height: 100%;
 }
 
 #loadedContent {
@@ -51,6 +53,9 @@ body {
 
 .brand-logo {
 	margin-left: 10px;
+}
+
+#nav-desktop {
 }
 
 #breadcrumb-holder {
@@ -132,4 +137,8 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 
 #drawing-viewer {
     box-sizing: content-box;
+}
+
+.material-icons {
+	cursor: pointer;
 }
