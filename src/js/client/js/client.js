@@ -563,7 +563,7 @@ window.onload = function() {
 	setTimeout(function() {
 		$('#preloader').css('opacity', '0');
 		$('body').css('background-color', '#fff');
-		$('#loadedContent').css('opacity', '1');
+		$('#loadedContent').addClass('visible');
 	}, 500);
 };
 
