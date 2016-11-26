@@ -11,7 +11,7 @@
 			<nav class="blue-grey" style="box-shadow: none;">
 				<div class="nav-wrapper">
 					<ul class="left">
-						<a id="menu-button" data-activates="menu" class="left"><i class="material-icons">menu</i></a>
+						<a data-activates="menu" class="left menu-button"><i class="material-icons">menu</i></a>
 						<span class="brand-logo left">µPad<em style="font-weight: 100; font-size: 1rem;">α</em></span>
 					</ul>
 
@@ -36,7 +36,7 @@
 			</nav>
 
 			<!-- Sidenav -->
-			<ul id="menu" class="side-nav">
+			<ul id="menu" class="side-nav menu-button">
 				<li><strong>Options</strong></li>
 				<li><input id="title-input" type="text" placeholder="Title" /></li>
 				<li><a href="javascript:updateTitle();" class="btn green waves-effect waves-light">Update Title</a></li>
@@ -284,18 +284,21 @@
 			<div id="viewer" class="display-with-note"></div>
 		</div>
 
-		<div id="preloader" class="preloader-wrapper big active">
-			<div class="spinner-layer spinner-red-only">
-				<div class="circle-clipper left">
-					<div class="circle"></div>
-				</div>
-				<div class="gap-patch">
-					<div class="circle"></div>
-				</div>
-				<div class="circle-clipper right">
-					<div class="circle"></div>
+		<div id="preloader">
+			<div class="preloader-wrapper big active">
+				<div class="spinner-layer spinner-red-only">
+					<div class="circle-clipper left">
+						<div class="circle"></div>
+					</div>
+					<div class="gap-patch">
+						<div class="circle"></div>
+					</div>
+					<div class="circle-clipper right">
+						<div class="circle"></div>
+					</div>
 				</div>
 			</div>
+			<h5 class="preloader-text center-align">While you're waiting, how about a little riddle for you?<br /><img src="fonts/equation.svg" /></h5>
 		</div>
 			
 		<script src="js/libs/jquery-3.1.1.min.js"></script>

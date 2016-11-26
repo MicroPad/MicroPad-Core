@@ -64,7 +64,7 @@ window.onload = function() {
 		note = undefined;
 		noteID = undefined;
 		lastClick = {x: 0, y: 0};
-		$('#menu-button').show();
+		$('.menu-button').show();
 		$('#search-button').show();
 		$('#open-type').html('Notepad')
 		$('#title-input').val(notepad.title);
@@ -106,10 +106,10 @@ window.onload = function() {
 	});
 	
 	$('.modal').modal();
-	$('#menu-button').sideNav({
+	$('.menu-button').sideNav({
 		closeOnClick: true
 	});
-	$('#menu-button').hide();
+	$('.menu-button').hide();
 	$('#search-button').hide();
 	$('#stop-recording-btn').hide();
 	$('.display-with-note').hide();

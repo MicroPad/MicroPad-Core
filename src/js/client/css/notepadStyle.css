@@ -28,10 +28,21 @@ body {
 }
 
 #preloader {
-	position: fixed;
+	position: relative;
+	transition: opacity 200ms linear;
+}
+.preloader-wrapper {
 	left: calc(50% - 64px);
 	top: calc(50% - 64px);
-	transition: opacity 200ms linear;
+	position: fixed;
+}
+.preloader-text {
+	position: fixed;
+	top: calc(50% + 64px);
+	left: 0;
+	width: 100%;
+	text-align: center;
+	color: #fff;
 }
 
 .nav-wrapper {
