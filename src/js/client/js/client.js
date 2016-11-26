@@ -562,6 +562,21 @@ window.onload = function() {
 		$('#recordingEditor').modal('open');
 	});
 
+	/** Auto create md-element on typing in empty note */
+	$(document).keypress(function(e) {
+		var charcode = e.charCode;
+		var char = String.fromCharCode(charcode);
+		if (char && note && note.elements.length === 0) {
+			lastClick = {
+				x: 10,
+				y: 10
+			};
+			insert('markdown');
+			$('#md-textarea').focus();
+		}
+	});
+
+	/** Page has loaded. Turn off the spinner */
 	setTimeout(function() {
 		$('#preloader').css('opacity', '0');
 		$('body').css('background-color', '#fff');
