@@ -203,7 +203,8 @@ window.onload = function() {
 			justMoved = false;
 			return;
 		}
-		if (event.originalEvent.path[0].tagName.toLowerCase() === 'a') return;
+		var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
+		if (path[0].tagName.toLowerCase() === 'a') return;
 
 		var currentTarget = $('#'+event.currentTarget.id);
 		for (k in note.elements) {
@@ -409,7 +410,8 @@ window.onload = function() {
 			}
 		}
 	}).on('tap', function(event) {
-		if (event.originalEvent.path[0].tagName.toLowerCase() === 'a') return;
+		var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
+		if (path[0].tagName.toLowerCase() === 'a') return;
 		$('#'+event.currentTarget.id).trigger('click');
 	});
 
