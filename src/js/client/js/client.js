@@ -609,7 +609,7 @@ function loadSearchResult(resID) {
 	if (parents.length > 0) $('#add-section-link').css('display', 'block');
 	if (parents.length > 1) $('#add-note-link').css('display', 'block');
 	$('#n-dd').css('color', '#fff');
-	$('#nd-dd').css('pointer-events', 'auto');
+	$('#n-dd').css('pointer-events', 'auto');
 
 	for (var i = 0; i < parents[parents.length - 1].notes.length; i++) {
 		var n = parents[parents.length - 1].notes[i];
@@ -841,7 +841,7 @@ function loadSection(id, providedSection) {
 	$('#open-type').html('Section');
 	$('#title-input').val(section.title);
 	$('#n-dd').css('color', '#fff');
-	$('#nd-dd').css('pointer-events', 'auto');
+	$('#n-dd').css('pointer-events', 'auto');
 
 	$('#selectorTitle').html(section.title);
 	for (k in section.sections) {
