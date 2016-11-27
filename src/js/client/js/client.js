@@ -77,8 +77,6 @@ window.onload = function() {
 		$('#viewer').html('');
 		$('#parents > span:not(#open-note)').remove();
 		$('#open-note').hide();
-		$('#n-dd').css('color', '#AAAFB4');
-		$('#n-dd').css('pointer-events', 'none');
 		$('#s-dd').css('color', '#fff');
 		$('#s-dd').css('pointer-events', 'auto');
 		$('#search-link').css('color', '#fff');
