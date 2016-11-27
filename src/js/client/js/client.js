@@ -77,6 +77,7 @@ window.onload = function() {
 		$('#viewer').html('');
 		$('#parents > span:not(#open-note)').remove();
 		$('#open-note').hide();
+		$('#s-dd').css('color', '#fff');
 
 		$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
 		for (k in notepad.sections) {
@@ -604,6 +605,7 @@ function loadSearchResult(resID) {
 	}
 	if (parents.length > 0) $('#add-section-link').css('display', 'block');
 	if (parents.length > 1) $('#add-note-link').css('display', 'block');
+	$('#n-dd').css('color', '#fff');
 
 	for (var i = 0; i < parents[parents.length - 1].notes.length; i++) {
 		var n = parents[parents.length - 1].notes[i];
@@ -834,6 +836,7 @@ function loadSection(id, providedSection) {
 	updateSelector();
 	$('#open-type').html('Section');
 	$('#title-input').val(section.title);
+	$('#n-dd').css('color', '#fff');
 
 	$('#selectorTitle').html(section.title);
 	for (k in section.sections) {
