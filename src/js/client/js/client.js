@@ -1157,7 +1157,7 @@ function loadFromBrowser(title) {
 
 function handleUpload(event) {
 	var uploadElement = $('#upload');
-	if (isMobile) uploadElement = $('#mob-upload');
+	if (isMobile()) uploadElement = $('#mob-upload');
 	var ext = uploadElement.val().split('.').pop().toLowerCase();
 	switch (ext) {
 		case "npx":
