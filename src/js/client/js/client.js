@@ -65,7 +65,7 @@ window.onload = function() {
 		noteID = undefined;
 		lastClick = {x: 0, y: 0};
 		$('#sidenav-options').show();
-		$('#search-button').show();
+		// $('#search-button').show();
 		$('#open-type').html('Notepad')
 		$('#title-input').val(notepad.title);
 
@@ -78,6 +78,9 @@ window.onload = function() {
 		$('#parents > span:not(#open-note)').remove();
 		$('#open-note').hide();
 		$('#s-dd').css('color', '#fff');
+		$('#s-dd').css('pointer-events', 'auto');
+		$('#search-link').css('color', '#fff');
+		$('#search-link').css('pointer-events', 'auto');
 
 		$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
 		for (k in notepad.sections) {
@@ -111,7 +114,7 @@ window.onload = function() {
 		// closeOnClick: true
 	});
 	$('#sidenav-options').hide();
-	$('#search-button').hide();
+	// $('#search-button').hide();
 	$('#stop-recording-btn').hide();
 	$('.display-with-note').hide();
 	$('#menu-button').sideNav();
@@ -606,6 +609,7 @@ function loadSearchResult(resID) {
 	if (parents.length > 0) $('#add-section-link').css('display', 'block');
 	if (parents.length > 1) $('#add-note-link').css('display', 'block');
 	$('#n-dd').css('color', '#fff');
+	$('#nd-dd').css('pointer-events', 'auto');
 
 	for (var i = 0; i < parents[parents.length - 1].notes.length; i++) {
 		var n = parents[parents.length - 1].notes[i];
@@ -837,6 +841,7 @@ function loadSection(id, providedSection) {
 	$('#open-type').html('Section');
 	$('#title-input').val(section.title);
 	$('#n-dd').css('color', '#fff');
+	$('#nd-dd').css('pointer-events', 'auto');
 
 	$('#selectorTitle').html(section.title);
 	for (k in section.sections) {

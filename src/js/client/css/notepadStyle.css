@@ -57,10 +57,17 @@ body {
 
 #s-dd {
 	color: #AAAFB4;
+	pointer-events: none;
 }
 
 #n-dd {
 	color: #AAAFB4;
+	pointer-events: none;
+}
+
+#search-link {
+	color: #AAAFB4;
+	pointer-events: none;
 }
 
 #breadcrumb-holder {
