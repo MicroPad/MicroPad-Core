@@ -9,13 +9,13 @@ var rec = new Recorder();
 
 /** Setup localforage */
 var notepadStorage = localforage.createInstance({
-	name: 'Intuition',
+	name: 'uPad',
 	version: 1.0,
 	storeName: 'notepads'
 });
 
 var appStorage = localforage.createInstance({
-	name: 'Intuition',
+	name: 'uPad',
 	version: 1.0,
 	storeName: 'app'
 });
@@ -90,7 +90,7 @@ window.onload = function() {
 		$('#add-section-link').css('display', 'block');
 		$('#add-note-link').css('display', 'none');
 		$('.display-with-note').hide();
-		document.title = 'Intuition';
+		document.title = 'µPad';
 
 		appStorage.setItem('lastNotepadTitle', notepad.title);
 	}
@@ -834,7 +834,7 @@ function loadSection(id, providedSection) {
 	parents.push(section);
 	note = undefined;
 	$('.display-with-note').hide();
-	document.title = 'Intuition';
+	document.title = 'µPad';
 	$('#viewer').html('');
 	$('#open-note').hide();
 	updateSelector();
@@ -860,7 +860,7 @@ function loadNote(id, delta) {
 		noteID = id;
 		oldNote = note;
 		note = parents[parents.length-1].notes[id];
-		document.title = note.title+" - Intuition";
+		document.title = note.title+" - µPad";
 		linkBreadcrumbs();
 		$('#open-note').html('{0} <span class="time">{1}</span>'.format(note.title, moment(note.time).format('dddd, D MMMM h:mm A')));
 		$('#viewer').html('');
