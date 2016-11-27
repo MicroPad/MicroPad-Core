@@ -599,6 +599,8 @@ function loadSearchResult(resID) {
 		var note = parents[parents.length - 1].notes[k];
 		$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(k, note.title));
 	}
+	if (parents.length > 0) $('#add-section-link').css('display', 'block');
+	if (parents.length > 1) $('#add-note-link').css('display', 'block');
 
 	for (var i = 0; i < parents[parents.length - 1].notes.length; i++) {
 		var n = parents[parents.length - 1].notes[i];
