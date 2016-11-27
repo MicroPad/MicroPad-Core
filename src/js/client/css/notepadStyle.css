@@ -34,7 +34,7 @@ body {
 	transition: opacity 200ms linear;
 }
 .preloader-wrapper {
-	left: calc(50% - 64px);
+	left: calc(50% - 40px);
 	top: calc(50% - 64px);
 	position: fixed;
 }
