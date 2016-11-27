@@ -411,6 +411,7 @@ window.onload = function() {
 	/** Pen Input Handler */
 	$(window).resize(function() {
 		resizeCanvas();
+		mobileNav();
 	});
 	canvasCtx = $('#drawing-viewer')[0].getContext("2d");
 	resizeCanvas();
@@ -553,23 +554,7 @@ window.onload = function() {
 		}
 	});
 
-	if (isMobile()) {
-		$('#mob-np-dd').attr('data-activates', 'notepad-dropdown');
-		$('#mob-np-dd').dropdown();
-		$('#mob-s-dd').attr('data-activates', 'section-dropdown');
-		$('#mob-n-dd').attr('data-activates', 'notes-dropdown');
-		$('#mob-np-dd').dropdown();
-		$('#mob-s-dd').dropdown();
-		$('#mob-n-dd').dropdown();
-	}
-	else {
-		$('#np-dd').attr('data-activates', 'notepad-dropdown');
-		$('#s-dd').attr('data-activates', 'section-dropdown');
-		$('#n-dd').attr('data-activates', 'notes-dropdown');
-		$('#np-dd').dropdown();
-		$('#s-dd').dropdown();
-		$('#n-dd').dropdown();
-	}
+	mobileNav();
 
 	/** Page has loaded. Turn off the spinner */
 	setTimeout(function() {
@@ -1219,6 +1204,26 @@ function resizeCanvas() {
 	canvasOffset = canvas.offset();
 }
 
+function mobileNav() {
+	if (isMobile()) {
+		$('#mob-np-dd').attr('data-activates', 'notepad-dropdown');
+		$('#mob-np-dd').dropdown();
+		$('#mob-s-dd').attr('data-activates', 'section-dropdown');
+		$('#mob-n-dd').attr('data-activates', 'notes-dropdown');
+		$('#mob-np-dd').dropdown();
+		$('#mob-s-dd').dropdown();
+		$('#mob-n-dd').dropdown();
+	}
+	else {
+		$('#np-dd').attr('data-activates', 'notepad-dropdown');
+		$('#s-dd').attr('data-activates', 'section-dropdown');
+		$('#n-dd').attr('data-activates', 'notes-dropdown');
+		$('#np-dd').dropdown();
+		$('#s-dd').dropdown();
+		$('#n-dd').dropdown();
+	}
+}
+
 /** Utility functions */
 function toBase64(str) {
 	return window.btoa(unescape(encodeURIComponent(str)));
@@ -1229,7 +1234,7 @@ function fromBase64(str) {
 }
 
 function isMobile() {
-	return $('#mobile-menu-btn').is(':visible');
+	return $('#mobile-canary').is(':visible');
 }
 
 //Thanks to http://stackoverflow.com/a/4673436/998467

@@ -142,3 +142,8 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 .material-icons {
 	cursor: pointer;
 }
+
+#mobile-canary {
+	font-weight: 100;
+	font-size: 1rem;
+}
