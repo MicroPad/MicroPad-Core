@@ -113,6 +113,7 @@ window.onload = function() {
 	$('#search-button').hide();
 	$('#stop-recording-btn').hide();
 	$('.display-with-note').hide();
+	$('#menu-button').sideNav();
 
 	/** Handle Notepad Upload */
 	document.getElementById("upload").addEventListener("change", function(event) {
@@ -372,6 +373,7 @@ window.onload = function() {
 			}
 		}
 	}).on('tap', function(event) {
+		if (event.pointer === 'mouse') return;
 		var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
 		if (path[0].tagName.toLowerCase() === 'a') return;
 		$('#'+event.currentTarget.id).trigger('click');
@@ -379,7 +381,7 @@ window.onload = function() {
 		holding = true;
 	});
 
-	if (!isMobile) {
+	if (!isMobile()) {
 		interact('.interact').draggable({
 			onmove: dragMoveListener,
 			onend: function (event) {
@@ -592,6 +594,7 @@ function loadSearchResult(resID) {
 	}
 	latestResults = [];
 }
+/**** END OF ONLOAD CODE */
 
 function recalculateParents(baseObj) {
 	parents.unshift(baseObj.parent);
@@ -835,6 +838,12 @@ function loadNote(id, delta) {
 		$('#viewer').html('');
 		$('.display-with-note').show();
 		scrollBreadcrumbs();
+
+		//Don't ask me why this works - it just does
+		$('#sidenav-overlay').trigger('click');
+		setTimeout(function() {
+			$('#sidenav-overlay').trigger('click');
+		}, 500);
 	}
 	$('#open-type').html('Note');
 	$('#title-input').val(note.title);
@@ -1111,9 +1120,6 @@ function resizePage(selElement) {
 	if (parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000 > parseInt($('#viewer').css('height'))){
 		$('#viewer').css('height', parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000+'px');
 	}
-	$('#menu-button').sideNav({
-		// closeOnClick: true
-	});
 }
 
 var tooBig = '';
