@@ -138,27 +138,27 @@
 				<div class="modal-content">
 					<h4>Insert</h4>
 					<div class="row center-align">
-						<div class="col s2">
+						<div class="col m2 s6">
 							<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Markdown-formatted Text" onclick="insert('markdown');">edit</i>
 						</div>
 
-						<div class="col s2">
+						<div class="col m2 s6">
 							<img class="insert-icon tooltipped" style="width: 6rem; height: auto" data-position="bottom" data-delay="50" data-tooltip="Microsoft&reg; Word Document (docx)" onclick="uploadDocx();" src="fonts/MSWord.svg" />
 						</div>
 
-						<div class="col s2">
+						<div class="col m2 s6">
 							<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Drawing Mode" onclick="insert('drawing');">gesture</i>
 						</div>
 
-						<div class="col s2">
+						<div class="col m2 s6">
 							<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Image" onclick="insert('image');">insert_photo</i>
 						</div>
 
-						<div class="col s2">
+						<div class="col m2 s6">
 							<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="File" onclick="insert('file');">attach_file</i>
 						</div>
 
-						<div class="col s2">
+						<div class="col m2 s6">
 							<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Recording" onclick="insertRecording();">record_voice_over</i>
 						</div>
 					</div>
@@ -176,12 +176,12 @@
 			<div id="mdEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
 				<div class="modal-content">
 					<div class="row">
-						<div class="input-field col s8">
+						<div class="input-field col m8 s12">
 							<label for="md-textarea">Content (in Markdown)</label>
 							<textarea id="md-textarea" style="height: calc(90% - 10px); width: 100%; margin-top: 10px;" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" autofocus></textarea>
 						</div>
 
-						<div class="col s4">
+						<div class="col m4 s12">
 								<input id="mdsw" type="text" placeholder="Source Website" />
 								<input id="mdfs" type="text" value="16px" placeholder="Font Size" />
 								<input id="mdw" type="text" placeholder="Width" />
@@ -199,15 +199,15 @@
 			<div id="docxEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
 				<div class="modal-content">
 					<div class="row">
-						<div class="file-field input-field col s8">
+						<div class="file-field input-field col m8 s12">
 							<div class="waves-effect waves-light btn amber darken-1">
 								<span>Upload a Word Document (docx)</span>
 								<input id="docx-upload" type="file">
 							</div>
-							<div class="file-path-wrapper"><input id="docx-upload-name" class="file-path validate" type="text"></div>
+							<div class="file-path-wrapper"><input id="docx-upload-name" style="display: none;" class="file-path validate" type="text"></div>
 						</div>
 
-						<div class="col s4">
+						<div class="col m4 s12">
 								<p>
 									This will take your document and convert it to the 
 									'Markdown-formatted' text that µPad understands.
@@ -224,7 +224,7 @@
 			<!-- Drawing Editor -->
 			<div id="drawingEditor" class="modal modal-fixed-footer">
 				<div id="canvas-holder" class="modal-content">
-					<canvas id="drawing-viewer" width="1000" height="1000" class="col s8" style="border:solid black 1px; touch-action:none"></canvas>
+					<canvas id="drawing-viewer" width="1000" height="1000" class="col m8 s12" style="border:solid black 1px; touch-action:none"></canvas>
 				</div>
 				<div class="modal-footer">
 					<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
@@ -236,15 +236,15 @@
 			<div id="imageEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
 				<div class="modal-content">
 					<div class="row">
-						<div class="file-field input-field col s8">
+						<div class="file-field input-field col m8 s12">
 							<div class="waves-effect waves-light btn amber darken-1">
 								<span>Upload Image</span>
 								<input id="image-upload" type="file">
 							</div>
-							<div class="file-path-wrapper"><input id="image-upload-name" class="file-path validate" type="text"></div>
+							<div class="file-path-wrapper"><input id="image-upload-name" style="display: none;" class="file-path validate" type="text"></div>
 						</div>
 
-						<div class="col s4">
+						<div class="col m4 s12">
 								<input id="isw" type="text" placeholder="Source Website" />
 								<input id="iw" type="text" placeholder="Width" />
 								<input id="ih" type="text" placeholder="Height" />
@@ -261,15 +261,15 @@
 			<div id="fileEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
 				<div class="modal-content">
 					<div class="row">
-						<div class="file-field input-field col s8">
+						<div class="file-field input-field col m8 s12">
 							<div class="waves-effect waves-light btn amber darken-1">
 								<span>Upload File</span>
 								<input id="file-upload" type="file">
 							</div>
-							<div class="file-path-wrapper"><input id="file-upload-name" class="file-path validate" type="text"></div>
+							<div class="file-path-wrapper"><input id="file-upload-name" style="display: none;" class="file-path validate" type="text"></div>
 						</div>
 
-						<div class="col s4">
+						<div class="col m4 s12">
 								<input id="fsw" type="text" placeholder="Source Website" />
 						</div>
 					</div>

@@ -235,6 +235,9 @@ window.onload = function() {
 							}
 						});
 						$('#mdEditor').modal('open');
+						setTimeout(function() {
+							$('#mdEditor').modal('open');
+						}, 500);
 						break;
 
 					case "drawing":
@@ -250,17 +253,22 @@ window.onload = function() {
 								}
 							},
 							complete: function() {
-								if (!isCanvasBlank($('#drawing-viewer')[0])) {
-									element.content = $('#drawing-viewer')[0].toDataURL();
-									
-									var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
-									currentTarget.attr('src', trimmed);
+								if (confirm("Do you want to save this drawing?")) {
+									if (!isCanvasBlank($('#drawing-viewer')[0])) {
+										element.content = $('#drawing-viewer')[0].toDataURL();
+										
+										var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
+										currentTarget.attr('src', trimmed);
 
-									saveToBrowser();
+										saveToBrowser();
+									}
 								}
 							}
 						});
 						$('#drawingEditor').modal('open');
+						setTimeout(function() {
+							$('#drawingEditor').modal('open');
+						}, 500);
 						break;
 
 					case "image":
@@ -321,6 +329,9 @@ window.onload = function() {
 							}
 						});
 						$('#imageEditor').modal('open');
+						setTimeout(function() {
+							$('#imageEditor').modal('open');
+						}, 500);
 						break;
 
 					case "file":
@@ -367,6 +378,9 @@ window.onload = function() {
 							}
 						});
 						$('#fileEditor').modal('open');
+						setTimeout(function() {
+							$('#fileEditor').modal('open');
+						}, 500);
 						break;
 				}
 				break;
@@ -377,8 +391,6 @@ window.onload = function() {
 		var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
 		if (path[0].tagName.toLowerCase() === 'a') return;
 		$('#'+event.currentTarget.id).trigger('click');
-	}).on('hold', function(event) {
-		holding = true;
 	});
 
 	if (!isMobile()) {
@@ -563,6 +575,9 @@ window.onload = function() {
 		$('#preloader').css('opacity', '0');
 		$('body').css('background-color', '#fff');
 		$('#loadedContent').addClass('visible');
+		setTimeout(function() {
+			$('#preloader').remove();
+		}, 1000);
 	}, 500);
 };
 
