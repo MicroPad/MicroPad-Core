@@ -138,12 +138,15 @@ window.onload = function() {
 
 	/** Creating elements */
 	$('#viewer').click(function (e) {
-		if (e.target == this && note) {
+		if (e.target == this && note && !isDropdownActive()) {
 			lastClick.x = e.pageX;
 			lastClick.y = e.pageY-128;
 			$('#insert').modal('open');
 		}
 	});
+	function isDropdownActive() {
+		return $('.dropdown-content.active').length > 0;
+	}
 
 	/** Editing elements */
 	var justMoved = false;
