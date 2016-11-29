@@ -141,6 +141,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 
 .insert-icon {
 	margin-left: calc(50% - 6rem);
+	cursor: pointer;
 }
 
 .insert-text {

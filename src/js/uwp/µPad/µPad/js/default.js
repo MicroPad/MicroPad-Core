@@ -97,15 +97,30 @@ function loadNote(id, delta) {
 	}, 1000);
 }
 
-function saveToFilesystem(blob, filename) {
+function updateNotepadList() {
+	if (isUpdating) return;
+	Windows.Storage.KnownFolders.documentsLibrary.getFolderAsync("µPad Notepads").then(function (folder) {
+		folder.getFilesAsync().done(function (files) {
+			isUpdating = true;
+			$('#notepadList').html('');
+			files.forEach(function (f) {
+				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(f.displayName));
+			});
+			isUpdating = false;
+		});
+	});
+}
+
+function saveToFilesystem(blob, filename, reload) {
 	Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (folder) {
-	   folder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting).then(function (file) {
+		folder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting).then(function (file) {
 			file.openAsync(Windows.Storage.FileAccessMode.readWrite).then(function (output) {
 				var input = blob.msDetachStream();
 				Windows.Storage.Streams.RandomAccessStream.copyAsync(input, output).then(function () {
 					output.flushAsync().done(function () {
 						input.close();
 						output.close();
+						if (reload) window.location.reload();
 					});
 				});
 			});
@@ -119,9 +134,10 @@ function saveToBrowser(retry, fileLoad) {
 	});
 
 	if (fileLoad) {
-		notepadStorage.setItem(notepad.title, notepad, function () {
+		notepadStorage.setItem(notepad.title, '', function () {
 			appStorage.setItem('lastNotepadTitle', notepad.title, function () {
-				window.location.reload();
+				var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
+				saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), true);
 			});
 		});
 	}
@@ -132,7 +148,7 @@ function saveToBrowser(retry, fileLoad) {
 
 		//Save to the FS
 		var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
-		saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+		saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), false);
 
 		appStorage.setItem('lastNotepadTitle', notepad.title);
 	}
