@@ -886,7 +886,6 @@ function loadNote(id, delta) {
 			case "markdown":
 				$('#viewer').append('<div class="interact z-depth-2 hoverable" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
 				asciimath.translate(undefined, true);
-				MathJax.Hub.Typeset();
 				break;
 			case "drawing":
 				$('#viewer').append('<img class="interact hoverable drawing" id="{0}" style="top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
@@ -908,7 +907,7 @@ function loadNote(id, delta) {
 	}
 	updateBib();
 	setTimeout(function() {
-		MathJax.Hub.Reprocess();
+		MathJax.Hub.Typeset();
 		initDrawings();
 	}, 1000);
 }
