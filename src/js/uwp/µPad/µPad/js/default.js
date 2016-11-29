@@ -42,6 +42,13 @@
 	app.start();
 })();
 
+$(document).ready(function () {
+	//TODO: Check if we're using a different working dir before doing this
+	Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (folder) {
+		$('#workingDir').html(folder.path);
+	});
+});
+
 function loadNote(id, delta) {
 	if (!delta) {
 		noteID = id;
@@ -184,5 +191,28 @@ function loadFromBrowser(title) {
 				window.initNotepad();
 			});
 		});
+	});
+}
+
+function deleteOpen() {
+	confirmAsync("Are you sure you want to delete this?").then(function (answer) {
+		if (answer) {
+			if (parents.length === 1) {
+				//Delete Notepad
+				alert("I need to implement this!");
+			}
+			else if (parents.length > 1 && !note) {
+				//Delete Section
+				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function (s) { return s !== parents[parents.length - 1] });
+				saveToBrowser();
+				loadParent(parents.length - 2)
+			}
+			else if (note) {
+				//Delete Note
+				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function (n) { return n !== note });
+				saveToBrowser();
+				loadParent(parents.length - 1);
+			}
+		}
 	});
 }
