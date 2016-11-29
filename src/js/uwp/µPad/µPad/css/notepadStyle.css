@@ -9,11 +9,6 @@
 .secondary-text-color  { color: #757575; !important }
 .divider-color         { border-color: #BDBDBD; !important }
 
-html {
-    width: 100%;
-    height: 100%;
-}
-
 body {
 	position: static;
 	background-color: #455A64;
@@ -146,6 +141,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 
 .insert-icon {
 	margin-left: calc(50% - 6rem);
+	cursor: pointer;
 }
 
 .insert-text {
