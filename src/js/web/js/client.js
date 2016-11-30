@@ -84,6 +84,7 @@ window.onload = function() {
 		$('#s-dd').css('pointer-events', 'auto');
 		$('#search-link').css('color', '#fff');
 		$('#search-link').css('pointer-events', 'auto');
+		updateInstructions();
 
 		$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
 		for (k in notepad.sections) {
@@ -138,6 +139,7 @@ window.onload = function() {
 			for (k in mutation.addedNodes) {
 				var selElement = $('#'+mutation.addedNodes[k].id);
 				resizePage(selElement);
+				updateInstructions();
 			}
 		});
 	});
@@ -579,6 +581,7 @@ window.onload = function() {
 	});
 
 	mobileNav();
+	updateInstructions();
 
 	$('.drag-target').bind('click', function() {
 		$('#sidenav-overlay').trigger('click');
@@ -848,6 +851,7 @@ function loadSection(id, providedSection) {
 	$('#viewer').html('');
 	$('#open-note').hide();
 	updateSelector();
+	updateInstructions();
 	$('#open-type').html('Section');
 	$('#title-input').val(section.title);
 	$('#n-dd').css('color', '#fff');
@@ -917,6 +921,7 @@ function loadNote(id, delta) {
 		MathJax.Hub.Typeset();
 		initDrawings();
 	}, 1000);
+	updateInstructions();
 }
 
 function updateNote(id) {
@@ -994,6 +999,7 @@ function insert(type, newElement) {
 function insertRecording() {
 	rec.initStream();
 	$('#insert').modal('close');
+	$('#empty-viewer').hide();
 }
 rec.addEventListener('streamReady', function(event) {
 	rec.start();
@@ -1265,6 +1271,28 @@ function mobileNav() {
 		$('#np-dd').dropdown();
 		$('#s-dd').dropdown();
 		$('#n-dd').dropdown();
+	}
+}
+
+function updateInstructions() {
+	if (!notepad) {
+		$('#empty-viewer').show();
+		$('#instructions').html("You don't have a notepad open. Open or create one to <s>procrastinate</s> study.");
+	}
+	else if (parents.length === 1) {
+		$('#empty-viewer').show();
+		$('#instructions').html("We don't put our notes in notepads directly. Use the sections menu to open or create a section.");
+	}
+	else if (!note) {
+		$('#empty-viewer').show();
+		$('#instructions').html("You're in a section! You can either open/create a note or open/create a sub-section.");
+	}
+	else if (note.elements.length === 0) {
+		$('#empty-viewer').show();
+		$('#instructions').html("Welcome to your note! Press anywhere on here to insert an element.");
+	}
+	else {
+		$('#empty-viewer').hide();
 	}
 }
 

@@ -80,6 +80,7 @@
 				</ul>
 				
 				<div id="viewer" class="display-with-note"></div>
+				<div id="empty-viewer"><h1 id="instructions" class="valign"></h1></div>
 			</div>
 
 			<!-- Search -->
@@ -172,9 +173,8 @@
 					<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
 				</div>
 			</div>
-			<!-- <a class="modal-trigger btn-floating btn-large waves-effect waves-light red display-with-note" style="position: fixed; right: 20px; bottom: 20px;" data-target="insert"><i class="material-icons">add</i></a> -->
 
-			<a id="stop-recording-btn" class="btn red waves-effect waves-light" style="position: fixed; left: 20px; bottom: 20px;"><i class="material-icons left">stop</i>Stop Recording</a>
+			<a id="stop-recording-btn" class="btn red waves-effect waves-light" style="position: fixed; left: 20px; bottom: 20px; z-index: 100;"><i class="material-icons left">stop</i>Stop Recording</a>
 
 			<!-- Markdown Editor -->
 			<div id="mdEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
