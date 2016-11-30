@@ -110,8 +110,8 @@ nav {
 	pointer-events: none;
 }
 #instructions {
-	position: fixed;
-	top: 50%;
+	position: absolute;
+	top: calc(50% - 128px);
 	left: 50%;
 	transform: translate(-50%, -50%);
 	text-align: center;

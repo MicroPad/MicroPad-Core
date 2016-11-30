@@ -173,6 +173,7 @@ function loadNote(id, delta) {
 		MathJax.Hub.Typeset();
 		initDrawings();
 	}, 1000);
+	updateInstructions();
 }
 
 function updateNotepadList() {
@@ -265,7 +266,16 @@ function deleteOpen() {
 		if (answer) {
 			if (parents.length === 1) {
 				//Delete Notepad
-				alert("I need to implement this!");
+				appStorage.removeItem('lastNotepadTitle', function () {
+					Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
+						.then(function (folder) {
+							return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+						}).then(function (file) {
+							return file.deleteAsync();
+						}).done(function () {
+							window.location.reload();
+						});
+				});
 			}
 			else if (parents.length > 1 && !note) {
 				//Delete Section

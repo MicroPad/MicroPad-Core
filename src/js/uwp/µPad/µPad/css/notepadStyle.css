@@ -17,6 +17,16 @@ body {
 	height: 100%;
 }
 
+nav {
+	position: fixed;
+	height: 64px; !important
+	cursor: default;
+}
+
+.breadcrumb {
+	cursor: pointer;
+}
+
 #loadedContent {
 	width: 100%;
 	height: 100%;
@@ -88,6 +98,26 @@ body {
 #parents {
 	overflow-x: auto;
 	white-space: nowrap;
+}
+
+#empty-viewer {
+	position: fixed;
+	top: 128px;
+	background-image: url('../img/white-lines.png');
+	background-color:rgba(0, 0, 0, 0.5);
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+}
+#instructions {
+	position: absolute;
+	top: calc(50% - 128px);
+	left: 50%;
+	transform: translate(-50%, -50%);
+	text-align: center;
+	font-weight: 200;
+	font-size: 10vmin;
+	width: 80%;
 }
 
 #viewer {

@@ -701,7 +701,7 @@ function deleteOpen() {
 			//Delete Section
 			parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) {return s !== parents[parents.length - 1]});
 			saveToBrowser();
-			loadParent(parents.length - 2)
+			loadParent(parents.length - 2);
 		}
 		else if (note) {
 			//Delete Note
@@ -845,7 +845,7 @@ function loadSection(id, providedSection) {
 	var section = parents[parents.length-1].sections[id];
 	if (providedSection) section = providedSection;
 	parents.push(section);
-	note = undefined;
+	window.note = undefined;
 	$('.display-with-note').hide();
 	document.title = 'µPad';
 	$('#viewer').html('');

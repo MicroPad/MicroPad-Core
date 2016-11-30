@@ -92,6 +92,7 @@
     <Content Include="images\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="images\StoreLogo.png" />
     <Content Include="images\Wide310x150Logo.scale-200.png" />
+    <Content Include="img\white-lines.png" />
     <Content Include="js\client.js" />
     <Content Include="js\default.js" />
     <Content Include="css\default.css" />

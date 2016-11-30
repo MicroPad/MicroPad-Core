@@ -35,12 +35,12 @@
 </head>
 <body class="win-type-body">
 	<div id="loadedContent">
-		<nav class="blue-grey" style="box-shadow: none;">
-			<div class="nav-wrapper">
-				<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
-				<!-- <a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a> -->
+		<nav class="blue-grey" style="box-shadow: none; z-index: 110;">
+			<div class="nav-wrapper" style="z-index: 110;">
+				<a id="menu-button" class="left hide-on-small-only side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
+				<a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a>
 				<ul class="left">
-					<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em style="font-weight: 100; font-size: 1rem;">pα</em></span>
+					<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em style="font-weight: 100; font-size: 1rem;">α</em></span>
 				</ul>
 
 				<ul id="nav-desktop" class="right hide-on-med-and-down">
@@ -53,8 +53,8 @@
 		</nav>
 
 		<!-- Breadcrumbs -->
-		<nav id="breadcrumb-holder" class="blue-grey" style="top: 64px;">
-			<div class="nav-wrapper">
+		<nav id="breadcrumb-holder" class="blue-grey" style="top: 64px; z-index: 100;">
+			<div class="nav-wrapper" style="z-index: 100;">
 				<div id="parents" class="col s12" style="padding-left: 10px;">
 					<span id="open-note" class="breadcrumb display-with-note" style="display: none;"></span>
 				</div>
@@ -76,33 +76,36 @@
 				<li><a href="javascript:updateTitle();" class="btn green waves-effect waves-light">Update Title</a></li>
 				<li><a href="javascript:deleteOpen();" class="btn red waves-effect waves-light"><i class="material-icons left" style="color: #fff;">delete_forever</i> Delete <span id="open-type"></span></a></li>
 				<li><div class="divider"></div></li>
+				<li><a href="javascript:exportOpen();" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">file_download</i> Export Notepad</a></li>
 			</div>
-			<li>Notepad Location:<br /></li>
-			<li style="margin-top: -20px;"><em id="workingDir" style="font-size: 8px;"></em></li>
-			<li><a href="javascript:changeStorageLocation();" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">folder</i>Change Location</a></li>
-			 
 		</ul>
 
-		<!-- Notepads -->
-		<ul id="notepad-dropdown" class="dropdown-content">
-			<li><a class="modal-trigger" data-target="new-notepad"><i class="material-icons left">add</i>New</a></li>
-			<li class="divider"></li>
-			<div id="notepadList"></div>
-		</ul>
+		<div style="width: 100%; height: 100%; position: relative; top: 128px; z-index: 50;">
+			<!-- Notepads -->
+			<ul id="notepad-dropdown" class="dropdown-content">
+				<li><a class="modal-trigger" data-target="new-notepad"><i class="material-icons left">add</i>New</a></li>
+				<li><a class="tooltipped" data-position="left" data-delay="50" data-tooltip="Export all of your notepads to an archive of NPX files" href="javascript:exportNotepads();"><i class="material-icons left">file_download</i>Export All</a></li>
+				<li class="divider"></li>
+				<div id="notepadList"></div>
+			</ul>
 
-		<!-- Sections -->
-		<ul id="section-dropdown" class="dropdown-content">
-			<li id="add-section-link" style="display: none"><a class="modal-trigger" data-target="new-section"><i class="material-icons left">add</i>Section</a></li>
-			<li class="divider"></li>
-			<div id="sectionList"></div>
-		</ul>
+			<!-- Sections -->
+			<ul id="section-dropdown" class="dropdown-content">
+				<li id="add-section-link" style="display: none"><a class="modal-trigger" data-target="new-section"><i class="material-icons left">add</i>Section</a></li>
+				<li class="divider"></li>
+				<div id="sectionList"></div>
+			</ul>
 
-		<!-- Notes -->
-		<ul id="notes-dropdown" class="dropdown-content">
-			<li id="add-note-link" style="display: none"><a class="modal-trigger" data-target="new-note"><i class="material-icons left">note_add</i>Note</a></li>
-			<li class="divider"></li>
-			<div id="noteList"></div>
-		</ul>
+			<!-- Notes -->
+			<ul id="notes-dropdown" class="dropdown-content">
+				<li id="add-note-link" style="display: none"><a class="modal-trigger" data-target="new-note"><i class="material-icons left">note_add</i>Note</a></li>
+				<li class="divider"></li>
+				<div id="noteList"></div>
+			</ul>
+
+			<div id="viewer" class="display-with-note"></div>
+			<div id="empty-viewer"><h1 id="instructions" class="valign"></h1></div>
+		</div>
 
 		<!-- Search -->
 		<div id="search" class="modal modal-fixed-footer">
@@ -165,27 +168,27 @@
 				<h4>Insert</h4>
 				<div class="row center-align">
 					<div class="col m2 s6">
-						<i class="insert-icon material-icons large " data-position="bottom" data-delay="50" data-tooltip="Markdown-formatted Text" onclick="insert('markdown');">edit</i>
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Markdown-formatted Text" onclick="insert('markdown');">edit</i>
 					</div>
 
 					<div class="col m2 s6">
-						<img class="insert-icon " style="width: 6rem; height: auto" data-position="bottom" data-delay="50" data-tooltip="Microsoft&reg; Word Document (docx)" onclick="uploadDocx();" src="fonts/MSWord.svg" />
+						<img class="insert-icon tooltipped" style="width: 6rem; height: auto" data-position="bottom" data-delay="50" data-tooltip="Microsoft&reg; Word Document (docx)" onclick="uploadDocx();" src="fonts/MSWord.svg" />
 					</div>
 
 					<div class="col m2 s6">
-						<i class="insert-icon material-icons large " data-position="bottom" data-delay="50" data-tooltip="Drawing Mode" onclick="insert('drawing');">gesture</i>
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Drawing Mode" onclick="insert('drawing');">gesture</i>
 					</div>
 
 					<div class="col m2 s6">
-						<i class="insert-icon material-icons large " data-position="bottom" data-delay="50" data-tooltip="Image" onclick="insert('image');">insert_photo</i>
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Image" onclick="insert('image');">insert_photo</i>
 					</div>
 
 					<div class="col m2 s6">
-						<i class="insert-icon material-icons large " data-position="bottom" data-delay="50" data-tooltip="File" onclick="insert('file');">attach_file</i>
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="File" onclick="insert('file');">attach_file</i>
 					</div>
 
 					<div class="col m2 s6">
-						<i class="insert-icon material-icons large " data-position="bottom" data-delay="50" data-tooltip="Recording" onclick="insertRecording();">record_voice_over</i>
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Recording" onclick="insertRecording();">record_voice_over</i>
 					</div>
 				</div>
 			</div>
@@ -194,9 +197,8 @@
 				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
 			</div>
 		</div>
-		<!-- <a class="modal-trigger btn-floating btn-large waves-effect waves-light red display-with-note" style="position: fixed; right: 20px; bottom: 20px;" data-target="insert"><i class="material-icons">add</i></a> -->
 
-		<a id="stop-recording-btn" class="btn red waves-effect waves-light" style="position: fixed; left: 20px; bottom: 20px;"><i class="material-icons left">stop</i>Stop Recording</a>
+		<a id="stop-recording-btn" class="btn red waves-effect waves-light" style="position: fixed; left: 20px; bottom: 20px; z-index: 100;"><i class="material-icons left">stop</i>Stop Recording</a>
 
 		<!-- Markdown Editor -->
 		<div id="mdEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
@@ -317,8 +319,6 @@
 				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
 			</div>
 		</div>
-
-		<div id="viewer" class="display-with-note"></div>
 	</div>
 
 	<div id="preloader">
