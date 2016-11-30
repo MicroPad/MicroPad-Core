@@ -1,5 +1,6 @@
 ﻿// For an introduction to the Blank template, see the following documentation:
 // http://go.microsoft.com/fwlink/?LinkId=232509
+var storageDir;
 (function () {
 	"use strict";
 
@@ -44,10 +45,30 @@
 
 $(document).ready(function () {
 	//TODO: Check if we're using a different working dir before doing this
-	Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (folder) {
-		$('#workingDir').html(folder.path);
+	appStorage.getItem('storageDir').then(function(res) {
+		if (res === null) {
+			appStorage.setItem('storageDir', Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
+				storageDir = f.path;
+				refreshStorageDir();
+			}));
+		}
+		else {
+			storageDir = res;
+			refreshStorageDir();
+		}
 	});
 });
+
+function refreshStorageDir() {
+	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) {
+		$('#workingDir').html(folder.path);
+	}, function (err) {
+		alert("Error accessing storage folder. Reverting to default.");
+		appStorage.setItem('storageDir', Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
+			storageDir = f.path;
+		}));
+	});
+}
 
 function loadNote(id, delta) {
 	if (!delta) {
@@ -105,20 +126,18 @@ function loadNote(id, delta) {
 
 function updateNotepadList() {
 	if (isUpdating) return;
-	Windows.Storage.KnownFolders.documentsLibrary.getFolderAsync("µPad Notepads").then(function (folder) {
-		folder.getFilesAsync().done(function (files) {
-			isUpdating = true;
-			$('#notepadList').html('');
-			files.forEach(function (f) {
-				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(f.displayName));
-			});
-			isUpdating = false;
+	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) { return folder.getFilesAsync(); }).done(function (files) {
+		isUpdating = true;
+		$('#notepadList').html('');
+		files.forEach(function (f) {
+			$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(f.displayName));
 		});
+		isUpdating = false;
 	});
 }
 
 function saveToFilesystem(blob, filename, reload) {
-	Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (folder) {
+	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) {
 		folder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting).then(function (file) {
 			file.openAsync(Windows.Storage.FileAccessMode.readWrite).then(function (output) {
 				var input = blob.msDetachStream();
@@ -161,37 +180,32 @@ function saveToBrowser(retry, fileLoad) {
 }
 
 function saveAs(blob, filename) {
-	Windows.Storage.ApplicationData.current.temporaryFolder.createFolderAsync("µPad Files", Windows.Storage.CreationCollisionOption.openIfExists).then(function (folder) {
-		folder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting).then(function (file) {
-			file.openAsync(Windows.Storage.FileAccessMode.readWrite).then(function (output) {
-				var input = blob.msDetachStream();
-				Windows.Storage.Streams.RandomAccessStream.copyAsync(input, output).then(function () {
-					output.flushAsync().done(function () {
-						input.close();
-						output.close();
-						Windows.System.Launcher.launchFileAsync(file).done();
-					});
+	Windows.Storage.ApplicationData.current.temporaryFolder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting).then(function (file) {
+		file.openAsync(Windows.Storage.FileAccessMode.readWrite).then(function (output) {
+			var input = blob.msDetachStream();
+			Windows.Storage.Streams.RandomAccessStream.copyAsync(input, output).then(function () {
+				output.flushAsync().done(function () {
+					input.close();
+					output.close();
+					Windows.System.Launcher.launchFileAsync(file).done();
 				});
 			});
 		});
 	});
 }
-
 function loadFromBrowser(title) {
-	Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (folder) {
-		folder.createFileAsync('{0}.npx'.format(title.replace(/[^a-z0-9 ]/gi, '')), Windows.Storage.CreationCollisionOption.openIfExists).then(function (file) {
-			Windows.Storage.FileIO.readTextAsync(file).then(function (text) {
-				if (text.length === 0) {
-					notepad = undefined;
-					return;
-				}
-				parser.parse(text, ["asciimath"]);
-				while (!parser.notepad) if (parser.notepad) break;
-				notepad = parser.notepad;
-				window.initNotepad();
-			});
+	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) { return folder.getFileAsync('{0}.npx'.format(title.replace(/[^a-z0-9 ]/gi, ''))); })
+		.then(function (file) { return Windows.Storage.FileIO.readTextAsync(file); }, function (err) { notepad = undefined; })
+		.then(function (text) {
+			if (!text || text.length === 0) {
+				notepad = undefined;
+				return;
+			}
+			parser.parse(text, ["asciimath"]);
+			while (!parser.notepad) if (parser.notepad) break;
+			notepad = parser.notepad;
+			window.initNotepad();
 		});
-	});
 }
 
 function deleteOpen() {
