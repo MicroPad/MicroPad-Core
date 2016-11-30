@@ -186,6 +186,12 @@ function updateNotepadList() {
 			$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(f.displayName));
 		});
 		isUpdating = false;
+	}, function (err) {
+		appStorage.setItem('storageDir', Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
+			storageDir = f.path;
+			refreshStorageDir();
+			updateNotepadList();
+		}));
 	});
 }
 
