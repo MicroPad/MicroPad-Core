@@ -106,10 +106,10 @@ window.onload = function () {
 	/** Restore to previous notepad */
 	appStorage.getItem('lastNotepadTitle', function (e, title) {
 		if (title == null || e) return;
-		notepadStorage.iterate(function (value, key, i) {
-			if (title === key) {
-				loadFromBrowser(title);
-			}
+		Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) { return folder.getFilesAsync(); }).done(function (files) {
+			files.forEach(function (f) {
+				if (title === f.displayName) loadFromBrowser(title);
+			});
 		});
 	});
 
