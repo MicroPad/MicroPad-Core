@@ -916,6 +916,9 @@
     <Content Include="js\libs\showdown.min.js" />
     <Content Include="js\libs\trim-canvas.js" />
     <Content Include="js\parser.js" />
+    <Content Include="npx logo.png" />
+    <Content Include="npxz logo.png" />
+    <Content Include="web_hi_res_512.png" />
     <Content Include="WinJS\css\ui-dark.css" />
     <Content Include="WinJS\css\ui-light.css" />
     <Content Include="WinJS\fonts\Symbols.ttf" />

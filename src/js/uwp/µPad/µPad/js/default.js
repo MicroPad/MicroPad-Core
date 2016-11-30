@@ -1,6 +1,7 @@
 ﻿// For an introduction to the Blank template, see the following documentation:
 // http://go.microsoft.com/fwlink/?LinkId=232509
 var storageDir;
+var count = 0;
 (function () {
 	"use strict";
 
@@ -13,12 +14,42 @@ var storageDir;
 				stillLoading = true;
 				$('.preloader-text').html('Importing Notepad...');
 				var f = args.detail.files[0];
-				Windows.Storage.FileIO.readTextAsync(f).then(function (text) {
-					parser.parse(text, ["asciimath"]);
-					while (!parser.notepad) if (parser.notepad) break;
-					notepad = parser.notepad;
-					saveToBrowser(undefined, true);
-				});
+				switch (f.fileType) {
+					case ".npx":
+						Windows.Storage.FileIO.readTextAsync(f).then(function (text) {
+							parser.parse(text, ["asciimath"]);
+							while (!parser.notepad) if (parser.notepad) break;
+							notepad = parser.notepad;
+							saveToBrowser(undefined, true);
+						});
+						break;
+					case ".zip":
+					case ".npxz":
+						Windows.Storage.FileIO.readBufferAsync(f).then(function (buffer) {
+							var bytes = new Uint8Array(buffer.length);
+							var dataReader = Windows.Storage.Streams.DataReader.fromBuffer(buffer);
+							dataReader.readBytes(bytes);
+							dataReader.close();
+
+							var zip = new JSZip();
+							zip.loadAsync(bytes).then(function () {
+								count = 0;
+								for (var k in zip.files) {
+									if (k.split('.').pop().toLowerCase() === 'npx') {
+										zip.file(k).async('string').then(function success(text) {
+											parser.parse(text, ["asciimath"]);
+											while (!parser.notepad) if (parser.notepad) break;
+											notepad = parser.notepad;
+											saveToBrowser(undefined, true, [count, Object.keys(zip.files).length]);
+
+											count++;
+										});
+									}
+								}
+							});
+						});
+						break;
+				}
 			}
 		}
 
@@ -150,13 +181,14 @@ function updateNotepadList() {
 		isUpdating = true;
 		$('#notepadList').html('');
 		files.forEach(function (f) {
+			if (f.fileType !== ".npx") return;
 			$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(f.displayName));
 		});
 		isUpdating = false;
 	});
 }
 
-function saveToFilesystem(blob, filename, reload) {
+function saveToFilesystem(blob, filename, reload, bulk) {
 	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) {
 		folder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting).then(function (file) {
 			file.openAsync(Windows.Storage.FileAccessMode.readWrite).then(function (output) {
@@ -165,7 +197,7 @@ function saveToFilesystem(blob, filename, reload) {
 					output.flushAsync().done(function () {
 						input.close();
 						output.close();
-						if (reload) window.location.reload();
+						if ((reload && !bulk) || (reload && bulk && bulk[0] >= bulk[1]-1)) window.location.reload();
 					});
 				});
 			});
@@ -173,7 +205,7 @@ function saveToFilesystem(blob, filename, reload) {
 	});
 }
 
-function saveToBrowser(retry, fileLoad) {	
+function saveToBrowser(retry, fileLoad, bulk) {	
 	$('#viewer ul').each(function(i) {
 		$(this).addClass('browser-default');
 	});
@@ -182,7 +214,7 @@ function saveToBrowser(retry, fileLoad) {
 		notepadStorage.setItem(notepad.title, '', function () {
 			appStorage.setItem('lastNotepadTitle', notepad.title, function () {
 				var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
-				saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), true);
+				saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), true, bulk);
 			});
 		});
 	}
@@ -193,7 +225,7 @@ function saveToBrowser(retry, fileLoad) {
 
 		//Save to the FS
 		var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
-		saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), false);
+		saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), false, bulk);
 
 		appStorage.setItem('lastNotepadTitle', notepad.title);
 	}

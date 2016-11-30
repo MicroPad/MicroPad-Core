@@ -27,8 +27,19 @@
         <uap:Extension Category="windows.fileTypeAssociation">
           <uap:FileTypeAssociation Name="notepads">
             <uap:DisplayName>µPad Notepad</uap:DisplayName>
+            <uap:Logo>npx logo.png</uap:Logo>
             <uap:SupportedFileTypes>
               <uap:FileType ContentType="text/xml">.npx</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="notepad-archives">
+            <uap:DisplayName>µPad Notepads</uap:DisplayName>
+            <uap:Logo>npxz logo.png</uap:Logo>
+            <uap:SupportedFileTypes>
+              <uap:FileType ContentType="application/zip">.npxz</uap:FileType>
+              <uap:FileType ContentType="application/zip">.zip</uap:FileType>
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
         </uap:Extension>

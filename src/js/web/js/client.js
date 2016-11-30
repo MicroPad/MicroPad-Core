@@ -730,7 +730,7 @@ function exportNotepads() {
 		zip.file(key.replace(/[^a-z0-9 ]/gi, '')+'.npx', blob);
 	}, function() {
 		zip.generateAsync({type:"blob"}).then(function(blob) {
-			saveAs(blob, "notepads.zip");
+			saveAs(blob, "notepads.npxz");
 		});
 	});
 }
@@ -1215,6 +1215,7 @@ function handleUpload(event) {
 			break;
 
 		case "zip":
+		case "npxz":
 			readFileInputEventAsArrayBuffer(event, function(arrayBuffer) {
 				var zip = new JSZip();
 				zip.loadAsync(arrayBuffer).then(function() {

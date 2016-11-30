@@ -122,15 +122,6 @@ window.onload = function () {
 	$('#menu-button').sideNav();
 	wasMobile = isMobile();
 
-	/** Handle Notepad Upload */
-	document.getElementById("upload").addEventListener("change", function (event) {
-		handleUpload(event);
-	}, false);
-	document.getElementById("mob-upload").addEventListener("change", function (event) {
-		handleUpload(event);
-	}, false);
-
-
 	/** Listen for when new elements are added to #viewer */
 	var observer = new MutationObserver(function (mutations) {
 		mutations.forEach(function (mutation) {
