@@ -8,8 +8,8 @@
 	</head>
 	<body>
 		<div id="loadedContent">
-			<nav class="blue-grey" style="box-shadow: none;">
-				<div class="nav-wrapper">
+			<nav class="blue-grey" style="box-shadow: none; z-index: 110;">
+				<div class="nav-wrapper" style="z-index: 110;">
 					<a id="menu-button" class="left hide-on-small-only side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
 					<a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a>
 					<ul class="left">
@@ -28,8 +28,8 @@
 			</nav>
 
 			<!-- Breadcrumbs -->
-			<nav id="breadcrumb-holder" class="blue-grey" style="top: 64px;">
-				<div class="nav-wrapper">
+			<nav id="breadcrumb-holder" class="blue-grey" style="top: 64px; z-index: 100;">
+				<div class="nav-wrapper" style="z-index: 100;">
 					<div id="parents" class="col s12" style="padding-left: 10px;">
 						<span id="open-note" class="breadcrumb display-with-note" style="display: none;"></span>
 					</div>
@@ -56,27 +56,31 @@
 				</div>
 			</ul>
 
-			<!-- Notepads -->
-			<ul id="notepad-dropdown" class="dropdown-content">
-				<li><a class="modal-trigger" data-target="new-notepad"><i class="material-icons left">add</i>New</a></li>
-				<li><a class="tooltipped" data-position="left" data-delay="50" data-tooltip="Export all of your notepads to an archive of NPX files" href="javascript:exportNotepads();"><i class="material-icons left">file_download</i>Export All</a></li>
-				<li class="divider"></li>
-				<div id="notepadList"></div>
-			</ul>
+			<div style="width: 100%; height: 100%; position: relative; top: 128px; z-index: 50;">
+				<!-- Notepads -->
+				<ul id="notepad-dropdown" class="dropdown-content">
+					<li><a class="modal-trigger" data-target="new-notepad"><i class="material-icons left">add</i>New</a></li>
+					<li><a class="tooltipped" data-position="left" data-delay="50" data-tooltip="Export all of your notepads to an archive of NPX files" href="javascript:exportNotepads();"><i class="material-icons left">file_download</i>Export All</a></li>
+					<li class="divider"></li>
+					<div id="notepadList"></div>
+				</ul>
 
-			<!-- Sections -->
-			<ul id="section-dropdown" class="dropdown-content">
-				<li id="add-section-link" style="display: none"><a class="modal-trigger" data-target="new-section"><i class="material-icons left">add</i>Section</a></li>
-				<li class="divider"></li>
-				<div id="sectionList"></div>
-			</ul>
+				<!-- Sections -->
+				<ul id="section-dropdown" class="dropdown-content">
+					<li id="add-section-link" style="display: none"><a class="modal-trigger" data-target="new-section"><i class="material-icons left">add</i>Section</a></li>
+					<li class="divider"></li>
+					<div id="sectionList"></div>
+				</ul>
 
-			<!-- Notes -->
-			<ul id="notes-dropdown" class="dropdown-content">
-				<li id="add-note-link" style="display: none"><a class="modal-trigger" data-target="new-note"><i class="material-icons left">note_add</i>Note</a></li>
-				<li class="divider"></li>
-				<div id="noteList"></div>
-			</ul>
+				<!-- Notes -->
+				<ul id="notes-dropdown" class="dropdown-content">
+					<li id="add-note-link" style="display: none"><a class="modal-trigger" data-target="new-note"><i class="material-icons left">note_add</i>Note</a></li>
+					<li class="divider"></li>
+					<div id="noteList"></div>
+				</ul>
+				
+				<div id="viewer" class="display-with-note"></div>
+			</div>
 
 			<!-- Search -->
 			<div id="search" class="modal modal-fixed-footer">
@@ -291,8 +295,6 @@
 					<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
 				</div>
 			</div>
-			
-			<div id="viewer" class="display-with-note"></div>
 		</div>
 
 		<div id="preloader">

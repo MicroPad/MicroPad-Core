@@ -1151,11 +1151,11 @@ function readFileInputEventAsArrayBuffer(event, callback) {
 /** Make sure the page is always larger than it's elements */
 function resizePage(selElement) {
 	if (parseInt(selElement.css('left'))+parseInt(selElement.css('width'))+1000 > parseInt($('#viewer').css('width'))) {
-		$('#viewer').css('width', parseInt(selElement.css('left'))+1000+'px');
-		if ($('#viewer').width() > $('nav').width()) $('nav').css('width', parseInt(selElement.css('left'))+1000+'px');
+		$('#viewer').css('width', parseInt(selElement.css('left'))+selElement.width()+1000+'px');
+		// if ($('#viewer').width() > $('nav').width()) $('nav').css('width', parseInt(selElement.css('left'))+1000+'px');
 	}
 	if (parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000 > parseInt($('#viewer').css('height'))){
-		$('#viewer').css('height', parseInt(selElement.css('top'))+parseInt(selElement.css('height'))+1000+'px');
+		$('#viewer').css('height', parseInt(selElement.css('top'))+selElement.height()+1000+'px');
 	}
 }
 
