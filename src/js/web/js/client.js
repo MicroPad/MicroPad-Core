@@ -580,6 +580,13 @@ window.onload = function() {
 
 	mobileNav();
 
+	$('.drag-target').bind('click', function() {
+		$('#sidenav-overlay').trigger('click');
+		setTimeout(function () {
+			$('#sidenav-overlay').trigger('click');
+		}, 200);
+	});
+
 	/** Page has loaded. Turn off the spinner */
 	setTimeout(function() {
 		$('#preloader').css('opacity', '0');
@@ -590,6 +597,7 @@ window.onload = function() {
 		}, 1000);
 	}, 500);
 };
+/**** END OF ONLOAD CODE */
 
 var latestResults = [];
 function loadSearchResult(resID) {
@@ -623,7 +631,6 @@ function loadSearchResult(resID) {
 	}
 	latestResults = [];
 }
-/**** END OF ONLOAD CODE */
 
 function recalculateParents(baseObj) {
 	parents.unshift(baseObj.parent);

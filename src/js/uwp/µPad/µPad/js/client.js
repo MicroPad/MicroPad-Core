@@ -584,6 +584,13 @@ window.onload = function () {
 
 	mobileNav();
 
+	$('.drag-target').bind('click', function () {
+		$('#sidenav-overlay').trigger('click');
+		setTimeout(function () {
+			$('#sidenav-overlay').trigger('click');
+		}, 200);
+	});
+
 	/** Page has loaded. Turn off the spinner */
 	setTimeout(function () {
 		if (stillLoading) return;

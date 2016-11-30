@@ -63,11 +63,31 @@ function refreshStorageDir() {
 	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) {
 		$('#workingDir').html(folder.path);
 	}, function (err) {
-		alert("Error accessing storage folder. Reverting to default.");
+		alert("Error accessing storage folder. Reverting to default: {0}".format(err));
 		appStorage.setItem('storageDir', Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
 			storageDir = f.path;
 		}));
 	});
+}
+
+function changeStorageLocation() {
+	var folderPicker = new Windows.Storage.Pickers.FolderPicker();
+	folderPicker.commitButtonText = "Set Notepad Storage Location";
+	folderPicker.suggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.documentsLibrary;
+	folderPicker.fileTypeFilter.replaceAll(["*"]);
+	folderPicker.pickSingleFolderAsync().then(function (folder) {
+		folder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (newFolder) {
+			//Give permission to access this directory without opening a picker everytime
+			Windows.Storage.AccessCache.StorageApplicationPermissions.futureAccessList.addOrReplace('storageDir', newFolder);
+
+			//Update settings an reload
+			appStorage.setItem('storageDir', newFolder.path, function () {
+				appStorage.removeItem('lastNotepadTitle', function () {
+					window.location.reload();
+				});
+			});
+		});
+	}, function (err) { alert("There was an error trying to access your selected folder"); });
 }
 
 function loadNote(id, delta) {
