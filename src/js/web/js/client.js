@@ -7,6 +7,7 @@ var lastClick = {x: 0, y: 0};
 var canvasCtx = undefined;
 var rec = new Recorder();
 var wasMobile = isMobile();
+var stillLoading = false;
 
 /** Setup localforage */
 var notepadStorage = localforage.createInstance({
@@ -60,58 +61,8 @@ var md = new showdown.Converter({
 });
 
 window.onload = function() {
-	window.initNotepad = function() {
-		parents = [];
-		note = undefined;
-		noteID = undefined;
-		lastClick = {x: 0, y: 0};
-		$('#sidenav-options').show();
-		// $('#search-button').show();
-		$('#open-type').html('Notepad')
-		$('#title-input').val(notepad.title);
-
-		parents.push(notepad);	
-
-		//Clear old lists
-		$('#sectionList').html('');
-		$('#noteList').html('');
-		$('#viewer').html('');
-		$('#parents > span:not(#open-note)').remove();
-		$('#open-note').hide();
-		$('#n-dd').css('color', '#AAAFB4');		
-		$('#n-dd').css('pointer-events', 'none');
-		$('#s-dd').css('color', '#fff');
-		$('#s-dd').css('pointer-events', 'auto');
-		$('#search-link').css('color', '#fff');
-		$('#search-link').css('pointer-events', 'auto');
-		updateInstructions();
-
-		$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
-		for (k in notepad.sections) {
-			var section = notepad.sections[k];
-			$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
-		}
-		$('#add-section-link').css('display', 'block');
-		$('#add-note-link').css('display', 'none');
-		$('.display-with-note').hide();
-		document.title = 'µPad';
-
-		appStorage.setItem('lastNotepadTitle', notepad.title);
-	}
-
 	/** Get the open notepads */
 	updateNotepadList();
-
-	/** Restore to previous notepad */
-	appStorage.getItem('lastNotepadTitle', function(e, title) {
-		if (title == null || e) return;
-		notepadStorage.iterate(function(value, key, i) {
-			if (title === key) {
-				notepad = parser.restoreNotepad(value);
-				initNotepad();
-			}
-		});
-	});
 	
 	$('.modal').modal();
 	$('#menu-button').sideNav({
@@ -123,13 +74,26 @@ window.onload = function() {
 	$('#menu-button').sideNav();
 	wasMobile = isMobile();
 
-	/** Handle Notepad Upload */
-	document.getElementById("upload").addEventListener("change", function(event) {
-		handleUpload(event);
-	}, false);
-	document.getElementById("mob-upload").addEventListener("change", function(event) {
-		handleUpload(event);
-	}, false);
+	if (window.platform === 'web') {
+		/** Restore to previous notepad */
+		appStorage.getItem('lastNotepadTitle', function(e, title) {
+			if (title == null || e) return;
+			notepadStorage.iterate(function(value, key, i) {
+				if (title === key) {
+					notepad = parser.restoreNotepad(value);
+					initNotepad();
+				}
+			});
+		});
+
+		/** Handle Notepad Upload */
+		document.getElementById("upload").addEventListener("change", function(event) {
+			handleUpload(event);
+		}, false);
+		document.getElementById("mob-upload").addEventListener("change", function(event) {
+			handleUpload(event);
+		}, false);
+	}
 
 
 	/** Listen for when new elements are added to #viewer */
@@ -149,7 +113,7 @@ window.onload = function() {
 	$('#viewer').click(function (e) {
 		if (e.target == this && note && !isDropdownActive()) {
 			lastClick.x = e.pageX;
-			lastClick.y = e.pageY-128;
+			lastClick.y = e.pageY - 128;
 			$('#insert').modal('open');
 		}
 	});
@@ -592,6 +556,7 @@ window.onload = function() {
 
 	/** Page has loaded. Turn off the spinner */
 	setTimeout(function() {
+		if (stillLoading) return;
 		$('#preloader').css('opacity', '0');
 		$('body').css('background-color', '#fff');
 		$('#loadedContent').addClass('visible');
@@ -601,6 +566,45 @@ window.onload = function() {
 	}, 500);
 };
 /**** END OF ONLOAD CODE */
+
+window.initNotepad = function() {
+	parents = [];
+	note = undefined;
+	noteID = undefined;
+	lastClick = {x: 0, y: 0};
+	$('#sidenav-options').show();
+	// $('#search-button').show();
+	$('#open-type').html('Notepad')
+	$('#title-input').val(notepad.title);
+
+	parents.push(notepad);	
+
+	//Clear old lists
+	$('#sectionList').html('');
+	$('#noteList').html('');
+	$('#viewer').html('');
+	$('#parents > span:not(#open-note)').remove();
+	$('#open-note').hide();
+	$('#n-dd').css('color', '#AAAFB4');		
+	$('#n-dd').css('pointer-events', 'none');
+	$('#s-dd').css('color', '#fff');
+	$('#s-dd').css('pointer-events', 'auto');
+	$('#search-link').css('color', '#fff');
+	$('#search-link').css('pointer-events', 'auto');
+	updateInstructions();
+
+	$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
+	for (k in notepad.sections) {
+		var section = notepad.sections[k];
+		$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
+	}
+	$('#add-section-link').css('display', 'block');
+	$('#add-note-link').css('display', 'none');
+	$('.display-with-note').hide();
+	document.title = 'µPad';
+
+	appStorage.setItem('lastNotepadTitle', notepad.title);
+}
 
 var latestResults = [];
 function loadSearchResult(resID) {
@@ -689,36 +693,56 @@ function newNote() {
 }
 
 function deleteOpen() {
-	if (confirm("Are you sure you want to delete this?")) {
-		if (parents.length === 1) {
-			//Delete Notepad
-			notepadStorage.removeItem(notepad.title, function() {
-				notepad = undefined;
-				location.reload();
-			});
+	confirmAsync("Are you sure you want to delete this?").then(function (answer) {
+		if (answer) {
+			if (parents.length === 1) {
+				//Delete Notepad
+				appStorage.removeItem('lastNotepadTitle', function () {
+					switch (window.platform) {
+						case "web":
+							notepadStorage.removeItem(notepad.title, function() {
+								notepad = undefined;
+								location.reload();
+							});
+							break;
+
+						case "uwp":
+							Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
+							.then(function (folder) {
+								return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+							}).then(function (file) {
+								return file.deleteAsync();
+							}).done(function () {
+								window.location.reload();
+							});
+							break;
+					}
+				});
+			}
+			else if (parents.length > 1 && !note) {
+				//Delete Section
+				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) {return s !== parents[parents.length - 1]});
+				saveToBrowser();
+				loadParent(parents.length - 2);
+			}
+			else if (note) {
+				//Delete Note
+				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) {return n !== note});
+				saveToBrowser();
+				loadParent(parents.length - 1);
+			}
 		}
-		else if (parents.length > 1 && !note) {
-			//Delete Section
-			parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) {return s !== parents[parents.length - 1]});
-			saveToBrowser();
-			loadParent(parents.length - 2);
-		}
-		else if (note) {
-			//Delete Note
-			parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) {return n !== note});
-			saveToBrowser();
-			loadParent(parents.length - 1);
-		}
-	}
+	});
 }
 
 function deleteElement() {
-	if (confirm("Are you sure you want to delete this?") && lastEditedElement) {
-		// lastEditedElement.content = undefined;
-		note.elements = note.elements.filter(function(e) {return (e !== lastEditedElement);});
-		$('#'+lastEditedElement.args.id).remove();
-		saveToBrowser();
-	}
+	confirmAsync("Are you sure you want to delete this?").then(function (answer) {
+		if (answer && lastEditedElement) {
+			note.elements = note.elements.filter(function (e) { return (e !== lastEditedElement); });
+			$('#' + lastEditedElement.args.id).remove();
+			saveToBrowser();
+		}
+	});
 }
 
 function exportOpen() {
@@ -757,13 +781,31 @@ function downloadFile(elementID) {
 function updateTitle() {
 	if (parents.length === 1) {
 		//Delete old Notepad
-		notepadStorage.removeItem(notepad.title, function() {
-			notepad.title = $('#title-input').val();
-			$('#parents > span:nth-child(1)').html(notepad.title);
-			saveToBrowser();
-			setTimeout(function() {
-				location.reload();
-			}, 500);
+		appStorage.removeItem('lastNotepadTitle', function () {
+			switch(window.platform) {
+				case "web":
+					notepadStorage.removeItem(notepad.title, function() {
+						notepad.title = $('#title-input').val();
+						$('#parents > span:nth-child(1)').html(notepad.title);
+						saveToBrowser();
+						setTimeout(function() {
+							location.reload();
+						}, 500);
+					});
+					break;
+
+				case "uwp":
+					Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
+						.then(function (folder) {
+							return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+						}).then(function (file) {
+							return file.deleteAsync();
+						}).done(function () {
+							notepad.title = $('#title-input').val();
+							saveToBrowser(undefined, true);
+						});
+					break;
+			}
 		});
 	}
 	else if (parents.length > 1 && !note) {
@@ -873,8 +915,8 @@ function loadNote(id, delta) {
 	if (!delta) {
 		noteID = id;
 		oldNote = note;
-		note = parents[parents.length-1].notes[id];
-		document.title = note.title+" - µPad";
+		note = parents[parents.length - 1].notes[id];
+		document.title = note.title + " - µPad";
 		linkBreadcrumbs();
 		$('#open-note').html('{0} <span class="time">{1}</span>'.format(note.title, moment(note.time).format('dddd, D MMMM h:mm A')));
 		$('#viewer').html('');
@@ -885,14 +927,14 @@ function loadNote(id, delta) {
 		$('#sidenav-overlay').trigger('click');
 		setTimeout(function() {
 			$('#sidenav-overlay').trigger('click');
-		}, 500);
+		}, 800);
 	}
 	$('#open-type').html('Note');
 	$('#title-input').val(note.title);
 
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
-		if (delta && $('#'+element.args.id).length) continue;
+		if (delta && $('#' + element.args.id).length) continue;
 		switch (element.type) {
 			case "markdown":
 				$('#viewer').append('<div class="interact z-depth-2 hoverable" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
@@ -912,7 +954,7 @@ function loadNote(id, delta) {
 			case "recording":
 				$('#viewer').append('<div class="z-depth-2 hoverable interact recording" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3};"><audio controls="true" src="{5}"></audio><p class="recording-text"><em>{4}</em></p></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.content, element.args.id));
 				if (!delta) edgeFix(dataURItoBlob(element.content), element.args.id);
-				if (window.navigator.userAgent.indexOf("Edge") > -1) $('#'+element.args.id).removeClass('interact');
+				if (window.navigator.userAgent.indexOf("Edge") > -1) $('#' + element.args.id).removeClass('interact');
 				break;
 		}
 	}
@@ -1164,40 +1206,26 @@ function resizePage(selElement) {
 	}
 }
 
-var tooBig = '';
 function saveToBrowser(retry) {
 	/*
 		I want to use the Filesystem and FileWriter API for this (https://www.html5rocks.com/en/tutorials/file/filesystem/)
 		but only Chrome and Opera support it. For now I'll use IndexedDB with a sneaky async library.
 	 */
-	
+	$('.save-status').html('Saving&hellip;');
 	$('#viewer ul').each(function(i) {
 		$(this).addClass('browser-default')
 	});
+		
+	notepadStorage.setItem(notepad.title, notepad, function() {
+		updateNotepadList();
+		$('.save-status').html('All changes saved');
+	});
 
-	// var compressedNotepad = window.pako.deflate(JSON.stringify(notepad), {to: 'string'});
-	try {
-		notepadStorage.setItem(notepad.title, notepad, function() {
-			updateNotepadList();
-		});
-
-		appStorage.setItem('lastNotepadTitle', notepad.title);
-	}
-	catch (e) {
-		if (retry && notepad.title != tooBig) {
-			alert("This notepad is too big to fit in your browser's storage. To keep changes make sure to download it.")
-			notepad.title = tooBig;
-		}
-		else if (notepad.title != tooBig) {
-			notepadStorage.clear();
-			saveToBrowser(true);
-		}
-	}
+	appStorage.setItem('lastNotepadTitle', notepad.title);
 }
 
 function loadFromBrowser(title) {
 	notepadStorage.getItem(title, function(err, res) {
-		// notepad = JSON.parse(window.pako.inflate(res, {to: 'string'}));
 		notepad = parser.restoreNotepad(res);
 		window.initNotepad();
 	});
@@ -1306,6 +1334,26 @@ function fromBase64(str) {
 
 function isMobile() {
 	return $('#mobile-canary').is(':visible');
+}
+
+function confirmAsync(question) {
+	switch (window.platform) {
+		case "web":
+			return Promise.resolve(confirm(question));
+			break;
+		case "uwp":
+			var msgbox = new Windows.UI.Popups.MessageDialog(message, "Are you sure?");
+			msgbox.commands.append(new Windows.UI.Popups.UICommand("No", null, 1));
+			msgbox.commands.append(new Windows.UI.Popups.UICommand("Yes", null, 2));
+			msgbox.defaultCommandIndex = 1;
+			return msgbox.showAsync().then(function (command) {
+				if (command) {
+					if (command.id == 2) return true;
+				}
+				return false;
+			});
+			break;
+	}
 }
 
 //Thanks to http://stackoverflow.com/a/4673436/998467

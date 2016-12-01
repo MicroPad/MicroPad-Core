@@ -5,6 +5,7 @@
 		<title>µPad</title>
 		<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
 		<link rel="stylesheet" type="text/css" href="css/notepadStyle.css">
+		<script>window.platform = "web";</script>
 	</head>
 	<body>
 		<div id="loadedContent">
@@ -17,6 +18,7 @@
 					</ul>
 
 					<ul id="nav-desktop" class="right hide-on-med-and-down">
+						<li class="save-status" style="margin-right: 10px;"></li>
 						<li><div style="top: 10px;" class="file-field input-field"><div class="waves-effect waves-light btn amber darken-1 tooltipped" data-position="left" data-delay="50" data-tooltip="Upload a .npx file or a .npxz/.zip archive"><span>Upload Notepads</span><input id="upload" type="file"></div><div style="display: none;" class="file-path-wrapper"><input id="upload-name" class="file-path validate" type="text"></div></div></li>
 
 						<li><a id="np-dd" class="dropdown-button" href="#!"><i class="material-icons left">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
@@ -39,6 +41,7 @@
 			<!-- Sidenav -->
 			<ul id="menu" class="side-nav menu-button">
 				<div class="hide-on-large-only">
+					<li class="save-status"></li>
 					<li><input type="file" id="mob-upload" /></li>
 					<li><a id="mob-np-dd" class="dropdown-button" href="#!"><i class="material-icons">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
 					<li><a id="mob-s-dd" class="dropdown-button" href="#!"><i class="material-icons">book</i>Sections<i class="material-icons right">arrow_drop_down</i></a></li>

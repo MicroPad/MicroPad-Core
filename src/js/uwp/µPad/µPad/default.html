@@ -9,22 +9,11 @@
 	<script src="WinJS/js/ui.js"></script> -->
 	<script src="WinJS/js/base.js"></script>
 	<script>
+		window.platform = "uwp";
+
 		function alert(message) {
 			var msgbox = new Windows.UI.Popups.MessageDialog(message);
 			msgbox.showAsync();
-		}
-
-		function confirmAsync(message) {
-			var msgbox = new Windows.UI.Popups.MessageDialog(message, "Are you sure?");
-			msgbox.commands.append(new Windows.UI.Popups.UICommand("No", null, 1));
-			msgbox.commands.append(new Windows.UI.Popups.UICommand("Yes", null, 2));
-			msgbox.defaultCommandIndex = 1;
-			return msgbox.showAsync().then(function (command) {
-				if (command) {
-					if (command.id == 2) return true;
-				}
-				return false;
-			});
 		}
 	</script>
 

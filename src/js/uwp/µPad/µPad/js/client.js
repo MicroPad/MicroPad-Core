@@ -1,5 +1,4 @@
-self.notepad = {};
-var notepad = self.notepad;
+var notepad;
 var parents = [];
 var note;
 var noteID;
@@ -24,13 +23,13 @@ var appStorage = localforage.createInstance({
 });
 
 /** Setup md parser */
-showdown.extension('math', function () {
+showdown.extension('math', function() {
 	var matches = [];
 	return [
 		{
 			type: 'lang',
 			regex: /===([^]+?)===/gi,
-			replace: function (s, match) {
+			replace: function(s, match) {
 				matches.push('===' + match + '===');
 				var n = matches.length - 1;
 				return '%PLACEHOLDER' + n + '%';
@@ -38,7 +37,7 @@ showdown.extension('math', function () {
 		},
 		{
 			type: 'output',
-			filter: function (text) {
+			filter: function(text) {
 				for (var i = 0; i < matches.length; ++i) {
 					var pat = '%PLACEHOLDER' + i + '%';
 					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
@@ -61,7 +60,7 @@ var md = new showdown.Converter({
 	extensions: ['math']
 });
 
-window.onload = function () {
+window.onload = function() {
 	/** Get the open notepads */
 	updateNotepadList();
 
@@ -75,9 +74,31 @@ window.onload = function () {
 	$('#menu-button').sideNav();
 	wasMobile = isMobile();
 
+	if (window.platform === 'web') {
+		/** Restore to previous notepad */
+		appStorage.getItem('lastNotepadTitle', function(e, title) {
+			if (title == null || e) return;
+			notepadStorage.iterate(function(value, key, i) {
+				if (title === key) {
+					notepad = parser.restoreNotepad(value);
+					initNotepad();
+				}
+			});
+		});
+
+		/** Handle Notepad Upload */
+		document.getElementById("upload").addEventListener("change", function(event) {
+			handleUpload(event);
+		}, false);
+		document.getElementById("mob-upload").addEventListener("change", function(event) {
+			handleUpload(event);
+		}, false);
+	}
+
+
 	/** Listen for when new elements are added to #viewer */
-	var observer = new MutationObserver(function (mutations) {
-		mutations.forEach(function (mutation) {
+	var observer = new MutationObserver(function(mutations) {
+		mutations.forEach(function(mutation) {
 			saveToBrowser();
 			for (k in mutation.addedNodes) {
 				var selElement = $('#' + mutation.addedNodes[k].id);
@@ -89,7 +110,7 @@ window.onload = function () {
 	observer.observe(document.getElementById('viewer'), { attributes: false, childList: true, characterData: true });
 
 	/** Creating elements */
-	$('#viewer').click(function (e) {
+	$('#viewer').click(function(e) {
 		if (e.target == this && note && !isDropdownActive()) {
 			lastClick.x = e.pageX;
 			lastClick.y = e.pageY - 128;
@@ -105,18 +126,18 @@ window.onload = function () {
 	interact('.interact').resizable({
 		preserveAspectRatio: false,
 		edges: { left: false, right: true, bottom: false, top: false },
-		onend: function (event) {
+		onend: function(event) {
 			updateNote(event.target.id);
 			justMoved = true;
 		}
-	}).on('resizemove', function (event) {
+	}).on('resizemove', function(event) {
 		$(event.target).css('width', parseInt($(event.target).css('width')) + event.dx);
 		// $(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
 		$(event.target).css('height', 'auto');
 		resizePage($(event.target));
 		updateReference(event);
 		justMoved = true;
-	}).on('click', function (event) {
+	}).on('click', function(event) {
 		if (justMoved) {
 			justMoved = false;
 			return;
@@ -144,7 +165,7 @@ window.onload = function () {
 
 						$('#md-textarea').val(element.content);
 						$('#md-textarea').unbind();
-						$('#md-textarea').bind('input propertychange', function () {
+						$('#md-textarea').bind('input propertychange', function() {
 							element.content = $('#md-textarea').val();
 							currentTarget.html(md.makeHtml(element.content));
 							updateReference(event);
@@ -153,7 +174,7 @@ window.onload = function () {
 						$('#mdfs').val(element.args.fontSize);
 						$('#mdfs').val(element.args.fontSize);
 						$('#mdfs').unbind();
-						$('#mdfs').bind('input propertychange', function () {
+						$('#mdfs').bind('input propertychange', function() {
 							element.args.fontSize = $('#mdfs').val();
 							currentTarget.css('font-size', element.args.fontSize);
 							updateReference(event);
@@ -161,7 +182,7 @@ window.onload = function () {
 
 						$('#mdw').val(element.args.width);
 						$('#mdw').unbind();
-						$('#mdw').bind('input propertychange', function () {
+						$('#mdw').bind('input propertychange', function() {
 							element.args.width = $('#mdw').val();
 							currentTarget.css('width', element.args.width);
 							updateReference(event);
@@ -169,14 +190,14 @@ window.onload = function () {
 
 						$('#mdh').val(element.args.height);
 						$('#mdh').unbind();
-						$('#mdh').bind('input propertychange', function () {
+						$('#mdh').bind('input propertychange', function() {
 							element.args.height = $('#mdh').val();
 							currentTarget.css('height', element.args.height);
 							updateReference(event);
 						});
 
 						$('#mdEditor').modal({
-							complete: function () {
+							complete: function() {
 								asciimath.translate(undefined, true);
 								MathJax.Hub.Typeset();
 
@@ -190,40 +211,38 @@ window.onload = function () {
 							}
 						});
 						$('#mdEditor').modal('open');
-						setTimeout(function () {
+						setTimeout(function() {
 							$('#mdEditor').modal('open');
 						}, 500);
 						break;
 
 					case "drawing":
 						$('#drawingEditor').modal({
-							ready: function () {
+							ready: function() {
 								resizeCanvas();
 								if (element.content) {
 									var img = new Image();
-									img.onload = function () {
+									img.onload = function() {
 										canvasCtx.drawImage(img, 0, 0);
 									}
 									img.src = element.content;
 								}
 							},
-							complete: function () {
-								confirmAsync("Do you want to save this drawing?").then(function (answer) {
-									if (answer) {
-										if (!isCanvasBlank($('#drawing-viewer')[0])) {
-											element.content = $('#drawing-viewer')[0].toDataURL();
+							complete: function() {
+								if (confirm("Do you want to save this drawing?")) {
+									if (!isCanvasBlank($('#drawing-viewer')[0])) {
+										element.content = $('#drawing-viewer')[0].toDataURL();
 
-											var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
-											currentTarget.attr('src', trimmed);
+										var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
+										currentTarget.attr('src', trimmed);
 
-											saveToBrowser();
-										}
+										saveToBrowser();
 									}
-								});
+								}
 							}
 						});
 						$('#drawingEditor').modal('open');
-						setTimeout(function () {
+						setTimeout(function() {
 							$('#drawingEditor').modal('open');
 						}, 500);
 						break;
@@ -241,13 +260,13 @@ window.onload = function () {
 
 						$('#image-upload-name').val('');
 						$('#image-upload').unbind();
-						$('#image-upload').bind('change', function (event) {
+						$('#image-upload').bind('change', function(event) {
 							var reader = new FileReader();
 							var file = event.target.files[0];
 							if (!file) return;
 							reader.readAsDataURL(file);
 
-							reader.onload = function () {
+							reader.onload = function() {
 								element.content = reader.result;
 								currentTarget.attr('src', URL.createObjectURL(dataURItoBlob(element.content)));
 								updateReference(event);
@@ -256,7 +275,7 @@ window.onload = function () {
 
 						$('#iw').val(element.args.width);
 						$('#iw').unbind();
-						$('#iw').bind('input propertychange', function () {
+						$('#iw').bind('input propertychange', function() {
 							element.args.width = $('#iw').val();
 							currentTarget.css('width', element.args.width);
 							updateReference(event);
@@ -264,14 +283,14 @@ window.onload = function () {
 
 						$('#ih').val(element.args.height);
 						$('#ih').unbind();
-						$('#ih').bind('input propertychange', function () {
+						$('#ih').bind('input propertychange', function() {
 							element.args.height = $('#ih').val();
 							currentTarget.css('height', element.args.height);
 							updateReference(event);
 						});
 
 						$('#imageEditor').modal({
-							complete: function () {
+							complete: function() {
 								if (source) {
 									source.content = $('#isw').val();
 								}
@@ -286,7 +305,7 @@ window.onload = function () {
 							}
 						});
 						$('#imageEditor').modal('open');
-						setTimeout(function () {
+						setTimeout(function() {
 							$('#imageEditor').modal('open');
 						}, 500);
 						break;
@@ -305,14 +324,14 @@ window.onload = function () {
 
 						$('#file-upload-name').val('');
 						$('#file-upload').unbind();
-						$('#file-upload').bind('change', function (event) {
+						$('#file-upload').bind('change', function(event) {
 							var reader = new FileReader();
 							var file = event.target.files[0];
 							element.args.filename = file.name;
 							if (!file) return;
 							reader.readAsDataURL(file);
 
-							reader.onload = function () {
+							reader.onload = function() {
 								element.content = reader.result;
 								$('#' + element.args.id + ' > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
 								$('#' + element.args.id + ' > a').html(element.args.filename);
@@ -320,7 +339,7 @@ window.onload = function () {
 						});
 
 						$('#fileEditor').modal({
-							complete: function () {
+							complete: function() {
 								if (source) {
 									source.content = $('#fsw').val();
 								}
@@ -335,7 +354,7 @@ window.onload = function () {
 							}
 						});
 						$('#fileEditor').modal('open');
-						setTimeout(function () {
+						setTimeout(function() {
 							$('#fileEditor').modal('open');
 						}, 500);
 						break;
@@ -343,7 +362,7 @@ window.onload = function () {
 				break;
 			}
 		}
-	}).on('tap', function (event) {
+	}).on('tap', function(event) {
 		if (event.pointer === 'mouse') return;
 		var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
 		if (path[0].tagName.toLowerCase() === 'a') return;
@@ -353,7 +372,7 @@ window.onload = function () {
 	if (!isMobile()) {
 		interact('.interact').draggable({
 			onmove: dragMoveListener,
-			onend: function (event) {
+			onend: function(event) {
 				updateNote(event.target.id);
 				justMoved = true;
 			},
@@ -380,7 +399,7 @@ window.onload = function () {
 	window.dragMoveListener = dragMoveListener;
 
 	/** Pen Input Handler */
-	$(window).resize(function () {
+	$(window).resize(function() {
 		resizeCanvas();
 		mobileNav();
 	});
@@ -388,13 +407,13 @@ window.onload = function () {
 	resizeCanvas();
 	canvasCtx.strokeStyle = "#000000";
 	var ongoingTouches = new Array();
-	$('#drawing-viewer')[0].onpointerdown = function (event) {
+	$('#drawing-viewer')[0].onpointerdown = function(event) {
 		if (true) {
 			ongoingTouches.push(copyTouch(event));
 			canvasCtx.beginPath();
 		}
 	}
-	$('#drawing-viewer')[0].onpointermove = function (event) {
+	$('#drawing-viewer')[0].onpointermove = function(event) {
 		var pos = realPos(event);
 		if (event.pressure > 0) {
 			if (event.buttons === 32) {
@@ -415,7 +434,7 @@ window.onload = function () {
 			}
 		}
 	}
-	$('#drawing-viewer')[0].onpointerup = function (event) {
+	$('#drawing-viewer')[0].onpointerup = function(event) {
 		var pos = realPos(event);
 		var idx = ongoingTouchIndexById(event.pointerId);
 		if (idx >= 0 && event.buttons !== 32) {
@@ -429,7 +448,7 @@ window.onload = function () {
 			ongoingTouches.splice(idx, 1);
 		}
 	}
-	$('#drawing-viewer')[0].onpointercancel = function (event) {
+	$('#drawing-viewer')[0].onpointercancel = function(event) {
 		var idx = ongoingTouchIndexById(event.pointerId);
 		ongoingTouches.splice(idx, 1);
 	}
@@ -456,12 +475,12 @@ window.onload = function () {
 
 	/** Search Notes */
 	$('#search').modal({
-		complete: function () {
+		complete: function() {
 			$('#search-text').val('');
 			$('#search-results').html('');
 		}
 	});
-	$('#search-text').bind('input propertychange', function (event) {
+	$('#search-text').bind('input propertychange', function(event) {
 		$('#search-results').html('');
 
 		var query = $('#search-text').val();
@@ -475,11 +494,11 @@ window.onload = function () {
 	});
 
 	/** Recording Stuff */
-	$('#stop-recording-btn').on('click', function (event) {
+	$('#stop-recording-btn').on('click', function(event) {
 		rec.stop();
 		$('#stop-recording-btn').hide();
 	});
-	$('#viewer').on('click', '.recording-text', function (event) {
+	$('#viewer').on('click', '.recording-text', function(event) {
 		if (justMoved) {
 			justMoved = false;
 			return;
@@ -498,14 +517,14 @@ window.onload = function () {
 
 		$('#rposl').val(lastEditedElement.args.x);
 		$('#rposl').unbind();
-		$('#rposl').bind('input propertychange', function () {
+		$('#rposl').bind('input propertychange', function() {
 			lastEditedElement.args.x = $('#rposl').val();
 			currentTarget.css('left', lastEditedElement.args.x);
 		});
 
 		$('#rpost').val(lastEditedElement.args.y);
 		$('#rpost').unbind();
-		$('#rpost').bind('input propertychange', function () {
+		$('#rpost').bind('input propertychange', function() {
 			lastEditedElement.args.y = $('#rpost').val();
 			currentTarget.css('top', lastEditedElement.args.y);
 		});
@@ -514,7 +533,7 @@ window.onload = function () {
 	});
 
 	/** Auto create md-element on typing in empty note */
-	$(document).keypress(function (e) {
+	$(document).keypress(function(e) {
 		var charcode = e.charCode;
 		var char = String.fromCharCode(charcode);
 		if (char && note && note.elements.length === 0) {
@@ -530,27 +549,27 @@ window.onload = function () {
 	mobileNav();
 	updateInstructions();
 
-	$('.drag-target').bind('click', function () {
+	$('.drag-target').bind('click', function() {
 		$('#sidenav-overlay').trigger('click');
-		setTimeout(function () {
+		setTimeout(function() {
 			$('#sidenav-overlay').trigger('click');
 		}, 200);
 	});
 
 	/** Page has loaded. Turn off the spinner */
-	setTimeout(function () {
+	setTimeout(function() {
 		if (stillLoading) return;
 		$('#preloader').css('opacity', '0');
 		$('body').css('background-color', '#fff');
 		$('#loadedContent').addClass('visible');
-		setTimeout(function () {
+		setTimeout(function() {
 			$('#preloader').remove();
 		}, 1000);
 	}, 500);
 };
 /**** END OF ONLOAD CODE */
 
-window.initNotepad = function () {
+window.initNotepad = function() {
 	parents = [];
 	note = undefined;
 	noteID = undefined;
@@ -629,7 +648,7 @@ function recalculateParents(baseObj) {
 	}
 
 	//Reset breadcrumbs
-	$('#parents').children().each(function (i) {
+	$('#parents').children().each(function(i) {
 		if (this.id == "open-note") return false;
 		$(this).remove();
 	});
@@ -676,24 +695,41 @@ function newNote() {
 }
 
 function deleteOpen() {
-	confirmAsync("Are you sure you want to delete this?").then(function (answer) {
+	confirmAsync("Are you sure you want to delete this?").then(function(answer) {
 		if (answer) {
 			if (parents.length === 1) {
 				//Delete Notepad
-				notepadStorage.removeItem(notepad.title, function () {
-					notepad = undefined;
-					location.reload();
+				appStorage.removeItem('lastNotepadTitle', function() {
+					switch (window.platform) {
+						case "web":
+							notepadStorage.removeItem(notepad.title, function() {
+								notepad = undefined;
+								location.reload();
+							});
+							break;
+
+						case "uwp":
+							Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
+							.then(function(folder) {
+								return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+							}).then(function(file) {
+								return file.deleteAsync();
+							}).done(function() {
+								window.location.reload();
+							});
+							break;
+					}
 				});
 			}
 			else if (parents.length > 1 && !note) {
 				//Delete Section
-				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function (s) { return s !== parents[parents.length - 1] });
+				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) { return s !== parents[parents.length - 1] });
 				saveToBrowser();
-				loadParent(parents.length - 2)
+				loadParent(parents.length - 2);
 			}
 			else if (note) {
 				//Delete Note
-				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function (n) { return n !== note });
+				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) { return n !== note });
 				saveToBrowser();
 				loadParent(parents.length - 1);
 			}
@@ -702,13 +738,29 @@ function deleteOpen() {
 }
 
 function deleteElement() {
-	confirmAsync("Are you sure you want to delete this?").then(function (answer) {
+	confirmAsync("Are you sure you want to delete this?").then(function(answer) {
 		if (answer && lastEditedElement) {
-			// lastEditedElement.content = undefined;
-			note.elements = note.elements.filter(function (e) { return (e !== lastEditedElement); });
+			note.elements = note.elements.filter(function(e) { return (e !== lastEditedElement); });
 			$('#' + lastEditedElement.args.id).remove();
 			saveToBrowser();
 		}
+	});
+}
+
+function exportOpen() {
+	var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
+	saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+}
+
+function exportNotepads() {
+	var zip = new JSZip();
+	notepadStorage.iterate(function(value, key, i) {
+		var blob = new Blob([parser.restoreNotepad(value).toXML()], { type: "text/xml;charset=utf-8" });
+		zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+	}, function() {
+		zip.generateAsync({ type: "blob" }).then(function(blob) {
+			saveAs(blob, "notepads.npxz");
+		});
 	});
 }
 
@@ -731,13 +783,31 @@ function downloadFile(elementID) {
 function updateTitle() {
 	if (parents.length === 1) {
 		//Delete old Notepad
-		notepadStorage.removeItem(notepad.title, function () {
-			notepad.title = $('#title-input').val();
-			$('#parents > span:nth-child(1)').html(notepad.title);
-			saveToBrowser();
-			setTimeout(function () {
-				location.reload();
-			}, 500);
+		appStorage.removeItem('lastNotepadTitle', function() {
+			switch (window.platform) {
+				case "web":
+					notepadStorage.removeItem(notepad.title, function() {
+						notepad.title = $('#title-input').val();
+						$('#parents > span:nth-child(1)').html(notepad.title);
+						saveToBrowser();
+						setTimeout(function() {
+							location.reload();
+						}, 500);
+					});
+					break;
+
+				case "uwp":
+					Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
+						.then(function(folder) {
+							return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+						}).then(function(file) {
+							return file.deleteAsync();
+						}).done(function() {
+							notepad.title = $('#title-input').val();
+							saveToBrowser(undefined, true);
+						});
+					break;
+			}
 		});
 	}
 	else if (parents.length > 1 && !note) {
@@ -758,14 +828,14 @@ var isUpdating = false;
 var arrOfKeys = [];
 function updateNotepadList() {
 	if (isUpdating) return;
-	notepadStorage.keys().then(function (keys) {
+	notepadStorage.keys().then(function(keys) {
 		if (JSON.stringify(keys) !== JSON.stringify(arrOfKeys)) {
 			arrOfKeys = keys;
 			isUpdating = true;
 			$('#notepadList').html('');
-			notepadStorage.iterate(function (value, key, i) {
+			notepadStorage.iterate(function(value, key, i) {
 				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(key));
-			}, function () {
+			}, function() {
 				isUpdating = false;
 			});
 		}
@@ -782,7 +852,7 @@ function loadParent(index) {
 	parents = parents.slice(0, index);
 
 	//Reset breadcrumbs
-	$('#parents').children().each(function (i) {
+	$('#parents').children().each(function(i) {
 		if (this.id == "open-note") return false;
 		$(this).remove();
 	});
@@ -797,7 +867,7 @@ function loadParent(index) {
 }
 
 function linkBreadcrumbs() {
-	$('#parents').children().each(function (i) {
+	$('#parents').children().each(function(i) {
 		if (this.id == "open-note") return false;
 
 		$(this).attr('onclick', 'loadParent(' + i + ');');
@@ -816,10 +886,10 @@ function updateSelector() {
 }
 
 function loadSection(id, providedSection) {
-	window.note = undefined;
 	var section = parents[parents.length - 1].sections[id];
 	if (providedSection) section = providedSection;
 	parents.push(section);
+	window.note = undefined;
 	$('.display-with-note').hide();
 	document.title = 'µPad';
 	$('#viewer').html('');
@@ -857,9 +927,9 @@ function loadNote(id, delta) {
 
 		//Don't ask me why this works - it just does
 		$('#sidenav-overlay').trigger('click');
-		setTimeout(function () {
+		setTimeout(function() {
 			$('#sidenav-overlay').trigger('click');
-		}, 500);
+		}, 800);
 	}
 	$('#open-type').html('Note');
 	$('#title-input').val(note.title);
@@ -871,7 +941,6 @@ function loadNote(id, delta) {
 			case "markdown":
 				$('#viewer').append('<div class="interact z-depth-2 hoverable" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
 				asciimath.translate(undefined, true);
-				MathJax.Hub.Typeset();
 				break;
 			case "drawing":
 				$('#viewer').append('<img class="interact hoverable drawing" id="{0}" style="top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
@@ -892,10 +961,11 @@ function loadNote(id, delta) {
 		}
 	}
 	updateBib();
-	setTimeout(function () {
-		MathJax.Hub.Reprocess();
+	setTimeout(function() {
+		MathJax.Hub.Typeset();
 		initDrawings();
 	}, 1000);
+	updateInstructions();
 }
 
 function updateNote(id) {
@@ -973,12 +1043,13 @@ function insert(type, newElement) {
 function insertRecording() {
 	rec.initStream();
 	$('#insert').modal('close');
+	$('#empty-viewer').hide();
 }
-rec.addEventListener('streamReady', function (event) {
+rec.addEventListener('streamReady', function(event) {
 	rec.start();
 	$('#stop-recording-btn').show();
 });
-rec.addEventListener("dataAvailable", function (e) {
+rec.addEventListener("dataAvailable", function(e) {
 	var blob = new Blob([e.detail], { type: 'audio/ogg' });
 	var url = URL.createObjectURL(blob);
 
@@ -986,7 +1057,7 @@ rec.addEventListener("dataAvailable", function (e) {
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
 		if (id === element.args.id) {
-			blobToDataURL(blob, function (dataURI) {
+			blobToDataURL(blob, function(dataURI) {
 				element.content = dataURI;
 				saveToBrowser();
 			});
@@ -1002,7 +1073,7 @@ function edgeFix(blob, id) {
 	if (window.navigator.userAgent.indexOf("Edge") > -1) {
 		//MS Edge sucks and can't opus. For them we'll use .wav
 		var fileReader = new FileReader();
-		fileReader.onload = function () {
+		fileReader.onload = function() {
 			var arrayBuffer = this.result;
 			var typedArray = new Uint8Array(arrayBuffer);
 			var decoderWorker = new Worker('js/libs/recorderjs/decoderWorker.min.js');
@@ -1021,7 +1092,7 @@ function edgeFix(blob, id) {
 				sampleRate: desiredSampleRate
 			});
 
-			decoderWorker.onmessage = function (e) {
+			decoderWorker.onmessage = function(e) {
 				if (e.data === null) {
 					wavWorker.postMessage({ command: 'done' });
 				}
@@ -1029,13 +1100,13 @@ function edgeFix(blob, id) {
 					wavWorker.postMessage({
 						command: 'record',
 						buffers: e.data
-					}, e.data.map(function (typedArray) {
+					}, e.data.map(function(typedArray) {
 						return typedArray.buffer;
 					}));
 				}
 			};
 
-			wavWorker.onmessage = function (e) {
+			wavWorker.onmessage = function(e) {
 				var blob = new Blob([e.data], { type: "audio/wav" });
 				var url = URL.createObjectURL(blob);
 
@@ -1058,11 +1129,11 @@ function edgeFix(blob, id) {
 function uploadDocx() {
 	$('#docx-upload-name').val('');
 	$('#docx-upload').unbind();
-	$('#docx-upload').bind('change', function (event) {
+	$('#docx-upload').bind('change', function(event) {
 		var file = event.target.files[0];
 		if (!file) return;
-		readFileInputEventAsArrayBuffer(event, function (arrayBuffer) {
-			mammoth.convertToMarkdown({ arrayBuffer: arrayBuffer }).then(function (res) {
+		readFileInputEventAsArrayBuffer(event, function(arrayBuffer) {
+			mammoth.convertToMarkdown({ arrayBuffer: arrayBuffer }).then(function(res) {
 				$('#docxEditor').modal('close');
 				insert('markdown', {
 					args: {},
@@ -1089,7 +1160,7 @@ function updateBib() {
 }
 
 function initDrawings() {
-	$('.drawing').each(function (i) {
+	$('.drawing').each(function(i) {
 		var img = $(this)[0];
 		var tmpCanvas = $('<canvas width="{0}" height="{1}"></canvas>'.format(img.naturalWidth, img.naturalHeight))[0];
 		var tmpCtx = tmpCanvas.getContext('2d');
@@ -1106,7 +1177,7 @@ function readFileInputEventAsText(event, callback) {
 
 	var reader = new FileReader();
 
-	reader.onload = function () {
+	reader.onload = function() {
 		var text = reader.result;
 		callback(text);
 	};
@@ -1119,7 +1190,7 @@ function readFileInputEventAsArrayBuffer(event, callback) {
 
 	var reader = new FileReader();
 
-	reader.onload = function (loadEvent) {
+	reader.onload = function(loadEvent) {
 		var arrayBuffer = loadEvent.target.result;
 		callback(arrayBuffer);
 	};
@@ -1134,6 +1205,71 @@ function resizePage(selElement) {
 	}
 	if (parseInt(selElement.css('top')) + selElement.height() + 1000 > parseInt($('#viewer').css('height'))) {
 		$('#viewer').css('height', parseInt(selElement.css('top')) + selElement.height() + 1000 + 'px');
+	}
+}
+
+function saveToBrowser(retry) {
+	/*
+		I want to use the Filesystem and FileWriter API for this (https://www.html5rocks.com/en/tutorials/file/filesystem/)
+		but only Chrome and Opera support it. For now I'll use IndexedDB with a sneaky async library.
+	 */
+	$('.save-status').html('Saving&hellip;');
+	$('#viewer ul').each(function(i) {
+		$(this).addClass('browser-default')
+	});
+
+	notepadStorage.setItem(notepad.title, notepad, function() {
+		updateNotepadList();
+		$('.save-status').html('All changes saved');
+	});
+
+	appStorage.setItem('lastNotepadTitle', notepad.title);
+}
+
+function loadFromBrowser(title) {
+	notepadStorage.getItem(title, function(err, res) {
+		notepad = parser.restoreNotepad(res);
+		window.initNotepad();
+	});
+}
+
+function handleUpload(event) {
+	var uploadElement = $('#upload');
+	if (isMobile()) uploadElement = $('#mob-upload');
+	var ext = uploadElement.val().split('.').pop().toLowerCase();
+	switch (ext) {
+		case "npx":
+			readFileInputEventAsText(event, function(text) {
+				parser.parse(text, ["asciimath"]);
+				while (!parser.notepad) if (parser.notepad) break;
+				notepad = parser.notepad;
+
+				window.initNotepad();
+				saveToBrowser();
+			});
+			break;
+
+		case "zip":
+		case "npxz":
+			readFileInputEventAsArrayBuffer(event, function(arrayBuffer) {
+				var zip = new JSZip();
+				zip.loadAsync(arrayBuffer).then(function() {
+					for (k in zip.files) {
+						if (k.split('.').pop().toLowerCase() === 'npx') {
+							zip.file(k).async('string').then(function success(text) {
+								parser.parse(text, ["asciimath"]);
+								while (!parser.notepad) if (parser.notepad) break;
+								notepad = parser.notepad;
+
+								window.initNotepad();
+								saveToBrowser();
+							});
+						}
+					}
+				});
+			});
+			break;
+
 	}
 }
 
@@ -1202,11 +1338,31 @@ function isMobile() {
 	return $('#mobile-canary').is(':visible');
 }
 
+function confirmAsync(question) {
+	switch (window.platform) {
+		case "web":
+			return Promise.resolve(confirm(question));
+			break;
+		case "uwp":
+			var msgbox = new Windows.UI.Popups.MessageDialog(message, "Are you sure?");
+			msgbox.commands.append(new Windows.UI.Popups.UICommand("No", null, 1));
+			msgbox.commands.append(new Windows.UI.Popups.UICommand("Yes", null, 2));
+			msgbox.defaultCommandIndex = 1;
+			return msgbox.showAsync().then(function(command) {
+				if (command) {
+					if (command.id == 2) return true;
+				}
+				return false;
+			});
+			break;
+	}
+}
+
 //Thanks to http://stackoverflow.com/a/4673436/998467
 if (!String.prototype.format) {
-	String.prototype.format = function () {
+	String.prototype.format = function() {
 		var args = arguments;
-		return this.replace(/{(\d+)}/g, function (match, number) {
+		return this.replace(/{(\d+)}/g, function(match, number) {
 			return typeof args[number] != 'undefined'
 				? args[number]
 				: match
@@ -1247,6 +1403,6 @@ function dataURItoBlob(dataURI) {
 
 function blobToDataURL(blob, callback) {
 	var a = new FileReader();
-	a.onload = function (e) { callback(e.target.result); }
+	a.onload = function(e) { callback(e.target.result); }
 	a.readAsDataURL(blob);
 }
