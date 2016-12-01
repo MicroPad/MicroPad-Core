@@ -216,6 +216,7 @@ function saveToFilesystem(blob, filename, reload, bulk) {
 						input.close();
 						output.close();
 						updateNotepadList();
+						$('.save-status').html('All changes saved');
 						if ((reload && !bulk) || (reload && bulk && bulk[0] >= bulk[1]-1)) window.location.reload();
 					});
 				});
@@ -225,6 +226,7 @@ function saveToFilesystem(blob, filename, reload, bulk) {
 }
 
 function saveToBrowser(retry, fileLoad, bulk) {	
+	$('.save-status').html('Saving&hellip;');
 	$('#viewer ul').each(function(i) {
 		$(this).addClass('browser-default');
 	});
