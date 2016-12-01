@@ -61,45 +61,6 @@ var md = new showdown.Converter({
 });
 
 window.onload = function () {
-	window.initNotepad = function () {
-		parents = [];
-		note = undefined;
-		noteID = undefined;
-		lastClick = { x: 0, y: 0 };
-		$('#sidenav-options').show();
-		// $('#search-button').show();
-		$('#open-type').html('Notepad')
-		$('#title-input').val(notepad.title);
-
-		parents.push(notepad);
-
-		//Clear old lists
-		$('#sectionList').html('');
-		$('#noteList').html('');
-		$('#viewer').html('');
-		$('#parents > span:not(#open-note)').remove();
-		$('#open-note').hide();
-		$('#n-dd').css('color', '#AAAFB4');
-		$('#n-dd').css('pointer-events', 'none');
-		$('#s-dd').css('color', '#fff');
-		$('#s-dd').css('pointer-events', 'auto');
-		$('#search-link').css('color', '#fff');
-		$('#search-link').css('pointer-events', 'auto');
-		updateInstructions();
-
-		$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
-		for (k in notepad.sections) {
-			var section = notepad.sections[k];
-			$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
-		}
-		$('#add-section-link').css('display', 'block');
-		$('#add-note-link').css('display', 'none');
-		$('.display-with-note').hide();
-		document.title = 'µPad';
-
-		appStorage.setItem('lastNotepadTitle', notepad.title);
-	}
-
 	/** Get the open notepads */
 	updateNotepadList();
 
@@ -587,6 +548,45 @@ window.onload = function () {
 	}, 500);
 };
 /**** END OF ONLOAD CODE */
+
+window.initNotepad = function () {
+	parents = [];
+	note = undefined;
+	noteID = undefined;
+	lastClick = { x: 0, y: 0 };
+	$('#sidenav-options').show();
+	// $('#search-button').show();
+	$('#open-type').html('Notepad')
+	$('#title-input').val(notepad.title);
+
+	parents.push(notepad);
+
+	//Clear old lists
+	$('#sectionList').html('');
+	$('#noteList').html('');
+	$('#viewer').html('');
+	$('#parents > span:not(#open-note)').remove();
+	$('#open-note').hide();
+	$('#n-dd').css('color', '#AAAFB4');
+	$('#n-dd').css('pointer-events', 'none');
+	$('#s-dd').css('color', '#fff');
+	$('#s-dd').css('pointer-events', 'auto');
+	$('#search-link').css('color', '#fff');
+	$('#search-link').css('pointer-events', 'auto');
+	updateInstructions();
+
+	$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
+	for (k in notepad.sections) {
+		var section = notepad.sections[k];
+		$('#sectionList').append('<li><a href="javascript:loadSection({0});">{1}</a></li>'.format(k, section.title));
+	}
+	$('#add-section-link').css('display', 'block');
+	$('#add-note-link').css('display', 'none');
+	$('.display-with-note').hide();
+	document.title = 'µPad';
+
+	appStorage.setItem('lastNotepadTitle', notepad.title);
+}
 
 var latestResults = [];
 function loadSearchResult(resID) {
