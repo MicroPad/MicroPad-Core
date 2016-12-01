@@ -103,16 +103,6 @@ window.onload = function () {
 	/** Get the open notepads */
 	updateNotepadList();
 
-	/** Restore to previous notepad */
-	appStorage.getItem('lastNotepadTitle', function (e, title) {
-		if (title == null || e) return;
-		Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) { return folder.getFilesAsync(); }).done(function (files) {
-			files.forEach(function (f) {
-				if (title === f.displayName) loadFromBrowser(title);
-			});
-		});
-	});
-
 	$('.modal').modal();
 	$('#menu-button').sideNav({
 		// closeOnClick: true
@@ -1144,83 +1134,6 @@ function resizePage(selElement) {
 	}
 	if (parseInt(selElement.css('top')) + parseInt(selElement.css('height')) + 1000 > parseInt($('#viewer').css('height'))) {
 		$('#viewer').css('height', parseInt(selElement.css('top')) + parseInt(selElement.css('height')) + 1000 + 'px');
-	}
-}
-
-var tooBig = '';
-function saveToBrowser(retry) {
-	/*
-		I want to use the Filesystem and FileWriter API for this (https://www.html5rocks.com/en/tutorials/file/filesystem/)
-		but only Chrome and Opera support it. For now I'll use IndexedDB with a sneaky async library.
-	 */
-
-	$('#viewer ul').each(function (i) {
-		$(this).addClass('browser-default')
-	});
-
-	// var compressedNotepad = window.pako.deflate(JSON.stringify(notepad), {to: 'string'});
-	try {
-		notepadStorage.setItem(notepad.title, notepad, function () {
-			updateNotepadList();
-		});
-
-		appStorage.setItem('lastNotepadTitle', notepad.title);
-	}
-	catch (e) {
-		if (retry && notepad.title != tooBig) {
-			alert("This notepad is too big to fit in your browser's storage. To keep changes make sure to download it.")
-			notepad.title = tooBig;
-		}
-		else if (notepad.title != tooBig) {
-			notepadStorage.clear();
-			saveToBrowser(true);
-		}
-	}
-}
-
-function loadFromBrowser(title) {
-	notepadStorage.getItem(title, function (err, res) {
-		notepad = parser.restoreNotepad(res);
-		window.initNotepad();
-	});
-}
-
-function handleUpload(event) {
-	var uploadElement = $('#upload');
-	if (isMobile()) uploadElement = $('#mob-upload');
-	var ext = uploadElement.val().split('.').pop().toLowerCase();
-	switch (ext) {
-		case "npx":
-			readFileInputEventAsText(event, function (text) {
-				parser.parse(text, ["asciimath"]);
-				while (!parser.notepad) if (parser.notepad) break;
-				notepad = parser.notepad;
-
-				window.initNotepad();
-				saveToBrowser();
-			});
-			break;
-
-		case "zip":
-			readFileInputEventAsArrayBuffer(event, function (arrayBuffer) {
-				var zip = new JSZip();
-				zip.loadAsync(arrayBuffer).then(function () {
-					for (k in zip.files) {
-						if (k.split('.').pop().toLowerCase() === 'npx') {
-							zip.file(k).async('string').then(function success(text) {
-								parser.parse(text, ["asciimath"]);
-								while (!parser.notepad) if (parser.notepad) break;
-								notepad = parser.notepad;
-
-								window.initNotepad();
-								saveToBrowser();
-							});
-						}
-					}
-				});
-			});
-			break;
-
 	}
 }
 

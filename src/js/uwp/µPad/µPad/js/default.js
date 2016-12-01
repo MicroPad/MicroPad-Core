@@ -93,10 +93,23 @@ $(document).ready(function () {
 function refreshStorageDir() {
 	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) {
 		$('#workingDir').html(folder.path);
+
+		/** Restore to previous notepad */
+		appStorage.getItem('lastNotepadTitle', function (e, title) {
+			if (title == null || e) return;
+			Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) { return folder.getFilesAsync(); }).done(function (files) {
+				files.forEach(function (f) {
+					if (title === f.displayName) loadFromBrowser(title);
+				});
+			}, function (e) {
+				console.log(e);
+			});
+		});
 	}, function (err) {
 		alert("Error accessing storage folder. Reverting to default: {0}".format(err));
 		appStorage.setItem('storageDir', Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
 			storageDir = f.path;
+			refreshStorageDir();
 		}));
 	});
 }
@@ -204,6 +217,7 @@ function saveToFilesystem(blob, filename, reload, bulk) {
 					output.flushAsync().done(function () {
 						input.close();
 						output.close();
+						updateNotepadList();
 						if ((reload && !bulk) || (reload && bulk && bulk[0] >= bulk[1]-1)) window.location.reload();
 					});
 				});
@@ -218,19 +232,12 @@ function saveToBrowser(retry, fileLoad, bulk) {
 	});
 
 	if (fileLoad) {
-		notepadStorage.setItem(notepad.title, '', function () {
-			appStorage.setItem('lastNotepadTitle', notepad.title, function () {
-				var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
-				saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), true, bulk);
-			});
+		appStorage.setItem('lastNotepadTitle', notepad.title, function () {
+			var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
+			saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), true, bulk);
 		});
 	}
 	else {
-		notepadStorage.setItem(notepad.title, '', function () {
-			updateNotepadList();
-		});
-
-		//Save to the FS
 		var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
 		saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), false, bulk);
 
