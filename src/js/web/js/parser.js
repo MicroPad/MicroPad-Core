@@ -17318,6 +17318,9 @@ Notepad.prototype.toXML = function() {
 	});
 	return builder.buildObject(this.toXMLObject());
 }
+Notepad.prototype.toString = function() {
+
+}
 
 var Section = function(title) {
 	this.parent = undefined;
@@ -17443,6 +17446,19 @@ exports.restoreNote = function restoreNote(obj) {
 	}
 
 	return restoredNote;
+}
+exports.xmlObjToXML = function xmlObjToXml(xmlObj) {
+	var builder = new xml2js.Builder({
+		allowSurrogateChars: true,
+		headless: false,
+		xmldec: {
+			version: '1.0',
+			encoding: 'UTF-8',
+			'standalone': false
+		},
+		cdata: true
+	});
+	return builder.buildObject(xmlObj);
 }
 
 function parseSection(sectionXML, section, parent) {

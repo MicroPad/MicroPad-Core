@@ -916,6 +916,7 @@
     <Content Include="js\libs\showdown.min.js" />
     <Content Include="js\libs\trim-canvas.js" />
     <Content Include="js\parser.js" />
+    <Content Include="js\saveWorker.js" />
     <Content Include="npx logo.png" />
     <Content Include="npxz logo.png" />
     <Content Include="web_hi_res_512.png" />

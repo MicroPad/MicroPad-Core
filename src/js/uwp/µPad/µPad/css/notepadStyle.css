@@ -9,6 +9,11 @@
 .secondary-text-color  { color: #757575; !important }
 .divider-color         { border-color: #BDBDBD; !important }
 
+html {
+	width: 100vw;
+	height: 100vh;
+}
+
 body {
 	position: static;
 	background-color: #455A64;
@@ -21,6 +26,10 @@ nav {
 	position: fixed;
 	height: 64px; !important
 	cursor: default;
+}
+
+.nav-wrapper {
+	width: calc(100vw - 15px);
 }
 
 .breadcrumb {
@@ -55,10 +64,6 @@ nav {
 	width: 100%;
 	text-align: center;
 	color: #fff;
-}
-
-.nav-wrapper {
-	width: calc(100vw - 15px);
 }
 
 .brand-logo {
@@ -124,6 +129,7 @@ nav {
 	position: relative;
 	width: 100%;
 	height: calc(100% - 128px);
+	top: 128px;
 }
 
 .interact {

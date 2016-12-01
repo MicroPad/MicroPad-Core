@@ -1,5 +1,7 @@
 ﻿var storageDir;
 var count = 0;
+var saveWorker = new Worker('js/saveWorker.js');
+
 (function () {
 	"use strict";
 
@@ -231,18 +233,27 @@ function saveToBrowser(retry, fileLoad, bulk) {
 		$(this).addClass('browser-default');
 	});
 
-	if (fileLoad) {
-		appStorage.setItem('lastNotepadTitle', notepad.title, function () {
-			var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
-			saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), true, bulk);
+	getXmlObject(function(xmlObj) {
+		saveWorker.postMessage({ xmlObj: xmlObj, fileLoad: fileLoad, bulk: bulk });
+	});
+}
+saveWorker.onmessage = function(event) {
+	var blob = event.data.xml;
+	if (event.data.fileLoad) {
+		appStorage.setItem('lastNotepadTitle', notepad.title, function() {
+			saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), true, event.data.bulk);
 		});
 	}
 	else {
-		var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
-		saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), false, bulk);
-
+		saveToFilesystem(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')), false, event.data.bulk);
 		appStorage.setItem('lastNotepadTitle', notepad.title);
 	}
+}
+
+function getXmlObject(callback) {
+	setTimeout(function() {
+		callback(notepad.toXMLObject());
+	}, 0);
 }
 
 function saveAs(blob, filename) {
@@ -259,6 +270,7 @@ function saveAs(blob, filename) {
 		});
 	});
 }
+
 function loadFromBrowser(title) {
 	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) { return folder.getFileAsync('{0}.npx'.format(title.replace(/[^a-z0-9 ]/gi, ''))); })
 		.then(function (file) { return Windows.Storage.FileIO.readTextAsync(file); }, function (err) { notepad = undefined; })
