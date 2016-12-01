@@ -3,7 +3,7 @@ var parents = [];
 var note;
 var noteID;
 var lastEditedElement = undefined;
-var lastClick = {x: 0, y: 0};
+var lastClick = { x: 0, y: 0 };
 var canvasCtx = undefined;
 var rec = new Recorder();
 var wasMobile = isMobile();
@@ -26,19 +26,19 @@ var appStorage = localforage.createInstance({
 showdown.extension('math', function() {
 	var matches = [];
 	return [
-		{ 
+		{
 			type: 'lang',
 			regex: /===([^]+?)===/gi,
-			replace: function(s, match) { 
-				matches.push('==='+match+'===');
+			replace: function(s, match) {
+				matches.push('===' + match + '===');
 				var n = matches.length - 1;
 				return '%PLACEHOLDER' + n + '%';
 			}
 		},
 		{
 			type: 'output',
-			filter: function (text) {
-				for (var i=0; i< matches.length; ++i) {
+			filter: function(text) {
+				for (var i = 0; i < matches.length; ++i) {
 					var pat = '%PLACEHOLDER' + i + '%';
 					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 				}
@@ -60,15 +60,18 @@ var md = new showdown.Converter({
 	extensions: ['math']
 });
 
+$(document).ready(function() {
+	$('#sidenav-options').hide();
+});
+
 window.onload = function() {
 	/** Get the open notepads */
 	updateNotepadList();
-	
+
 	$('.modal').modal();
 	$('#menu-button').sideNav({
 		// closeOnClick: true
 	});
-	$('#sidenav-options').hide();
 	$('#stop-recording-btn').hide();
 	$('.display-with-note').hide();
 	$('#menu-button').sideNav();
@@ -101,16 +104,16 @@ window.onload = function() {
 		mutations.forEach(function(mutation) {
 			saveToBrowser();
 			for (k in mutation.addedNodes) {
-				var selElement = $('#'+mutation.addedNodes[k].id);
+				var selElement = $('#' + mutation.addedNodes[k].id);
 				resizePage(selElement);
 				updateInstructions();
 			}
 		});
 	});
-	observer.observe(document.getElementById('viewer'), {attributes: false, childList: true, characterData: true});
+	observer.observe(document.getElementById('viewer'), { attributes: false, childList: true, characterData: true });
 
 	/** Creating elements */
-	$('#viewer').click(function (e) {
+	$('#viewer').click(function(e) {
 		if (e.target == this && note && !isDropdownActive()) {
 			lastClick.x = e.pageX;
 			lastClick.y = e.pageY - 128;
@@ -125,13 +128,13 @@ window.onload = function() {
 	var justMoved = false;
 	interact('.interact').resizable({
 		preserveAspectRatio: false,
-		edges: {left: false, right: true, bottom: false, top: false},
-		onend: function (event) {
+		edges: { left: false, right: true, bottom: false, top: false },
+		onend: function(event) {
 			updateNote(event.target.id);
 			justMoved = true;
 		}
 	}).on('resizemove', function(event) {
-		$(event.target).css('width', parseInt($(event.target).css('width'))+event.dx);
+		$(event.target).css('width', parseInt($(event.target).css('width')) + event.dx);
 		// $(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
 		$(event.target).css('height', 'auto');
 		resizePage($(event.target));
@@ -145,7 +148,7 @@ window.onload = function() {
 		var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
 		if (path[0].tagName.toLowerCase() === 'a') return;
 
-		var currentTarget = $('#'+event.currentTarget.id);
+		var currentTarget = $('#' + event.currentTarget.id);
 		for (k in note.elements) {
 			var element = note.elements[k];
 			if (element.args.id == event.currentTarget.id) {
@@ -205,7 +208,7 @@ window.onload = function() {
 									source.content = $('#mdsw').val();
 								}
 								else if ($('#mdsw').val().length > 0) {
-									note.addSource(note.bibliography.length+1, element.args.id, $('#mdsw').val());
+									note.addSource(note.bibliography.length + 1, element.args.id, $('#mdsw').val());
 								}
 								updateBib();
 							}
@@ -232,7 +235,7 @@ window.onload = function() {
 								if (confirm("Do you want to save this drawing?")) {
 									if (!isCanvasBlank($('#drawing-viewer')[0])) {
 										element.content = $('#drawing-viewer')[0].toDataURL();
-										
+
 										var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
 										currentTarget.attr('src', trimmed);
 
@@ -296,7 +299,7 @@ window.onload = function() {
 								}
 								else if ($('#isw').val().length > 0) {
 									note.bibliography.push({
-										id: note.bibliography.length+1,
+										id: note.bibliography.length + 1,
 										item: element.args.id,
 										content: $('#isw').val()
 									});
@@ -333,8 +336,8 @@ window.onload = function() {
 
 							reader.onload = function() {
 								element.content = reader.result;
-								$('#'+element.args.id+' > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
-								$('#'+element.args.id+' > a').html(element.args.filename);
+								$('#' + element.args.id + ' > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
+								$('#' + element.args.id + ' > a').html(element.args.filename);
 							}
 						});
 
@@ -345,7 +348,7 @@ window.onload = function() {
 								}
 								else if ($('#fsw').val().length > 0) {
 									note.bibliography.push({
-										id: note.bibliography.length+1,
+										id: note.bibliography.length + 1,
 										item: element.args.id,
 										content: $('#fsw').val()
 									});
@@ -366,13 +369,13 @@ window.onload = function() {
 		if (event.pointer === 'mouse') return;
 		var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
 		if (path[0].tagName.toLowerCase() === 'a') return;
-		$('#'+event.currentTarget.id).trigger('click');
+		$('#' + event.currentTarget.id).trigger('click');
 	});
 
 	if (!isMobile()) {
 		interact('.interact').draggable({
 			onmove: dragMoveListener,
-			onend: function (event) {
+			onend: function(event) {
 				updateNote(event.target.id);
 				justMoved = true;
 			},
@@ -383,17 +386,17 @@ window.onload = function() {
 
 	function dragMoveListener(event) {
 		if (isMobile()) return;
-		$(event.target).css('left', Math.max(parseInt($(event.target).css('left'))+event.dx, 0));
-		$(event.target).css('top', Math.max(parseInt($(event.target).css('top'))+event.dy, 0));
+		$(event.target).css('left', Math.max(parseInt($(event.target).css('left')) + event.dx, 0));
+		$(event.target).css('top', Math.max(parseInt($(event.target).css('top')) + event.dy, 0));
 
 		updateReference(event);
 		resizePage($(event.target));
 	}
 
 	function updateReference(event) {
-		if ($('#source_'+event.target.id).length) {
-			$('#source_'+event.target.id).css('left', parseInt($('#'+event.target.id).css('left'))+parseInt($('#'+event.target.id).css('width'))+10+"px");
-			$('#source_'+event.target.id).css('top', $('#'+event.target.id).css('top'));
+		if ($('#source_' + event.target.id).length) {
+			$('#source_' + event.target.id).css('left', parseInt($('#' + event.target.id).css('left')) + parseInt($('#' + event.target.id).css('width')) + 10 + "px");
+			$('#source_' + event.target.id).css('top', $('#' + event.target.id).css('top'));
 		}
 	}
 	window.dragMoveListener = dragMoveListener;
@@ -414,7 +417,7 @@ window.onload = function() {
 		}
 	}
 	$('#drawing-viewer')[0].onpointermove = function(event) {
-	  var pos = realPos(event);
+		var pos = realPos(event);
 		if (event.pressure > 0) {
 			if (event.buttons === 32) {
 				canvasCtx.clearRect(pos.x - 10, pos.y - 10, 20, 20);
@@ -426,7 +429,7 @@ window.onload = function() {
 				ongoingPos = realPos(ongoingTouches[idx]);
 				canvasCtx.moveTo(ongoingPos.x, ongoingPos.y);
 				canvasCtx.lineTo(pos.x, pos.y);
-				canvasCtx.lineWidth = event.pressure*10;
+				canvasCtx.lineWidth = event.pressure * 10;
 				canvasCtx.lineCap = "round";
 				canvasCtx.stroke();
 
@@ -435,10 +438,10 @@ window.onload = function() {
 		}
 	}
 	$('#drawing-viewer')[0].onpointerup = function(event) {
-	  var pos = realPos(event);
+		var pos = realPos(event);
 		var idx = ongoingTouchIndexById(event.pointerId);
 		if (idx >= 0 && event.buttons !== 32) {
-			canvasCtx.lineWidth = event.pressure*10;
+			canvasCtx.lineWidth = event.pressure * 10;
 			canvasCtx.fillStyle = "#000000";
 			canvasCtx.beginPath();
 			ongoingPos = realPos(ongoingTouches[idx]);
@@ -457,20 +460,22 @@ window.onload = function() {
 	}
 
 	function realPos(touchEvent) {
-		return { x: touchEvent.pageX - canvasOffset.left,
-				 y: touchEvent.pageY - canvasOffset.top };
+		return {
+			x: touchEvent.pageX - canvasOffset.left,
+			y: touchEvent.pageY - canvasOffset.top
+		};
 	}
 	function ongoingTouchIndexById(idToFind) {
 		for (var i = 0; i < ongoingTouches.length; i++) {
 			var id = ongoingTouches[i].identifier;
-			
+
 			if (id == idToFind) {
 				return i;
 			}
 		}
 		return -1;
 	}
-	 
+
 	/** Search Notes */
 	$('#search').modal({
 		complete: function() {
@@ -501,7 +506,7 @@ window.onload = function() {
 			justMoved = false;
 			return;
 		}
-		
+
 		var currentTarget = $(event.currentTarget).parent();
 		var id = currentTarget.attr('id');
 		for (var i = 0; i < note.elements.length; i++) {
@@ -526,7 +531,7 @@ window.onload = function() {
 			lastEditedElement.args.y = $('#rpost').val();
 			currentTarget.css('top', lastEditedElement.args.y);
 		});
-		
+
 		$('#recordingEditor').modal('open');
 	});
 
@@ -549,7 +554,7 @@ window.onload = function() {
 
 	$('.drag-target').bind('click', function() {
 		$('#sidenav-overlay').trigger('click');
-		setTimeout(function () {
+		setTimeout(function() {
 			$('#sidenav-overlay').trigger('click');
 		}, 200);
 	});
@@ -571,13 +576,13 @@ window.initNotepad = function() {
 	parents = [];
 	note = undefined;
 	noteID = undefined;
-	lastClick = {x: 0, y: 0};
+	lastClick = { x: 0, y: 0 };
 	$('#sidenav-options').show();
 	// $('#search-button').show();
 	$('#open-type').html('Notepad')
 	$('#title-input').val(notepad.title);
 
-	parents.push(notepad);	
+	parents.push(notepad);
 
 	//Clear old lists
 	$('#sectionList').html('');
@@ -585,7 +590,7 @@ window.initNotepad = function() {
 	$('#viewer').html('');
 	$('#parents > span:not(#open-note)').remove();
 	$('#open-note').hide();
-	$('#n-dd').css('color', '#AAAFB4');		
+	$('#n-dd').css('color', '#AAAFB4');
 	$('#n-dd').css('pointer-events', 'none');
 	$('#s-dd').css('color', '#fff');
 	$('#s-dd').css('pointer-events', 'auto');
@@ -647,7 +652,7 @@ function recalculateParents(baseObj) {
 
 	//Reset breadcrumbs
 	$('#parents').children().each(function(i) {
-		if(this.id == "open-note") return false;
+		if (this.id == "open-note") return false;
 		$(this).remove();
 	});
 	for (k in parents) {
@@ -673,7 +678,7 @@ function newNotepad() {
 
 function newSection() {
 	var title = $('#new-section-title').val();
-	var index = parents[parents.length-1].sections.push(parser.createSection(title)) - 1;
+	var index = parents[parents.length - 1].sections.push(parser.createSection(title)) - 1;
 	loadSection(index);
 	saveToBrowser();
 
@@ -683,7 +688,7 @@ function newSection() {
 function newNote() {
 	var title = $('#new-note-title').val();
 	var newNote = parser.createNote(title, ['asciimath']);
-	var notesInParent = parents[parents.length-1].notes;
+	var notesInParent = parents[parents.length - 1].notes;
 	var index = notesInParent.push(newNote) - 1;
 	$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(index, newNote.title));
 	loadNote(index);
@@ -693,11 +698,11 @@ function newNote() {
 }
 
 function deleteOpen() {
-	confirmAsync("Are you sure you want to delete this?").then(function (answer) {
+	confirmAsync("Are you sure you want to delete this?").then(function(answer) {
 		if (answer) {
 			if (parents.length === 1) {
 				//Delete Notepad
-				appStorage.removeItem('lastNotepadTitle', function () {
+				appStorage.removeItem('lastNotepadTitle', function() {
 					switch (window.platform) {
 						case "web":
 							notepadStorage.removeItem(notepad.title, function() {
@@ -708,11 +713,11 @@ function deleteOpen() {
 
 						case "uwp":
 							Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
-							.then(function (folder) {
+							.then(function(folder) {
 								return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
-							}).then(function (file) {
+							}).then(function(file) {
 								return file.deleteAsync();
-							}).done(function () {
+							}).done(function() {
 								window.location.reload();
 							});
 							break;
@@ -721,13 +726,13 @@ function deleteOpen() {
 			}
 			else if (parents.length > 1 && !note) {
 				//Delete Section
-				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) {return s !== parents[parents.length - 1]});
+				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) { return s !== parents[parents.length - 1] });
 				saveToBrowser();
 				loadParent(parents.length - 2);
 			}
 			else if (note) {
 				//Delete Note
-				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) {return n !== note});
+				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) { return n !== note });
 				saveToBrowser();
 				loadParent(parents.length - 1);
 			}
@@ -736,9 +741,9 @@ function deleteOpen() {
 }
 
 function deleteElement() {
-	confirmAsync("Are you sure you want to delete this?").then(function (answer) {
+	confirmAsync("Are you sure you want to delete this?").then(function(answer) {
 		if (answer && lastEditedElement) {
-			note.elements = note.elements.filter(function (e) { return (e !== lastEditedElement); });
+			note.elements = note.elements.filter(function(e) { return (e !== lastEditedElement); });
 			$('#' + lastEditedElement.args.id).remove();
 			saveToBrowser();
 		}
@@ -746,17 +751,17 @@ function deleteElement() {
 }
 
 function exportOpen() {
-	var blob = new Blob([notepad.toXML()], {type: "text/xml;charset=utf-8"});
+	var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
 	saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
 }
 
 function exportNotepads() {
 	var zip = new JSZip();
 	notepadStorage.iterate(function(value, key, i) {
-		var blob = new Blob([parser.restoreNotepad(value).toXML()], {type: "text/xml;charset=utf-8"});
-		zip.file(key.replace(/[^a-z0-9 ]/gi, '')+'.npx', blob);
+		var blob = new Blob([parser.restoreNotepad(value).toXML()], { type: "text/xml;charset=utf-8" });
+		zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
 	}, function() {
-		zip.generateAsync({type:"blob"}).then(function(blob) {
+		zip.generateAsync({ type: "blob" }).then(function(blob) {
 			saveAs(blob, "notepads.npxz");
 		});
 	});
@@ -781,8 +786,8 @@ function downloadFile(elementID) {
 function updateTitle() {
 	if (parents.length === 1) {
 		//Delete old Notepad
-		appStorage.removeItem('lastNotepadTitle', function () {
-			switch(window.platform) {
+		appStorage.removeItem('lastNotepadTitle', function() {
+			switch (window.platform) {
 				case "web":
 					notepadStorage.removeItem(notepad.title, function() {
 						notepad.title = $('#title-input').val();
@@ -796,11 +801,11 @@ function updateTitle() {
 
 				case "uwp":
 					Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
-						.then(function (folder) {
+						.then(function(folder) {
 							return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
-						}).then(function (file) {
+						}).then(function(file) {
 							return file.deleteAsync();
-						}).done(function () {
+						}).done(function() {
 							notepad.title = $('#title-input').val();
 							saveToBrowser(undefined, true);
 						});
@@ -846,12 +851,12 @@ function loadParent(index) {
 		return;
 	}
 
-	var oldParents = parents.slice(0, index+1);
+	var oldParents = parents.slice(0, index + 1);
 	parents = parents.slice(0, index);
 
 	//Reset breadcrumbs
 	$('#parents').children().each(function(i) {
-		if(this.id == "open-note") return false;
+		if (this.id == "open-note") return false;
 		$(this).remove();
 	});
 	for (k in parents) {
@@ -861,20 +866,20 @@ function loadParent(index) {
 	scrollBreadcrumbs();
 	linkBreadcrumbs();
 
-	loadSection(undefined, oldParents[oldParents.length-1]);
+	loadSection(undefined, oldParents[oldParents.length - 1]);
 }
 
 function linkBreadcrumbs() {
 	$('#parents').children().each(function(i) {
 		if (this.id == "open-note") return false;
 
-		$(this).attr('onclick', 'loadParent('+i+');');
+		$(this).attr('onclick', 'loadParent(' + i + ');');
 	});
 }
 
 function updateSelector() {
 	linkBreadcrumbs();
-	$('<span class="breadcrumb">{0}</span>'.format(parents[parents.length-1].title)).insertBefore('#open-note');
+	$('<span class="breadcrumb">{0}</span>'.format(parents[parents.length - 1].title)).insertBefore('#open-note');
 	scrollBreadcrumbs();
 	$('#sectionList').html('');
 	$('#noteList').html('');
@@ -884,7 +889,7 @@ function updateSelector() {
 }
 
 function loadSection(id, providedSection) {
-	var section = parents[parents.length-1].sections[id];
+	var section = parents[parents.length - 1].sections[id];
 	if (providedSection) section = providedSection;
 	parents.push(section);
 	window.note = undefined;
@@ -969,22 +974,22 @@ function loadNote(id, delta) {
 function updateNote(id) {
 	for (k in note.elements) {
 		var element = note.elements[k];
-		var sel = $('#'+element.args.id);
-		element.args.x = $('#'+element.args.id).css('left');
-		element.args.y = $('#'+element.args.id).css('top');
-		if ($('#'+element.args.id)[0]) {
-			element.args.width = $('#'+element.args.id)[0].style.width;
-			element.args.height = $('#'+element.args.id)[0].style.height;
+		var sel = $('#' + element.args.id);
+		element.args.x = $('#' + element.args.id).css('left');
+		element.args.y = $('#' + element.args.id).css('top');
+		if ($('#' + element.args.id)[0]) {
+			element.args.width = $('#' + element.args.id)[0].style.width;
+			element.args.height = $('#' + element.args.id)[0].style.height;
 		}
 
-		resizePage($('#'+element.args.id));
+		resizePage($('#' + element.args.id));
 		saveToBrowser();
 	}
 }
 
 function insert(type, newElement) {
 	$('#insert').modal('close');
-	if (!newElement){
+	if (!newElement) {
 		var newElement = {
 			args: {},
 			content: '',
@@ -996,19 +1001,19 @@ function insert(type, newElement) {
 	var id = undefined;
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
-		if (element.type == type && !id){
+		if (element.type == type && !id) {
 			id = parseInt(element.args.id.split(element.type)[1]);
 		}
-		
+
 		if (element.type == type) {
 			id++;
 		}
 	}
 	if (!id) id = 1;
-	newElement.args.id = type+id;
+	newElement.args.id = type + id;
 
-	newElement.args.x = lastClick.x+'px';
-	newElement.args.y = lastClick.y+'px';
+	newElement.args.x = lastClick.x + 'px';
+	newElement.args.y = lastClick.y + 'px';
 	newElement.args.width = 'auto';
 	newElement.args.height = 'auto';
 
@@ -1024,7 +1029,7 @@ function insert(type, newElement) {
 			newElement.args.filename = "File";
 			break;
 		case "recording":
-			newElement.args.filename = note.title.replace(/[^a-z0-9 ]/gi, '')+' '+new Date().toISOString() + ".ogg";
+			newElement.args.filename = note.title.replace(/[^a-z0-9 ]/gi, '') + ' ' + new Date().toISOString() + ".ogg";
 			break;
 	}
 
@@ -1033,7 +1038,7 @@ function insert(type, newElement) {
 	loadNote(noteID, true);
 	asciimath.translate(undefined, true);
 	MathJax.Hub.Typeset();
-	$('#'+newElement.args.id).trigger('click');
+	$('#' + newElement.args.id).trigger('click');
 	return newElement.args.id;
 }
 
@@ -1047,8 +1052,8 @@ rec.addEventListener('streamReady', function(event) {
 	rec.start();
 	$('#stop-recording-btn').show();
 });
-rec.addEventListener( "dataAvailable", function(e) {
-	var blob = new Blob([e.detail], { type: 'audio/ogg' } );
+rec.addEventListener("dataAvailable", function(e) {
+	var blob = new Blob([e.detail], { type: 'audio/ogg' });
 	var url = URL.createObjectURL(blob);
 
 	var id = insert('recording');
@@ -1063,7 +1068,7 @@ rec.addEventListener( "dataAvailable", function(e) {
 		}
 	}
 
-	$('#'+id+' > audio').attr('src', url);
+	$('#' + id + ' > audio').attr('src', url);
 	edgeFix(blob, id);
 });
 
@@ -1079,13 +1084,13 @@ function edgeFix(blob, id) {
 			var desiredSampleRate = 8000;
 
 			decoderWorker.postMessage({
-				command:'init',
+				command: 'init',
 				decoderSampleRate: desiredSampleRate,
 				outputBufferSampleRate: desiredSampleRate
 			});
 
-			wavWorker.postMessage({ 
-				command:'init',
+			wavWorker.postMessage({
+				command: 'init',
 				bitDepth: 16,
 				sampleRate: desiredSampleRate
 			});
@@ -1098,17 +1103,17 @@ function edgeFix(blob, id) {
 					wavWorker.postMessage({
 						command: 'record',
 						buffers: e.data
-					}, e.data.map(function(typedArray){
+					}, e.data.map(function(typedArray) {
 						return typedArray.buffer;
 					}));
 				}
 			};
 
 			wavWorker.onmessage = function(e) {
-				var blob = new Blob([e.data], {type: "audio/wav"});
+				var blob = new Blob([e.data], { type: "audio/wav" });
 				var url = URL.createObjectURL(blob);
 
-				$('#'+id+' > audio').attr('src', url);
+				$('#' + id + ' > audio').attr('src', url);
 			};
 
 			decoderWorker.postMessage({
@@ -1131,7 +1136,7 @@ function uploadDocx() {
 		var file = event.target.files[0];
 		if (!file) return;
 		readFileInputEventAsArrayBuffer(event, function(arrayBuffer) {
-			mammoth.convertToMarkdown({arrayBuffer: arrayBuffer}).then(function(res) {
+			mammoth.convertToMarkdown({ arrayBuffer: arrayBuffer }).then(function(res) {
 				$('#docxEditor').modal('close');
 				insert('markdown', {
 					args: {},
@@ -1149,16 +1154,16 @@ function uploadDocx() {
 function updateBib() {
 	for (var i = 0; i < note.bibliography.length; i++) {
 		var source = note.bibliography[i];
-		if ($('#source_'+source.item).length) $('#source_'+source.item).remove();
+		if ($('#source_' + source.item).length) $('#source_' + source.item).remove();
 		if (source.content.length < 1) continue;
-		var item = $('#'+source.item);
-		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('['+source.id+']', source.content, item.css('top'), parseInt(item.css('left'))+parseInt(item.css('width'))+10+"px", source.item));
+		var item = $('#' + source.item);
+		$('#viewer').append('<div id="source_{4}" style="top: {2}; left: {3};"><a target="_blank" href="{1}">{0}</a></div>'.format('[' + source.id + ']', source.content, item.css('top'), parseInt(item.css('left')) + parseInt(item.css('width')) + 10 + "px", source.item));
 	}
 	saveToBrowser();
 }
 
 function initDrawings() {
-	$('.drawing').each(function (i) {
+	$('.drawing').each(function(i) {
 		var img = $(this)[0];
 		var tmpCanvas = $('<canvas width="{0}" height="{1}"></canvas>'.format(img.naturalWidth, img.naturalHeight))[0];
 		var tmpCtx = tmpCanvas.getContext('2d');
@@ -1174,12 +1179,12 @@ function readFileInputEventAsText(event, callback) {
 	var file = event.target.files[0];
 
 	var reader = new FileReader();
-	
+
 	reader.onload = function() {
 		var text = reader.result;
 		callback(text);
 	};
-	
+
 	reader.readAsText(file);
 }
 
@@ -1187,22 +1192,22 @@ function readFileInputEventAsArrayBuffer(event, callback) {
 	var file = event.target.files[0];
 
 	var reader = new FileReader();
-	
+
 	reader.onload = function(loadEvent) {
 		var arrayBuffer = loadEvent.target.result;
 		callback(arrayBuffer);
 	};
-	
+
 	reader.readAsArrayBuffer(file);
 }
 
 /** Make sure the page is always larger than it's elements */
 function resizePage(selElement) {
-	if (parseInt(selElement.css('left'))+selElement.width()+1000 > parseInt($('#viewer').css('width'))) {
-		$('#viewer').css('width', parseInt(selElement.css('left'))+selElement.width()+1000+'px');
+	if (parseInt(selElement.css('left')) + selElement.width() + 1000 > parseInt($('#viewer').css('width'))) {
+		$('#viewer').css('width', parseInt(selElement.css('left')) + selElement.width() + 1000 + 'px');
 	}
-	if (parseInt(selElement.css('top'))+selElement.height()+1000 > parseInt($('#viewer').css('height'))){
-		$('#viewer').css('height', parseInt(selElement.css('top'))+selElement.height()+1000+'px');
+	if (parseInt(selElement.css('top')) + selElement.height() + 1000 > parseInt($('#viewer').css('height'))) {
+		$('#viewer').css('height', parseInt(selElement.css('top')) + selElement.height() + 1000 + 'px');
 	}
 }
 
@@ -1215,7 +1220,7 @@ function saveToBrowser(retry) {
 	$('#viewer ul').each(function(i) {
 		$(this).addClass('browser-default')
 	});
-		
+
 	notepadStorage.setItem(notepad.title, notepad, function() {
 		updateNotepadList();
 		$('.save-status').html('All changes saved');
@@ -1342,11 +1347,11 @@ function confirmAsync(question) {
 			return Promise.resolve(confirm(question));
 			break;
 		case "uwp":
-			var msgbox = new Windows.UI.Popups.MessageDialog(message, "Are you sure?");
+			var msgbox = new Windows.UI.Popups.MessageDialog(question, "Are you sure?");
 			msgbox.commands.append(new Windows.UI.Popups.UICommand("No", null, 1));
 			msgbox.commands.append(new Windows.UI.Popups.UICommand("Yes", null, 2));
 			msgbox.defaultCommandIndex = 1;
-			return msgbox.showAsync().then(function (command) {
+			return msgbox.showAsync().then(function(command) {
 				if (command) {
 					if (command.id == 2) return true;
 				}
@@ -1360,7 +1365,7 @@ function confirmAsync(question) {
 if (!String.prototype.format) {
 	String.prototype.format = function() {
 		var args = arguments;
-		return this.replace(/{(\d+)}/g, function(match, number) { 
+		return this.replace(/{(\d+)}/g, function(match, number) {
 			return typeof args[number] != 'undefined'
 				? args[number]
 				: match
@@ -1395,12 +1400,12 @@ function dataURItoBlob(dataURI) {
 	}
 
 	// write the ArrayBuffer to a blob, and you're done
-	var blob = new Blob([ab], {type: mimeString});
+	var blob = new Blob([ab], { type: mimeString });
 	return blob;
 }
 
 function blobToDataURL(blob, callback) {
 	var a = new FileReader();
-	a.onload = function(e) {callback(e.target.result);}
+	a.onload = function(e) { callback(e.target.result); }
 	a.readAsDataURL(blob);
 }

@@ -60,6 +60,10 @@ var md = new showdown.Converter({
 	extensions: ['math']
 });
 
+$(document).ready(function() {
+	$('#sidenav-options').hide();
+});
+
 window.onload = function() {
 	/** Get the open notepads */
 	updateNotepadList();
@@ -68,7 +72,6 @@ window.onload = function() {
 	$('#menu-button').sideNav({
 		// closeOnClick: true
 	});
-	$('#sidenav-options').hide();
 	$('#stop-recording-btn').hide();
 	$('.display-with-note').hide();
 	$('#menu-button').sideNav();
@@ -1344,7 +1347,7 @@ function confirmAsync(question) {
 			return Promise.resolve(confirm(question));
 			break;
 		case "uwp":
-			var msgbox = new Windows.UI.Popups.MessageDialog(message, "Are you sure?");
+			var msgbox = new Windows.UI.Popups.MessageDialog(question, "Are you sure?");
 			msgbox.commands.append(new Windows.UI.Popups.UICommand("No", null, 1));
 			msgbox.commands.append(new Windows.UI.Popups.UICommand("Yes", null, 2));
 			msgbox.defaultCommandIndex = 1;
