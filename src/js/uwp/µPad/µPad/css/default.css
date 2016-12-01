@@ -10,3 +10,8 @@
 .modal-content > .row > .input-field {
 	height: 100%;
 }
+
+.noselect {
+	-ms-user-select: none;
+	cursor: default;
+}

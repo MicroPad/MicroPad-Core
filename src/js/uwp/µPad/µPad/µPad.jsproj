@@ -97,7 +97,6 @@
     <Content Include="js\default.js" />
     <Content Include="css\default.css" />
     <Content Include="js\libs\ASCIIMathML.js" />
-    <Content Include="js\libs\FileSaver.min.js" />
     <Content Include="js\libs\interact.min.js" />
     <Content Include="js\libs\jquery-3.1.1.min.js" />
     <Content Include="js\libs\jquery.modal.min.js" />

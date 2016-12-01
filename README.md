@@ -1,5 +1,5 @@
 # µPad
-µPad is a tiny open digital note taking app. µPad works with XML so that anyone can implement into their software allowing a truly open and free experience.
+µPad is a tiny open digital note taking app. µPad works with the open XML-based format: NPX, so anyone can implement it into their software allowing a truly open and free experience.
 
 ## How to use the JS client
 

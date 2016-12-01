@@ -35,7 +35,7 @@
 </head>
 <body class="win-type-body">
 	<div id="loadedContent">
-		<nav class="blue-grey" style="box-shadow: none; z-index: 110;">
+		<nav class="blue-grey noselect" style="box-shadow: none; z-index: 110;">
 			<div class="nav-wrapper" style="z-index: 110;">
 				<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
 				<ul class="left">
@@ -52,7 +52,7 @@
 		</nav>
 
 		<!-- Breadcrumbs -->
-		<nav id="breadcrumb-holder" class="blue-grey" style="top: 64px; z-index: 100;">
+		<nav id="breadcrumb-holder" class="blue-grey noselect" style="top: 64px; z-index: 100;">
 			<div class="nav-wrapper" style="z-index: 100;">
 				<div id="parents" class="col s12" style="padding-left: 10px;">
 					<span id="open-note" class="breadcrumb display-with-note" style="display: none;"></span>
@@ -61,7 +61,7 @@
 		</nav>
 
 		<!-- Sidenav -->
-		<ul id="menu" class="side-nav menu-button">
+		<ul id="menu" class="side-nav menu-button noselect">
 			<div class="hide-on-large-only">
 				<li><a id="mob-np-dd" class="dropdown-button" href="#!"><i class="material-icons">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
 				<li><a id="mob-s-dd" class="dropdown-button" href="#!"><i class="material-icons">book</i>Sections<i class="material-icons right">arrow_drop_down</i></a></li>
@@ -75,15 +75,16 @@
 				<li><a href="javascript:updateTitle();" class="btn green waves-effect waves-light">Update Title</a></li>
 				<li><a href="javascript:deleteOpen();" class="btn red waves-effect waves-light"><i class="material-icons left" style="color: #fff;">delete_forever</i> Delete <span id="open-type"></span></a></li>
 				<li><div class="divider"></div></li>
-				<li><a href="javascript:exportOpen();" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">file_download</i> Export Notepad</a></li>
 			</div>
+			<li>Notepad Location:<br /></li>
+			<li style="margin-top: -20px;"><em id="workingDir" style="font-size: 8px; -ms-user-select: element;"></em></li>
+			<li><a href="javascript:changeStorageLocation();" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">folder</i>Change Location</a></li>
 		</ul>
 
 		<div style="width: 100%; height: 100%; position: relative; top: 128px; z-index: 50;">
 			<!-- Notepads -->
 			<ul id="notepad-dropdown" class="dropdown-content">
 				<li><a class="modal-trigger" data-target="new-notepad"><i class="material-icons left">add</i>New</a></li>
-				<li><a class="tooltipped" data-position="left" data-delay="50" data-tooltip="Export all of your notepads to an archive of NPX files" href="javascript:exportNotepads();"><i class="material-icons left">file_download</i>Export All</a></li>
 				<li class="divider"></li>
 				<div id="notepadList"></div>
 			</ul>
@@ -334,14 +335,13 @@
 				</div>
 			</div>
 		</div>
-		<h5 class="preloader-text center-align">While you're waiting, how about a little riddle for you?<br /><img src="fonts/equation.svg" style="max-width: 90%; height: auto;" /></h5>
+		<h5 class="preloader-text center-align noselect">While you're waiting, how about a little riddle for you?<br /><img src="fonts/equation.svg" style="max-width: 90%; height: auto;" /></h5>
 	</div>
 
 	<script src="js/libs/jquery-3.1.1.min.js"></script>
 	<script src="js/libs/materialize.min.js"></script>
 	<script src="js/libs/moment.js"></script>
 	<script src="js/libs/localforage.min.js"></script>
-	<script src="js/libs/FileSaver.min.js"></script>
 	<script src="js/libs/jszip.min.js"></script>
 	<script src="js/libs/trim-canvas.js"></script>
 	<script src="js/libs/mammoth.browser.min.js"></script>
