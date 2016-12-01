@@ -721,23 +721,6 @@ function deleteElement() {
 	});
 }
 
-function exportOpen() {
-	var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
-	saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
-}
-
-function exportNotepads() {
-	var zip = new JSZip();
-	notepadStorage.iterate(function (value, key, i) {
-		var blob = new Blob([parser.restoreNotepad(value).toXML()], { type: "text/xml;charset=utf-8" });
-		zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
-	}, function () {
-		zip.generateAsync({ type: "blob" }).then(function (blob) {
-			saveAs(blob, "notepads.zip");
-		});
-	});
-}
-
 function downloadFile(elementID) {
 	var selElement;
 	for (var i = 0; i < note.elements.length; i++) {

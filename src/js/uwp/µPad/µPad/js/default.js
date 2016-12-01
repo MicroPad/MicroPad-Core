@@ -298,3 +298,32 @@ function deleteOpen() {
 		}
 	});
 }
+
+function updateTitle() {
+	if (parents.length === 1) {
+		//Delete old Notepad
+		appStorage.removeItem('lastNotepadTitle', function () {
+			Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
+				.then(function (folder) {
+					return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+				}).then(function (file) {
+					return file.deleteAsync();
+				}).done(function () {
+					notepad.title = $('#title-input').val();
+					saveToBrowser(undefined, true);
+				});
+		});
+	}
+	else if (parents.length > 1 && !note) {
+		//Rename Section
+		parents[parents.length - 1].title = $('#title-input').val();
+		$('#parents > span:nth-last-child(2)').html(parents[parents.length - 1].title);
+		saveToBrowser();
+	}
+	else if (note) {
+		//Rename Note
+		note.title = $('#title-input').val();
+		$('#open-note').html(note.title);
+		saveToBrowser();
+	}
+}
