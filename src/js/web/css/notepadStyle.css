@@ -130,6 +130,8 @@ nav {
 	width: 100%;
 	height: calc(100% - 128px);
 	top: 128px;
+	transform-origin: 0 0;
+	transform: scale(1);
 }
 
 .interact {

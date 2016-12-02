@@ -1330,6 +1330,20 @@ function updateInstructions() {
 	}
 }
 
+function zoom(zoomIn) {
+	if (!note) return;
+
+	var matrix = $('#viewer').css('transform').split('matrix(').pop().slice(0, -1).split(', ');
+	curScale = parseFloat(matrix[0]);
+	if (zoomIn) {
+		curScale += 0.25;
+	}
+	else {
+		curScale -= 0.25;
+	}
+	$('#viewer').css('transform', 'scale('+curScale+')');
+}
+
 /** Utility functions */
 function toBase64(str) {
 	return window.btoa(unescape(encodeURIComponent(str)));
