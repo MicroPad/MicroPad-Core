@@ -4,7 +4,7 @@
   <mp:PhoneIdentity PhoneProductId="556d1994-aaf4-44c6-ae5d-d3cdc8e2938d" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>µPad</DisplayName>
-    <PublisherDisplayName>nick</PublisherDisplayName>
+    <PublisherDisplayName>Nick Webster</PublisherDisplayName>
     <Logo>images\storelogo.png</Logo>
   </Properties>
   <Dependencies>
@@ -19,20 +19,17 @@
         <uap:DefaultTile Wide310x150Logo="images\Wide310x150Logo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="images\splashscreen.png" />
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="portrait" />
+          <uap:Rotation Preference="landscape" />
+          <uap:Rotation Preference="portraitFlipped" />
+          <uap:Rotation Preference="landscapeFlipped" />
+        </uap:InitialRotationPreference>
       </uap:VisualElements>
       <uap:ApplicationContentUriRules>
         <uap:Rule Match="ms-appx-web:///" Type="include" WindowsRuntimeAccess="all" />
       </uap:ApplicationContentUriRules>
       <Extensions>
-        <uap:Extension Category="windows.fileTypeAssociation">
-          <uap:FileTypeAssociation Name="notepads">
-            <uap:DisplayName>µPad Notepad</uap:DisplayName>
-            <uap:Logo>npx logo.png</uap:Logo>
-            <uap:SupportedFileTypes>
-              <uap:FileType ContentType="text/xml">.npx</uap:FileType>
-            </uap:SupportedFileTypes>
-          </uap:FileTypeAssociation>
-        </uap:Extension>
         <uap:Extension Category="windows.fileTypeAssociation">
           <uap:FileTypeAssociation Name="notepad-archives">
             <uap:DisplayName>µPad Notepad Archive</uap:DisplayName>
@@ -40,6 +37,15 @@
             <uap:SupportedFileTypes>
               <uap:FileType ContentType="application/zip">.npxz</uap:FileType>
               <uap:FileType ContentType="application/zip">.zip</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="notepads">
+            <uap:DisplayName>µPad Notepad</uap:DisplayName>
+            <uap:Logo>npx logo.png</uap:Logo>
+            <uap:SupportedFileTypes>
+              <uap:FileType ContentType="text/xml">.npx</uap:FileType>
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
         </uap:Extension>
