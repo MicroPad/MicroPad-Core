@@ -249,8 +249,8 @@ function parseSection(sectionXML, section, parent) {
 						}
 
 						if (noteXML.file) {
-							for (var j = 0; j < noteXML.image.length; j++) {
-								var element = noteXML.image[j];
+							for (var j = 0; j < noteXML.file.length; j++) {
+								var element = noteXML.file[j];
 								note.addElement("file", element.$, element._);
 							}
 						}
