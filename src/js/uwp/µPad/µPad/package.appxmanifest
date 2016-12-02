@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="556d1994-aaf4-44c6-ae5d-d3cdc8e2938d" Version="1.0.0.0" Publisher="CN=nick" />
+  <Identity Name="44929EtheralStudios.Pad-Notesandmore" Version="1.0.0.0" Publisher="CN=7748D8E1-79D1-4CBE-9248-5491F3F937B2" />
   <mp:PhoneIdentity PhoneProductId="556d1994-aaf4-44c6-ae5d-d3cdc8e2938d" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>µPad</DisplayName>
-    <PublisherDisplayName>Nick Webster</PublisherDisplayName>
-    <Logo>images\storelogo.png</Logo>
+    <DisplayName>µPad - Notes and more</DisplayName>
+    <PublisherDisplayName>Etheral Studios</PublisherDisplayName>
+    <Logo>images\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
@@ -15,10 +15,10 @@
   </Resources>
   <Applications>
     <Application Id="App" StartPage="ms-appx-web:///default.html">
-      <uap:VisualElements DisplayName="µPad - Notes and more" Description="µPad - A powerful and open note taking app" BackgroundColor="transparent" Square150x150Logo="images\Square150x150Logo.png" Square44x44Logo="images\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="images\Wide310x150Logo.png">
+      <uap:VisualElements DisplayName="µPad - Notes and more" Description="µPad - A powerful and open note taking app" BackgroundColor="#607d8b" Square150x150Logo="images\Square150x150Logo.png" Square44x44Logo="images\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="images\Wide310x150Logo.png" Square71x71Logo="images\Square71x71Logo.png" Square310x310Logo="images\Square310x310Logo.png">
         </uap:DefaultTile>
-        <uap:SplashScreen Image="images\splashscreen.png" />
+        <uap:SplashScreen Image="images\SplashScreen.png" BackgroundColor="#607d8b" />
         <uap:InitialRotationPreference>
           <uap:Rotation Preference="portrait" />
           <uap:Rotation Preference="landscape" />
