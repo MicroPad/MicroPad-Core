@@ -558,7 +558,7 @@ window.onload = function() {
 		$('#sidenav-overlay').trigger('click');
 		setTimeout(function() {
 			$('#sidenav-overlay').trigger('click');
-		}, 200);
+		}, 300);
 	});
 
 	/** Page has loaded. Turn off the spinner */
@@ -1336,10 +1336,10 @@ function zoom(zoomIn) {
 	var matrix = $('#viewer').css('transform').split('matrix(').pop().slice(0, -1).split(', ');
 	curScale = parseFloat(matrix[0]);
 	if (zoomIn) {
-		curScale += 0.25;
+		curScale += 0.1;
 	}
 	else {
-		curScale -= 0.25;
+		curScale -= 0.1;
 	}
 	$('#viewer').css('transform', 'scale('+curScale+')');
 }

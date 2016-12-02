@@ -24,7 +24,7 @@
 </head>
 <body class="win-type-body">
 	<div id="loadedContent">
-		<nav class="blue-grey noselect" style="box-shadow: none; z-index: 110;">
+		<nav class="blue-grey noselect" style="box-shadow: none; z-index: 110; padding-bottom: 65px;">
 			<div class="nav-wrapper" style="z-index: 110;">
 				<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
 				<ul class="left">
@@ -60,8 +60,13 @@
 				<li id="search-button"><a href="#!" class="modal-trigger" data-target="search"><i class="material-icons">search</i>Search</a></li>
 				<li><div class="divider"></div></li>
 			</div>
-			<li><strong>Options</strong></li>
+			<div class="display-with-note">
+				<li><a href="javascript:zoom(true);" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">zoom_in</i> Zoom In</a></li>
+				<li><a href="javascript:zoom(false);" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">zoom_out</i> Zoom Out</a></li>
+				<li><div class="divider"></div></li>
+			</div>
 			<div id="sidenav-options">
+				<li><strong>Options</strong></li>
 				<li><input id="title-input" type="text" placeholder="Title" /></li>
 				<li><a href="javascript:updateTitle();" class="btn green waves-effect waves-light">Update Title</a></li>
 				<li><a href="javascript:deleteOpen();" class="btn red waves-effect waves-light"><i class="material-icons left" style="color: #fff;">delete_forever</i> Delete <span id="open-type"></span></a></li>
@@ -70,10 +75,6 @@
 			<li>Notepad Location:<br /></li>
 			<li style="margin-top: -20px;"><em id="workingDir" style="font-size: 8px; -ms-user-select: element;"></em></li>
 			<li><a href="javascript:changeStorageLocation();" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">folder</i>Change Location</a></li>
-
-			<li><div class="divider"></div></li>
-			<li><a href="javascript:zoom(true);" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">zoom_in</i> Zoom In</a></li>
-			<li><a href="javascript:zoom(false);" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">zoom_out</i> Zoom Out</a></li>
 		</ul>
 
 		<div style="width: 100%; height: 100%; position: relative; z-index: 50;">

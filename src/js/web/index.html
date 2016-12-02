@@ -9,10 +9,10 @@
 	</head>
 	<body>
 		<div id="loadedContent">
-			<nav class="blue-grey" style="box-shadow: none; z-index: 110;">
+			<nav class="blue-grey" style="box-shadow: none; z-index: 110; padding-bottom: 65px;">
 				<div class="nav-wrapper" style="z-index: 110;">
-					<a id="menu-button" class="left hide-on-small-only side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
-					<a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a>
+					<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
+					<!-- <a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a> -->
 					<ul class="left">
 						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em style="font-weight: 100; font-size: 1rem;">α</em></span>
 					</ul>
@@ -49,6 +49,11 @@
 					<li id="search-button"><a href="#!" class="modal-trigger" data-target="search"><i class="material-icons">search</i>Search</a></li>
 					<li><div class="divider"></div></li>
 				</div>
+				<div class="display-with-note">
+					<li><a href="javascript:zoom(true);" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">zoom_in</i> Zoom In</a></li>
+					<li><a href="javascript:zoom(false);" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">zoom_out</i> Zoom Out</a></li>
+					<li><div class="divider"></div></li>
+				</div>
 				<li><strong>Options</strong></li>
 				<div id="sidenav-options">
 					<li><input id="title-input" type="text" placeholder="Title" /></li>
@@ -57,9 +62,6 @@
 					<li><div class="divider"></div></li>
 					<li><a href="javascript:exportOpen();" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">file_download</i> Export Notepad</a></li>
 				</div>
-				<li><div class="divider"></div></li>
-				<li><a href="javascript:zoom(true);" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">zoom_in</i> Zoom In</a></li>
-				<li><a href="javascript:zoom(false);" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">zoom_out</i> Zoom Out</a></li>
 			</ul>
 
 			<div style="width: 100%; height: 100%; position: relative; z-index: 50;">
