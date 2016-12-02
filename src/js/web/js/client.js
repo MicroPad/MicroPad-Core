@@ -232,16 +232,18 @@ window.onload = function() {
 								}
 							},
 							complete: function() {
-								if (confirm("Do you want to save this drawing?")) {
-									if (!isCanvasBlank($('#drawing-viewer')[0])) {
-										element.content = $('#drawing-viewer')[0].toDataURL();
+								confirmAsync("Do you want to save this drawing?").then(function(answer) {
+									if (answer) {
+										if (!isCanvasBlank($('#drawing-viewer')[0])) {
+											element.content = $('#drawing-viewer')[0].toDataURL();
 
-										var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
-										currentTarget.attr('src', trimmed);
+											var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
+											currentTarget.attr('src', trimmed);
 
-										saveToBrowser();
+											saveToBrowser();
+										}
 									}
-								}
+								});
 							}
 						});
 						$('#drawingEditor').modal('open');
