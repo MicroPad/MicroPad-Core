@@ -54,7 +54,7 @@
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
-    <uap:Capability Name="documentsLibrary" />
+    <!-- <uap:Capability Name="documentsLibrary" /> -->
     <DeviceCapability Name="microphone" />
   </Capabilities>
 </Package>

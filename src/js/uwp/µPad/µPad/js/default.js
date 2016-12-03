@@ -78,7 +78,7 @@ $(document).ready(function () {
 	//TODO: Check if we're using a different working dir before doing this
 	appStorage.getItem('storageDir').then(function(res) {
 		if (res === null) {
-			appStorage.setItem('storageDir', Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
+			appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
 				storageDir = f.path;
 				refreshStorageDir();
 			}));
@@ -95,11 +95,11 @@ function refreshStorageDir() {
 		$('#workingDir').html(folder.path);
 
 		/** Restore to previous notepad */
-		appStorage.getItem('lastNotepadTitle', function (e, title) {
+		appStorage.getItem('lastNotepadTitle', function(e, title) {
 			if (title == null || e) return;
 			Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) { return folder.getFilesAsync(); }).done(function (files) {
 				files.forEach(function (f) {
-					if (title === f.displayName) loadFromBrowser(title);
+					if (title.replace(/[^a-z0-9 ]/gi, '') === f.displayName) loadFromBrowser(title);
 				});
 			}, function (e) {
 				console.log(e);
@@ -107,7 +107,7 @@ function refreshStorageDir() {
 		});
 	}, function (err) {
 		alert("Error accessing storage folder. Reverting to default: {0}".format(err));
-		appStorage.setItem('storageDir', Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
+		appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
 			storageDir = f.path;
 			refreshStorageDir();
 		}));
@@ -119,8 +119,9 @@ function changeStorageLocation() {
 	folderPicker.commitButtonText = "Set Notepad Storage Location";
 	folderPicker.suggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.documentsLibrary;
 	folderPicker.fileTypeFilter.replaceAll(["*"]);
-	folderPicker.pickSingleFolderAsync().then(function (folder) {
-		folder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (newFolder) {
+	folderPicker.pickSingleFolderAsync().then(function(folder) {
+		return folder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists); })
+		.then(function (newFolder) {
 			//Give permission to access this directory without opening a picker everytime
 			Windows.Storage.AccessCache.StorageApplicationPermissions.futureAccessList.addOrReplace('storageDir', newFolder);
 
@@ -130,8 +131,8 @@ function changeStorageLocation() {
 					window.location.reload();
 				});
 			});
-		});
-	}, function (err) { alert("There was an error trying to access your selected folder"); });
+		})
+		.done(undefined, function(err) { alert("There was an error trying to access your selected folder"); });
 }
 
 function updateNotepadList() {
@@ -145,7 +146,7 @@ function updateNotepadList() {
 		});
 		isUpdating = false;
 	}, function (err) {
-		appStorage.setItem('storageDir', Windows.Storage.KnownFolders.documentsLibrary.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
+		appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
 			storageDir = f.path;
 			refreshStorageDir();
 			updateNotepadList();
@@ -178,8 +179,10 @@ function saveToBrowser(retry, fileLoad, bulk) {
 		$(this).addClass('browser-default');
 	});
 
-	getXmlObject(function(xmlObj) {
-		saveWorker.postMessage({ xmlObj: xmlObj, fileLoad: fileLoad, bulk: bulk });
+	appStorage.setItem('lastNotepadTitle', notepad.title, function() {
+		getXmlObject(function(xmlObj) {
+			saveWorker.postMessage({ xmlObj: xmlObj, fileLoad: fileLoad, bulk: bulk });
+		});
 	});
 }
 saveWorker.onmessage = function(event) {

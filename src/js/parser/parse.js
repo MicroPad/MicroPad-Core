@@ -1,6 +1,8 @@
 var xml2js = require('xml2js');
 var parseString = require('xml2js').parseString;
 var moment = require('moment');
+var toMarkdown = require('to-markdown');
+var pd = require('pretty-data').pd;
 
 var Note = require('./Note.js').Note;
 
@@ -131,6 +133,55 @@ exports.parse = function parse(xml, addons) {
 				parseSection(sectionXML, section, exports.notepad);
 			}
 		}
+	});
+}
+
+exports.parseFromEvernote = function parseFromEvernote(xml, addons) {
+	supportedAddons = addons;
+	parseString(xml, {trim: true, normalize: false}, function(e, res) {
+		exports.notepad = new Notepad("{0} Import ({1})".format(res['en-export'].$.application, moment(res['en-export'].$['export-date']).format('D MMM h:mmA')));
+		var section = new Section('Imported Notes');
+		var notes = res['en-export'].note;
+		for (var i = 0; i < notes.length; i++) {
+			var noteXML = notes[i];
+			var note = new Note(noteXML.title[0], moment(noteXML.created[0]).format(), supportedAddons);
+
+			//Add the general note content
+			note.addElement('markdown', {
+				id: 'markdown1',
+				x: '10px',
+				y: '10px',
+				width: '600px',
+				height: 'auto',
+				fontSize: '16px'
+			}, enmlToMarkdown(pd.xml(noteXML.content[0])));
+
+			//Add attachments
+			var resources = noteXML.resource;
+			if (resources) {
+				var y = 10;
+				for (var j = 0; j < resources.length; j++) {
+					var resource = resources[j];
+
+					// console.log(note.elements);
+					if (note.elements[note.elements.length - 1].type === 'file') {
+						y = parseInt(note.elements[note.elements.length - 1].args.y) + 100;
+					}
+
+					note.addElement('file', {
+						id: 'file'+(j+1),
+						x: '650px',
+						y: y+'px',
+						width: 'auto',
+						height: 'auto',
+						filename: resource['resource-attributes'][0]['file-name'][0]
+					}, 'data:'+resource.mime[0]+';base64,'+resource.data[0]._.replace(/\r?\n|\r/g, ''));
+				}
+			}
+
+			section.addNote(note);
+		}
+		exports.notepad.addSection(section);
 	});
 }
 
@@ -277,6 +328,51 @@ function parseSection(sectionXML, section, parent) {
 	}
 
 	parent.addSection(section);
+}
+
+function enmlToMarkdown(enml) {
+	var lineArr = enml.split('\n');
+	lineArr = lineArr.slice(3, lineArr.length-1);
+	var html = [];
+	for (var i = 0; i < lineArr.length; i++) {
+		var line = lineArr[i].trim();
+		html.push(line);
+	}
+
+	html = html.join('\n');
+	return toMarkdown(html, {
+		gfm: true,
+		converters: [
+			{
+				filter: 'div',
+				replacement: function(content) {
+					return '\n\n'+content+'\n\n';
+				}
+			},
+			{
+				filter: 'en-media',
+				replacement: function(content) {
+					return '';
+				}
+			},
+			{
+				filter: 'en-todo',
+				replacement: function(content, node) {
+					var checkStr = '';
+					if (node.getAttributeNode('checked')) {
+						if (node.getAttributeNode('checked').value == 'true') checkStr = 'x';
+					}
+					return '- [{0}] {1}'.format(checkStr, content);
+				}
+			},
+			{
+				filter: 'en-crypt',
+				replacement: function(content) {
+					return '';
+				}
+			}
+		]
+	});
 }
 
 // Thanks to http://stackoverflow.com/a/4673436/998467

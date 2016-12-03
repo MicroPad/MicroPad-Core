@@ -1,4 +1,5 @@
 var xml2js = require('xml2js');
+var moment = require('moment');
 
 exports.Note = function(title, time, addons) {
 	this.parent = undefined;
