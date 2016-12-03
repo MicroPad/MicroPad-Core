@@ -31,12 +31,11 @@
       </uap:ApplicationContentUriRules>
       <Extensions>
         <uap:Extension Category="windows.fileTypeAssociation">
-          <uap:FileTypeAssociation Name="notepad-archives">
-            <uap:DisplayName>µPad Notepad Archive</uap:DisplayName>
-            <uap:Logo>npxz logo.png</uap:Logo>
+          <uap:FileTypeAssociation Name="evernote-notes">
+            <uap:DisplayName>Evernote Notes</uap:DisplayName>
+            <uap:Logo>enex logo.png</uap:Logo>
             <uap:SupportedFileTypes>
-              <uap:FileType ContentType="application/zip">.npxz</uap:FileType>
-              <uap:FileType ContentType="application/zip">.zip</uap:FileType>
+              <uap:FileType>.enex</uap:FileType>
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
         </uap:Extension>
@@ -46,6 +45,16 @@
             <uap:Logo>npx logo.png</uap:Logo>
             <uap:SupportedFileTypes>
               <uap:FileType ContentType="text/xml">.npx</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="notepad-archives">
+            <uap:DisplayName>µPad Notepad Archive</uap:DisplayName>
+            <uap:Logo>npxz logo.png</uap:Logo>
+            <uap:SupportedFileTypes>
+              <uap:FileType ContentType="application/zip">.npxz</uap:FileType>
+              <uap:FileType ContentType="application/zip">.zip</uap:FileType>
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
         </uap:Extension>

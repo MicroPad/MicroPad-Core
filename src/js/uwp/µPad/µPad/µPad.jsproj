@@ -66,6 +66,7 @@
     <Content Include="css\materialize.min.css" />
     <Content Include="css\notepadStyle.css" />
     <Content Include="default.html" />
+    <Content Include="enex logo.png" />
     <Content Include="fonts\equation.svg" />
     <Content Include="fonts\icons.woff2" />
     <Content Include="fonts\MSWord.svg" />

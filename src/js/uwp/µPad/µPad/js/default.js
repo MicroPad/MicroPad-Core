@@ -49,6 +49,14 @@ var saveWorker = new Worker('js/saveWorker.js');
 							});
 						});
 						break;
+					case ".enex":
+						Windows.Storage.FileIO.readTextAsync(f).then(function(text) {
+							parser.parseFromEvernote(text, ["asciimath"]);
+							while (!parser.notepad) if (parser.notepad) break;
+							notepad = parser.notepad;
+							saveToBrowser(undefined, true);
+						});
+						break;
 				}
 			}
 		}
@@ -78,36 +86,43 @@ $(document).ready(function () {
 	//TODO: Check if we're using a different working dir before doing this
 	appStorage.getItem('storageDir').then(function(res) {
 		if (res === null) {
-			appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
-				storageDir = f.path;
-				refreshStorageDir();
-			}));
+			Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
+				appStorage.setItem('storageDir', f.path, function() {
+					storageDir = f.path;
+					refreshStorageDir();
+				});
+			});
 		}
 		else {
 			storageDir = res;
 			refreshStorageDir();
 		}
+	}).catch(function(err) {
+		Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
+			appStorage.setItem('storageDir', f.path, function() {
+				storageDir = f.path;
+				refreshStorageDir();
+			});
+		});
 	});
 });
 
 function refreshStorageDir() {
-	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) {
+	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function(folder) {
 		$('#workingDir').html(folder.path);
 
 		/** Restore to previous notepad */
 		appStorage.getItem('lastNotepadTitle', function(e, title) {
 			if (title == null || e) return;
-			Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) { return folder.getFilesAsync(); }).done(function (files) {
-				files.forEach(function (f) {
+			folder.getFilesAsync().done(function(files) {
+				files.forEach(function(f) {
 					if (title.replace(/[^a-z0-9 ]/gi, '') === f.displayName) loadFromBrowser(title);
 				});
-			}, function (e) {
-				console.log(e);
 			});
 		});
-	}, function (err) {
+	}, function(err) {
 		alert("Error accessing storage folder. Reverting to default: {0}".format(err));
-		appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
+		appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
 			storageDir = f.path;
 			refreshStorageDir();
 		}));
