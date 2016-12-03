@@ -161,10 +161,10 @@ function updateNotepadList() {
 		});
 		isUpdating = false;
 	}, function (err) {
-		appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function (f) {
+		alert("Error accessing storage folder. Reverting to default: {0}".format(err));
+		appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
 			storageDir = f.path;
 			refreshStorageDir();
-			updateNotepadList();
 		}));
 	});
 }

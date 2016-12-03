@@ -162,19 +162,29 @@ exports.parseFromEvernote = function parseFromEvernote(xml, addons) {
 				var y = 10;
 				for (var j = 0; j < resources.length; j++) {
 					var resource = resources[j];
-
-					// console.log(note.elements);
+					var id = 'file'+(j+1);
+					
 					if (note.elements[note.elements.length - 1].type === 'file') {
 						y = parseInt(note.elements[note.elements.length - 1].args.y) + 100;
 					}
 
+					if (resource['resource-attributes'][0]['file-name']) {
+						var filename = resource['resource-attributes'][0]['file-name'][0];
+					}
+					else if (resource['resource-attributes'][0]['source-url']) {
+						var filename = resource['resource-attributes'][0]['source-url'][0].split('/').pop();
+					}
+					else {
+						var filename = id+'.'+resource.mime[0].split('/').pop();
+					}
+
 					note.addElement('file', {
-						id: 'file'+(j+1),
+						id: id,
 						x: '650px',
 						y: y+'px',
 						width: 'auto',
 						height: 'auto',
-						filename: resource['resource-attributes'][0]['file-name'][0]
+						filename: filename
 					}, 'data:'+resource.mime[0]+';base64,'+resource.data[0]._.replace(/\r?\n|\r/g, ''));
 				}
 			}
@@ -352,7 +362,7 @@ function enmlToMarkdown(enml) {
 			{
 				filter: 'en-media',
 				replacement: function(content) {
-					return '';
+					return '`<there was an attachment here>`';
 				}
 			},
 			{
@@ -368,7 +378,7 @@ function enmlToMarkdown(enml) {
 			{
 				filter: 'en-crypt',
 				replacement: function(content) {
-					return '';
+					return '`<there was encrypted text here>`';
 				}
 			}
 		]

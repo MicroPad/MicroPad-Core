@@ -1254,6 +1254,17 @@ function handleUpload(event) {
 			});
 			break;
 
+		case "enex":
+			readFileInputEventAsText(event, function(text) {
+				parser.parseFromEvernote(text, ["asciimath"]);
+				while (!parser.notepad) if (parser.notepad) break;
+				notepad = parser.notepad;
+
+				window.initNotepad();
+				saveToBrowser();
+			});
+			break;
+
 		case "zip":
 		case "npxz":
 			readFileInputEventAsArrayBuffer(event, function(arrayBuffer) {
