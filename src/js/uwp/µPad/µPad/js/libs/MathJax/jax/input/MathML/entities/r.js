@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  /MathJax/jax/input/MathML/entities/r.js
  *
  *  Copyright (c) 2009-2016 The MathJax Consortium

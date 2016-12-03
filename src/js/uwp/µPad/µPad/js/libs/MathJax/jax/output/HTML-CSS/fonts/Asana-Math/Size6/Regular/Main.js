@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  /MathJax/jax/output/HTML-CSS/fonts/Asana-Math/Size6/Regular/Main.js
  *
  *  Copyright (c) 2009-2016 The MathJax Consortium

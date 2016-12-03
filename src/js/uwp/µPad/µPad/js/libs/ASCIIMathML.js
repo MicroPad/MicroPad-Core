@@ -1,4 +1,4 @@
-/*
+﻿/*
 ASCIIMathML.js
 ==============
 This file contains JavaScript functions to convert ASCII math notation

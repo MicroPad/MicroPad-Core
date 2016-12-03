@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  /MathJax/jax/output/HTML-CSS/fonts/STIX/General/Bold/MiscSymbols.js
  *
  *  Copyright (c) 2009-2016 The MathJax Consortium

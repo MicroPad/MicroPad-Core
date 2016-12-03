@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  /MathJax/jax/output/HTML-CSS/fonts/Latin-Modern/Arrows/Regular/Main.js
  *
  *  Copyright (c) 2009-2016 The MathJax Consortium

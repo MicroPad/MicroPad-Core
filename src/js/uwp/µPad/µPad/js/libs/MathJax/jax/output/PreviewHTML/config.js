@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  /MathJax/jax/output/PreviewHTML/config.js
  *
  *  Copyright (c) 2009-2016 The MathJax Consortium

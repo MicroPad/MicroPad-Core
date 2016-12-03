@@ -1,4 +1,4 @@
-Font: Latin Modern MathJax
+﻿Font: Latin Modern MathJax
 
 Copyright 2012--2013 for TeX Gyre math extensions by B. Jackowski,
 P. Strzelczyk and P. Pianowski (on behalf of TeX Users Groups).

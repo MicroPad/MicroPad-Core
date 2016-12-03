@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  /MathJax.js
  *
  *  Copyright (c) 2009-2016 The MathJax Consortium

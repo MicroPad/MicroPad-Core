@@ -1,4 +1,4 @@
-Copyright (c) 1997, 2009 American Mathematical Society (http://www.ams.org),
+﻿Copyright (c) 1997, 2009 American Mathematical Society (http://www.ams.org),
 with Reserved Font Names EUEX10, EUEX7, EUEX8, EUEX9, EUFB10, EUFB5, EUFB7,
 EUFM10, EUFM5, EUFM7, EURB10, EURB5, EURB7, EURM10, EURM5, EURM7, EUSB10,
 EUSB5, EUSB7, EUSM10, EUSM5, EUSM7, CMEX10, CMSY5, CMSY7.

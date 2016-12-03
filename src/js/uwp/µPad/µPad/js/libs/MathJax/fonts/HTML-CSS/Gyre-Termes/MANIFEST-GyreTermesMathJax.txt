@@ -1,4 +1,4 @@
-Font: Gyre Termes MathJax
+﻿Font: Gyre Termes MathJax
 
 Copyright 2012--2013 for TeX Gyre math extensions by B. Jackowski,
 P. Strzelczyk and P. Pianowski (on behalf of TeX Users Groups).

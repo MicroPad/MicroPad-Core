@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  /MathJax/config/Accessible-full.js
  *  
  *  Copyright (c) 2010-2016 The MathJax Consortium

@@ -1,4 +1,4 @@
-// MIT http://rem.mit-license.org
+﻿// MIT http://rem.mit-license.org
 
 function trim(c) {
   var ctx = c.getContext('2d'),

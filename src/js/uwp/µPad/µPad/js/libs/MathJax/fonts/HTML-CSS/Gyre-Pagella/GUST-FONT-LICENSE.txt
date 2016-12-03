@@ -1,4 +1,4 @@
-% This is a preliminary version (2006-09-30), barring acceptance from
+﻿% This is a preliminary version (2006-09-30), barring acceptance from
 % the LaTeX Project Team and other feedback, of the GUST Font License.
 % (GUST is the Polish TeX Users Group, http://www.gust.org.pl)
 %

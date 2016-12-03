@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  /MathJax/jax/output/CommonHTML/fonts/TeX/SansSerif-Bold.js
  *
  *  Copyright (c) 2009-2016 The MathJax Consortium
