@@ -1,0 +1,17 @@
+﻿html {
+	width: 100vw;
+	height: 100vh;
+}
+
+.modal-content > .row {
+	height: 100%;
+}
+
+.modal-content > .row > .input-field {
+	height: 100%;
+}
+
+.noselect {
+	-ms-user-select: none;
+	cursor: default;
+}
