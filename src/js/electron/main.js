@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, ipcMain} = require('electron')
 
 let win //This is the window object
 
@@ -23,3 +23,14 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
 	if (win === null) createWindow();
 });
+
+/** Renderer/Main IPC */
+// ipcMain.on('updateNotepadList', (event, arg) => {
+// 	console.log(arg);
+// 	event.sender.send('asynchronous-reply', 'test');
+// });
+
+// ipcMain.on('synchronous-message', (event, arg) => {
+// 	console.log(arg);
+// 	event.returnValue= 'test';
+// });
