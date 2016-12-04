@@ -5161,99 +5161,99 @@ var xml2js = require('xml2js');
 var moment = require('moment');
 
 exports.Note = function(title, time, addons) {
-  this.parent = undefined;
-  this.title = title;
-  this.time = Date.parse(time);
-  this.addons = addons;
-  this.bibliography = [];
-  this.elements = [];
+	this.parent = undefined;
+	this.title = title;
+	this.time = Date.parse(time);
+	this.addons = addons;
+	this.bibliography = [];
+	this.elements = [];
 };
 exports.Note.prototype.addSource = function(id, item, content) {
-  this.bibliography.push({
-    id: id,
-    item: item,
-    content: content
-  });
+	this.bibliography.push({
+		id: id,
+		item: item,
+		content: content
+	});
 };
 exports.Note.prototype.addElement = function(type, args, content) {
-  if (!type) return;
-  if (!content || content.length === 0) return;
-  this.elements.push({
-    type: type,
-    args: args,
-    content: content
-  });
+	if (!type) return;
+	if (!content || content.length === 0) return;
+	this.elements.push({
+		type: type,
+		args: args,
+		content: content
+	});
 };
 exports.Note.prototype.search = function(query) {
-  var pattern = new RegExp("\\b"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
-  if (pattern.test(this.title)) return this;
-  return false;
+	var pattern = new RegExp("\\b"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
+	if (pattern.test(this.title)) return this;
+	return false;
 }
 exports.Note.prototype.toXMLObject = function() {
-  var parseableNote = {
-    note: {
-      $: {
-        title: this.title,
-        time: moment(this.time).format()
-      },
-      addons: [],
-      bibliography: []
-    }
-  }
+	var parseableNote = {
+		note: {
+			$: {
+				title: this.title,
+				time: moment(this.time).format()
+			},
+			addons: [],
+			bibliography: []
+		}
+	}
 
-  var imports = {
-    import: []
-  };
-  for (k in this.addons) {
-    imports.import.push(this.addons[k]);
-  }
-  parseableNote.note.addons.push(imports);
+	var imports = {
+		import: []
+	};
+	for (k in this.addons) {
+		imports.import.push(this.addons[k]);
+	}
+	parseableNote.note.addons.push(imports);
 
-  var sources = {
-    source: []
-  };
-  for (k in this.bibliography) {
-    var source = this.bibliography[k];
-    sources.source.push({
-      _: source.content,
-      $: {
-        id: source.id,
-        item: source.item
-      }
-    });
-  }
-  parseableNote.note.bibliography.push(sources);
+	var sources = {
+		source: []
+	};
+	for (k in this.bibliography) {
+		var source = this.bibliography[k];
+		sources.source.push({
+			_: source.content,
+			$: {
+				id: source.id,
+				item: source.item
+			}
+		});
+	}
+	parseableNote.note.bibliography.push(sources);
 
-  elements = {};
-  for (k in this.elements) {
-    var element = this.elements[k];
-    if (!elements[element.type]) elements[element.type] = [];
-    
-    var elementToPush = {
-      _: element.content,
-      $: {}
-    }
+	elements = {};
+	for (k in this.elements) {
+		var element = this.elements[k];
+		if (!elements[element.type]) elements[element.type] = [];
+		
+		var elementToPush = {
+			_: element.content,
+			$: {}
+		}
 
-    for (argName in element.args) {
-      elementToPush.$[argName] = element.args[argName];
-    }
+		for (argName in element.args) {
+			elementToPush.$[argName] = element.args[argName];
+		}
 
-    elements[element.type].push(elementToPush);
-  }
-  for (k in elements) {
-    var elementGroup = elements[k];
-    parseableNote.note[k] = elementGroup;
-  }
+		elements[element.type].push(elementToPush);
+	}
+	for (k in elements) {
+		var elementGroup = elements[k];
+		parseableNote.note[k] = elementGroup;
+	}
 
-  return parseableNote;
+	return parseableNote;
 }
 exports.Note.prototype.toXML = function() {
-  var builder = new xml2js.Builder({
-    allowSurrogateChars: true,
-    headless: true,
-    cdata: true
-  });
-  return builder.buildObject(this.toXMLObject());
+	var builder = new xml2js.Builder({
+		allowSurrogateChars: true,
+		headless: true,
+		cdata: true
+	});
+	return builder.buildObject(this.toXMLObject());
 }
 
 },{"moment":165,"xml2js":175}],29:[function(require,module,exports){
@@ -13666,172 +13666,172 @@ return hooks;
 *   http://www.opensource.org/licenses/mit-license.php
 *   http://www.gnu.org/licenses/gpl.html
 *
-* pd.xml(data ) - pretty print XML;
-* pd.json(data) - pretty print JSON;
-* pd.css(data ) - pretty print CSS;
-* pd.sql(data)  - pretty print SQL;
+*	pd.xml(data ) - pretty print XML;
+*	pd.json(data) - pretty print JSON;
+*	pd.css(data ) - pretty print CSS;
+*	pd.sql(data)  - pretty print SQL;
 *
-* pd.xmlmin(data [, preserveComments] ) - minify XML; 
-* pd.jsonmin(data)                      - minify JSON; 
-* pd.cssmin(data [, preserveComments] ) - minify CSS; 
-* pd.sqlmin(data)                       - minify SQL; 
+*	pd.xmlmin(data [, preserveComments] ) - minify XML; 
+*	pd.jsonmin(data)                      - minify JSON; 
+*	pd.cssmin(data [, preserveComments] ) - minify CSS; 
+*	pd.sqlmin(data)                       - minify SQL; 
 *
 * PARAMETERS:
 *
-* @data       - String; XML, JSON, CSS or SQL text to beautify;
-*   @preserveComments - Bool (optional, used in minxml and mincss only); 
-*         Set this flag to true to prevent removing comments from @text; 
-* @Return     - String;
-* 
+*	@data  			- String; XML, JSON, CSS or SQL text to beautify;
+* 	@preserveComments	- Bool (optional, used in minxml and mincss only); 
+*				  Set this flag to true to prevent removing comments from @text; 
+*	@Return 		- String;
+*	
 * USAGE:
-* 
-* var pd  = require('pretty-data').pd;
+*	
+*	var pd  = require('pretty-data').pd;
 *
-* var xml_pp   = pd.xml(xml_text);
-* var xml_min  = pd.xmlmin(xml_text [,true]);
-* var json_pp  = pd.json(json_text);
-* var json_min = pd.jsonmin(json_text);
-* var css_pp   = pd.css(css_text);
-* var css_min  = pd.cssmin(css_text [, true]);
-* var sql_pp   = pd.sql(sql_text);
-* var sql_min  = pd.sqlmin(sql_text);
+*	var xml_pp   = pd.xml(xml_text);
+*	var xml_min  = pd.xmlmin(xml_text [,true]);
+*	var json_pp  = pd.json(json_text);
+*	var json_min = pd.jsonmin(json_text);
+*	var css_pp   = pd.css(css_text);
+*	var css_min  = pd.cssmin(css_text [, true]);
+*	var sql_pp   = pd.sql(sql_text);
+*	var sql_min  = pd.sqlmin(sql_text);
 *
 * TEST:
-* comp-name:pretty-data$ node ./test/test_xml
-* comp-name:pretty-data$ node ./test/test_json
-* comp-name:pretty-data$ node ./test/test_css
-* comp-name:pretty-data$ node ./test/test_sql
+*	comp-name:pretty-data$ node ./test/test_xml
+*	comp-name:pretty-data$ node ./test/test_json
+*	comp-name:pretty-data$ node ./test/test_css
+*	comp-name:pretty-data$ node ./test/test_sql
 */
 
 
 function pp() {
-  this.shift = ['\n']; // array of shifts
-  this.step = '  ', // 2 spaces
-    maxdeep = 100, // nesting level
-    ix = 0;
+	this.shift = ['\n']; // array of shifts
+	this.step = '  ', // 2 spaces
+		maxdeep = 100, // nesting level
+		ix = 0;
 
-  // initialize array with shifts //
-  for(ix=0;ix<maxdeep;ix++){
-    this.shift.push(this.shift[ix]+this.step); 
-  }
+	// initialize array with shifts //
+	for(ix=0;ix<maxdeep;ix++){
+		this.shift.push(this.shift[ix]+this.step); 
+	}
 
-};  
-  
+};	
+	
 // ----------------------- XML section ----------------------------------------------------
 
 pp.prototype.xml = function(text) {
 
-  var ar = text.replace(/>\s{0,}</g,"><")
-         .replace(/</g,"~::~<")
-         .replace(/xmlns\:/g,"~::~xmlns:")
-         .replace(/xmlns\=/g,"~::~xmlns=")
-         .split('~::~'),
-    len = ar.length,
-    inComment = false,
-    deep = 0,
-    str = '',
-    ix = 0;
+	var ar = text.replace(/>\s{0,}</g,"><")
+				 .replace(/</g,"~::~<")
+				 .replace(/xmlns\:/g,"~::~xmlns:")
+				 .replace(/xmlns\=/g,"~::~xmlns=")
+				 .split('~::~'),
+		len = ar.length,
+		inComment = false,
+		deep = 0,
+		str = '',
+		ix = 0;
 
-    for(ix=0;ix<len;ix++) {
-      // start comment or <![CDATA[...]]> or <!DOCTYPE //
-      if(ar[ix].search(/<!/) > -1) { 
-        str += this.shift[deep]+ar[ix];
-        inComment = true; 
-        // end comment  or <![CDATA[...]]> //
-        if(ar[ix].search(/-->/) > -1 || ar[ix].search(/\]>/) > -1 || ar[ix].search(/!DOCTYPE/) > -1 ) { 
-          inComment = false; 
-        }
-      } else 
-      // end comment  or <![CDATA[...]]> //
-      if(ar[ix].search(/-->/) > -1 || ar[ix].search(/\]>/) > -1) { 
-        str += ar[ix];
-        inComment = false; 
-      } else 
-      // <elm></elm> //
-      if( /^<\w/.exec(ar[ix-1]) && /^<\/\w/.exec(ar[ix]) &&
-        /^<[\w:\-\.\,]+/.exec(ar[ix-1]) == /^<\/[\w:\-\.\,]+/.exec(ar[ix])[0].replace('/','')) { 
-        str += ar[ix];
-        if(!inComment) deep--;
-      } else
-       // <elm> //
-      if(ar[ix].search(/<\w/) > -1 && ar[ix].search(/<\//) == -1 && ar[ix].search(/\/>/) == -1 ) {
-        str = !inComment ? str += this.shift[deep++]+ar[ix] : str += ar[ix];
-      } else 
-       // <elm>...</elm> //
-      if(ar[ix].search(/<\w/) > -1 && ar[ix].search(/<\//) > -1) {
-        str = !inComment ? str += this.shift[deep]+ar[ix] : str += ar[ix];
-      } else 
-      // </elm> //
-      if(ar[ix].search(/<\//) > -1) { 
-        str = !inComment ? str += this.shift[--deep]+ar[ix] : str += ar[ix];
-      } else 
-      // <elm/> //
-      if(ar[ix].search(/\/>/) > -1 ) { 
-        str = !inComment ? str += this.shift[deep]+ar[ix] : str += ar[ix];
-      } else 
-      // <? xml ... ?> //
-      if(ar[ix].search(/<\?/) > -1) { 
-        str += this.shift[deep]+ar[ix];
-      } else 
-      // xmlns //
-      if( ar[ix].search(/xmlns\:/) > -1  || ar[ix].search(/xmlns\=/) > -1) { 
-        str += this.shift[deep]+ar[ix];
-      } 
-      
-      else {
-        str += ar[ix];
-      }
-    }
-    
-  return  (str[0] == '\n') ? str.slice(1) : str;
+		for(ix=0;ix<len;ix++) {
+			// start comment or <![CDATA[...]]> or <!DOCTYPE //
+			if(ar[ix].search(/<!/) > -1) { 
+				str += this.shift[deep]+ar[ix];
+				inComment = true; 
+				// end comment  or <![CDATA[...]]> //
+				if(ar[ix].search(/-->/) > -1 || ar[ix].search(/\]>/) > -1 || ar[ix].search(/!DOCTYPE/) > -1 ) { 
+					inComment = false; 
+				}
+			} else 
+			// end comment  or <![CDATA[...]]> //
+			if(ar[ix].search(/-->/) > -1 || ar[ix].search(/\]>/) > -1) { 
+				str += ar[ix];
+				inComment = false; 
+			} else 
+			// <elm></elm> //
+			if( /^<\w/.exec(ar[ix-1]) && /^<\/\w/.exec(ar[ix]) &&
+				/^<[\w:\-\.\,]+/.exec(ar[ix-1]) == /^<\/[\w:\-\.\,]+/.exec(ar[ix])[0].replace('/','')) { 
+				str += ar[ix];
+				if(!inComment) deep--;
+			} else
+			 // <elm> //
+			if(ar[ix].search(/<\w/) > -1 && ar[ix].search(/<\//) == -1 && ar[ix].search(/\/>/) == -1 ) {
+				str = !inComment ? str += this.shift[deep++]+ar[ix] : str += ar[ix];
+			} else 
+			 // <elm>...</elm> //
+			if(ar[ix].search(/<\w/) > -1 && ar[ix].search(/<\//) > -1) {
+				str = !inComment ? str += this.shift[deep]+ar[ix] : str += ar[ix];
+			} else 
+			// </elm> //
+			if(ar[ix].search(/<\//) > -1) { 
+				str = !inComment ? str += this.shift[--deep]+ar[ix] : str += ar[ix];
+			} else 
+			// <elm/> //
+			if(ar[ix].search(/\/>/) > -1 ) { 
+				str = !inComment ? str += this.shift[deep]+ar[ix] : str += ar[ix];
+			} else 
+			// <? xml ... ?> //
+			if(ar[ix].search(/<\?/) > -1) { 
+				str += this.shift[deep]+ar[ix];
+			} else 
+			// xmlns //
+			if( ar[ix].search(/xmlns\:/) > -1  || ar[ix].search(/xmlns\=/) > -1) { 
+				str += this.shift[deep]+ar[ix];
+			} 
+			
+			else {
+				str += ar[ix];
+			}
+		}
+		
+	return  (str[0] == '\n') ? str.slice(1) : str;
 }
 
 // ----------------------- JSON section ----------------------------------------------------
 
 pp.prototype.json = function(text) {
 
-  if ( typeof text === "string" ) {
-    return JSON.stringify(JSON.parse(text), null, this.step);
-  }
-  if ( typeof text === "object" ) {
-    return JSON.stringify(text, null, this.step);
-  }
-  return null;
+	if ( typeof text === "string" ) {
+		return JSON.stringify(JSON.parse(text), null, this.step);
+	}
+	if ( typeof text === "object" ) {
+		return JSON.stringify(text, null, this.step);
+	}
+	return null;
 }
 
 // ----------------------- CSS section ----------------------------------------------------
 
 pp.prototype.css = function(text) {
 
-  var ar = text.replace(/\s{1,}/g,' ')
-        .replace(/\{/g,"{~::~")
-        .replace(/\}/g,"~::~}~::~")
-        .replace(/\;/g,";~::~")
-        .replace(/\/\*/g,"~::~/*")
-        .replace(/\*\//g,"*/~::~")
-        .replace(/~::~\s{0,}~::~/g,"~::~")
-        .split('~::~'),
-    len = ar.length,
-    deep = 0,
-    str = '',
-    ix = 0;
-    
-    for(ix=0;ix<len;ix++) {
+	var ar = text.replace(/\s{1,}/g,' ')
+				.replace(/\{/g,"{~::~")
+				.replace(/\}/g,"~::~}~::~")
+				.replace(/\;/g,";~::~")
+				.replace(/\/\*/g,"~::~/*")
+				.replace(/\*\//g,"*/~::~")
+				.replace(/~::~\s{0,}~::~/g,"~::~")
+				.split('~::~'),
+		len = ar.length,
+		deep = 0,
+		str = '',
+		ix = 0;
+		
+		for(ix=0;ix<len;ix++) {
 
-      if( /\{/.exec(ar[ix]))  { 
-        str += this.shift[deep++]+ar[ix];
-      } else 
-      if( /\}/.exec(ar[ix]))  { 
-        str += this.shift[--deep]+ar[ix];
-      } else
-      if( /\*\\/.exec(ar[ix]))  { 
-        str += this.shift[deep]+ar[ix];
-      }
-      else {
-        str += this.shift[deep]+ar[ix];
-      }
-    }
-    return str.replace(/^\n{1,}/,'');
+			if( /\{/.exec(ar[ix]))  { 
+				str += this.shift[deep++]+ar[ix];
+			} else 
+			if( /\}/.exec(ar[ix]))  { 
+				str += this.shift[--deep]+ar[ix];
+			} else
+			if( /\*\\/.exec(ar[ix]))  { 
+				str += this.shift[deep]+ar[ix];
+			}
+			else {
+				str += this.shift[deep]+ar[ix];
+			}
+		}
+		return str.replace(/^\n{1,}/,'');
 }
 
 // ----------------------- SQL section ----------------------------------------------------
@@ -13946,13 +13946,13 @@ pp.prototype.sql = function(text) {
 
 pp.prototype.xmlmin = function(text, preserveComments) {
 
-  var str = preserveComments ? text
-           : text.replace(/\<![ \r\n\t]*(--([^\-]|[\r\n]|-[^\-])*--[ \r\n\t]*)\>/g,"");
-  return  str.replace(/>\s{0,}</g,"><"); 
+	var str = preserveComments ? text
+				   : text.replace(/\<![ \r\n\t]*(--([^\-]|[\r\n]|-[^\-])*--[ \r\n\t]*)\>/g,"");
+	return  str.replace(/>\s{0,}</g,"><"); 
 }
 
 pp.prototype.jsonmin = function(text) {
-                  
+								  
     return  text.replace(/\s{0,}\{\s{0,}/g,"{")
                 .replace(/\s{0,}\[$/g,"[")
                 .replace(/\[\s{0,}/g,"[")
@@ -13970,16 +13970,16 @@ pp.prototype.jsonmin = function(text) {
 }
 
 pp.prototype.cssmin = function(text, preserveComments) {
-  
-  var str = preserveComments ? text
-           : text.replace(/\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g,"") ;
-  return str.replace(/\s{1,}/g,' ')
-        .replace(/\{\s{1,}/g,"{")
-        .replace(/\}\s{1,}/g,"}")
-        .replace(/\;\s{1,}/g,";")
-        .replace(/\/\*\s{1,}/g,"/*")
-        .replace(/\*\/\s{1,}/g,"*/");
-} 
+	
+	var str = preserveComments ? text
+				   : text.replace(/\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g,"") ;
+	return str.replace(/\s{1,}/g,' ')
+			  .replace(/\{\s{1,}/g,"{")
+			  .replace(/\}\s{1,}/g,"}")
+			  .replace(/\;\s{1,}/g,";")
+			  .replace(/\/\*\s{1,}/g,"/*")
+			  .replace(/\*\/\s{1,}/g,"*/");
+}	
 
 pp.prototype.sqlmin = function(text) {
     return text.replace(/\s{1,}/g," ").replace(/\s{1,}\(/,"(").replace(/\s{1,}\)/,")");
@@ -13987,7 +13987,7 @@ pp.prototype.sqlmin = function(text) {
 
 // --------------------------------------------------------------------------------------------
 
-exports.pd= new pp; 
+exports.pd= new pp;	
 
 
 
@@ -18404,394 +18404,402 @@ var Note = require('./Note.js').Note;
 
 var searchResults = [];
 
-var Notepad = function(title) {
-  this.title = title;
-  this.sections = [];
+var Notepad = function(title, lastModified) {
+	this.title = title;
+	this.sections = [];
+
+	if (lastModified) {
+		this.lastModified = lastModified;
+	}
+	else {
+		this.lastModified = new Date();
+	}
 }
 Notepad.prototype.addSection = function(section) {
-  section.parent = this;
-  this.sections.push(section);
+	section.parent = this;
+	this.sections.push(section);
 }
 Notepad.prototype.search = function(query) {
-  searchResults = [];
-  for (s in this.sections) {
-    var section = this.sections[s];
-    Array.prototype.push.apply(searchResults, section.search(query));
-  }
+	searchResults = [];
+	for (s in this.sections) {
+		var section = this.sections[s];
+		Array.prototype.push.apply(searchResults, section.search(query));
+	}
 
-  return searchResults;
+	return searchResults;
 }
 Notepad.prototype.toXMLObject = function() {
-  var parseableNotepad = {
-    notepad: {
-      $: {
-        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-        'xsi:noNamespaceSchemaLocation': 'https://nick.geek.nz/projects/uPad/schema.xsd',
-        title: this.title
-      },
-      section: []
-    }
-  }
+	var parseableNotepad = {
+		notepad: {
+			$: {
+				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+				'xsi:noNamespaceSchemaLocation': 'https://nick.geek.nz/projects/uPad/schema.xsd',
+				title: this.title,
+				lastModified: moment().format()
+			},
+			section: []
+		}
+	}
 
-  for (k in this.sections) {
-    parseableNotepad.notepad.section.push(this.sections[k].toXMLObject().section);
-  }
+	for (k in this.sections) {
+		parseableNotepad.notepad.section.push(this.sections[k].toXMLObject().section);
+	}
 
-  return parseableNotepad;
+	return parseableNotepad;
 }
 Notepad.prototype.toXML = function() {
-  var builder = new xml2js.Builder({
-    allowSurrogateChars: true,
-    headless: false,
-    xmldec: {
-      version: '1.0',
-      encoding: 'UTF-8',
-      'standalone': false
-    },
-    cdata: true
-  });
-  return builder.buildObject(this.toXMLObject());
+	var builder = new xml2js.Builder({
+		allowSurrogateChars: true,
+		headless: false,
+		xmldec: {
+			version: '1.0',
+			encoding: 'UTF-8',
+			'standalone': false
+		},
+		cdata: true
+	});
+	return builder.buildObject(this.toXMLObject());
 }
 Notepad.prototype.toString = function() {
 
 }
 
 var Section = function(title) {
-  this.parent = undefined;
-  this.title = title;
-  this.sections = [];
-  this.notes = [];
+	this.parent = undefined;
+	this.title = title;
+	this.sections = [];
+	this.notes = [];
 };
 Section.prototype.addSection = function(section) {
-  section.parent = this;
-  this.sections.push(section);
+	section.parent = this;
+	this.sections.push(section);
 };
 Section.prototype.addNote = function(note) {
-  note.parent = this;
-  this.notes.push(note);
+	note.parent = this;
+	this.notes.push(note);
 };
 Section.prototype.search = function(query) {
-  var res = [];
-  for (n in this.notes) {
-    var note = this.notes[n];
-    var searchRes = note.search(query);
-    if (searchRes) {
-      res.push(searchRes);
-    }
-  }
+	var res = [];
+	for (n in this.notes) {
+		var note = this.notes[n];
+		var searchRes = note.search(query);
+		if (searchRes) {
+			res.push(searchRes);
+		}
+	}
 
-  for (s in this.sections) {
-    Array.prototype.push.apply(searchResults, this.sections[s].search(query));
-  }
+	for (s in this.sections) {
+		Array.prototype.push.apply(searchResults, this.sections[s].search(query));
+	}
 
-  return res;
+	return res;
 }
 Section.prototype.toXMLObject = function() {
-  var parseableSection = {
-    section: {
-      $: {
-        title: this.title
-      },
-      section: [],
-      note: []
-    }
-  }
+	var parseableSection = {
+		section: {
+			$: {
+				title: this.title
+			},
+			section: [],
+			note: []
+		}
+	}
 
-  for (k in this.sections) {
-    parseableSection.section.section.push(this.sections[k].toXMLObject().section);
-  }
+	for (k in this.sections) {
+		parseableSection.section.section.push(this.sections[k].toXMLObject().section);
+	}
 
-  for (k in this.notes) {
-    parseableSection.section.note.push(this.notes[k].toXMLObject().note);
-  }
+	for (k in this.notes) {
+		parseableSection.section.note.push(this.notes[k].toXMLObject().note);
+	}
 
-  return parseableSection;
+	return parseableSection;
 }
 Section.prototype.toXML = function() {
-  var builder = new xml2js.Builder({
-    allowSurrogateChars: true,
-    headless: true,
-    cdata: true
-  });
-  return builder.buildObject(this.toXMLObject());
+	var builder = new xml2js.Builder({
+		allowSurrogateChars: true,
+		headless: true,
+		cdata: true
+	});
+	return builder.buildObject(this.toXMLObject());
 }
 
 var supportedAddons = [];
 exports.parse = function parse(xml, addons) {
-  supportedAddons = addons;
-  parseString(xml, {trim: true}, function(e, res) {
-    exports.notepad = new Notepad(res.notepad.$.title);
-    if (res.notepad.section) {
-      for (var i = 0; i < res.notepad.section.length; i++) {
-        var sectionXML = res.notepad.section[i];
-        var section = new Section(sectionXML.$.title);
+	supportedAddons = addons;
+	parseString(xml, {trim: true}, function(e, res) {
+		exports.notepad = new Notepad(res.notepad.$.title, res.notepad.$.lastModified);
+		if (res.notepad.section) {
+			for (var i = 0; i < res.notepad.section.length; i++) {
+				var sectionXML = res.notepad.section[i];
+				var section = new Section(sectionXML.$.title);
 
-        parseSection(sectionXML, section, exports.notepad);
-      }
-    }
-  });
+				parseSection(sectionXML, section, exports.notepad);
+			}
+		}
+	});
 }
 
 exports.parseFromEvernote = function parseFromEvernote(xml, addons) {
-  supportedAddons = addons;
-  parseString(xml, {trim: true, normalize: false}, function(e, res) {
-    exports.notepad = new Notepad("{0} Import ({1})".format(res['en-export'].$.application, moment(res['en-export'].$['export-date']).format('D MMM h:mmA')));
-    var section = new Section('Imported Notes');
-    var notes = res['en-export'].note;
-    for (var i = 0; i < notes.length; i++) {
-      var noteXML = notes[i];
-      var note = new Note(noteXML.title[0], moment(noteXML.created[0]).format(), supportedAddons);
+	supportedAddons = addons;
+	parseString(xml, {trim: true, normalize: false}, function(e, res) {
+		exports.notepad = new Notepad("{0} Import ({1})".format(res['en-export'].$.application, moment(res['en-export'].$['export-date']).format('D MMM h:mmA')));
+		var section = new Section('Imported Notes');
+		var notes = res['en-export'].note;
+		for (var i = 0; i < notes.length; i++) {
+			var noteXML = notes[i];
+			var note = new Note(noteXML.title[0], moment(noteXML.created[0]).format(), supportedAddons);
 
-      //Add the general note content
-      note.addElement('markdown', {
-        id: 'markdown1',
-        x: '10px',
-        y: '10px',
-        width: '600px',
-        height: 'auto',
-        fontSize: '16px'
-      }, enmlToMarkdown(pd.xml(noteXML.content[0])));
+			//Add the general note content
+			note.addElement('markdown', {
+				id: 'markdown1',
+				x: '10px',
+				y: '10px',
+				width: '600px',
+				height: 'auto',
+				fontSize: '16px'
+			}, enmlToMarkdown(pd.xml(noteXML.content[0])));
 
-      //Add attachments
-      var resources = noteXML.resource;
-      if (resources) {
-        var y = 10;
-        for (var j = 0; j < resources.length; j++) {
-          var resource = resources[j];
-          var id = 'file'+(j+1);
-          
-          if (note.elements[note.elements.length - 1].type === 'file') {
-            y = parseInt(note.elements[note.elements.length - 1].args.y) + 100;
-          }
+			//Add attachments
+			var resources = noteXML.resource;
+			if (resources) {
+				var y = 10;
+				for (var j = 0; j < resources.length; j++) {
+					var resource = resources[j];
+					var id = 'file'+(j+1);
+					
+					if (note.elements[note.elements.length - 1].type === 'file') {
+						y = parseInt(note.elements[note.elements.length - 1].args.y) + 100;
+					}
 
-          if (resource['resource-attributes'][0]['file-name']) {
-            var filename = resource['resource-attributes'][0]['file-name'][0];
-          }
-          else if (resource['resource-attributes'][0]['source-url']) {
-            var filename = resource['resource-attributes'][0]['source-url'][0].split('/').pop();
-          }
-          else {
-            var filename = id+'.'+resource.mime[0].split('/').pop();
-          }
+					if (resource['resource-attributes'][0]['file-name']) {
+						var filename = resource['resource-attributes'][0]['file-name'][0];
+					}
+					else if (resource['resource-attributes'][0]['source-url']) {
+						var filename = resource['resource-attributes'][0]['source-url'][0].split('/').pop();
+					}
+					else {
+						var filename = id+'.'+resource.mime[0].split('/').pop();
+					}
 
-          note.addElement('file', {
-            id: id,
-            x: '650px',
-            y: y+'px',
-            width: 'auto',
-            height: 'auto',
-            filename: filename
-          }, 'data:'+resource.mime[0]+';base64,'+resource.data[0]._.replace(/\r?\n|\r/g, ''));
-        }
-      }
+					note.addElement('file', {
+						id: id,
+						x: '650px',
+						y: y+'px',
+						width: 'auto',
+						height: 'auto',
+						filename: filename
+					}, 'data:'+resource.mime[0]+';base64,'+resource.data[0]._.replace(/\r?\n|\r/g, ''));
+				}
+			}
 
-      section.addNote(note);
-    }
-    exports.notepad.addSection(section);
-  });
+			section.addNote(note);
+		}
+		exports.notepad.addSection(section);
+	});
 }
 
 exports.createNotepad = function createNotepad(title) {
-  return new Notepad(title);
+	return new Notepad(title);
 }
 
 exports.createSection = function createSection(title) {
-  return new Section(title);
+	return new Section(title);
 }
 
 exports.createNote = function createNote(title, addons) {
-  return new Note(title, moment().format(), addons);
+	return new Note(title, moment().format(), addons);
 }
 
 exports.restoreNotepad = function restoreNotepad(obj) {
-  var restoredNotepad = new Notepad(obj.title);
-  for (k in obj.sections) {
-    var section = obj.sections[k];
-    restoredNotepad.addSection(exports.restoreSection(section));
-  }
+	var restoredNotepad = new Notepad(obj.title, obj.lastModified);
+	for (k in obj.sections) {
+		var section = obj.sections[k];
+		restoredNotepad.addSection(exports.restoreSection(section));
+	}
 
-  return restoredNotepad;
+	return restoredNotepad;
 }
 exports.restoreSection = function restoreSection(obj) {
-  var restoredSection = new Section(obj.title);
-  for (k in obj.sections) {
-    var section = obj.sections[k];
-    restoredSection.addSection(exports.restoreSection(section));
-  }
+	var restoredSection = new Section(obj.title);
+	for (k in obj.sections) {
+		var section = obj.sections[k];
+		restoredSection.addSection(exports.restoreSection(section));
+	}
 
-  for (k in obj.notes) {
-    var note = obj.notes[k];
-    restoredSection.addNote(exports.restoreNote(note));
-  }
+	for (k in obj.notes) {
+		var note = obj.notes[k];
+		restoredSection.addNote(exports.restoreNote(note));
+	}
 
-  return restoredSection;
+	return restoredSection;
 }
 exports.restoreNote = function restoreNote(obj) {
-  var restoredNote = new Note(obj.title, moment(obj.time).format(), obj.addons);
-  for (k in obj.bibliography) {
-    var source = obj.bibliography[k];
-    restoredNote.addSource(source.id, source.item, source.content);
-  }
+	var restoredNote = new Note(obj.title, moment(obj.time).format(), obj.addons);
+	for (k in obj.bibliography) {
+		var source = obj.bibliography[k];
+		restoredNote.addSource(source.id, source.item, source.content);
+	}
 
-  for (k in obj.elements) {
-    var element = obj.elements[k];
-    restoredNote.addElement(element.type, element.args, element.content);
-  }
+	for (k in obj.elements) {
+		var element = obj.elements[k];
+		restoredNote.addElement(element.type, element.args, element.content);
+	}
 
-  return restoredNote;
+	return restoredNote;
 }
 exports.xmlObjToXML = function xmlObjToXml(xmlObj) {
-  var builder = new xml2js.Builder({
-    allowSurrogateChars: true,
-    headless: false,
-    xmldec: {
-      version: '1.0',
-      encoding: 'UTF-8',
-      'standalone': false
-    },
-    cdata: true
-  });
-  return builder.buildObject(xmlObj);
+	var builder = new xml2js.Builder({
+		allowSurrogateChars: true,
+		headless: false,
+		xmldec: {
+			version: '1.0',
+			encoding: 'UTF-8',
+			'standalone': false
+		},
+		cdata: true
+	});
+	return builder.buildObject(xmlObj);
 }
 
 function parseSection(sectionXML, section, parent) {
-  for (var k in sectionXML) {
-    if (typeof sectionXML[k] !== 'function') {
-      var v = sectionXML[k];
+	for (var k in sectionXML) {
+		if (typeof sectionXML[k] !== 'function') {
+			var v = sectionXML[k];
 
-      switch (k) {
-        case "note":
-          for (var i = 0; i < v.length; i++) {
-            var noteXML = v[i];
+			switch (k) {
+				case "note":
+					for (var i = 0; i < v.length; i++) {
+						var noteXML = v[i];
 
-            var title = noteXML.$.title;
-            var time = noteXML.$.time;
-            var addons = [];
-            if (noteXML.addons[0].import) {
-              for (var j = noteXML.addons[0].import.length - 1; j >= 0; j--) {
-                var addon = noteXML.addons[0].import[j];
-                if (supportedAddons.indexOf(addon) == -1) console.log("This note contains some features that aren't supported: "+addon);
-                addons.push(addon);
-              }
-            }
+						var title = noteXML.$.title;
+						var time = noteXML.$.time;
+						var addons = [];
+						if (noteXML.addons[0].import) {
+							for (var j = noteXML.addons[0].import.length - 1; j >= 0; j--) {
+								var addon = noteXML.addons[0].import[j];
+								if (supportedAddons.indexOf(addon) == -1) console.log("This note contains some features that aren't supported: "+addon);
+								addons.push(addon);
+							}
+						}
 
-            var note = new Note(title, time, addons);
+						var note = new Note(title, time, addons);
 
-            if (noteXML.bibliography[0].source) {
-              for (var l = noteXML.bibliography[0].source.length - 1; l >= 0; l--) {
-                var source = noteXML.bibliography[0].source[l];
-                note.addSource(source.$.id, source.$.item, source._);
-              }
-            }
+						if (noteXML.bibliography[0].source) {
+							for (var l = noteXML.bibliography[0].source.length - 1; l >= 0; l--) {
+								var source = noteXML.bibliography[0].source[l];
+								note.addSource(source.$.id, source.$.item, source._);
+							}
+						}
 
-            if (noteXML.markdown) {
-              for (var j = 0; j < noteXML.markdown.length; j++) {
-                var element = noteXML.markdown[j];
-                note.addElement("markdown", element.$, element._);
-              }
-            }
+						if (noteXML.markdown) {
+							for (var j = 0; j < noteXML.markdown.length; j++) {
+								var element = noteXML.markdown[j];
+								note.addElement("markdown", element.$, element._);
+							}
+						}
 
-            if (noteXML.drawing) {
-              for (var j = 0; j < noteXML.drawing.length; j++) {
-                var element = noteXML.drawing[j];
-                note.addElement("drawing", element.$, element._);
-              }
-            }
+						if (noteXML.drawing) {
+							for (var j = 0; j < noteXML.drawing.length; j++) {
+								var element = noteXML.drawing[j];
+								note.addElement("drawing", element.$, element._);
+							}
+						}
 
-            if (noteXML.image) {
-              for (var j = 0; j < noteXML.image.length; j++) {
-                var element = noteXML.image[j];
-                note.addElement("image", element.$, element._);
-              }
-            }
+						if (noteXML.image) {
+							for (var j = 0; j < noteXML.image.length; j++) {
+								var element = noteXML.image[j];
+								note.addElement("image", element.$, element._);
+							}
+						}
 
-            if (noteXML.file) {
-              for (var j = 0; j < noteXML.file.length; j++) {
-                var element = noteXML.file[j];
-                note.addElement("file", element.$, element._);
-              }
-            }
+						if (noteXML.file) {
+							for (var j = 0; j < noteXML.file.length; j++) {
+								var element = noteXML.file[j];
+								note.addElement("file", element.$, element._);
+							}
+						}
 
-            if (noteXML.recording) {
-              for (var j = 0; j < noteXML.recording.length; j++) {
-                var element = noteXML.recording[j];
-                note.addElement("recording", element.$, element._);
-              }
-            }
+						if (noteXML.recording) {
+							for (var j = 0; j < noteXML.recording.length; j++) {
+								var element = noteXML.recording[j];
+								note.addElement("recording", element.$, element._);
+							}
+						}
 
-            section.addNote(note);
-          }
-          break;
+						section.addNote(note);
+					}
+					break;
 
-        case "section":
-          for (var i = 0; i < v.length; i++) {
-            var subsectionXML = v[i];
-            parseSection(subsectionXML, new Section(subsectionXML.$.title), section);
-          }
-          break;
-      }
-    }
-  }
+				case "section":
+					for (var i = 0; i < v.length; i++) {
+						var subsectionXML = v[i];
+						parseSection(subsectionXML, new Section(subsectionXML.$.title), section);
+					}
+					break;
+			}
+		}
+	}
 
-  parent.addSection(section);
+	parent.addSection(section);
 }
 
 function enmlToMarkdown(enml) {
-  var lineArr = enml.split('\n');
-  lineArr = lineArr.slice(3, lineArr.length-1);
-  var html = [];
-  for (var i = 0; i < lineArr.length; i++) {
-    var line = lineArr[i].trim();
-    html.push(line);
-  }
+	var lineArr = enml.split('\n');
+	lineArr = lineArr.slice(3, lineArr.length-1);
+	var html = [];
+	for (var i = 0; i < lineArr.length; i++) {
+		var line = lineArr[i].trim();
+		html.push(line);
+	}
 
-  html = html.join('\n');
-  return toMarkdown(html, {
-    gfm: true,
-    converters: [
-      {
-        filter: 'div',
-        replacement: function(content) {
-          return '\n\n'+content+'\n\n';
-        }
-      },
-      {
-        filter: 'en-media',
-        replacement: function(content) {
-          return '`<there was an attachment here>`';
-        }
-      },
-      {
-        filter: 'en-todo',
-        replacement: function(content, node) {
-          var checkStr = '';
-          if (node.getAttributeNode('checked')) {
-            if (node.getAttributeNode('checked').value == 'true') checkStr = 'x';
-          }
-          return '- [{0}] {1}'.format(checkStr, content);
-        }
-      },
-      {
-        filter: 'en-crypt',
-        replacement: function(content) {
-          return '`<there was encrypted text here>`';
-        }
-      }
-    ]
-  });
+	html = html.join('\n');
+	return toMarkdown(html, {
+		gfm: true,
+		converters: [
+			{
+				filter: 'div',
+				replacement: function(content) {
+					return '\n\n'+content+'\n\n';
+				}
+			},
+			{
+				filter: 'en-media',
+				replacement: function(content) {
+					return '`<there was an attachment here>`';
+				}
+			},
+			{
+				filter: 'en-todo',
+				replacement: function(content, node) {
+					var checkStr = '';
+					if (node.getAttributeNode('checked')) {
+						if (node.getAttributeNode('checked').value == 'true') checkStr = 'x';
+					}
+					return '- [{0}] {1}'.format(checkStr, content);
+				}
+			},
+			{
+				filter: 'en-crypt',
+				replacement: function(content) {
+					return '`<there was encrypted text here>`';
+				}
+			}
+		]
+	});
 }
 
 // Thanks to http://stackoverflow.com/a/4673436/998467
 if (!String.prototype.format) {
-  String.prototype.format = function() {
-    var args = arguments;
-    return this.replace(/{(\d+)}/g, function(match, number) { 
-      return typeof args[number] != 'undefined'
-        ? args[number]
-        : match
-      ;
-    });
-  };
+	String.prototype.format = function() {
+		var args = arguments;
+		return this.replace(/{(\d+)}/g, function(match, number) { 
+			return typeof args[number] != 'undefined'
+				? args[number]
+				: match
+			;
+		});
+	};
 }
 },{"./Note.js":28,"moment":165,"pretty-data":166,"to-markdown":168,"xml2js":175}]},{},[193])(193)
 });

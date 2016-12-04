@@ -8,9 +8,16 @@ var Note = require('./Note.js').Note;
 
 var searchResults = [];
 
-var Notepad = function(title) {
+var Notepad = function(title, lastModified) {
 	this.title = title;
 	this.sections = [];
+
+	if (lastModified) {
+		this.lastModified = lastModified;
+	}
+	else {
+		this.lastModified = new Date();
+	}
 }
 Notepad.prototype.addSection = function(section) {
 	section.parent = this;
@@ -31,7 +38,8 @@ Notepad.prototype.toXMLObject = function() {
 			$: {
 				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
 				'xsi:noNamespaceSchemaLocation': 'https://nick.geek.nz/projects/uPad/schema.xsd',
-				title: this.title
+				title: this.title,
+				lastModified: moment().format()
 			},
 			section: []
 		}
@@ -124,7 +132,7 @@ var supportedAddons = [];
 exports.parse = function parse(xml, addons) {
 	supportedAddons = addons;
 	parseString(xml, {trim: true}, function(e, res) {
-		exports.notepad = new Notepad(res.notepad.$.title);
+		exports.notepad = new Notepad(res.notepad.$.title, res.notepad.$.lastModified);
 		if (res.notepad.section) {
 			for (var i = 0; i < res.notepad.section.length; i++) {
 				var sectionXML = res.notepad.section[i];
@@ -208,7 +216,7 @@ exports.createNote = function createNote(title, addons) {
 }
 
 exports.restoreNotepad = function restoreNotepad(obj) {
-	var restoredNotepad = new Notepad(obj.title);
+	var restoredNotepad = new Notepad(obj.title, obj.lastModified);
 	for (k in obj.sections) {
 		var section = obj.sections[k];
 		restoredNotepad.addSection(exports.restoreSection(section));

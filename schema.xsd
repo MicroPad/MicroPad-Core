@@ -47,8 +47,9 @@
 		<xs:sequence>
 			<xs:element type="sectionType" name="section" maxOccurs="unbounded" minOccurs="0"/>
 		</xs:sequence>
-		<xs:attribute type="xs:string" name="title"/>
-	</xs:complexType>
+		<xs:attribute type="xs:string" name="title" use="required" />
+		<xs:attribute type="xs:dateTime" name="lastModified" use="optional" />
+	</xs:complexType> 
 	<xs:complexType name="sourceType">
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
