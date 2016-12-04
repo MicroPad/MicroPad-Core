@@ -1,4 +1,4 @@
-var notepad;
+﻿var notepad;
 var parents = [];
 var note;
 var noteID;

@@ -62,7 +62,6 @@
     <AppxManifest Include="package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <Content Include="css\libs\jquery.modal.min.css" />
     <Content Include="css\materialize.min.css" />
     <Content Include="css\notepadStyle.css" />
     <Content Include="default.html" />

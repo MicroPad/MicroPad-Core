@@ -86,7 +86,7 @@ $(document).ready(function () {
 	//TODO: Check if we're using a different working dir before doing this
 	appStorage.getItem('storageDir').then(function(res) {
 		if (res === null) {
-			Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
+			Windows.Storage.ApplicationData.current.localFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
 				appStorage.setItem('storageDir', f.path, function() {
 					storageDir = f.path;
 					refreshStorageDir();
@@ -98,7 +98,7 @@ $(document).ready(function () {
 			refreshStorageDir();
 		}
 	}).catch(function(err) {
-		Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
+		Windows.Storage.ApplicationData.current.localFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
 			appStorage.setItem('storageDir', f.path, function() {
 				storageDir = f.path;
 				refreshStorageDir();
@@ -122,7 +122,7 @@ function refreshStorageDir() {
 		});
 	}, function(err) {
 		alert("Error accessing storage folder. Reverting to default: {0}".format(err));
-		appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
+		appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.localFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
 			storageDir = f.path;
 			refreshStorageDir();
 		}));
@@ -161,11 +161,8 @@ function updateNotepadList() {
 		});
 		isUpdating = false;
 	}, function (err) {
-		alert("Error accessing storage folder. Reverting to default: {0}".format(err));
-		appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.roamingFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
-			storageDir = f.path;
-			refreshStorageDir();
-		}));
+		alert("Error accessing storage folder: {0}".format(err));
+		changeStorageLocation();
 	});
 }
 
