@@ -1483,6 +1483,7 @@ syncWorker.onmessage = function(event) {
 						window.initNotepad();
 						$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
 					}
+					saveToBrowser();
 				});
 			}
 			break;
