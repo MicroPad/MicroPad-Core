@@ -16,7 +16,7 @@ var Notepad = function(title, lastModified) {
 		this.lastModified = lastModified;
 	}
 	else {
-		this.lastModified = new Date();
+		this.lastModified = moment().format();
 	}
 }
 Notepad.prototype.addSection = function(section) {
@@ -39,7 +39,7 @@ Notepad.prototype.toXMLObject = function() {
 				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
 				'xsi:noNamespaceSchemaLocation': 'https://nick.geek.nz/projects/uPad/schema.xsd',
 				title: this.title,
-				lastModified: moment().format()
+				lastModified: this.lastModified
 			},
 			section: []
 		}

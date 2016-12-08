@@ -18412,7 +18412,7 @@ var Notepad = function(title, lastModified) {
     this.lastModified = lastModified;
   }
   else {
-    this.lastModified = new Date();
+    this.lastModified = moment().format();
   }
 }
 Notepad.prototype.addSection = function(section) {

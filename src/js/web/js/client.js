@@ -599,6 +599,7 @@ window.initNotepad = function() {
 	$('#s-dd').css('pointer-events', 'auto');
 	$('#search-link').css('color', '#fff');
 	$('#search-link').css('pointer-events', 'auto');
+	$('#notepadTitle').html(notepad.title);
 	updateInstructions();
 
 	appStorage.getItem('syncToken', function(err, res) {
@@ -1236,6 +1237,9 @@ function saveToBrowser(retry) {
 		but only Chrome and Opera support it. For now I'll use IndexedDB with a sneaky async library.
 	 */
 	$('.save-status').html('Saving&hellip;');
+	notepad.lastModified = moment().format();
+	msHasNotepad();
+
 	$('#viewer ul').each(function(i) {
 		$(this).addClass('browser-default')
 	});
@@ -1252,6 +1256,14 @@ function loadFromBrowser(title) {
 	notepadStorage.getItem(title, function(err, res) {
 		notepad = parser.restoreNotepad(res);
 		window.initNotepad();
+
+		getXmlObject(function(xmlObj) {
+			syncWorker.postMessage({
+				req: "setOld",
+				xmlObj: xmlObj
+			});
+			msHasNotepad();
+		});
 	});
 }
 
@@ -1380,10 +1392,15 @@ syncWorker.onmessage = function(event) {
 		case "hasAddedNotepad":
 			var isTrue = (msg.text === 'true');
 			if (isTrue) {
-				$('#parents > span:first-child').append(' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+				$('#not-syncing-pitch').hide();
+				$('#sync-options').show();
+				msSync();
 			}
 			else {
-				$('#parents > span:first-child').append(' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Enable µSync</a>)');
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Enable µSync</a>)');
+				$('#not-syncing-pitch').show();
+				$('#sync-options').hide();
 			}
 			break;
 
@@ -1399,16 +1416,74 @@ syncWorker.onmessage = function(event) {
 
 		case "login":
 			if (msg.code === 200) {
-				appStorage.setItem('syncToken', msg.text);
-				syncWorker.postMessage({
-					syncURL: window.syncURL,
-					req: "hasAddedNotepad",
-					token: msg.text,
-					filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''))
+				appStorage.setItem('syncToken', msg.text, function() {
+					window.location.reload();
 				});
 			}
 			else {
 				alert(msg.text);
+			}
+			break;
+
+		case "addNotepad":
+			if (msg.code === 201) {
+				window.location.reload();
+			}
+			else {
+				alert("Notepad already exists");
+			}
+			break;
+
+		case "sync":
+			if (msg.code === 200) {
+				if (msg.text.length === 0) {
+					$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+					return;
+				}
+				var res = JSON.parse(msg.text);
+				switch (res.type) {
+					case "upload":
+						getXmlObject(function(xmlObj) {
+							syncWorker.postMessage({
+								req: "upload",
+								notepad: xmlObj,
+								url: res.url
+							});
+						});
+						break;
+
+					case "download":
+						syncWorker.postMessage({
+							req: "download",
+							url: res.url
+						});
+						break;
+				}
+			}
+			else {
+				if (msg.text !== "Notepads are unprocessable if they have not been added") alert(msg.text);
+			}
+			break;
+
+		case "upload":
+			if (msg.code === 200) {
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+			}
+			break;
+
+		case "download":
+			if (msg.code === 200) {
+				if (msg.text.length === 0) return;
+				confirmAsync("A newer version of this notepad has been synced. Do you want to use it?").then(function(answer){
+					if (answer) {
+						parser.parse(msg.text, ["asciimath"]);
+						while (!parser.notepad) if (parser.notepad) break;
+						notepad = parser.notepad;
+
+						window.initNotepad();
+						$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+					}
+				});
 			}
 			break;
 	}
@@ -1426,6 +1501,54 @@ function msLogin(type) {
 		username: un,
 		password: pw
 	});
+}
+
+function msAddNotepad() {
+	appStorage.getItem('syncToken', function(err, res) {
+		if (err || res === null) return;
+
+		syncWorker.postMessage({
+			syncURL: window.syncURL,
+			req: 'addNotepad',
+			token: res,
+			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
+			lastModified: notepad.lastModified
+		});
+	});
+}
+
+function msSync() {
+	appStorage.getItem('syncToken', function(err, res) {
+		if (err || res === null) return;
+
+		$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Syncing&hellip;</a>)');
+		syncWorker.postMessage({
+			syncURL: window.syncURL,
+			req: 'sync',
+			token: res,
+			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
+			lastModified: notepad.lastModified
+		});
+	});
+}
+
+function msHasNotepad() {
+	appStorage.getItem('syncToken', function(err, res) {
+		if (err || res === null) return;
+
+		syncWorker.postMessage({
+			syncURL: window.syncURL,
+			req: "hasAddedNotepad",
+			token: res,
+			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''))
+		});
+	});
+}
+
+function getXmlObject(callback) {
+	setTimeout(function() {
+		callback(notepad.toXMLObject());
+	}, 0);
 }
 
 /** Utility functions */
