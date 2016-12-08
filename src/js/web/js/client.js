@@ -613,7 +613,7 @@ window.initNotepad = function() {
 			});
 		}
 		else {
-			$('#parents > span:first-child').append(' (<a href="#!" onclick="$(\'#login\').modal(\'open\')">Enable µSync</a>)');
+			$('#parents > span:first-child').append(' (<a href="#!" onclick="$(\'#login\').modal(\'open\')">Connect to µSync</a>)');
 		}
 	});
 
@@ -1378,22 +1378,50 @@ syncWorker.onmessage = function(event) {
 
 	switch (msg.req) {
 		case "hasAddedNotepad":
+			var isTrue = (msg.text === 'true');
+			if (isTrue) {
+				$('#parents > span:first-child').append(' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+			}
+			else {
+				$('#parents > span:first-child').append(' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Enable µSync</a>)');
+			}
 			break;
 
 		case "signup":
+			if (msg.code === 201) {
+				alert("Account Created! Login to get started.");
+				$('#login').modal('open');
+			}
+			else {
+				alert(msg.text);
+			}
 			break;
 
 		case "login":
-			console.log(msg.code);
+			if (msg.code === 200) {
+				appStorage.setItem('syncToken', msg.text);
+				syncWorker.postMessage({
+					syncURL: window.syncURL,
+					req: "hasAddedNotepad",
+					token: msg.text,
+					filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''))
+				});
+			}
+			else {
+				alert(msg.text);
+			}
 			break;
 	}
 }
 
 function msLogin(type) {
 	var un = $('#username-input').val();
+	$('#username-input').val('');
 	var pw = $('#password-input').val();
+	$('#password-input').val('');
 
 	syncWorker.postMessage({
+		syncURL: window.syncURL,
 		req: type,
 		username: un,
 		password: pw
