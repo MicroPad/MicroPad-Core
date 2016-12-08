@@ -8,6 +8,7 @@ var canvasCtx = undefined;
 var rec = new Recorder();
 var wasMobile = isMobile();
 var stillLoading = false;
+var syncWorker = new Worker('js/syncWorker.js');
 
 /** Setup localforage */
 var notepadStorage = localforage.createInstance({
