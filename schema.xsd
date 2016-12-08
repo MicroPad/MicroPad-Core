@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="notepad" type="notepadType"/>
+	<xs:complexType name="markdownType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="id" use="required"/>
+				<xs:attribute type="xs:string" name="x" use="required"/>
+				<xs:attribute type="xs:string" name="y" use="required"/>
+				<xs:attribute type="xs:string" name="width" use="required"/>
+				<xs:attribute type="xs:string" name="height" use="required"/>
+				<xs:attribute type="xs:string" name="fontSize" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="noteType">
+		<xs:sequence>
+			<xs:element type="addonsType" name="addons"/>
+			<xs:element name="bibliography">
+				<xs:complexType mixed="true">
+					<xs:sequence>
+						<xs:element type="sourceType" name="source" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element type="markdownType" name="markdown" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element type="drawingType" name="drawing" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element type="recordingType" name="recording" minOccurs="0"/>
+			<xs:element type="imageType" name="image" minOccurs="0"/>
+			<xs:element type="fileType" name="file" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="title" use="required"/>
+		<xs:attribute type="xs:dateTime" name="time" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="drawingType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="id" use="required"/>
+				<xs:attribute type="xs:string" name="x" use="required"/>
+				<xs:attribute type="xs:string" name="y" use="required"/>
+				<xs:attribute type="xs:string" name="width" use="required"/>
+				<xs:attribute type="xs:string" name="height" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="notepadType">
+		<xs:sequence>
+			<xs:element type="sectionType" name="section" maxOccurs="unbounded" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="title" use="required" />
+		<xs:attribute type="xs:dateTime" name="lastModified" use="optional" />
+	</xs:complexType> 
+	<xs:complexType name="sourceType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:byte" name="id"/>
+				<xs:attribute type="xs:string" name="item"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="recordingType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="id"/>
+				<xs:attribute type="xs:string" name="x"/>
+				<xs:attribute type="xs:string" name="y"/>
+				<xs:attribute type="xs:string" name="width"/>
+				<xs:attribute type="xs:string" name="height"/>
+				<xs:attribute type="xs:string" name="filename"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="addonsType" mixed="true">
+		<xs:sequence>
+			<xs:element type="xs:string" name="import" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="bibliographyType">
+		<xs:sequence>
+			<xs:element type="sourceType" name="source" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="sectionType">
+		<xs:sequence>
+			<xs:element type="sectionType" name="section" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element type="noteType" name="note" maxOccurs="unbounded" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="title" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="imageType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="id" use="required"/>
+				<xs:attribute type="xs:string" name="x" use="required"/>
+				<xs:attribute type="xs:string" name="y" use="required"/>
+				<xs:attribute type="xs:string" name="width" use="required"/>
+				<xs:attribute type="xs:string" name="height" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="fileType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="id"/>
+				<xs:attribute type="xs:string" name="x"/>
+				<xs:attribute type="xs:string" name="y"/>
+				<xs:attribute type="xs:string" name="width"/>
+				<xs:attribute type="xs:string" name="height"/>
+				<xs:attribute type="xs:string" name="filename"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+</xs:schema>

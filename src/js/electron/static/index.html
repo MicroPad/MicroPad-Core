@@ -1,0 +1,344 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>µPad</title>
+
+	<link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+	<link rel="stylesheet" type="text/css" href="css/notepadStyle.css">
+</head>
+<body class="win-type-body">
+	<div id="loadedContent">
+		<nav class="blue-grey noselect" style="box-shadow: none; z-index: 110; padding-bottom: 65px;">
+			<div class="nav-wrapper" style="z-index: 110;">
+				<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
+				<ul class="left">
+					<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em style="font-weight: 100; font-size: 1rem;">α</em></span>
+				</ul>
+
+				<ul id="nav-desktop" class="right hide-on-med-and-down">
+					<li class="save-status"></li>
+					<li><a id="np-dd" class="dropdown-button" href="#!"><i class="material-icons left">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
+					<li><a id="s-dd" class="dropdown-button" href="#!"><i class="material-icons left">book</i>Sections<i class="material-icons right">arrow_drop_down</i></a></li>
+					<li><a id="n-dd" class="dropdown-button" href="#!"><i class="material-icons left">note</i>Notes<i class="material-icons right">arrow_drop_down</i></a></li>
+					<li id="search-button"><a id="search-link" href="#!" class="modal-trigger" data-target="search"><i class="material-icons left">search</i>Search</a></li>
+				</ul>
+			</div>
+		</nav>
+
+		<!-- Breadcrumbs -->
+		<nav id="breadcrumb-holder" class="blue-grey noselect" style="top: 64px; z-index: 100;">
+			<div class="nav-wrapper" style="z-index: 100;">
+				<div id="parents" class="col s12" style="padding-left: 10px;">
+					<span id="open-note" class="breadcrumb display-with-note" style="display: none;"></span>
+				</div>
+			</div>
+		</nav>
+
+		<!-- Sidenav -->
+		<ul id="menu" class="side-nav menu-button noselect">
+			<div class="hide-on-large-only">
+				<li class="save-status"></li>
+				<li><a id="mob-np-dd" class="dropdown-button" href="#!"><i class="material-icons">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
+				<li><a id="mob-s-dd" class="dropdown-button" href="#!"><i class="material-icons">book</i>Sections<i class="material-icons right">arrow_drop_down</i></a></li>
+				<li><a id="mob-n-dd" class="dropdown-button" href="#!"><i class="material-icons">note</i>Notes<i class="material-icons right">arrow_drop_down</i></a></li>
+				<li id="search-button"><a href="#!" class="modal-trigger" data-target="search"><i class="material-icons">search</i>Search</a></li>
+				<li><div class="divider"></div></li>
+			</div>
+			<div class="display-with-note">
+				<li><a href="javascript:zoom(true);" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">zoom_in</i> Zoom In</a></li>
+				<li><a href="javascript:zoom(false);" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">zoom_out</i> Zoom Out</a></li>
+				<li><div class="divider"></div></li>
+			</div>
+			<div id="sidenav-options">
+				<li><strong>Options</strong></li>
+				<li><input id="title-input" type="text" placeholder="Title" /></li>
+				<li><a href="javascript:updateTitle();" class="btn green waves-effect waves-light">Update Title</a></li>
+				<li><a href="javascript:deleteOpen();" class="btn red waves-effect waves-light"><i class="material-icons left" style="color: #fff;">delete_forever</i> Delete <span id="open-type"></span></a></li>
+				<li><div class="divider"></div></li>
+			</div>
+			<li>Notepad Location:<br /></li>
+			<li style="margin-top: -20px;"><pre id="workingDir" style="word-break: keep-all; overflow-x: auto; -ms-user-select: element;"></pre></li>
+			<li><a href="javascript:changeStorageLocation();" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">folder</i>Change Location</a></li>
+		</ul>
+
+		<div style="width: 100%; height: 100%; position: relative; z-index: 50;">
+			<!-- Notepads -->
+			<ul id="notepad-dropdown" class="dropdown-content">
+				<li><a class="modal-trigger" data-target="new-notepad"><i class="material-icons left">add</i>New</a></li>
+				<li class="divider"></li>
+				<div id="notepadList"></div>
+			</ul>
+
+			<!-- Sections -->
+			<ul id="section-dropdown" class="dropdown-content">
+				<li id="add-section-link" style="display: none"><a class="modal-trigger" data-target="new-section"><i class="material-icons left">add</i>Section</a></li>
+				<li class="divider"></li>
+				<div id="sectionList"></div>
+			</ul>
+
+			<!-- Notes -->
+			<ul id="notes-dropdown" class="dropdown-content">
+				<li id="add-note-link" style="display: none"><a class="modal-trigger" data-target="new-note"><i class="material-icons left">note_add</i>Note</a></li>
+				<li class="divider"></li>
+				<div id="noteList"></div>
+			</ul>
+
+			<div id="viewer" class="display-with-note"></div>
+			<div id="empty-viewer"><h1 id="instructions" class="valign noselect"></h1></div>
+		</div>
+
+		<!-- Search -->
+		<div id="search" class="modal modal-fixed-footer">
+			<div class="modal-content">
+				<div class="input-field">
+					<input id="search-text" placeholder="Search for Notes in Notepad" autocomplete="off" autofocus />
+				</div>
+				<ul id="search-results"></ul>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+			</div>
+		</div>
+
+		<!-- New Notepad -->
+		<div id="new-notepad" class="modal">
+			<div class="modal-content">
+				<h4>New Notepad</h4>
+				<div class="input-field">
+					<label for="new-notepad-title">Notepad Title</label>
+					<input id="new-notepad-title" type="text" autofocus />
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:newNotepad();" class="modal-action modal-close waves-effect waves-green btn-flat"><i class="material-icons left">add</i>Create</a>
+			</div>
+		</div>
+
+		<!-- New Section -->
+		<div id="new-section" class="modal">
+			<div class="modal-content">
+				<h4>New Section</h4>
+				<div class="input-field">
+					<label for="new-section-title">Section Title</label>
+					<input id="new-section-title" type="text" autofocus />
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:newSection();" class="modal-action modal-close waves-effect waves-green btn-flat"><i class="material-icons left">add</i>Create</a>
+			</div>
+		</div>
+
+		<!-- New Note -->
+		<div id="new-note" class="modal">
+			<div class="modal-content">
+				<h4>New Note</h4>
+				<div class="input-field">
+					<label for="new-note-title">Note Title</label>
+					<input id="new-note-title" type="text" autofocus />
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:newNote();" class="modal-action modal-close waves-effect waves-green btn-flat"><i class="material-icons left">add</i>Create</a>
+			</div>
+		</div>
+
+		<!-- Insert Elements -->
+		<div id="insert" class="modal bottom-sheet modal-fixed-footer">
+			<div class="modal-content">
+				<h4>Insert</h4>
+				<div class="row center-align">
+					<div class="col m2 s6">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Markdown-formatted Text" onclick="insert('markdown');">edit</i>
+					</div>
+
+					<div class="col m2 s6">
+						<img class="insert-icon tooltipped" style="width: 6rem; height: auto" data-position="bottom" data-delay="50" data-tooltip="Microsoft&reg; Word Document (docx)" onclick="uploadDocx();" src="fonts/MSWord.svg" />
+					</div>
+
+					<div class="col m2 s6">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Drawing Mode" onclick="insert('drawing');">gesture</i>
+					</div>
+
+					<div class="col m2 s6">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Image" onclick="insert('image');">insert_photo</i>
+					</div>
+
+					<div class="col m2 s6">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="File" onclick="insert('file');">attach_file</i>
+					</div>
+
+					<div class="col m2 s6">
+						<i class="insert-icon material-icons large tooltipped" data-position="bottom" data-delay="50" data-tooltip="Recording" onclick="insertRecording();">record_voice_over</i>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<p style="font-size: 9px; display: inline;">The 'Word Launch Icon 2012' is a Registered Trademark of the Microsoft group of companies</p>
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+			</div>
+		</div>
+
+		<a id="stop-recording-btn" class="btn red waves-effect waves-light" style="position: fixed; left: 20px; bottom: 20px; z-index: 100;"><i class="material-icons left">stop</i>Stop Recording</a>
+
+		<!-- Markdown Editor -->
+		<div id="mdEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
+			<div class="modal-content">
+				<div class="row">
+					<div class="input-field col m8 s12">
+						<label for="md-textarea">Content (in Markdown)</label>
+						<textarea id="md-textarea" style="height: calc(90% - 10px); width: 100%; margin-top: 10px;" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" autofocus></textarea>
+					</div>
+
+					<div class="col m4 s12">
+						<input id="mdsw" type="text" placeholder="Source Website" />
+						<input id="mdfs" type="text" value="16px" placeholder="Font Size" />
+						<input id="mdw" type="text" placeholder="Width" />
+						<input id="mdh" type="text" placeholder="Height" />
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
+			</div>
+		</div>
+
+		<!-- Docx Editor -->
+		<div id="docxEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
+			<div class="modal-content">
+				<div class="row">
+					<div class="file-field input-field col m8 s12">
+						<div class="waves-effect waves-light btn amber darken-1">
+							<span>Upload a Word Document (docx)</span>
+							<input id="docx-upload" type="file">
+						</div>
+						<div class="file-path-wrapper"><input id="docx-upload-name" style="display: none;" class="file-path validate" type="text"></div>
+					</div>
+
+					<div class="col m4 s12">
+						<p>
+							This will take your document and convert it to the
+							'Markdown-formatted' text that µPad understands.
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
+			</div>
+		</div>
+
+		<!-- Drawing Editor -->
+		<div id="drawingEditor" class="modal modal-fixed-footer">
+			<div id="canvas-holder" class="modal-content">
+				<canvas id="drawing-viewer" width="1000" height="1000" class="col m8 s12" style="border:solid black 1px; touch-action:none"></canvas>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
+			</div>
+		</div>
+
+		<!-- Image Editor -->
+		<div id="imageEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
+			<div class="modal-content">
+				<div class="row">
+					<div class="file-field input-field col m8 s12">
+						<div class="waves-effect waves-light btn amber darken-1">
+							<span>Upload Image</span>
+							<input id="image-upload" type="file">
+						</div>
+						<div class="file-path-wrapper"><input id="image-upload-name" style="display: none;" class="file-path validate" type="text"></div>
+					</div>
+
+					<div class="col m4 s12">
+						<input id="isw" type="text" placeholder="Source Website" />
+						<input id="iw" type="text" placeholder="Width" />
+						<input id="ih" type="text" placeholder="Height" />
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
+			</div>
+		</div>
+
+		<!-- File Editor -->
+		<div id="fileEditor" class="modal bottom-sheet modal-fixed-footer" style="min-height: 65%;">
+			<div class="modal-content">
+				<div class="row">
+					<div class="file-field input-field col m8 s12">
+						<div class="waves-effect waves-light btn amber darken-1">
+							<span>Upload File</span>
+							<input id="file-upload" type="file">
+						</div>
+						<div class="file-path-wrapper"><input id="file-upload-name" style="display: none;" class="file-path validate" type="text"></div>
+					</div>
+
+					<div class="col m4 s12">
+						<input id="fsw" type="text" placeholder="Source Website" />
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
+			</div>
+		</div>
+
+		<!-- Recording Editor -->
+		<div id="recordingEditor" class="modal modal-fixed-footer" style="min-height: 65%;">
+			<div class="modal-content">
+				<input id="rposl" type="text" placeholder="Position relative to left-border" />
+				<input id="rpost" type="text" placeholder="Position relative to top-border" />
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				<a href="javascript:deleteElement();" class="modal-action modal-close waves-effect waves-red btn-flat">Delete Element</a>
+			</div>
+		</div>
+	</div>
+
+	<div id="preloader">
+		<div class="preloader-wrapper big active">
+			<div class="spinner-layer spinner-red-only">
+				<div class="circle-clipper left">
+					<div class="circle"></div>
+				</div>
+				<div class="gap-patch">
+					<div class="circle"></div>
+				</div>
+				<div class="circle-clipper right">
+					<div class="circle"></div>
+				</div>
+			</div>
+		</div>
+		<h5 class="preloader-text center-align noselect">While you're waiting, how about a little riddle for you?<br /><img src="fonts/equation.svg" style="max-width: 90%; height: auto;" /></h5>
+	</div>
+
+	<script>const {ipcRenderer} = require('electron')</script>
+	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+	<script src="js/libs/jquery-3.1.1.min.js"></script>
+	<script src="js/libs/materialize.min.js"></script>
+	<script src="js/libs/moment.js"></script>
+	<script src="js/libs/localforage.min.js"></script>
+	<script src="js/libs/jszip.min.js"></script>
+	<script src="js/libs/trim-canvas.js"></script>
+	<script src="js/libs/mammoth.browser.min.js"></script>
+	<script src="js/libs/recorderjs/recorder.min.js"></script>
+
+	<script src="js/libs/interact.min.js"></script>
+	<script src="js/libs/showdown.min.js"></script>
+	<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
+	<script type="text/javascript" async src="js/libs/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
+	<script src="js/libs/ASCIIMathML.js"></script>
+
+	<script src="js/parser.js"></script>
+	<script src="js/client.js"></script>
+	<script>if (window.module) module = window.module;</script>
+</body>
+</html>
