@@ -123,6 +123,9 @@ function apiPost(url, params, callback) {
 
 function reqGET(url, callback) {
 	var xhr = new XMLHttpRequest();
+	xhr.addEventListener("progress", function(event) {
+		progress(event, "Download");
+	});
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			callback(xhr.responseText, xhr.status);
@@ -134,6 +137,9 @@ function reqGET(url, callback) {
 
 function reqPUT(url, data, callback) {
 	var xhr = new XMLHttpRequest();
+	xhr.upload.addEventListener("progress", function(event) {
+		progress(event, "Upload");
+	});
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			callback(xhr.responseText, xhr.status);
@@ -143,4 +149,14 @@ function reqPUT(url, data, callback) {
 	xhr.open("PUT", url, true);
 	xhr.setRequestHeader('Content-Type', 'text/plain');
 	xhr.send(data);
+}
+
+function progress(event, type) {
+	if (event.lengthComputable) {
+		postMessage({
+			req: "progress",
+			type: type,
+			percentage: parseInt((event.loaded/event.total)*100)
+		});
+	}
 }

@@ -1487,6 +1487,15 @@ syncWorker.onmessage = function(event) {
 				});
 			}
 			break;
+
+		case "progress":
+			if (msg.percentage < 100) {
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">{0}ing: {1}%</a>)'.format(msg.type, msg.percentage));
+			}
+			else {
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+			}
+			break;
 	}
 }
 
