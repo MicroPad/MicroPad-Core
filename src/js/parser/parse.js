@@ -3,6 +3,7 @@ var parseString = require('xml2js').parseString;
 var moment = require('moment');
 var toMarkdown = require('to-markdown');
 var pd = require('pretty-data').pd;
+var JsDiff = require('diff');
 
 var Note = require('./Note.js').Note;
 
@@ -64,8 +65,13 @@ Notepad.prototype.toXML = function() {
 	});
 	return builder.buildObject(this.toXMLObject());
 }
-Notepad.prototype.toString = function() {
-
+Notepad.prototype.makeDiff = function(oldXML) {
+	// var myDiff = new JsDiff.Diff();
+	// myDiff.tokenize = function(value) {
+	// 	return value.split(/(\n|\r\n)/);
+	// };
+	// return JsDiff.convertChangesToXML(myDiff.diff(this.toXML(), oldXML));
+	return JsDiff.createPatch('test.npx', oldXML, this.toXML());
 }
 
 var Section = function(title) {
