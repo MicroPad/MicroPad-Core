@@ -7,7 +7,8 @@ fs.readFile(path.resolve('oldXML.npx'), 'utf-8', function(e, data) {
 	while (!parser.notepad) if (parser.notepad) break;
 	fs.readFile(path.resolve('oldXML.npx'), 'utf-8', function(e, oldData) {
 		parser.notepad.addSection(parser.createSection("Test"));
+		parser.notepad.addSection(parser.createSection("Test2"));
 		var res = parser.notepad.makeDiff(oldData);
-		console.log(res);
+		// console.log(res);
 	});
 });

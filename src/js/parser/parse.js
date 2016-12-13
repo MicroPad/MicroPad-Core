@@ -66,12 +66,35 @@ Notepad.prototype.toXML = function() {
 	return builder.buildObject(this.toXMLObject());
 }
 Notepad.prototype.makeDiff = function(oldXML) {
-	// var myDiff = new JsDiff.Diff();
-	// myDiff.tokenize = function(value) {
-	// 	return value.split(/(\n|\r\n)/);
-	// };
-	// return JsDiff.convertChangesToXML(myDiff.diff(this.toXML(), oldXML));
-	return JsDiff.createPatch('test.npx', oldXML, this.toXML());
+	var diff = JsDiff.parsePatch(JsDiff.createPatch('d.npx', oldXML, this.toXML(), undefined, undefined, {context: 0}))[0].hunks;
+
+	var processedDiff = [];
+	for (var i = 0; i < diff.length; i++) {
+		var toPush = {opts: {replace: false}};
+		toPush[diff[i].oldStart] = [];
+
+		for (var j = 0; j < diff[i].lines.length; j++) {
+			var line = diff[i].lines[j];
+			switch (line.substring(0, 1)) {
+				case "-":
+					toPush.opts.replace = true;
+					toPush[diff[i].oldStart] = [""];
+					break;
+				case "+":
+					if (toPush[diff[i].oldStart][0] === "") toPush[diff[i].oldStart] = [];
+					toPush[diff[i].oldStart].push(line.substring(1, line.length));
+					break;
+			}
+		}
+		processedDiff.push(toPush);
+	}
+	
+	var diffStr = "";
+	for (var i = 0; i < processedDiff.length; i++) {
+		var hunk = processedDiff[i];
+		diffStr += JSON.stringify(hunk)+'\n';
+	}
+	return diffStr;
 }
 
 var Section = function(title) {

@@ -1443,19 +1443,26 @@ syncWorker.onmessage = function(event) {
 				var res = JSON.parse(msg.text);
 				switch (res.type) {
 					case "upload":
-						getXmlObject(function(xmlObj) {
-							syncWorker.postMessage({
-								req: "upload",
-								notepad: xmlObj,
-								url: res.url
-							});
+						// getXmlObject(function(xmlObj) {
+						// 	syncWorker.postMessage({
+						// 		req: "upload",
+						// 		notepad: xmlObj,
+						// 		url: res.url
+						// 	});
+						// });
+						syncWorker.postMessage({
+							req: "upload",
+							notepad: notepad,
+							url: res.url
 						});
 						break;
 
 					case "download":
-						syncWorker.postMessage({
-							req: "download",
-							url: res.url
+						confirmAsync("A newer version of this notepad has been synced. Do you want to download it?").then(function(answer) {
+							syncWorker.postMessage({
+								req: "download",
+								url: res.url
+							});
 						});
 						break;
 				}
@@ -1474,17 +1481,13 @@ syncWorker.onmessage = function(event) {
 		case "download":
 			if (msg.code === 200) {
 				if (msg.text.length === 0) return;
-				confirmAsync("A newer version of this notepad has been synced. Do you want to use it?").then(function(answer){
-					if (answer) {
-						parser.parse(msg.text, ["asciimath"]);
-						while (!parser.notepad) if (parser.notepad) break;
-						notepad = parser.notepad;
+				parser.parse(msg.text, ["asciimath"]);
+				while (!parser.notepad) if (parser.notepad) break;
+				notepad = parser.notepad;
 
-						window.initNotepad();
-						$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
-					}
-					saveToBrowser();
-				});
+				window.initNotepad();
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+				saveToBrowser();
 			}
 			break;
 
@@ -1537,7 +1540,7 @@ function msSync() {
 			req: 'sync',
 			token: res,
 			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
-			lastModified: notepad.lastModified
+			notepad: notepad
 		});
 	});
 }

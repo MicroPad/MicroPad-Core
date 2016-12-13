@@ -51,10 +51,13 @@ onmessage = function(event) {
 			break;
 
 		case "sync":
+			var np = parser.restoreNotepad(msg.notepad);
+			var newLines = np.makeDiff(oldXML).split(/\r\n|\r|\n/).length - oldXML.split(/\r\n|\r|\n/).length;
 			apiPost(msg.req+'.php', {
 				token: msg.token,
 				filename: msg.filename,
-				lastModified: msg.lastModified
+				lastModified: np.lastModified,
+				newLines: newLines
 			}, function(res, code) {
 				postMessage({
 					req: msg.req,
@@ -65,27 +68,43 @@ onmessage = function(event) {
 			break;
 
 		case "upload":
-			var notepadXML = parser.xmlObjToXML(msg.notepad);
-			var notepadXMLArr = notepadXML.split(/\r?\n/);
-			var old = oldXML.split(/\r?\n/);
-			oldXML = notepadXML;
-			var diff = {};
+			// var notepadXML = parser.xmlObjToXML(msg.notepad);
+			// var notepadXMLArr = notepadXML.split(/\r?\n/);
+			// var old = oldXML.split(/\r?\n/);
+			// oldXML = notepadXML;
+			// var diff = {};
 
 			//Generate diff
-			for (var i = 0; i < notepadXMLArr.length; i++) {
-				if (notepadXMLArr[i] !== old[i]) diff[i] = notepadXMLArr[i];
+			// for (var i = 0; i < notepadXMLArr.length; i++) {
+			// 	if (notepadXMLArr[i] !== old[i]) diff[i] = notepadXMLArr[i];
+			// }
+
+			// if (Object.keys(diff).length < 1) {
+			// 	postMessage({
+			// 		req: 'upload',
+			// 		code: 200
+			// 	});
+			// 	break;
+			// }
+			var np = parser.restoreNotepad(msg.notepad);
+			var diff = np.makeDiff(oldXML);
+			if (diff.length < 1) {
+				postMessage({
+					req: 'upload',
+					code: 200
+				});
+				return;
 			}
 			console.log(diff);
 
-			reqPUT(msg.url, JSON.stringify(diff), function(res, code) {
-				postMessage({
-					req: 'upload',
-					code: code
-				});
-			});
+			// reqPUT(msg.url, diff, function(res, code) {
+			// 	postMessage({
+			// 		req: 'upload',
+			// 		code: code
+			// 	});
+			// });
 
-			notepadXML = undefined;
-			old = undefined;
+			oldXML = np.toXML();
 			break;
 
 		case "download":
