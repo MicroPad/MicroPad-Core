@@ -72,6 +72,7 @@ Notepad.prototype.makeDiff = function(oldXML) {
 	for (var i = 0; i < diff.length; i++) {
 		var toPush = {opts: {replace: false}};
 		toPush[diff[i].oldStart] = [];
+		var toDelete = [];
 
 		for (var j = 0; j < diff[i].lines.length; j++) {
 			var line = diff[i].lines[j];
@@ -79,6 +80,7 @@ Notepad.prototype.makeDiff = function(oldXML) {
 				case "-":
 					toPush.opts.replace = true;
 					toPush[diff[i].oldStart] = [""];
+					toDelete.push(parseInt(diff[i].oldStart)+j);
 					break;
 				case "+":
 					if (toPush[diff[i].oldStart][0] === "") toPush[diff[i].oldStart] = [];
@@ -86,7 +88,16 @@ Notepad.prototype.makeDiff = function(oldXML) {
 					break;
 			}
 		}
+
 		processedDiff.push(toPush);
+		if (toDelete.length > 1) {
+			for (var j = 1; j < toDelete.length; j++) {
+				var lineNumber = toDelete[j];
+				toPush = {opts: {replace: true}};
+				toPush[lineNumber] = [""];
+				processedDiff.push(toPush);
+			}
+		}
 	}
 	
 	var diffStr = "";

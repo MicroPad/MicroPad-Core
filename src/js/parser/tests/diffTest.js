@@ -9,6 +9,6 @@ fs.readFile(path.resolve('oldXML.npx'), 'utf-8', function(e, data) {
 		parser.notepad.addSection(parser.createSection("Test"));
 		parser.notepad.addSection(parser.createSection("Test2"));
 		var res = parser.notepad.makeDiff(oldData);
-		// console.log(res);
+		console.log(res);
 	});
 });
