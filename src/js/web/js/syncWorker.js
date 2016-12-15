@@ -2,7 +2,14 @@ var me = {};
 var oldXML = '';
 
 importScripts('libs/moment.js');
+importScripts('libs/localforage.min.js');
 importScripts('parser.js');
+
+var appStorage = localforage.createInstance({
+	name: 'uPad',
+	version: 1.0,
+	storeName: 'app'
+});
 
 onmessage = function(event) {
 	var msg = event.data;
@@ -52,6 +59,7 @@ onmessage = function(event) {
 
 		case "sync":
 			var np = parser.restoreNotepad(msg.notepad);
+			// if (msg.hasBeenSynced) oldXML = np.toXML();
 			var newLines = np.makeDiff(oldXML).split(/\r\n|\r|\n/).length - oldXML.split(/\r\n|\r|\n/).length;
 			apiPost(msg.req+'.php', {
 				token: msg.token,
@@ -95,16 +103,51 @@ onmessage = function(event) {
 				});
 				return;
 			}
-			console.log(diff);
+			if (byteLength(diff) > 10000000 && byteLength(diff) <= 1000000000) {
+				//Diff >10MB; do a direct upload
+				apiPost('directUpload.php', {
+					token: msg.token,
+					filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, ''))
+				}, function(res, code) {
+					if (code === 200) {
+						console.log(res);
+						reqPUT(res, np.toXML(), function(res, code) {
+							postMessage({
+								req: 'upload',
+								code: code
+							});
+						});
+					}
+					else {
+						console.log(res);
+						return;
+					}
+				});
+			}
+			else if (byteLength(diff) > 1000000000) {
+				//Diff >1GB; don't upload
+				postMessage({
+					req: 'error',
+					message: "Wowza! Your notepad is so big we can't store it.<br><br>It might be a good idea to split up your notepad, it'll also improve performance."
+				});
+			}
+			else {
+				reqPUT(msg.url, diff, function(res, code) {
+					postMessage({
+						req: 'upload',
+						code: code
+					});
+				});
+			}
 
-			// reqPUT(msg.url, diff, function(res, code) {
-			// 	postMessage({
-			// 		req: 'upload',
-			// 		code: code
-			// 	});
-			// });
+			appStorage.getItem('syncedNotepads', function(err, syncList) {
+				if (syncList === null) syncList = {};
+				syncList[np.title] = true;
+				appStorage.setItem('syncedNotepads', syncList);
+			});
 
 			oldXML = np.toXML();
+
 			break;
 
 		case "download":
@@ -165,7 +208,7 @@ function reqPUT(url, data, callback) {
 		}
 	}
 
-	xhr.open("PUT", url, true);
+	xhr.open("PUT", url, false);
 	xhr.setRequestHeader('Content-Type', 'text/plain');
 	xhr.send(data);
 }
@@ -178,4 +221,17 @@ function progress(event, type) {
 			percentage: parseInt((event.loaded/event.total)*100)
 		});
 	}
+}
+
+//Thanks to http://stackoverflow.com/a/23329386/998467
+function byteLength(str) {
+	// returns the byte length of an utf8 string
+	var s = str.length;
+	for (var i=str.length-1; i>=0; i--) {
+		var code = str.charCodeAt(i);
+		if (code > 0x7f && code <= 0x7ff) s++;
+		else if (code > 0x7ff && code <= 0xffff) s+=2;
+		if (code >= 0xDC00 && code <= 0xDFFF) i--; //trail surrogate
+	}
+	return s;
 }

@@ -1450,10 +1450,15 @@ syncWorker.onmessage = function(event) {
 						// 		url: res.url
 						// 	});
 						// });
-						syncWorker.postMessage({
-							req: "upload",
-							notepad: notepad,
-							url: res.url
+						appStorage.getItem('syncToken', function(err, token) {
+							if (err || token === null) return;
+							syncWorker.postMessage({
+								req: "upload",
+								notepad: notepad,
+								url: res.url,
+								syncURL: window.syncURL,
+								token: token
+							});
 						});
 						break;
 
@@ -1535,12 +1540,27 @@ function msSync() {
 		if (err || res === null) return;
 
 		$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Syncing&hellip;</a>)');
-		syncWorker.postMessage({
-			syncURL: window.syncURL,
-			req: 'sync',
-			token: res,
-			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
-			notepad: notepad
+		appStorage.getItem('syncedNotepads', function(err, syncList) {
+			if (!err && syncList !== null)  {
+				var hasBeenSynced = syncList[notepad.title];
+			}
+			else {
+				var hasBeenSynced = false;
+				syncList = {};
+			}
+			console.log(hasBeenSynced);
+
+			syncWorker.postMessage({
+				syncURL: window.syncURL,
+				req: 'sync',
+				token: res,
+				filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
+				notepad: notepad,
+				hasBeenSynced: hasBeenSynced
+			});
+
+			// syncList[notepad.title] = true;
+			// appStorage.setItem('syncedNotepads', syncList);
 		});
 	});
 }
