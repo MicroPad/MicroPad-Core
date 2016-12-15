@@ -114,7 +114,7 @@ onmessage = function(event) {
 
 			reqGET(msg.url, function(res, code) {
 				var remoteMap = JSON.parse(res);
-				if (moment(remoteMap.lastModified).isBefore(moment(localMap.lastModified))) {
+				if (moment(localMap.lastModified).isBefore(moment(remoteMap.lastModified))) {
 					postMessage({
 						req: 'upload',
 						code: 200,
