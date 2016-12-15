@@ -10,6 +10,9 @@ var wasMobile = isMobile();
 var stillLoading = false;
 var syncWorker = new Worker('js/syncWorker.js');
 
+var uploadWorker = new Worker('js/uploadWorker.js');
+var putRequests = [];
+
 /** Setup localforage */
 var notepadStorage = localforage.createInstance({
 	name: 'uPad',
@@ -1384,6 +1387,31 @@ function zoom(zoomIn) {
 	$('#viewer').css('transform', 'scale('+curScale+')');
 }
 
+uploadWorker.onmessage = function(event) {
+	var msg = event.data;
+
+	switch (msg.req) {
+		case "done":
+			putRequests.shift();
+			cueUpload();
+			break;
+
+		case "progress":
+			if (msg.percentage < 100) {
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">{0}ing: {1}%</a>)'.format(msg.type, msg.percentage));
+			}
+			else {
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+			}
+			break;
+	}
+}
+
+function cueUpload() {
+	console.log(putRequests);
+	if (putRequests.length > 0) uploadWorker.postMessage(putRequests[0]);
+}
+
 /** Sync Functions */
 syncWorker.onmessage = function(event) {
 	var msg = event.data;
@@ -1504,6 +1532,20 @@ syncWorker.onmessage = function(event) {
 				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
 			}
 			break;
+
+		case "error":
+			$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Sync Error</a>)');
+			$('#error-modal-text').html(msg.text);
+			$('#error-modal').modal('open');
+			break;
+
+		case "cuePUT":
+			putRequests.push(msg);
+
+			if (putRequests.length === 1) {
+				cueUpload();
+			}
+			break;
 	}
 }
 
@@ -1548,7 +1590,6 @@ function msSync() {
 				var hasBeenSynced = false;
 				syncList = {};
 			}
-			console.log(hasBeenSynced);
 
 			syncWorker.postMessage({
 				syncURL: window.syncURL,

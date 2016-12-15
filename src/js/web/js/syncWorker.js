@@ -1,8 +1,10 @@
 var me = {};
-var oldXML = '';
+var oldMap = "";
 
 importScripts('libs/moment.js');
 importScripts('libs/localforage.min.js');
+importScripts('libs/encoding.js');
+importScripts('libs/md5.js');
 importScripts('parser.js');
 
 var appStorage = localforage.createInstance({
@@ -60,12 +62,11 @@ onmessage = function(event) {
 		case "sync":
 			var np = parser.restoreNotepad(msg.notepad);
 			// if (msg.hasBeenSynced) oldXML = np.toXML();
-			var newLines = np.makeDiff(oldXML).split(/\r\n|\r|\n/).length - oldXML.split(/\r\n|\r|\n/).length;
 			apiPost(msg.req+'.php', {
 				token: msg.token,
 				filename: msg.filename,
 				lastModified: np.lastModified,
-				newLines: newLines
+				newLines: 0
 			}, function(res, code) {
 				postMessage({
 					req: msg.req,
@@ -76,77 +77,119 @@ onmessage = function(event) {
 			break;
 
 		case "upload":
-			// var notepadXML = parser.xmlObjToXML(msg.notepad);
-			// var notepadXMLArr = notepadXML.split(/\r?\n/);
-			// var old = oldXML.split(/\r?\n/);
-			// oldXML = notepadXML;
-			// var diff = {};
-
-			//Generate diff
-			// for (var i = 0; i < notepadXMLArr.length; i++) {
-			// 	if (notepadXMLArr[i] !== old[i]) diff[i] = notepadXMLArr[i];
-			// }
-
-			// if (Object.keys(diff).length < 1) {
-			// 	postMessage({
-			// 		req: 'upload',
-			// 		code: 200
-			// 	});
-			// 	break;
-			// }
 			var np = parser.restoreNotepad(msg.notepad);
-			var diff = np.makeDiff(oldXML);
-			if (diff.length < 1) {
+			var npxUInt8Arr = new TextEncoder().encode(np.toXML());
+			var chunks = [];
+			var localMap = {lastModified: np.lastModified};
+
+			//Split the octet array (npxUInt8Arr) chunks of 1000000B (where 1B = 8b)
+			var pos = 0;
+			var count = 0;
+			while (!chunks[chunks.length-1] || chunks[chunks.length-1].length === 1000000) {
+				var chunk = npxUInt8Arr.slice(pos, pos+1000000);
+				chunks.push(chunk);
+				pos += chunk.length;
+
+				localMap[count++] = {md5: md5(new TextDecoder("utf-8").decode(chunk))};
+			}
+
+			if (chunks.length > 1000) {
 				postMessage({
-					req: 'upload',
-					code: 200
+					req: 'error',
+					text: "Wowza! Your notepad is so big we can't store it.<br><br>It might be a good idea to split up your notepad."
 				});
 				return;
 			}
-			if (byteLength(diff) > 10000000 && byteLength(diff) <= 1000000000) {
-				//Diff >10MB; do a direct upload
-				apiPost('directUpload.php', {
-					token: msg.token,
-					filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, ''))
-				}, function(res, code) {
-					if (code === 200) {
-						console.log(res);
-						reqPUT(res, np.toXML(), function(res, code) {
-							postMessage({
-								req: 'upload',
-								code: code
-							});
-						});
-					}
-					else {
-						console.log(res);
-						return;
-					}
-				});
-			}
-			else if (byteLength(diff) > 1000000000) {
-				//Diff >1GB; don't upload
+
+			var localMapJSON = JSON.stringify(localMap);
+			if (oldMap === localMapJSON) {
 				postMessage({
-					req: 'error',
-					message: "Wowza! Your notepad is so big we can't store it.<br><br>It might be a good idea to split up your notepad, it'll also improve performance."
+					req: 'upload',
+					code: 200,
+					text: ''
 				});
+				return;
 			}
-			else {
-				reqPUT(msg.url, diff, function(res, code) {
+			oldMap = localMapJSON;
+
+			reqGET(msg.url, function(res, code) {
+				var remoteMap = JSON.parse(res);
+				if (moment(remoteMap.lastModified).isBefore(moment(localMap.lastModified))) {
 					postMessage({
 						req: 'upload',
-						code: code
+						code: 200,
+						text: ''
 					});
-				});
-			}
+					return;
+				}
 
-			appStorage.getItem('syncedNotepads', function(err, syncList) {
-				if (syncList === null) syncList = {};
-				syncList[np.title] = true;
-				appStorage.setItem('syncedNotepads', syncList);
+				if (res !== localMapJSON) {
+					//Add local map.json to the upload cue
+					apiPost('getMapUpload.php', {
+						token: msg.token,
+						filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, ''))
+					}, function(mapURL, code) {
+						if (code === 200) {
+							postMessage({
+								req: "cuePUT",
+								url: mapURL,
+								data: localMapJSON
+							});
+						}
+						else {
+							console.log(mapURL);
+							postMessage({
+								req: 'upload',
+								code: code,
+								text: ''
+							});
+							return;
+						}
+					});
+
+					//Loop through the remote map to figure out which blocks are different
+					for (var lineNumber in localMap) {
+						if (lineNumber === 'lastModified') continue;
+						if (!remoteMap[lineNumber] || localMap[lineNumber].md5 !== remoteMap[lineNumber].md5) {
+							
+							apiPostSync('getChunkUpload.php', {
+								token: msg.token,
+								filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, '')),
+								index: lineNumber,
+								md5: localMap[lineNumber].md5
+							}, function(uploadURL, code) {
+								if (code === 200) {
+									//Add that chunk to the upload cue
+									postMessage({
+										req: "cuePUT",
+										url: uploadURL,
+										data: new TextDecoder("utf-8").decode(chunks[lineNumber]),
+										md5: localMap[lineNumber].md5
+									});
+								}
+								else {
+									console.log(uploadURL);
+									postMessage({
+										req: 'upload',
+										code: code,
+										text: ''
+									});
+									return;
+								}
+							});
+						}
+					}
+				}
+				else {
+					//The remote map is identical to this one
+					postMessage({
+						req: 'upload',
+						code: 200,
+						text: ''
+					});
+					return;
+				}
 			});
-
-			oldXML = np.toXML();
 
 			break;
 
@@ -183,6 +226,26 @@ function apiPost(url, params, callback) {
 	xhr.send(paramString);
 }
 
+function apiPostSync(url, params, callback) {
+	url = me.syncURL+url;
+	var paramString = "";
+	for (var param in params) {
+		if (paramString.length > 0) paramString += "&";
+		paramString += param+"="+encodeURIComponent(params[param]);
+	}
+
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) {
+			callback(xhr.responseText, xhr.status);
+		}
+	}
+
+	xhr.open("POST", url, false);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.send(paramString);
+}
+
 function reqGET(url, callback) {
 	var xhr = new XMLHttpRequest();
 	xhr.addEventListener("progress", function(event) {
@@ -208,7 +271,7 @@ function reqPUT(url, data, callback) {
 		}
 	}
 
-	xhr.open("PUT", url, false);
+	xhr.open("PUT", url, true);
 	xhr.setRequestHeader('Content-Type', 'text/plain');
 	xhr.send(data);
 }
