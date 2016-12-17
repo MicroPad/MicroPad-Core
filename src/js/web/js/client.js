@@ -609,11 +609,22 @@ window.initNotepad = function() {
 		if (err) return;
 
 		if (res !== null) {
+			var filename = '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''));
+
+			$.post(window.syncURL+'getSyncStatus.php', {token: res, filename: filename}, function(data) {
+				if (data.initialSyncDone) {
+					syncWorker.postMessage({
+						req: 'setOldXML',
+						notepad: notepad
+					});
+				}
+			}, 'json');
+
 			syncWorker.postMessage({
 				syncURL: window.syncURL,
 				req: "hasAddedNotepad",
 				token: res,
-				filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''))
+				filename: filename
 			});
 		}
 		else {
@@ -1420,7 +1431,7 @@ syncWorker.onmessage = function(event) {
 		case "hasAddedNotepad":
 			var isTrue = (msg.text === 'true');
 			if (isTrue) {
-				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+				// $('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
 				$('#not-syncing-pitch').hide();
 				$('#sync-options').show();
 				msSync();
@@ -1492,10 +1503,12 @@ syncWorker.onmessage = function(event) {
 
 					case "download":
 						confirmAsync("A newer version of this notepad has been synced. Do you want to download it?").then(function(answer) {
-							syncWorker.postMessage({
-								req: "download",
-								url: res.url
-							});
+							if (answer) {
+								syncWorker.postMessage({
+									req: "download",
+									url: res.url
+								});
+							}
 						});
 						break;
 				}
@@ -1540,11 +1553,13 @@ syncWorker.onmessage = function(event) {
 			break;
 
 		case "cuePUT":
-			putRequests.push(msg);
+			setTimeout(function() {
+				putRequests.push(msg);
 
-			if (putRequests.length === 1) {
-				cueUpload();
-			}
+				if (putRequests.length === 1) {
+					cueUpload();
+				}
+			}, 0);
 			break;
 	}
 }

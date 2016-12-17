@@ -1,5 +1,10 @@
+var syncURL;
+
 onmessage = function(event) {
+	console.log("syncing");
 	var msg = event.data;
+	syncURL = msg.syncURL;
+	var hasProcessedYet = false;
 
 	var xhr = new XMLHttpRequest();
 	xhr.upload.addEventListener("progress", function(event) {
@@ -8,6 +13,12 @@ onmessage = function(event) {
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			if (xhr.status == 200) {
+				while (!hasProcessedYet) {
+					var until = new Date().getTime() + 3000; while(new Date().getTime() < until) {}; 
+					hasProcessed(msg.token, decodeURIComponent(msg.url.split('/').pop().split('npx')[0]+'npx'), function(res) {
+						hasProcessedYet = res;
+					});
+				}
 				postMessage({req: "done"});
 			}
 			else {
@@ -22,6 +33,25 @@ onmessage = function(event) {
 	xhr.send(msg.data);
 }
 
+function hasProcessed(token, filename, callback) {
+	apiPostSync('getSyncStatus.php', {token: token, filename: filename}, function(res, code) {
+		if (code === 200) {
+			var res = JSON.parse(res);
+			if (res.syncProcessed == 1) {
+				callback(true);
+			}
+			else {
+				callback(false);
+			}
+		}
+		else {
+			console.log(res);
+			callback(false);
+		}
+	});
+
+}
+
 function progress(event, type) {
 	if (event.lengthComputable) {
 		postMessage({
@@ -30,4 +60,24 @@ function progress(event, type) {
 			percentage: parseInt((event.loaded/event.total)*100)
 		});
 	}
+}
+
+function apiPostSync(url, params, callback) {
+	url = syncURL+url;
+	var paramString = "";
+	for (var param in params) {
+		if (paramString.length > 0) paramString += "&";
+		paramString += param+"="+encodeURIComponent(params[param]);
+	}
+
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) {
+			callback(xhr.responseText, xhr.status);
+		}
+	}
+
+	xhr.open("POST", url, false);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.send(paramString);
 }

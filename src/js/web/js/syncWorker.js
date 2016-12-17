@@ -1,5 +1,6 @@
 var me = {};
 var oldMap = "";
+var oldXML = "";
 
 importScripts('libs/moment.js');
 importScripts('libs/localforage.min.js');
@@ -60,12 +61,12 @@ onmessage = function(event) {
 			break;
 
 		case "sync":
-			var np = parser.restoreNotepad(msg.notepad);
+			// var np = parser.restoreNotepad(msg.notepad);
 			// if (msg.hasBeenSynced) oldXML = np.toXML();
 			apiPost(msg.req+'.php', {
 				token: msg.token,
 				filename: msg.filename,
-				lastModified: np.lastModified,
+				lastModified: msg.notepad.lastModified,
 				newLines: 0
 			}, function(res, code) {
 				postMessage({
@@ -78,119 +79,55 @@ onmessage = function(event) {
 
 		case "upload":
 			var np = parser.restoreNotepad(msg.notepad);
-			var npxUInt8Arr = new TextEncoder().encode(np.toXML());
-			var chunks = [];
-			var localMap = {lastModified: np.lastModified};
-
-			//Split the octet array (npxUInt8Arr) chunks of 1000000B (where 1B = 8b)
-			var pos = 0;
-			var count = 0;
-			while (!chunks[chunks.length-1] || chunks[chunks.length-1].length === 1000000) {
-				var chunk = npxUInt8Arr.slice(pos, pos+1000000);
-				chunks.push(chunk);
-				pos += chunk.length;
-
-				localMap[count++] = {md5: md5(new TextDecoder("utf-8").decode(chunk))};
-			}
-
-			if (chunks.length > 1000) {
-				postMessage({
-					req: 'error',
-					text: "Wowza! Your notepad is so big we can't store it.<br><br>It might be a good idea to split up your notepad."
-				});
-				return;
-			}
-
-			var localMapJSON = JSON.stringify(localMap);
-			if (oldMap === localMapJSON) {
+			var diff = np.makeDiff(oldXML);
+			if (diff.length < 1) {
 				postMessage({
 					req: 'upload',
-					code: 200,
-					text: ''
+					code: 200
 				});
 				return;
 			}
-			oldMap = localMapJSON;
 
-			reqGET(msg.url, function(res, code) {
-				var remoteMap = JSON.parse(res);
-				if (moment(localMap.lastModified).isBefore(moment(remoteMap.lastModified))) {
-					postMessage({
-						req: 'upload',
-						code: 200,
-						text: ''
-					});
-					return;
-				}
-
-				if (res !== localMapJSON) {
-					//Add local map.json to the upload cue
-					apiPost('getMapUpload.php', {
-						token: msg.token,
-						filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, ''))
-					}, function(mapURL, code) {
-						if (code === 200) {
-							postMessage({
-								req: "cuePUT",
-								url: mapURL,
-								data: localMapJSON
-							});
-						}
-						else {
-							console.log(mapURL);
-							postMessage({
-								req: 'upload',
-								code: code,
-								text: ''
-							});
-							return;
-						}
-					});
-
-					//Loop through the remote map to figure out which blocks are different
-					for (var lineNumber in localMap) {
-						if (lineNumber === 'lastModified') continue;
-						if (!remoteMap[lineNumber] || localMap[lineNumber].md5 !== remoteMap[lineNumber].md5) {
-							
-							apiPostSync('getChunkUpload.php', {
-								token: msg.token,
-								filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, '')),
-								index: lineNumber,
-								md5: localMap[lineNumber].md5
-							}, function(uploadURL, code) {
-								if (code === 200) {
-									//Add that chunk to the upload cue
-									postMessage({
-										req: "cuePUT",
-										url: uploadURL,
-										data: new TextDecoder("utf-8").decode(chunks[lineNumber]),
-										md5: localMap[lineNumber].md5
-									});
-								}
-								else {
-									console.log(uploadURL);
-									postMessage({
-										req: 'upload',
-										code: code,
-										text: ''
-									});
-									return;
-								}
-							});
-						}
+			if (byteLength(diff) > 10000000 && byteLength(diff) <= 1000000000) {
+				//Diff >10MB; do a direct upload
+				apiPost('directUpload.php', {
+					token: msg.token,
+					filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, ''))
+				}, function(res, code) {
+					if (code === 200) {
+						console.log(res);
+						postMessage({
+							req: "cuePUT",
+							token: msg.token,
+							syncURL: me.syncURL,
+							url: res,
+							data: np.toXML()
+						});
 					}
-				}
-				else {
-					//The remote map is identical to this one
-					postMessage({
-						req: 'upload',
-						code: 200,
-						text: ''
-					});
-					return;
-				}
-			});
+					else {
+						console.log(res);
+						return;
+					}
+				});
+			}
+			else if (byteLength(diff) > 1000000000) {
+				//Diff >1GB; don't upload
+				postMessage({
+					req: 'error',
+					message: "Wowza! Your notepad is so big we can't store it.<br><br>It might be a good idea to split up your notepad, it'll also improve performance."
+				});
+			}
+			else {
+				postMessage({
+					req: "cuePUT",
+					token: msg.token,
+					syncURL: me.syncURL,
+					url: msg.url,
+					data: diff
+				});
+			}
 
+			oldXML = np.toXML();
 			break;
 
 		case "download":
@@ -202,6 +139,10 @@ onmessage = function(event) {
 					text: res
 				});
 			});
+			break;
+
+		case "setOldXML":
+			oldXML = parser.restoreNotepad(msg.notepad).toXML();
 			break;
 	}
 }
