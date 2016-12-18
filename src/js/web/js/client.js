@@ -9,6 +9,7 @@ var rec = new Recorder();
 var wasMobile = isMobile();
 var stillLoading = false;
 var syncWorker = new Worker('js/syncWorker.js');
+var syncMethod = "block";
 
 var uploadWorker = new Worker('js/uploadWorker.js');
 var putRequests = [];
@@ -154,6 +155,7 @@ window.onload = function() {
 
 		var currentTarget = $('#' + event.currentTarget.id);
 		for (k in note.elements) {
+			notepad.lastModified = moment().format();
 			var element = note.elements[k];
 			if (element.args.id == event.currentTarget.id) {
 				lastEditedElement = element;
@@ -244,6 +246,7 @@ window.onload = function() {
 											var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
 											currentTarget.attr('src', trimmed);
 
+											notepad.lastModified = moment().format();
 											saveToBrowser();
 										}
 									}
@@ -714,6 +717,7 @@ function newSection() {
 	var title = $('#new-section-title').val();
 	var index = parents[parents.length - 1].sections.push(parser.createSection(title)) - 1;
 	loadSection(index);
+	notepad.lastModified = moment().format();
 	saveToBrowser();
 
 	$('#new-section-title').val('');
@@ -726,6 +730,7 @@ function newNote() {
 	var index = notesInParent.push(newNote) - 1;
 	$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(index, newNote.title));
 	loadNote(index);
+	notepad.lastModified = moment().format();
 	saveToBrowser();
 
 	$('#new-note-title').val('');
@@ -761,12 +766,14 @@ function deleteOpen() {
 			else if (parents.length > 1 && !note) {
 				//Delete Section
 				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) { return s !== parents[parents.length - 1] });
+				notepad.lastModified = moment().format();
 				saveToBrowser();
 				loadParent(parents.length - 2);
 			}
 			else if (note) {
 				//Delete Note
 				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) { return n !== note });
+				notepad.lastModified = moment().format();
 				saveToBrowser();
 				loadParent(parents.length - 1);
 			}
@@ -779,6 +786,7 @@ function deleteElement() {
 		if (answer && lastEditedElement) {
 			note.elements = note.elements.filter(function(e) { return (e !== lastEditedElement); });
 			$('#' + lastEditedElement.args.id).remove();
+			notepad.lastModified = moment().format();
 			saveToBrowser();
 		}
 	});
@@ -851,12 +859,14 @@ function updateTitle() {
 		//Rename Section
 		parents[parents.length - 1].title = $('#title-input').val();
 		$('#parents > span:nth-last-child(2)').html(parents[parents.length - 1].title);
+		notepad.lastModified = moment().format();
 		saveToBrowser();
 	}
 	else if (note) {
 		//Rename Note
 		note.title = $('#title-input').val();
 		$('#open-note').html(note.title);
+		notepad.lastModified = moment().format();
 		saveToBrowser();
 	}
 }
@@ -1017,6 +1027,7 @@ function updateNote(id) {
 		}
 
 		resizePage($('#' + element.args.id));
+		notepad.lastModified = moment().format();
 		saveToBrowser();
 	}
 }
@@ -1096,6 +1107,7 @@ rec.addEventListener("dataAvailable", function(e) {
 		if (id === element.args.id) {
 			blobToDataURL(blob, function(dataURI) {
 				element.content = dataURI;
+				notepad.lastModified = moment().format();
 				saveToBrowser();
 			});
 			break;
@@ -1251,7 +1263,6 @@ function saveToBrowser(retry) {
 		but only Chrome and Opera support it. For now I'll use IndexedDB with a sneaky async library.
 	 */
 	$('.save-status').html('Saving&hellip;');
-	notepad.lastModified = moment().format();
 	msHasNotepad();
 
 	$('#viewer ul').each(function(i) {
@@ -1496,7 +1507,8 @@ syncWorker.onmessage = function(event) {
 								notepad: notepad,
 								url: res.url,
 								syncURL: window.syncURL,
-								token: token
+								token: token,
+								method: syncMethod
 							});
 						});
 						break;
@@ -1504,9 +1516,16 @@ syncWorker.onmessage = function(event) {
 					case "download":
 						confirmAsync("A newer version of this notepad has been synced. Do you want to download it?").then(function(answer) {
 							if (answer) {
-								syncWorker.postMessage({
-									req: "download",
-									url: res.url
+								appStorage.getItem('syncToken', function(err, token) {
+									if (err || token === null) return;
+									syncWorker.postMessage({
+										req: "download",
+										notepad: notepad,
+										url: res.url,
+										syncURL: window.syncURL,
+										token: token,
+										method: syncMethod
+									});
 								});
 							}
 						});
@@ -1597,26 +1616,13 @@ function msSync() {
 		if (err || res === null) return;
 
 		$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Syncing&hellip;</a>)');
-		appStorage.getItem('syncedNotepads', function(err, syncList) {
-			if (!err && syncList !== null)  {
-				var hasBeenSynced = syncList[notepad.title];
-			}
-			else {
-				var hasBeenSynced = false;
-				syncList = {};
-			}
-
-			syncWorker.postMessage({
-				syncURL: window.syncURL,
-				req: 'sync',
-				token: res,
-				filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
-				notepad: notepad,
-				hasBeenSynced: hasBeenSynced
-			});
-
-			// syncList[notepad.title] = true;
-			// appStorage.setItem('syncedNotepads', syncList);
+		syncWorker.postMessage({
+			syncURL: window.syncURL,
+			req: 'sync',
+			token: res,
+			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
+			notepad: notepad,
+			method: syncMethod
 		});
 	});
 }

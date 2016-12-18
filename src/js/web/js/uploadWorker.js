@@ -1,10 +1,9 @@
 var syncURL;
 
 onmessage = function(event) {
-	console.log("syncing");
 	var msg = event.data;
 	syncURL = msg.syncURL;
-	var hasProcessedYet = false;
+	var hasProcessedYet = (msg.url.split('.').pop().substring(0, 4) == "part" || msg.url.split('.').pop().substring(0, 4) == "json");
 
 	var xhr = new XMLHttpRequest();
 	xhr.upload.addEventListener("progress", function(event) {
