@@ -280,8 +280,7 @@ onmessage = function(event) {
 
 							if (res !== localMapJSON) {
 								//Loop through the remote map to figure out which blocks are different
-								var newNotepadStr = "";
-								for (var lineNumber in localMap) {
+								for (var lineNumber in remoteMap) {
 									if (lineNumber === 'lastModified') continue;
 									if (!localMap[lineNumber] || remoteMap[lineNumber].md5 !== localMap[lineNumber].md5) {
 										apiPostSync('getChunkDownload.php', {
@@ -295,15 +294,6 @@ onmessage = function(event) {
 												console.log(downloadURL);
 												reqGetSync(downloadURL, function(res, code) {
 													chunks[lineNumber] = new TextEncoder().encode(res);
-													for (var i = 0; i < chunks.length; i++) {
-														var chunk = chunks[i];
-														newNotepadStr += new TextDecoder("utf-8").decode(chunk);
-													}
-													postMessage({
-														req: 'download',
-														code: 200,
-														text: newNotepadStr
-													});
 												});
 											}
 											else {
@@ -313,6 +303,17 @@ onmessage = function(event) {
 										});
 									}
 								}
+
+								var newNotepadStr = "";
+								for (var i = 0; i < chunks.length; i++) {
+									var chunk = chunks[i];
+									newNotepadStr += new TextDecoder("utf-8").decode(chunk);
+								}
+								postMessage({
+									req: 'download',
+									code: 200,
+									text: newNotepadStr
+								});
 							}
 							else {
 								//The remote map is identical to this one
