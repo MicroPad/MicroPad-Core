@@ -19673,7 +19673,7 @@ Notepad.prototype.toXMLObject = function() {
     notepad: {
       $: {
         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-        'xsi:noNamespaceSchemaLocation': 'https://nick.geek.nz/projects/uPad/schema.xsd',
+        'xsi:noNamespaceSchemaLocation': 'https://getmicropad.com/schema.xsd',
         title: this.title,
         lastModified: this.lastModified
       },
@@ -19701,12 +19701,46 @@ Notepad.prototype.toXML = function() {
   return builder.buildObject(this.toXMLObject());
 }
 Notepad.prototype.makeDiff = function(oldXML) {
-  // var myDiff = new JsDiff.Diff();
-  // myDiff.tokenize = function(value) {
-  //  return value.split(/(\n|\r\n)/);
-  // };
-  // return JsDiff.convertChangesToXML(myDiff.diff(this.toXML(), oldXML));
-  return JsDiff.createPatch('test.npx', oldXML, this.toXML());
+  var diff = JsDiff.parsePatch(JsDiff.createPatch('d.npx', oldXML, this.toXML(), undefined, undefined, {context: 0}))[0].hunks;
+
+  var processedDiff = [];
+  for (var i = 0; i < diff.length; i++) {
+    var toPush = {opts: {replace: false}};
+    toPush[diff[i].oldStart] = [];
+    var toDelete = [];
+
+    for (var j = 0; j < diff[i].lines.length; j++) {
+      var line = diff[i].lines[j];
+      switch (line.substring(0, 1)) {
+        case "-":
+          toPush.opts.replace = true;
+          toPush[diff[i].oldStart] = [""];
+          toDelete.push(parseInt(diff[i].oldStart)+j);
+          break;
+        case "+":
+          if (toPush[diff[i].oldStart][0] === "") toPush[diff[i].oldStart] = [];
+          toPush[diff[i].oldStart].push(line.substring(1, line.length));
+          break;
+      }
+    }
+
+    processedDiff.push(toPush);
+    if (toDelete.length > 1) {
+      for (var j = 1; j < toDelete.length; j++) {
+        var lineNumber = toDelete[j];
+        toPush = {opts: {replace: true}};
+        toPush[lineNumber] = [""];
+        processedDiff.push(toPush);
+      }
+    }
+  }
+
+  var diffStr = "";
+  for (var i = 0; i < processedDiff.length; i++) {
+    var hunk = processedDiff[i];
+    diffStr += JSON.stringify(hunk)+'\n';
+  }
+  return diffStr;
 }
 
 var Section = function(title) {

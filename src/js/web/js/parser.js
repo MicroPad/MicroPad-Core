@@ -19673,7 +19673,7 @@ Notepad.prototype.toXMLObject = function() {
 		notepad: {
 			$: {
 				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-				'xsi:noNamespaceSchemaLocation': 'https://nick.geek.nz/projects/uPad/schema.xsd',
+				'xsi:noNamespaceSchemaLocation': 'https://getmicropad.com/schema.xsd',
 				title: this.title,
 				lastModified: this.lastModified
 			},
@@ -19739,20 +19739,6 @@ Notepad.prototype.makeDiff = function(oldXML) {
 	for (var i = 0; i < processedDiff.length; i++) {
 		var hunk = processedDiff[i];
 		diffStr += JSON.stringify(hunk)+'\n';
-
-
-		// var hunks = [];
-		// var lineNumber = Object.keys(hunk)[0];
-		// while (hunk[lineNumber].length) {
-		// 	var splitHunk = {opts: {replace: hunk.opts.replace}};
-		// 	splitHunk[lineNumber] = hunk[lineNumber].splice(0, 5);
-		// 	hunks.push(splitHunk);
-		// }
-
-		// for (var j = 0; j < hunks.length; j++) {
-		// 	var newHunk = hunks[j];
-		// 	diffStr += JSON.stringify(newHunk)+'\n';
-		// }
 	}
 	return diffStr;
 }
