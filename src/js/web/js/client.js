@@ -73,6 +73,9 @@ window.onload = function() {
 	/** Get the open notepads */
 	updateNotepadList();
 
+	/** Get a list of notepads */
+	updateOpenList();
+
 	$('.modal').modal();
 	$('#menu-button').sideNav({
 		// closeOnClick: true
@@ -646,6 +649,26 @@ window.initNotepad = function() {
 	document.title = 'µPad';
 
 	appStorage.setItem('lastNotepadTitle', notepad.title);
+}
+
+function updateOpenList() {
+	appStorage.getItem('syncToken', function(err, res) {
+		if (err) return;
+
+		if (res !== null) {
+			$('#sync-list-results').html('');
+			$.get(window.syncURL+'getNotepads.php', {token: res}, function(data) {
+				for (var i = 0; i < data.length; i++) {
+					var notepadTitle = data[i];
+					$('#sync-list-results').append('<li style="opacity: 0;"><h5><a href="javascript:downloadNotepad(\'{0}\');">{0}</a></h4></li>'.format(notepadTitle));
+				}
+				Materialize.showStaggeredList('#sync-list-results');
+			}, 'json');
+		}
+		else {
+			$('#open-from-sync-button').hide();
+		}
+	});
 }
 
 var latestResults = [];
@@ -1638,6 +1661,12 @@ function msHasNotepad() {
 			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''))
 		});
 	});
+}
+
+function downloadNotepad(filename) {
+	notepad = parser.createNotepad(filename.split('.npx')[0]);
+	notepad.lastModified = moment().subtract(100, 'years').format();
+	window.initNotepad();
 }
 
 function getXmlObject(callback) {

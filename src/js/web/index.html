@@ -71,6 +71,7 @@
 				<!-- Notepads -->
 				<ul id="notepad-dropdown" class="dropdown-content">
 					<li><a class="modal-trigger" data-target="new-notepad"><i class="material-icons left">add</i>New</a></li>
+					<li id="open-from-sync-button"><a class="modal-trigger" data-target="open-microsync"><i class="material-icons left">cloud_download</i>Open (μSync)</a></li>
 					<li><a class="tooltipped" data-position="left" data-delay="50" data-tooltip="Export all of your notepads to an archive of NPX files" href="javascript:exportNotepads();"><i class="material-icons left">file_download</i>Export All</a></li>
 					<li class="divider"></li>
 					<div id="notepadList"></div>
@@ -124,10 +125,10 @@
 					<div id="not-syncing-pitch">
 						<div class="row">
 							<div class="col m4 s12">
-								<h3 style="display: inline;">$1.49</h3>🇳🇿<em>/month</em>
+								<h3 style="display: inline;"><s style="font-size: 12px;">$1.49</s>$1.00</h3>🇳🇿<em>/month</em>
 							</div>
 							<div class="col m6 s12">
-								<h4 style="display: inline;">1 Notepad</h4><em> (up to 1GiB)</em>
+								<h4 style="display: inline;">1 Notepad</h4><em> (up to 1GB)</em>
 							</div>
 							<div class="col m2 s12">
 								<a href="#!" class="btn green waves-effect waves-light">Buy</a>
@@ -147,6 +148,17 @@
 					<a href="#!"" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
 				</div>
 			</div>
+
+			<div id="open-microsync" class="modal modal-fixed-footer">
+				<div class="modal-content">
+					<h4>Open from μSync</h4>
+					<a href="javascript:updateOpenList();"><i class="material-icons left">refresh</i>Refresh List</a>
+					<ul id="sync-list-results"></ul>
+				</div>
+				<div class="modal-footer">
+					<a href="#!"" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				</div>
+			</div>			
 
 			<div id="error-modal" class="modal modal-fixed-footer">
 				<div class="modal-content">
