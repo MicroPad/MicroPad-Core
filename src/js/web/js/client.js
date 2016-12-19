@@ -660,6 +660,7 @@ function updateOpenList() {
 		if (res !== null) {
 			$('#sync-list-results').html('');
 			$.get(window.syncURL+'getNotepads.php', {token: res}, function(data) {
+				$('#connect-to-sync').hide();
 				for (var i = 0; i < data.length; i++) {
 					var notepadTitle = data[i];
 					$('#sync-list-results').append('<li style="opacity: 0;"><h5><a href="javascript:downloadNotepad(\'{0}\');">{0}</a></h4></li>'.format(notepadTitle));
