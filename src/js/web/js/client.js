@@ -134,21 +134,7 @@ window.onload = function() {
 
 	/** Editing elements */
 	var justMoved = false;
-	interact('.interact').resizable({
-		preserveAspectRatio: false,
-		edges: { left: false, right: true, bottom: false, top: false },
-		onend: function(event) {
-			updateNote(event.target.id);
-			justMoved = true;
-		}
-	}).on('resizemove', function(event) {
-		$(event.target).css('width', parseInt($(event.target).css('width')) + event.dx);
-		// $(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
-		$(event.target).css('height', 'auto');
-		resizePage($(event.target));
-		updateReference(event);
-		justMoved = true;
-	}).on('click', function(event) {
+	interact('.interact').on('click', function(event) {
 		if (justMoved) {
 			justMoved = false;
 			return;
@@ -394,6 +380,22 @@ window.onload = function() {
 			inertia: false,
 			autoScroll: true
 		});
+
+		interact('.interact').resizable({
+			preserveAspectRatio: false,
+			edges: { left: false, right: true, bottom: false, top: false },
+			onend: function(event) {
+				updateNote(event.target.id);
+				justMoved = true;
+			}
+		}).on('resizemove', function(event) {
+			$(event.target).css('width', parseInt($(event.target).css('width')) + event.dx);
+			// $(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
+			$(event.target).css('height', 'auto');
+			resizePage($(event.target));
+			updateReference(event);
+			justMoved = true;
+		})
 	}
 
 	function dragMoveListener(event) {
