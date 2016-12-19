@@ -671,6 +671,13 @@ function updateOpenList() {
 	});
 }
 
+function downloadNotepad(filename) {
+	$('#open-microsync').modal('close');
+	notepad = parser.createNotepad(filename.split('.npx')[0]);
+	notepad.lastModified = moment().subtract(100, 'years').format();
+	window.initNotepad();
+}
+
 var latestResults = [];
 function loadSearchResult(resID) {
 	$('#search').modal('close');
@@ -1661,12 +1668,6 @@ function msHasNotepad() {
 			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''))
 		});
 	});
-}
-
-function downloadNotepad(filename) {
-	notepad = parser.createNotepad(filename.split('.npx')[0]);
-	notepad.lastModified = moment().subtract(100, 'years').format();
-	window.initNotepad();
 }
 
 function getXmlObject(callback) {
