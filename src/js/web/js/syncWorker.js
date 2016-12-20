@@ -145,7 +145,8 @@ onmessage = function(event) {
 												token: msg.token,
 												url: uploadURL,
 												data: new TextDecoder("utf-8").decode(chunks[lineNumber]),
-												md5: localMap[lineNumber].md5
+												md5: localMap[lineNumber].md5,
+												method: msg.method
 											});
 										}
 										else {
@@ -172,7 +173,8 @@ onmessage = function(event) {
 										syncURL: me.syncURL,
 										token: msg.token,
 										url: mapURL,
-										data: localMapJSON
+										data: localMapJSON,
+										method: msg.method
 									});
 								}
 								else {
@@ -215,13 +217,13 @@ onmessage = function(event) {
 							filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, ''))
 						}, function(res, code) {
 							if (code === 200) {
-								console.log(res);
 								postMessage({
 									req: "cuePUT",
 									token: msg.token,
 									syncURL: me.syncURL,
 									url: res,
-									data: np.toXML()
+									data: np.toXML(),
+									method: msg.method
 								});
 							}
 							else {
@@ -243,7 +245,8 @@ onmessage = function(event) {
 							token: msg.token,
 							syncURL: me.syncURL,
 							url: msg.url,
-							data: diff
+							data: diff,
+							method: msg.method
 						});
 					}
 
@@ -257,7 +260,6 @@ onmessage = function(event) {
 				case "block":
 					reqGET(msg.url, function(res, code) {
 						if (code === 200) {
-							console.log(res);
 							var np = parser.restoreNotepad(msg.notepad);
 							var npxUInt8Arr = new TextEncoder().encode(np.toXML());
 							var chunks = [];
@@ -287,13 +289,22 @@ onmessage = function(event) {
 											token: msg.token,
 											filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, '')),
 											index: lineNumber,
-											md5: localMap[lineNumber].md5
+											md5: remoteMap[lineNumber].md5
 										}, function(downloadURL, code) {
 											if (code === 200) {
 												//Download chunk
-												console.log(downloadURL);
+												postMessage({
+													req: "progress",
+													type: "Download",
+													percentage: ((parseInt(lineNumber))/(Object.keys(remoteMap).length-1))*100
+												});
 												reqGetSync(downloadURL, function(res, code) {
 													chunks[lineNumber] = new TextEncoder().encode(res);
+													postMessage({
+														req: "progress",
+														type: "Download",
+														percentage: ((parseInt(lineNumber)+1)/(Object.keys(remoteMap).length-1))*100
+													});
 												});
 											}
 											else {

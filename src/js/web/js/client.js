@@ -628,7 +628,9 @@ window.initNotepad = function() {
 						notepad: notepad
 					});
 				}
-			}, 'json');
+			}, 'json').fail(() => {
+				msLogout();
+			});
 
 			syncWorker.postMessage({
 				syncURL: window.syncURL,
@@ -668,7 +670,9 @@ function updateOpenList() {
 					$('#sync-list-results').append('<li style="opacity: 0;"><h5 style="display: inline;"><a href="javascript:downloadNotepad(\'{0}\');">{0}</a></h5> <a href="javascript:msRemoveNotepad(\'{0}\');">(Remove Notepad)</a></li><br />'.format(notepadTitle));
 				}
 				Materialize.showStaggeredList('#sync-list-results');
-			}, 'json');
+			}, 'json').fail(() => {
+				msLogout();
+			});
 		}
 		else {
 			$('#open-from-sync-button').hide();
@@ -863,32 +867,51 @@ function downloadFile(elementID) {
 function updateTitle() {
 	if (parents.length === 1) {
 		//Delete old Notepad
-		appStorage.removeItem('lastNotepadTitle', function() {
-			switch (window.platform) {
-				case "web":
-					notepadStorage.removeItem(notepad.title, function() {
-						notepad.title = $('#title-input').val();
-						$('#parents > span:nth-child(1)').html(notepad.title);
-						saveToBrowser();
-						setTimeout(function() {
-							location.reload();
-						}, 500);
-					});
-					break;
+		appStorage.getItem('syncToken', (err, token) => {
+			function clientUpdate() {
+				appStorage.removeItem('lastNotepadTitle', function() {
+					switch (window.platform) {
+						case "web":
+							notepadStorage.removeItem(notepad.title, function() {
+								notepad.title = $('#title-input').val();
+								$('#parents > span:nth-child(1)').html(notepad.title);
+								saveToBrowser();
+								setTimeout(function() {
+									location.reload();
+								}, 500);
+							});
+							break;
 
-				case "uwp":
-					Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
-						.then(function(folder) {
-							return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
-						}).then(function(file) {
-							return file.deleteAsync();
-						}).done(function() {
-							notepad.title = $('#title-input').val();
-							saveToBrowser(undefined, true);
-						});
-					break;
+						case "uwp":
+							Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
+								.then(function(folder) {
+									return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+								}).then(function(file) {
+									return file.deleteAsync();
+								}).done(function() {
+									notepad.title = $('#title-input').val();
+									saveToBrowser(undefined, true);
+								});
+							break;
+					}
+				});
+			}
+
+			if (!err && token !== null) {
+				$.post(window.syncURL+'updateTitle.php', {
+					token: token,
+					filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
+					newFilename: '{0}.npx'.format($('#title-input').val().replace(/[^a-z0-9 ]/gi, ''))
+				}).always((res) => {
+					console.log(res);
+					clientUpdate();
+				});
+			}
+			else {
+				clientUpdate();
 			}
 		});
+		
 	}
 	else if (parents.length > 1 && !note) {
 		//Rename Section
@@ -1465,7 +1488,6 @@ uploadWorker.onmessage = function(event) {
 }
 
 function cueUpload() {
-	console.log(putRequests);
 	if (putRequests.length > 0) uploadWorker.postMessage(putRequests[0]);
 }
 
@@ -1606,6 +1628,7 @@ syncWorker.onmessage = function(event) {
 			$('#error-modal').modal('open');
 			break;
 
+		case "cueGET":
 		case "cuePUT":
 			setTimeout(function() {
 				putRequests.push(msg);

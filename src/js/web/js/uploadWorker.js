@@ -3,11 +3,14 @@ var syncURL;
 onmessage = function(event) {
 	var msg = event.data;
 	syncURL = msg.syncURL;
-	var hasProcessedYet = (msg.url.split('.').pop().substring(0, 4) == "part" || msg.url.split('.').pop().substring(0, 4) == "json");
+	var hasProcessedYet = (msg.method !== "diff");
 
 	var xhr = new XMLHttpRequest();
 	xhr.upload.addEventListener("progress", function(event) {
-		progress(event, "Upload");
+		if (msg.req === "cuePUT") var verb = "Upload";
+		if (msg.req === "cueGET") var verb = "Download";
+
+		progress(event, verb);
 	});
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
