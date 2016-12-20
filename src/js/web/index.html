@@ -110,11 +110,36 @@
 						<label for="password-input">Password</label>
 					</div>
 
-					<p style="max-width: 50ch;"><em>Note: Due to the way that we protect your privacy, we can't reset your password for you. Make sure that you won't forget it.</em></p>
+					<p style="max-width: 50ch;"><em>Note: Due to the way that we protect your privacy, we can't recover your password for you. Make sure that you won't forget it.</em></p>
 				</div>
 				<div class="modal-footer">
 					<a href="javascript:msLogin('login');" class="modal-action modal-close waves-effect waves-light btn-flat">Login</a>
 					<a href="javascript:msLogin('signup');" class="modal-action modal-close waves-effect waves-light btn-flat">Register</a>
+				</div>
+			</div>
+
+			<div id="change-password-microsync" class="modal">
+				<div class="modal-content">
+					<h4>Change µSync Password</h4>
+
+					<div class="input-field">
+						<input id="change-username-input" autocomplete="off" autocorrect="off" autocapitalize="off" type="text" required />
+						<label for="change-username-input">Username</label>
+					</div>
+					<div class="input-field">
+						<input id="old-password-input" autocomplete="off" autocorrect="off" autocapitalize="off" type="password" required />
+						<label for="old-password-input">Old Password</label>
+					</div>
+					<div class="input-field">
+						<input id="new-password-input" type="password" required />
+						<label for="new-password-input">New Password</label>
+					</div>
+
+					<p style="max-width: 50ch;"><em>Note: Due to the way that we protect your privacy, we can't recover your password for you. Make sure that you won't forget it.</em></p>
+				</div>
+				<div class="modal-footer">
+					<a href="javascript:syncOptions('changePassword');" class="modal-action modal-close waves-effect waves-light btn-flat">Change Password</a>
+					<a href="#!"" class="modal-action modal-close waves-effect waves-light btn-flat">Cancel</a>
 				</div>
 			</div>
 
@@ -135,15 +160,45 @@
 								<a href="#!" class="btn green waves-effect waves-light">Buy</a>
 							</div>
 						</div>
-						<a href="javascript:msAddNotepad();" class="secondary-text-color"><em>I've already paid for this notepad</em></a>
+						<a href="javascript:msAddNotepad();" class="secondary-text-color"><em>I already have a free notepad-slot</em></a>
 					</div>
 
 					<div id="sync-options">
+						<ul>
+							<li><a href="javascript:syncOptions('removeNotepad');">Stop syncing this notepad (this will not cancel your subscription)</a></li>
+						</ul>
 					</div>
 
 					<br /><div class="divider"></div>
 					
 					<h5>Account Options</h5>
+					<ul>
+						<li><a href="#!">Change Subscription</a></li>
+						<li><a href="#!" class="modal-trigger" data-target="change-password-microsync">Change Password</a></li>
+						<li><a href="javascript:msLogout();">Sign out</a></li>
+					</ul>
+
+					<ul>
+						<strong style="color: #F44336;">Dangerous Account Options</strong>
+						<div class="row">
+							<div class="col m6 s12">
+								<li><a href="javascript:syncOptions('removeAllData');">Delete all data associated with my account</a></li>
+								<li><a href="javascript:syncOptions('revokeAllTokens');">Sign out all of my devices</a></li>
+							</div>
+
+							<div class="col m6 s12">
+								For these options to work you need to enter your username and password below:
+								<div class="input-field">
+									<input id="verify-username-input" autocomplete="off" autocorrect="off" autocapitalize="off" type="text" required />
+									<label for="verify-username-input">Username</label>
+								</div>
+								<div class="input-field">
+									<input id="verify-password-input" type="password" required />
+									<label for="verify-password-input">Password</label>
+								</div>
+							</div>
+						</div>
+					</ul>
 				</div>
 				<div class="modal-footer">
 					<a href="#!"" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
@@ -153,13 +208,13 @@
 			<div id="open-microsync" class="modal modal-fixed-footer">
 				<div class="modal-content">
 					<h4>Open from μSync</h4>
-					<a href="javascript:updateOpenList();"><i class="material-icons left">refresh</i>Refresh List</a>
+					<a href="javascript:updateOpenList();"><i class="material-icons left">refresh</i>Refresh List</a> | <a href="#!" class="modal-trigger" data-target="sync-manager">Open Sync Manager</a>
 					<ul id="sync-list-results"></ul>
 				</div>
 				<div class="modal-footer">
 					<a href="#!"" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
 				</div>
-			</div>			
+			</div>
 
 			<div id="error-modal" class="modal modal-fixed-footer">
 				<div class="modal-content">

@@ -82,6 +82,8 @@ window.onload = function() {
 	});
 	$('#stop-recording-btn').hide();
 	$('.display-with-note').hide();
+	$('#not-syncing-pitch').hide();
+	$('#sync-options').hide();
 	$('#menu-button').sideNav();
 	wasMobile = isMobile();
 
@@ -663,7 +665,7 @@ function updateOpenList() {
 				$('#connect-to-sync').hide();
 				for (var i = 0; i < data.length; i++) {
 					var notepadTitle = data[i];
-					$('#sync-list-results').append('<li style="opacity: 0;"><h5><a href="javascript:downloadNotepad(\'{0}\');">{0}</a></h4></li>'.format(notepadTitle));
+					$('#sync-list-results').append('<li style="opacity: 0;"><h5 style="display: inline;"><a href="javascript:downloadNotepad(\'{0}\');">{0}</a></h5> <a href="javascript:msRemoveNotepad(\'{0}\');">(Remove Notepad)</a></li><br />'.format(notepadTitle));
 				}
 				Materialize.showStaggeredList('#sync-list-results');
 			}, 'json');
@@ -1639,7 +1641,7 @@ function msAddNotepad() {
 			req: 'addNotepad',
 			token: res,
 			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
-			lastModified: notepad.lastModified
+			lastModified: moment().subtract(100, 'years').format()
 		});
 	});
 }
@@ -1671,6 +1673,81 @@ function msHasNotepad() {
 			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''))
 		});
 	});
+}
+
+function msLogout() {
+	appStorage.removeItem("syncToken", () => {
+		window.location.reload();
+	});
+}
+
+function msRemoveNotepad(filename) {
+	confirmAsync("This will permanently remove your notepad from our servers. Are you sure you want to continue?").then(a => {
+		if (a) {
+			appStorage.getItem("syncToken", function(err, token) {
+				if (err || token === null) {
+					alert("Error getting token");
+					msLogout();
+					return;
+				}
+
+				$.post(window.syncURL+"removeNotepad.php", {
+					filename: filename,
+					token: token
+				}, () => {
+					window.location.reload();
+				}).fail(() => {
+					alert("There was an error completing your request");
+				});
+			});
+		}
+	});
+}
+
+function syncOptions(option) {
+	switch (option) {
+		case "removeNotepad":
+			msRemoveNotepad('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+			break;
+
+		case "removeAllData":
+			confirmAsync("This will permanently remove all of your notepads from our servers. Are you sure you want to continue?").then(a => {
+				if (a) {
+					$.post(window.syncURL+"deleteAccountData.php", {
+						username: $('#verify-username-input').val(),
+						password: $('#verify-password-input').val()
+					}, () => {
+						window.location.reload();
+					}).fail(() => {
+						alert("There was an error completing your request");
+					});
+				}
+			});
+			break;
+
+		case "revokeAllTokens":
+			$.post(window.syncURL+"revokeAllTokens.php", {
+				username: $('#verify-username-input').val(),
+				password: $('#verify-password-input').val()
+			}, () => {
+				msLogout();
+			}).fail(() => {
+				alert("There was an error completing your request");
+			});
+			break;
+
+		case "changePassword":
+			$.post(window.syncURL+"changePassword.php", {
+				username: $('#change-username-input').val(),
+				password: $('#old-password-input').val(),
+				newPassword: $('#new-password-input').val()
+			}, () => {
+				alert("Your password has been changed");
+			}).fail(() => {
+				alert("There was an error completing your request");
+			});
+			break;
+	}
 }
 
 function getXmlObject(callback) {
