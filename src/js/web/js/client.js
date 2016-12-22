@@ -134,6 +134,22 @@ window.onload = function() {
 		return $('.dropdown-content.active').length > 0;
 	}
 
+	$('#microsync-checkout-form').hide();
+	function updateMSTotal() {
+		var total = 1*parseInt($('#notepad-quantity').val());
+		$('#microsync-total').html(total.toFixed(2));
+		$('#microsync-checkout-form > form > input[name="li_1_quantity"]').val($('#notepad-quantity').val());
+	}
+	$('#notepad-quantity').bind('change', event => {
+		updateMSTotal();
+	});
+	$('#change-subscription').modal({
+		complete: () => {
+			$('#microsync-checkout-form').hide();
+		}
+	});
+	updateMSTotal();
+
 	/** Editing elements */
 	var justMoved = false;
 	interact('.interact').on('click', function(event) {
@@ -619,18 +635,39 @@ window.initNotepad = function() {
 		if (err) return;
 
 		if (res !== null) {
-			var filename = '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''));
+			var req1 = $.get(window.syncURL+'payments/isSubscribed.php', {token: res});
+			var req2 = $.get(window.syncURL+'getFreeSlots.php', {token: res});
+			$.when(req1, req2).done((isSubscribed, freeSlots) => {
+				if (isSubscribed === "true" && freeSlots > 0) {
+					$('#add-notepad-msg').html('Start Syncing this Notepad ({0} slot(s) left)'.format(freeSlots));
+					$('#add-notepad-msg').show();
+					$('#buy-slots-msg').hide();
+				}
+				else {
+					$('#add-notepad-msg').hide();
+				}
 
-			$.post(window.syncURL+'getSyncStatus.php', {token: res, filename: filename}, function(data) {
+				if (isSubscribed === "true") {
+					$('#start-sub-btn').hide();
+					$('#cancel-sub-btn').show();
+				}
+				else {
+					$('#start-sub-btn').show();
+					$('#cancel-sub-btn').hide();
+				}
+			}).fail(() => {
+				$('#add-notepad-msg').hide();
+			});
+
+			var filename = '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''));
+			$.post(window.syncURL+'getSyncStatus.php', {token: res, filename: filename}, data => {
 				if (data.initialSyncDone) {
 					syncWorker.postMessage({
 						req: 'setOldXML',
 						notepad: notepad
 					});
 				}
-			}, 'json').fail(() => {
-				msLogout();
-			});
+			}).fail(() => { return; });
 
 			syncWorker.postMessage({
 				syncURL: window.syncURL,
@@ -1533,11 +1570,14 @@ syncWorker.onmessage = function(event) {
 			break;
 
 		case "addNotepad":
-			if (msg.code === 201) {
-				window.location.reload();
-			}
-			else {
-				alert("Notepad already exists");
+			switch (msg.code) {
+				case 201:
+					window.location.reload();
+					break;
+
+				default:
+					alert(msg.text);
+					break;	
 			}
 			break;
 
@@ -1724,6 +1764,16 @@ function msRemoveNotepad(filename) {
 				});
 			});
 		}
+	});
+}
+
+function msGetOrderID() {
+	appStorage.getItem("syncToken", (err, token) => {
+		if (err || token === null) return;
+
+		$.post(window.syncURL+'payments/newOrderID.php', {token: token}, data => {
+			$('#microsync-checkout-form > form > input[name="merchant_order_id"]').val(data);
+		});
 	});
 }
 

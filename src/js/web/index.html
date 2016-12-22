@@ -143,24 +143,57 @@
 				</div>
 			</div>
 
-			<div id="sync-manager" class="modal modal-fixed-footer">
+			<div id="change-subscription" class="modal">
+				<div class="modal-content">
+					<div class="row">
+						<div class="col m4 s12">
+							<h3 style="display: inline;"><s style="font-size: 12px;">$1.49</s>$1.00</h3>🇳🇿<em>/month</em>
+						</div>
+						<div class="col m6 s12">
+							<h4 style="display: inline;"><input id="notepad-quantity" type="number" value="1" min="1" style="width: 30px;" /> Notepad(s)</h4><em> (up to 1GB)</em>
+						</div>
+						<div class="col m2 s12">
+							<a href="#!" class="btn blue waves-effect waves-light" onclick="msGetOrderID(); $('#microsync-checkout-form').slideDown('slow');">Next</a>
+						</div>
+					</div>
+					<div id="microsync-checkout-form">
+						<strong></strong>
+						<form action='https://2checkout.com/checkout/purchase' method='post'>
+							<input type='hidden' name='sid' value='103115725' />
+							<input type='hidden' name='mode' value='2CO' />
+							<input type='hidden' name='li_1_type' value='product' />
+							<input type='hidden' name='li_1_name' value='µSync' />
+							<input type='hidden' name='li_1_price' value='1.00' />
+							<input type='hidden' name='li_1_quantity' value='1' />
+							<input type='hidden' name='merchant_order_id' value="" />
+							<input type='text' name='card_holder_name' placeholder="Full Name" required />
+							<input type='text' name='street_address' placeholder="Street Address" required />
+							<input type='text' name='street_address2' placeholder="Street Address (Line 2)" />
+							<input type='text' name='city' placeholder="City" required />
+							<input type='text' name='state' placeholder="Region/State" required />
+							<input type='text' name='zip' placeholder="ZIP Code" required />
+							<input type='text' name='country' placeholder="Country" required />
+							<input type='email' name='email' placeholder="Email Address" required />
+							<input type='tel' name='phone' placeholder="Phone Number" required />
+							<button class="btn green waves-effect waves-light" name='submit' type='submit'>Checkout</button>
+						</form>
+					</div>
+					<h5 style="display: inline;">Total: $<span id="microsync-total"></span></h5>🇳🇿<em>/month</em><br />
+					<em>µSync is over 30% off while µPad is in <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">alpha</a>.</em>
+				</div>
+				<div class="modal-footer">
+					<a href="#!"" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				</div>
+			</div>
+
+			<div id="sync-manager" class="modal">
 				<div class="modal-content">
 					<h4>Sync Manager</h4>
 					
 					<h5>Notepad Options (<span id="notepadTitle"></span>)</h5>
 					<div id="not-syncing-pitch">
-						<div class="row">
-							<div class="col m4 s12">
-								<h3 style="display: inline;"><s style="font-size: 12px;">$1.49</s>$1.00</h3>🇳🇿<em>/month</em>
-							</div>
-							<div class="col m6 s12">
-								<h4 style="display: inline;">1 Notepad</h4><em> (up to 1GB)</em>
-							</div>
-							<div class="col m2 s12">
-								<a href="#!" class="btn green waves-effect waves-light">Buy</a>
-							</div>
-						</div>
-						<a href="javascript:msAddNotepad();" class="secondary-text-color"><em>I already have a free notepad-slot</em></a>
+						<a href="javascript:msAddNotepad();" class="secondary-text-color"><em id="add-notepad-msg"></em></a>
+						<a href="#!" id="buy-slots-msg" class="modal-trigger secondary-text-color" data-target="change-subscription">Add this notepad for as low as $1🇳🇿</a>
 					</div>
 
 					<div id="sync-options">
@@ -173,7 +206,7 @@
 					
 					<h5>Account Options</h5>
 					<ul>
-						<li><a href="#!">Change Subscription</a></li>
+						<li id="start-sub-btn"><a href="#!" class="modal-trigger" data-target="change-subscription">Start Subscription</a></li>
 						<li><a href="#!" class="modal-trigger" data-target="change-password-microsync">Change Password</a></li>
 						<li><a href="javascript:msLogout();">Sign out</a></li>
 					</ul>
@@ -182,6 +215,7 @@
 						<strong style="color: #F44336;">Dangerous Account Options</strong>
 						<div class="row">
 							<div class="col m6 s12">
+								<li id="cancel-sub-btn" style="display: none;"><a href="javascript:syncOptions('cancelSubscription');">Cancel Subscription</a></li>
 								<li><a href="javascript:syncOptions('removeAllData');">Delete all data associated with my account</a></li>
 								<li><a href="javascript:syncOptions('revokeAllTokens');">Sign out all of my devices</a></li>
 							</div>
@@ -472,6 +506,8 @@
 		<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
 		<script type="text/javascript" async src="js/libs/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
 		<script src="js/libs/ASCIIMathML.js"></script>
+
+		<script src="https://www.2checkout.com/static/checkout/javascript/direct.min.js"></script>
 		
 		<script src="js/parser.js"></script>
 		<script src="js/client.js"></script>
