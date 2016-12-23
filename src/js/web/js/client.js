@@ -1517,7 +1517,9 @@ syncWorker.onmessage = function(event) {
 				$('#sync-options').show();
 				msSync();
 
-				appStorage.getItem('syncToken', token => {
+				appStorage.getItem('syncToken', (err, token) => {
+					if (err || token === null) $('#add-notepad-msg').hide();
+
 					var req1 = $.get(window.syncURL+'payments/isSubscribed.php?token='+token);
 					var req2 = $.get(window.syncURL+'getFreeSlots.php?token='+token);
 					$.when(req1, req2).done((isSubscribed, freeSlots) => {
