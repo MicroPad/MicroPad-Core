@@ -1864,7 +1864,7 @@ function formatMd(type) {
 			break;
 
 		case "table":
-			//TODO
+			$('#md-textarea').replaceSelectedText("| Header 1 | Header 2 |\n|---|---|\n| Column 1 | Column 2 |\n| Row 2 |  |");
 			break;
 	}
 }
