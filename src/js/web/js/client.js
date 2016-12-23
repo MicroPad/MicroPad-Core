@@ -1517,8 +1517,8 @@ syncWorker.onmessage = function(event) {
 				$('#sync-options').show();
 				msSync();
 
-				var req1 = $.get(window.syncURL+'payments/isSubscribed.php', {token: res});
-				var req2 = $.get(window.syncURL+'getFreeSlots.php', {token: res});
+				var req1 = $.get(window.syncURL+'payments/isSubscribed.php?token='+res);
+				var req2 = $.get(window.syncURL+'getFreeSlots.php?token='+res);
 				$.when(req1, req2).done((isSubscribed, freeSlots) => {
 					if (isSubscribed === "true" && freeSlots > 0) {
 						$('#add-notepad-msg').html('Start Syncing this Notepad ({0} slot(s) left)'.format(freeSlots));
