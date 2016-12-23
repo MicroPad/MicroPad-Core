@@ -1517,28 +1517,30 @@ syncWorker.onmessage = function(event) {
 				$('#sync-options').show();
 				msSync();
 
-				var req1 = $.get(window.syncURL+'payments/isSubscribed.php?token='+res);
-				var req2 = $.get(window.syncURL+'getFreeSlots.php?token='+res);
-				$.when(req1, req2).done((isSubscribed, freeSlots) => {
-					if (isSubscribed === "true" && freeSlots > 0) {
-						$('#add-notepad-msg').html('Start Syncing this Notepad ({0} slot(s) left)'.format(freeSlots));
-						$('#add-notepad-msg').show();
-						$('#buy-slots-msg').hide();
-					}
-					else {
-						$('#add-notepad-msg').hide();
-					}
+				appStorage.getItem('syncToken', token => {
+					var req1 = $.get(window.syncURL+'payments/isSubscribed.php?token='+token);
+					var req2 = $.get(window.syncURL+'getFreeSlots.php?token='+token);
+					$.when(req1, req2).done((isSubscribed, freeSlots) => {
+						if (isSubscribed === "true" && freeSlots > 0) {
+							$('#add-notepad-msg').html('Start Syncing this Notepad ({0} slot(s) left)'.format(freeSlots));
+							$('#add-notepad-msg').show();
+							$('#buy-slots-msg').hide();
+						}
+						else {
+							$('#add-notepad-msg').hide();
+						}
 
-					if (isSubscribed === "true") {
-						$('#start-sub-btn').hide();
-						$('#cancel-sub-btn').show();
-					}
-					else {
-						$('#start-sub-btn').show();
-						$('#cancel-sub-btn').hide();
-					}
-				}).fail(() => {
-					$('#add-notepad-msg').hide();
+						if (isSubscribed === "true") {
+							$('#start-sub-btn').hide();
+							$('#cancel-sub-btn').show();
+						}
+						else {
+							$('#start-sub-btn').show();
+							$('#cancel-sub-btn').hide();
+						}
+					}).fail(() => {
+						$('#add-notepad-msg').hide();
+					});
 				});
 			}
 			else {
