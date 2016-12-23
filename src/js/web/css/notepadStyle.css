@@ -195,6 +195,11 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	cursor: pointer;
 }
 
+.format-btn {
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
 #mobile-canary {
 	font-weight: 100;
 	font-size: 1rem;

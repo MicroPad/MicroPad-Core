@@ -635,30 +635,6 @@ window.initNotepad = function() {
 		if (err) return;
 
 		if (res !== null) {
-			var req1 = $.get(window.syncURL+'payments/isSubscribed.php', {token: res});
-			var req2 = $.get(window.syncURL+'getFreeSlots.php', {token: res});
-			$.when(req1, req2).done((isSubscribed, freeSlots) => {
-				if (isSubscribed === "true" && freeSlots > 0) {
-					$('#add-notepad-msg').html('Start Syncing this Notepad ({0} slot(s) left)'.format(freeSlots));
-					$('#add-notepad-msg').show();
-					$('#buy-slots-msg').hide();
-				}
-				else {
-					$('#add-notepad-msg').hide();
-				}
-
-				if (isSubscribed === "true") {
-					$('#start-sub-btn').hide();
-					$('#cancel-sub-btn').show();
-				}
-				else {
-					$('#start-sub-btn').show();
-					$('#cancel-sub-btn').hide();
-				}
-			}).fail(() => {
-				$('#add-notepad-msg').hide();
-			});
-
 			var filename = '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''));
 			$.post(window.syncURL+'getSyncStatus.php', {token: res, filename: filename}, data => {
 				if (data.initialSyncDone) {
@@ -1540,6 +1516,30 @@ syncWorker.onmessage = function(event) {
 				$('#not-syncing-pitch').hide();
 				$('#sync-options').show();
 				msSync();
+
+				var req1 = $.get(window.syncURL+'payments/isSubscribed.php', {token: res});
+				var req2 = $.get(window.syncURL+'getFreeSlots.php', {token: res});
+				$.when(req1, req2).done((isSubscribed, freeSlots) => {
+					if (isSubscribed === "true" && freeSlots > 0) {
+						$('#add-notepad-msg').html('Start Syncing this Notepad ({0} slot(s) left)'.format(freeSlots));
+						$('#add-notepad-msg').show();
+						$('#buy-slots-msg').hide();
+					}
+					else {
+						$('#add-notepad-msg').hide();
+					}
+
+					if (isSubscribed === "true") {
+						$('#start-sub-btn').hide();
+						$('#cancel-sub-btn').show();
+					}
+					else {
+						$('#start-sub-btn').show();
+						$('#cancel-sub-btn').hide();
+					}
+				}).fail(() => {
+					$('#add-notepad-msg').hide();
+				});
 			}
 			else {
 				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Enable µSync</a>)');
@@ -1827,6 +1827,46 @@ function getXmlObject(callback) {
 	setTimeout(function() {
 		callback(notepad.toXMLObject());
 	}, 0);
+}
+
+function formatMd(type) {
+	switch (type) {
+		case "bold":
+			$('#md-textarea').surroundSelectedText("**", "**");
+			break;
+
+		case "italic":
+			$('#md-textarea').surroundSelectedText("*", "*");
+			break;
+
+		case "b-list":
+			$('#md-textarea').surroundSelectedText("- ", "");
+			break;
+
+		case "n-list":
+			$('#md-textarea').surroundSelectedText("1. ", "");
+			break;
+
+		case "t-list":
+			$('#md-textarea').surroundSelectedText("- [] ", "");
+			break;
+
+		case "indent":
+			$('#md-textarea').surroundSelectedText("\t", "");
+			break;
+
+		case "strikethrough":
+			$('#md-textarea').surroundSelectedText("~~", "~~");
+			break;
+
+		case "link":
+			$('#md-textarea').replaceSelectedText("[{0}]({1})".format($('#md-textarea').getSelection().text, "https://example.com"));
+			break;
+
+		case "table":
+			//TODO
+			break;
+	}
 }
 
 /** Utility functions */
