@@ -1156,12 +1156,12 @@ function loadNote(id, delta) {
 	setTimeout(function() {
 		MathJax.Hub.Typeset();
 		initDrawings();
-		updateNote();
+		updateNote(undefined, true);
 	}, 1000);
 	updateInstructions();
 }
 
-function updateNote(id) {
+function updateNote(id, init) {
 	for (k in note.elements) {
 		var element = note.elements[k];
 		var sel = $('#' + element.args.id);
@@ -1173,7 +1173,7 @@ function updateNote(id) {
 		}
 
 		resizePage($('#' + element.args.id));
-		notepad.lastModified = moment().format();
+		if (!init) notepad.lastModified = moment().format();
 		saveToBrowser();
 	}
 }
