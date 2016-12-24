@@ -1933,6 +1933,10 @@ function formatMd(type) {
 			$('#md-textarea').surroundSelectedText("\t", "");
 			break;
 
+		case "equation":
+			$('#md-textarea').surroundSelectedText("===", "===");
+			break;
+
 		case "strikethrough":
 			$('#md-textarea').surroundSelectedText("~~", "~~");
 			break;
