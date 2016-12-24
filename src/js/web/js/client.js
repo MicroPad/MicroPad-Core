@@ -1156,6 +1156,7 @@ function loadNote(id, delta) {
 	setTimeout(function() {
 		MathJax.Hub.Typeset();
 		initDrawings();
+		updateNote();
 	}, 1000);
 	updateInstructions();
 }
