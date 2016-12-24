@@ -1107,6 +1107,7 @@ function loadSection(id, providedSection) {
 
 function loadNote(id, delta) {
 	if (!delta) {
+		window.scrollTo(0, 0);
 		noteID = id;
 		oldNote = note;
 		note = parents[parents.length - 1].notes[id];
@@ -1935,7 +1936,7 @@ function formatMd(type) {
 			break;
 
 		case "equation":
-			$('#md-textarea').surroundSelectedText("===", "===");
+			$('#md-textarea').surroundSelectedText(" ===", "=== ");
 			break;
 
 		case "strikethrough":
