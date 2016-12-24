@@ -4,6 +4,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<title>µPad</title>
 		<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+		<link type="text/css" rel="stylesheet" href="css/libs/pricing.css"/>
 		<link rel="stylesheet" type="text/css" href="css/notepadStyle.css">
 		<script>
 			window.platform = "web";
@@ -143,9 +144,9 @@
 				</div>
 			</div>
 
-			<div id="change-subscription" class="modal">
+			<div id="change-subscription" class="modal" style="width: 90%; min-height: 85%;">
 				<div class="modal-content">
-					<div class="row">
+					<!-- <div class="row">
 						<div class="col m4 s12">
 							<h3 style="display: inline;"><s style="font-size: 12px;">$1.49</s>$1.00</h3>🇳🇿<em>/month</em>
 						</div>
@@ -153,18 +154,51 @@
 							<h4 style="display: inline;"><input id="notepad-quantity" type="number" value="1" min="1" style="width: 30px;" /> Notepad(s)</h4><em> (up to 1GB)</em>
 						</div>
 						<div class="col m2 s12">
-							<a href="#!" class="btn blue waves-effect waves-light" onclick="msGetOrderID(); $('#microsync-checkout-form').slideDown('slow');">Next</a>
+							<a href="#!" class="btn blue waves-effect waves-light" onclick="msGetOrderID('s'); $('#microsync-checkout-form').slideDown('slow');">Next</a>
 						</div>
+					</div> -->
+					<div class="pricingTable">
+						<ul class="pricingTable-firstTable">
+							<li class="pricingTable-firstTable_table">
+								<h1 class="pricingTable-firstTable_table__header">Single</h1>
+								<p class="pricingTable-firstTable_table__pricing"><span>$</span><span id="s_price">1.00</span><span>Month</span></p>
+								<ul class="pricingTable-firstTable_table__options">
+									<li>1 Notepad</li>
+									<li>Up to 1GB per notepad</li>
+									<li>No romantic attachment</li>
+								</ul>
+								<div class="pricingTable-firstTable_table__getstart" onclick="msGetOrderID('s'); $('#microsync-checkout-form').slideDown('slow');">Get Started Now</div>
+							</li><li class="pricingTable-firstTable_table">
+								<h1 class="pricingTable-firstTable_table__header">Study Pack</h1>
+								<p class="pricingTable-firstTable_table__pricing"><span>$</span><span id="sp_price">2.95</span><span>Month</span></p>
+								<ul class="pricingTable-firstTable_table__options">
+									<li>3 Notepads</li>
+									<li>Up to 1GB per notepad</li>
+									<li>Allows room for school notepads and personal notepads</li>
+								</ul>
+								<div class="pricingTable-firstTable_table__getstart" onclick="msGetOrderID('sp'); $('#microsync-checkout-form').slideDown('slow');">Get Started Now</div>
+							</li><li class="pricingTable-firstTable_table">
+								<h1 class="pricingTable-firstTable_table__header">Power Pack</h1>
+								<p class="pricingTable-firstTable_table__pricing"><span>$</span><span id="pp_price">9.50</span><span>Month</span></p>
+								<ul class="pricingTable-firstTable_table__options">
+									<li>10 Notepads</li>
+									<li>Up to 1GB per notepad</li>
+									<li>Over 12,500,000 A4 pages worth of notepads</li>
+								</ul>
+								<div class="pricingTable-firstTable_table__getstart" onclick="msGetOrderID('pp'); $('#microsync-checkout-form').slideDown('slow');">Get Started Now</div>
+							</li>
+						</ul>
 					</div>
+					<em>Prices are in New Zealand Dollars
+					<br />µSync is discounted while µPad is in <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">alpha</a> (usually $1.49, $4.29, and $14.50).</em>
 					<div id="microsync-checkout-form">
-						<strong></strong>
 						<form action='https://2checkout.com/checkout/purchase' method='post'>
 							<input type='hidden' name='sid' value='103115725' />
 							<input type='hidden' name='mode' value='2CO' />
-							<input type='hidden' name='li_1_type' value='product' />
-							<input type='hidden' name='li_1_name' value='µSync' />
-							<input type='hidden' name='li_1_price' value='1.00' />
-							<input type='hidden' name='li_1_quantity' value='1' />
+							<input type='hidden' name='li_0_type' value='product' />
+							<input type='hidden' name='li_0_name' value='µSync' />
+							<input type='hidden' name='li_0_price' value='1.00' />
+							<input type='hidden' name='li_0_quantity' value='1' />
 							<input type='hidden' name='merchant_order_id' value="" />
 							<input type='text' name='card_holder_name' placeholder="Full Name" required />
 							<input type='text' name='street_address' placeholder="Street Address" required />
@@ -178,8 +212,6 @@
 							<button class="btn green waves-effect waves-light" name='submit' type='submit'>Checkout</button>
 						</form>
 					</div>
-					<h5 style="display: inline;">Total: $<span id="microsync-total"></span></h5>🇳🇿<em>/month</em><br />
-					<em>µSync is over 30% off while µPad is in <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">alpha</a>.</em>
 				</div>
 				<div class="modal-footer">
 					<a href="#!"" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
@@ -192,13 +224,13 @@
 					
 					<h5>Notepad Options (<span id="notepadTitle"></span>)</h5>
 					<div id="not-syncing-pitch">
-						<a href="javascript:msAddNotepad();" class="secondary-text-color"><em id="add-notepad-msg"></em></a>
-						<a href="#!" id="buy-slots-msg" class="modal-trigger secondary-text-color" data-target="change-subscription">Add this notepad for as low as $1🇳🇿</a>
+						<a href="javascript:msAddNotepad();"><em id="add-notepad-msg"></em></a>
+						<a href="#!" id="buy-slots-msg" class="modal-trigger" data-target="change-subscription">Start syncing this notepad</a>
 					</div>
 
 					<div id="sync-options">
 						<ul>
-							<li><a href="javascript:syncOptions('removeNotepad');">Stop syncing this notepad (this will not cancel your subscription)</a></li>
+							<li><a href="javascript:syncOptions('removeNotepad');">Stop syncing this notepad</a></li>
 						</ul>
 					</div>
 

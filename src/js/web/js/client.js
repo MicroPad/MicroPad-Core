@@ -135,20 +135,11 @@ window.onload = function() {
 	}
 
 	$('#microsync-checkout-form').hide();
-	function updateMSTotal() {
-		var total = 1*parseInt($('#notepad-quantity').val());
-		$('#microsync-total').html(total.toFixed(2));
-		$('#microsync-checkout-form > form > input[name="li_1_quantity"]').val($('#notepad-quantity').val());
-	}
-	$('#notepad-quantity').bind('change', event => {
-		updateMSTotal();
-	});
 	$('#change-subscription').modal({
 		complete: () => {
 			$('#microsync-checkout-form').hide();
 		}
 	});
-	updateMSTotal();
 
 	/** Editing elements */
 	var justMoved = false;
@@ -1592,40 +1583,40 @@ syncWorker.onmessage = function(event) {
 				$('#not-syncing-pitch').hide();
 				$('#sync-options').show();
 				msSync();
-
-				appStorage.getItem('syncToken', (err, token) => {
-					if (err || token === null) $('#add-notepad-msg').hide();
-
-					var req1 = $.get(window.syncURL+'payments/isSubscribed.php?token='+token);
-					var req2 = $.get(window.syncURL+'getFreeSlots.php?token='+token);
-					$.when(req1, req2).done((isSubscribed, freeSlots) => {
-						if (isSubscribed === "true" && freeSlots > 0) {
-							$('#add-notepad-msg').html('Start Syncing this Notepad ({0} slot(s) left)'.format(freeSlots));
-							$('#add-notepad-msg').show();
-							$('#buy-slots-msg').hide();
-						}
-						else {
-							$('#add-notepad-msg').hide();
-						}
-
-						if (isSubscribed === "true") {
-							$('#start-sub-btn').hide();
-							$('#cancel-sub-btn').show();
-						}
-						else {
-							$('#start-sub-btn').show();
-							$('#cancel-sub-btn').hide();
-						}
-					}).fail(() => {
-						$('#add-notepad-msg').hide();
-					});
-				});
 			}
 			else {
 				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Enable µSync</a>)');
 				$('#not-syncing-pitch').show();
 				$('#sync-options').hide();
 			}
+
+			appStorage.getItem('syncToken', (err, token) => {
+				if (err || token === null) $('#add-notepad-msg').hide();
+
+				var req1 = $.get(window.syncURL+'payments/isSubscribed.php?token='+token);
+				var req2 = $.get(window.syncURL+'getFreeSlots.php?token='+token);
+				$.when(req1, req2).done((isSubscribed, freeSlots) => {
+					if (isSubscribed[0] === "true" && freeSlots[0] > 0) {
+						$('#add-notepad-msg').html('Start Syncing this Notepad ({0} slot(s) left)'.format(freeSlots[0]));
+						$('#add-notepad-msg').show();
+						$('#buy-slots-msg').hide();
+					}
+					else {
+						$('#add-notepad-msg').hide();
+					}
+
+					if (isSubscribed[0] === "true") {
+						$('#start-sub-btn').hide();
+						$('#cancel-sub-btn').css('display', 'unset');
+					}
+					else {
+						$('#start-sub-btn').show();
+						$('#cancel-sub-btn').css('display', 'none');
+					}
+				}).fail(() => {
+					$('#add-notepad-msg').hide();
+				});
+			});
 			break;
 
 		case "signup":
@@ -1847,7 +1838,36 @@ function msRemoveNotepad(filename) {
 	});
 }
 
-function msGetOrderID() {
+function msGetOrderID(plan) {
+	var prodNum;
+	var prodName;
+	var price;
+	switch (plan) {
+		case "s":
+			prodNum = 1;
+			prodName = "Single";
+			price = '1.00';
+			break;
+		case "sp":
+			prodNum = 2;
+			prodName = "Study Pack";
+			price = '2.95';
+			break;
+		case "pp":
+			prodNum = 3;
+			prodName = "Power Pack";
+			price = '9.50';
+			break;
+	}
+
+	$('#microsync-checkout-form > form > input[name="li_0_name"]').attr('value', 'µSync ({0})'.format(prodName));
+	$('#microsync-checkout-form > form > input[name="li_0_price"]').attr('value', price);
+
+	$('#microsync-checkout-form > form > input[value="product"]').attr('name', 'li_{0}_type'.format(prodNum));
+	$('#microsync-checkout-form > form > input[name="li_0_name"]').attr('name', 'li_{0}_name'.format(prodNum));
+	$('#microsync-checkout-form > form > input[name="li_0_price"]').attr('name', 'li_{0}_price'.format(prodNum));
+	$('#microsync-checkout-form > form > input[name="li_0_quantity"]').attr('name', 'li_{0}_quantity'.format(prodNum));
+
 	appStorage.getItem("syncToken", (err, token) => {
 		if (err || token === null) return;
 
