@@ -5,7 +5,10 @@ var noteID;
 var lastEditedElement = undefined;
 var lastClick = { x: 0, y: 0 };
 var canvasCtx = undefined;
-var rec = new Recorder();
+try {
+	var rec = new Recorder();
+}
+catch(err) {}
 var wasMobile = isMobile();
 var stillLoading = false;
 var syncWorker = new Worker('js/syncWorker.js');
@@ -1245,33 +1248,37 @@ function insertRecording() {
 	$('#insert').modal('close');
 	$('#empty-viewer').hide();
 }
-rec.addEventListener('streamReady', function(event) {
-	rec.start();
-	$('#stop-recording-btn').show();
-});
-rec.addEventListener("dataAvailable", function(e) {
-	var blob = new Blob([e.detail], { type: 'audio/ogg' });
-	var url = URL.createObjectURL(blob);
 
-	var id = insert('recording');
-	for (var i = 0; i < note.elements.length; i++) {
-		var element = note.elements[i];
-		if (id === element.args.id) {
-			blobToDataURL(blob, function(dataURI) {
-				element.content = dataURI;
-				notepad.lastModified = moment().format();
-				saveToBrowser();
-			});
-			break;
+try {
+	rec.addEventListener('streamReady', function(event) {
+		rec.start();
+		$('#stop-recording-btn').show();
+	});
+	rec.addEventListener("dataAvailable", function(e) {
+		var blob = new Blob([e.detail], { type: 'audio/ogg' });
+		var url = URL.createObjectURL(blob);
+
+		var id = insert('recording');
+		for (var i = 0; i < note.elements.length; i++) {
+			var element = note.elements[i];
+			if (id === element.args.id) {
+				blobToDataURL(blob, function(dataURI) {
+					element.content = dataURI;
+					notepad.lastModified = moment().format();
+					saveToBrowser();
+				});
+				break;
+			}
 		}
-	}
 
-	$('#' + id + ' > audio').attr('src', url);
-	edgeFix(blob, id);
-});
+		$('#' + id + ' > audio').attr('src', url);
+		edgeFix(blob, id);
+	});
+}
+catch (err) {}
 
 function edgeFix(blob, id) {
-	if (window.navigator.userAgent.indexOf("Edge") > -1) {
+	if (window.navigator.userAgent.indexOf("Edge") > -1 || (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
 		//MS Edge sucks and can't opus. For them we'll use .wav
 		var fileReader = new FileReader();
 		fileReader.onload = function() {
@@ -1421,7 +1428,7 @@ function saveToBrowser(retry) {
 		$(this).addClass('browser-default')
 	});
 
-	notepadStorage.setItem(notepad.title, notepad, function() {
+	notepadStorage.setItem(notepad.title, stringify(notepad), function() {
 		updateNotepadList();
 		$('.save-status').html('All changes saved');
 	});
@@ -1431,7 +1438,9 @@ function saveToBrowser(retry) {
 
 function loadFromBrowser(title) {
 	notepadStorage.getItem(title, function(err, res) {
-		notepad = parser.restoreNotepad(res);
+		if (err || res === null) return;
+
+		notepad = parser.restoreNotepad(JSON.parse(res));
 		window.initNotepad();
 
 		getXmlObject(function(xmlObj) {
@@ -1645,6 +1654,7 @@ syncWorker.onmessage = function(event) {
 
 		case "login":
 			if (msg.code === 200) {
+				console.log(JSON.stringify(msg));
 				appStorage.setItem('syncToken', msg.text, function() {
 					window.location.reload();
 				});
@@ -2018,6 +2028,17 @@ function confirmAsync(question) {
 			});
 			break;
 	}
+}
+
+function stringify(obj) {
+	var seen = [];
+	return JSON.stringify(obj, (key, val) => {
+		if (val != null && typeof val === "object") {
+			if (seen.indexOf(val) > -1) return;
+			seen.push(val);
+		}
+		return val;
+	});
 }
 
 //Thanks to http://stackoverflow.com/a/4673436/998467
