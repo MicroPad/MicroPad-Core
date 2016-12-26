@@ -5167,14 +5167,16 @@ exports.Note = function(title, time, addons) {
 	this.addons = addons;
 	this.bibliography = [];
 	this.elements = [];
-};
+}
+
 exports.Note.prototype.addSource = function(id, item, content) {
 	this.bibliography.push({
 		id: id,
 		item: item,
 		content: content
 	});
-};
+}
+
 exports.Note.prototype.addElement = function(type, args, content) {
 	if (!type) return;
 	if (!content || content.length === 0) return;
@@ -5183,12 +5185,14 @@ exports.Note.prototype.addElement = function(type, args, content) {
 		args: args,
 		content: content
 	});
-};
+}
+
 exports.Note.prototype.search = function(query) {
 	var pattern = new RegExp("\\b"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
 	if (pattern.test(this.title)) return this;
 	return false;
 }
+
 exports.Note.prototype.toXMLObject = function() {
 	var parseableNote = {
 		note: {
@@ -5247,6 +5251,7 @@ exports.Note.prototype.toXMLObject = function() {
 
 	return parseableNote;
 }
+
 exports.Note.prototype.toXML = function() {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
@@ -5254,6 +5259,52 @@ exports.Note.prototype.toXML = function() {
 		cdata: true
 	});
 	return builder.buildObject(this.toXMLObject());
+}
+
+exports.Note.prototype.toMarkdown = function() {
+	var mdNote = "";
+	for (var i = 0; i < this.elements.length; i++) {
+		var element = this.elements[i];
+		var citation = "";
+		for (var j = 0; j < this.bibliography.length; j++) {
+			var source = this.bibliography[j];
+
+			if (source.item === element.args.id) {
+				citation = "[[{0}]]({1})".format(source.id, source.content);
+			}
+		}
+
+		switch (element.type) {
+			case "markdown":
+				mdNote += element.content+citation+"\n\n";
+				break;
+
+			case "drawing":
+			case "image":
+				mdNote += "![]({0}){1}\n\n".format(element.content, citation);
+				break;
+
+			case "file":
+			case "recording":
+				mdNote += "[{0}]({1}){2}\n\n".format(element.args.filename, element.args.content, citation);
+				break;
+		}
+	}
+
+	return {title: this.title, md: mdNote};
+}
+
+// Thanks to http://stackoverflow.com/a/4673436/998467
+if (!String.prototype.format) {
+	String.prototype.format = function() {
+		var args = arguments;
+		return this.replace(/{(\d+)}/g, function(match, number) { 
+			return typeof args[number] != 'undefined'
+				? args[number]
+				: match
+			;
+		});
+	};
 }
 
 },{"moment":181,"xml2js":191}],29:[function(require,module,exports){
@@ -19700,6 +19751,13 @@ Notepad.prototype.toXML = function() {
 	});
 	return builder.buildObject(this.toXMLObject());
 }
+Notepad.prototype.toMarkdown = function() {
+	var notes = [];
+	for (var i = 0; i < this.sections.length; i++) {
+		notes.push.apply(notes, this.sections[i].toMarkdown());
+	}
+	return notes;
+}
 Notepad.prototype.makeDiff = function(oldXML) {
 	var diff = JsDiff.parsePatch(JsDiff.createPatch('d.npx', oldXML, this.toXML(), undefined, undefined, {context: 0}))[0].hunks;
 
@@ -19801,6 +19859,20 @@ Section.prototype.toXML = function() {
 		cdata: true
 	});
 	return builder.buildObject(this.toXMLObject());
+}
+Section.prototype.toMarkdown = function() {
+	var mdNoteList = [];
+
+	for (var i = 0; i < this.sections.length; i++) {
+		var section = this.sections[i];
+		mdNoteList.push.apply(mdNoteList, section.toMarkdown());
+	}
+
+	for (var i = 0; i < this.notes.length; i++) {
+		mdNoteList.push(this.notes[i].toMarkdown());
+	}
+
+	return mdNoteList;
 }
 
 var supportedAddons = [];
@@ -20051,7 +20123,7 @@ function enmlToMarkdown(enml) {
 			{
 				filter: 'en-todo',
 				replacement: function(content, node) {
-					var checkStr = '';
+					var checkStr = ' ';
 					if (node.getAttributeNode('checked')) {
 						if (node.getAttributeNode('checked').value == 'true') checkStr = 'x';
 					}
@@ -20080,5 +20152,6 @@ if (!String.prototype.format) {
 		});
 	};
 }
+
 },{"./Note.js":28,"diff":41,"moment":181,"pretty-data":182,"to-markdown":184,"xml2js":191}]},{},[209])(209)
 });

@@ -74,7 +74,7 @@
 					<li><a class="modal-trigger" data-target="new-notepad"><i class="material-icons left">add</i>New</a></li>
 					<li id="open-from-sync-button"><a class="modal-trigger" data-target="open-microsync"><i class="material-icons left">cloud_download</i>Open (μSync)</a></li>
 					<li id="connect-to-sync"><a class="modal-trigger" data-target="login">Connect to μSync</a></li>
-					<li><a class="tooltipped" data-position="left" data-delay="50" data-tooltip="Export all of your notepads to an archive of NPX files" href="javascript:exportNotepads();"><i class="material-icons left">file_download</i>Export All</a></li>
+					<li><a class="modal-trigger tooltipped" data-position="left" data-delay="50" data-tooltip="Export all of your notepads to an archive of NPX files" href="#!" data-target="export-all"><i class="material-icons left">file_download</i>Export All</a></li>
 					<li class="divider"></li>
 					<div id="notepadList"></div>
 				</ul>
@@ -299,6 +299,24 @@
 						<input id="search-text" placeholder="Search for Notes in Notepad" autocomplete="off" autofocus />
 					</div>
 					<ul id="search-results"></ul>
+				</div>
+				<div class="modal-footer">
+					<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+				</div>
+			</div>
+
+			<div id="export-all" class="modal">
+				<div class="modal-content">
+					<h4>Export All Notepads</h4>
+					<div class="row">
+						<div class="col s6">
+							<img class="insert-icon tooltipped" style="width: 6rem; height: auto" data-position="bottom" data-delay="50" data-tooltip="ZIP Archive of Notepad XML Files" src="img/npxz.png" onclick="exportNotepads('npx');" />
+						</div>
+
+						<div class="col s6">
+							<img class="insert-icon tooltipped" style="width: 6rem; height: auto" data-position="bottom" data-delay="50" data-tooltip="ZIP Archive of Markdown Files" src="fonts/md.svg" onclick="exportNotepads('md');" />
+						</div>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>

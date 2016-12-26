@@ -65,6 +65,13 @@ Notepad.prototype.toXML = function() {
 	});
 	return builder.buildObject(this.toXMLObject());
 }
+Notepad.prototype.toMarkdown = function() {
+	var notes = [];
+	for (var i = 0; i < this.sections.length; i++) {
+		notes.push.apply(notes, this.sections[i].toMarkdown());
+	}
+	return notes;
+}
 Notepad.prototype.makeDiff = function(oldXML) {
 	var diff = JsDiff.parsePatch(JsDiff.createPatch('d.npx', oldXML, this.toXML(), undefined, undefined, {context: 0}))[0].hunks;
 
@@ -166,6 +173,20 @@ Section.prototype.toXML = function() {
 		cdata: true
 	});
 	return builder.buildObject(this.toXMLObject());
+}
+Section.prototype.toMarkdown = function() {
+	var mdNoteList = [];
+
+	for (var i = 0; i < this.sections.length; i++) {
+		var section = this.sections[i];
+		mdNoteList.push.apply(mdNoteList, section.toMarkdown());
+	}
+
+	for (var i = 0; i < this.notes.length; i++) {
+		mdNoteList.push(this.notes[i].toMarkdown());
+	}
+
+	return mdNoteList;
 }
 
 var supportedAddons = [];
@@ -416,7 +437,7 @@ function enmlToMarkdown(enml) {
 			{
 				filter: 'en-todo',
 				replacement: function(content, node) {
-					var checkStr = '';
+					var checkStr = ' ';
 					if (node.getAttributeNode('checked')) {
 						if (node.getAttributeNode('checked').value == 'true') checkStr = 'x';
 					}

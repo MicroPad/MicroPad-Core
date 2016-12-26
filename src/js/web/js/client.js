@@ -914,14 +914,28 @@ function exportOpen() {
 	saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
 }
 
-function exportNotepads() {
+function exportNotepads(type) {
 	var zip = new JSZip();
+	var ext = "npxz";
 	notepadStorage.iterate(function(value, key, i) {
-		var blob = new Blob([parser.restoreNotepad(value).toXML()], { type: "text/xml;charset=utf-8" });
-		zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+		switch (type) {
+			case "npx":
+				var blob = new Blob([parser.restoreNotepad(value).toXML()], { type: "text/xml;charset=utf-8" });
+				zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+				break;
+			case "md":
+				ext = 'zip';
+				for (var i = 0; i < parser.restoreNotepad(value).toMarkdown().length; i++) {
+					var note = parser.restoreNotepad(value).toMarkdown()[i];
+
+					var blob = new Blob([note.md], { type: "text/markdown;charset=utf-8" });
+					zip.file('{0}/{1}.md'.format(key.replace(/[^a-z0-9 ]/gi, ''), note.title.replace(/[^a-z0-9 ]/gi, '')), blob);
+				}
+				break;
+		}
 	}, function() {
 		zip.generateAsync({ type: "blob" }).then(function(blob) {
-			saveAs(blob, "notepads.npxz");
+			saveAs(blob, "notepads."+ext);
 		});
 	});
 }

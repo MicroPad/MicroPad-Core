@@ -132,7 +132,7 @@ exports.Note.prototype.toMarkdown = function() {
 		}
 	}
 
-	return mdNote;
+	return {title: this.title, md: mdNote};
 }
 
 // Thanks to http://stackoverflow.com/a/4673436/998467
