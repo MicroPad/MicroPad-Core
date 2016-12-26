@@ -19,13 +19,12 @@ var putRequests = [];
 
 /** Setup localforage */
 var notepadStorage = localforage.createInstance({
-	name: 'uPad',
-	version: 4.0,
+	name: 'MicroPad',
 	storeName: 'notepads'
 });
 
 var appStorage = localforage.createInstance({
-	name: 'uPad',
+	name: 'MicroPad',
 	version: 1.0,
 	storeName: 'app'
 });
