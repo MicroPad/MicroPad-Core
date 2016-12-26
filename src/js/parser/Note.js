@@ -8,14 +8,16 @@ exports.Note = function(title, time, addons) {
 	this.addons = addons;
 	this.bibliography = [];
 	this.elements = [];
-};
+}
+
 exports.Note.prototype.addSource = function(id, item, content) {
 	this.bibliography.push({
 		id: id,
 		item: item,
 		content: content
 	});
-};
+}
+
 exports.Note.prototype.addElement = function(type, args, content) {
 	if (!type) return;
 	if (!content || content.length === 0) return;
@@ -24,12 +26,14 @@ exports.Note.prototype.addElement = function(type, args, content) {
 		args: args,
 		content: content
 	});
-};
+}
+
 exports.Note.prototype.search = function(query) {
 	var pattern = new RegExp("\\b"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
 	if (pattern.test(this.title)) return this;
 	return false;
 }
+
 exports.Note.prototype.toXMLObject = function() {
 	var parseableNote = {
 		note: {
@@ -88,6 +92,7 @@ exports.Note.prototype.toXMLObject = function() {
 
 	return parseableNote;
 }
+
 exports.Note.prototype.toXML = function() {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
@@ -95,4 +100,50 @@ exports.Note.prototype.toXML = function() {
 		cdata: true
 	});
 	return builder.buildObject(this.toXMLObject());
+}
+
+exports.Note.prototype.toMarkdown = function() {
+	var mdNote = "";
+	for (var i = 0; i < this.elements.length; i++) {
+		var element = this.elements[i];
+		var citation = "";
+		for (var j = 0; j < this.bibliography.length; j++) {
+			var source = this.bibliography[j];
+
+			if (source.item === element.args.id) {
+				citation = "[[{0}]]({1})".format(source.id, source.content);
+			}
+		}
+
+		switch (element.type) {
+			case "markdown":
+				mdNote += element.content+citation+"\n\n";
+				break;
+
+			case "drawing":
+			case "image":
+				mdNote += "![]({0}){1}\n\n".format(element.content, citation);
+				break;
+
+			case "file":
+			case "recording":
+				mdNote += "[{0}]({1}){2}\n\n".format(element.args.filename, element.args.content, citation);
+				break;
+		}
+	}
+
+	return mdNote;
+}
+
+// Thanks to http://stackoverflow.com/a/4673436/998467
+if (!String.prototype.format) {
+	String.prototype.format = function() {
+		var args = arguments;
+		return this.replace(/{(\d+)}/g, function(match, number) { 
+			return typeof args[number] != 'undefined'
+				? args[number]
+				: match
+			;
+		});
+	};
 }
