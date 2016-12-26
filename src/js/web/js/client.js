@@ -96,7 +96,7 @@ window.onload = function() {
 			if (title == null || e) return;
 			notepadStorage.iterate(function(value, key, i) {
 				if (title === key) {
-					notepad = parser.restoreNotepad(value);
+					notepad = parser.restoreNotepad(JSON.parse(value));
 					initNotepad();
 				}
 			});
@@ -923,13 +923,13 @@ function exportNotepads(type) {
 	notepadStorage.iterate(function(value, key, i) {
 		switch (type) {
 			case "npx":
-				var blob = new Blob([parser.restoreNotepad(value).toXML()], { type: "text/xml;charset=utf-8" });
+				var blob = new Blob([parser.restoreNotepad(JSON.parse(value)).toXML()], { type: "text/xml;charset=utf-8" });
 				zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
 				break;
 			case "md":
 				ext = 'zip';
-				for (var i = 0; i < parser.restoreNotepad(value).toMarkdown().length; i++) {
-					var note = parser.restoreNotepad(value).toMarkdown()[i];
+				for (var i = 0; i < parser.restoreNotepad(JSON.parse(value)).toMarkdown().length; i++) {
+					var note = parser.restoreNotepad(JSON.parse(value)).toMarkdown()[i];
 
 					var blob = new Blob([note.md], { type: "text/markdown;charset=utf-8" });
 					zip.file('{0}/{1}.md'.format(key.replace(/[^a-z0-9 ]/gi, ''), note.title.replace(/[^a-z0-9 ]/gi, '')), blob);
