@@ -1,23 +1,30 @@
-﻿var notepad;
+var notepad;
 var parents = [];
 var note;
 var noteID;
 var lastEditedElement = undefined;
 var lastClick = { x: 0, y: 0 };
 var canvasCtx = undefined;
-var rec = new Recorder();
+try {
+	var rec = new Recorder();
+}
+catch (err) { }
 var wasMobile = isMobile();
 var stillLoading = false;
+var syncWorker = new Worker('js/syncWorker.js');
+var syncMethod = "block";
+
+var uploadWorker = new Worker('js/uploadWorker.js');
+var putRequests = [];
 
 /** Setup localforage */
 var notepadStorage = localforage.createInstance({
-	name: 'uPad',
-	version: 1.0,
+	name: 'MicroPad',
 	storeName: 'notepads'
 });
 
 var appStorage = localforage.createInstance({
-	name: 'uPad',
+	name: 'MicroPad',
 	version: 1.0,
 	storeName: 'app'
 });
@@ -68,12 +75,17 @@ window.onload = function() {
 	/** Get the open notepads */
 	updateNotepadList();
 
+	/** Get a list of notepads */
+	updateOpenList();
+
 	$('.modal').modal();
 	$('#menu-button').sideNav({
 		// closeOnClick: true
 	});
 	$('#stop-recording-btn').hide();
 	$('.display-with-note').hide();
+	$('#not-syncing-pitch').hide();
+	$('#sync-options').hide();
 	$('#menu-button').sideNav();
 	wasMobile = isMobile();
 
@@ -83,7 +95,7 @@ window.onload = function() {
 			if (title == null || e) return;
 			notepadStorage.iterate(function(value, key, i) {
 				if (title === key) {
-					notepad = parser.restoreNotepad(value);
+					notepad = parser.restoreNotepad(JSON.parse(value));
 					initNotepad();
 				}
 			});
@@ -124,23 +136,16 @@ window.onload = function() {
 		return $('.dropdown-content.active').length > 0;
 	}
 
+	$('#microsync-checkout-form').hide();
+	$('#change-subscription').modal({
+		complete: () => {
+			$('#microsync-checkout-form').hide();
+		}
+	});
+
 	/** Editing elements */
 	var justMoved = false;
-	interact('.interact').resizable({
-		preserveAspectRatio: false,
-		edges: { left: false, right: true, bottom: false, top: false },
-		onend: function(event) {
-			updateNote(event.target.id);
-			justMoved = true;
-		}
-	}).on('resizemove', function(event) {
-		$(event.target).css('width', parseInt($(event.target).css('width')) + event.dx);
-		// $(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
-		$(event.target).css('height', 'auto');
-		resizePage($(event.target));
-		updateReference(event);
-		justMoved = true;
-	}).on('click', function(event) {
+	interact('.interact').on('click', function(event) {
 		if (justMoved) {
 			justMoved = false;
 			return;
@@ -150,6 +155,7 @@ window.onload = function() {
 
 		var currentTarget = $('#' + event.currentTarget.id);
 		for (k in note.elements) {
+			notepad.lastModified = moment().format();
 			var element = note.elements[k];
 			if (element.args.id == event.currentTarget.id) {
 				lastEditedElement = element;
@@ -240,6 +246,7 @@ window.onload = function() {
 											var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
 											currentTarget.attr('src', trimmed);
 
+											notepad.lastModified = moment().format();
 											saveToBrowser();
 										}
 									}
@@ -384,6 +391,22 @@ window.onload = function() {
 			inertia: false,
 			autoScroll: true
 		});
+
+		interact('.interact').resizable({
+			preserveAspectRatio: false,
+			edges: { left: false, right: true, bottom: false, top: false },
+			onend: function(event) {
+				updateNote(event.target.id);
+				justMoved = true;
+			}
+		}).on('resizemove', function(event) {
+			$(event.target).css('width', parseInt($(event.target).css('width')) + event.dx);
+			// $(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
+			$(event.target).css('height', 'auto');
+			resizePage($(event.target));
+			updateReference(event);
+			justMoved = true;
+		})
 	}
 
 	function dragMoveListener(event) {
@@ -480,7 +503,10 @@ window.onload = function() {
 
 	/** Search Notes */
 	$('#search').modal({
-		complete: function() {
+		ready: () => {
+			$('#search-text').focus();
+		},
+		complete: () => {
 			$('#search-text').val('');
 			$('#search-results').html('');
 		}
@@ -551,6 +577,80 @@ window.onload = function() {
 		}
 	});
 
+	/** Keyboard Shortcuts - Navigation */
+	Mousetrap.bind('s', e => {
+		if (parents.length > 0 && (!note || note.elements.length > 0)) {
+			e.preventDefault();
+			$('#new-section').modal('open');
+		}
+	});
+	Mousetrap.bind('n', e => {
+		if (parents[parents.length - 1].notes && (!note || note.elements.length > 0)) {
+			e.preventDefault();
+			$('#new-note').modal('open');
+		}
+	});
+	Mousetrap.bind('f', e => {
+		if (parents.length > 0 && (!note || note.elements.length > 0)) {
+			e.preventDefault();
+			$('#search').modal('open');
+		}
+	});
+	Mousetrap.bind('mod+1', e => {
+		if (parents.length > 0) {
+			e.preventDefault();
+			loadParent(0);
+		}
+	});
+	Mousetrap.bind('mod+2', e => {
+		if (parents.length > 1) {
+			e.preventDefault();
+			loadParent(1);
+		}
+	});
+	Mousetrap.bind('mod+3', e => {
+		if (parents.length > 2) {
+			e.preventDefault();
+			loadParent(2);
+		}
+	});
+	Mousetrap.bind('mod+4', e => {
+		if (parents.length > 3) {
+			e.preventDefault();
+			loadParent(3);
+		}
+	});
+	Mousetrap.bind('mod+5', e => {
+		if (parents.length > 4) {
+			e.preventDefault();
+			loadParent(4);
+		}
+	});
+	Mousetrap.bind('mod+6', e => {
+		if (parents.length > 5) {
+			e.preventDefault();
+			loadParent(5);
+		}
+	});
+	Mousetrap.bind('mod+7', e => {
+		if (parents.length > 6) {
+			e.preventDefault();
+			loadParent(6);
+		}
+	});
+	Mousetrap.bind('mod+8', e => {
+		if (parents.length > 7) {
+			e.preventDefault();
+			loadParent(7);
+		}
+	});
+	Mousetrap.bind('mod+9', e => {
+		if (parents.length > 8) {
+			e.preventDefault();
+			loadParent(8);
+		}
+	});
+
 	mobileNav();
 	updateInstructions();
 
@@ -598,7 +698,34 @@ window.initNotepad = function() {
 	$('#s-dd').css('pointer-events', 'auto');
 	$('#search-link').css('color', '#fff');
 	$('#search-link').css('pointer-events', 'auto');
+	$('#notepadTitle').html(notepad.title);
 	updateInstructions();
+
+	appStorage.getItem('syncToken', function(err, res) {
+		if (err) return;
+
+		if (res !== null) {
+			var filename = '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''));
+			$.post(window.syncURL + 'getSyncStatus.php', { token: res, filename: filename }, data => {
+				if (data.initialSyncDone) {
+					syncWorker.postMessage({
+						req: 'setOldXML',
+						notepad: notepad
+					});
+				}
+			}).fail(() => { return; });
+
+			syncWorker.postMessage({
+				syncURL: window.syncURL,
+				req: "hasAddedNotepad",
+				token: res,
+				filename: filename
+			});
+		}
+		else {
+			$('#parents > span:first-child').append(' (<a href="#!" onclick="$(\'#login\').modal(\'open\')">Connect to µSync</a>)');
+		}
+	});
 
 	$('<span class="breadcrumb">{0}</span>'.format(notepad.title)).insertBefore('#open-note');
 	for (k in notepad.sections) {
@@ -611,6 +738,36 @@ window.initNotepad = function() {
 	document.title = 'µPad';
 
 	appStorage.setItem('lastNotepadTitle', notepad.title);
+}
+
+function updateOpenList() {
+	appStorage.getItem('syncToken', function(err, res) {
+		if (err) return;
+
+		if (res !== null) {
+			$('#sync-list-results').html('');
+			$.get(window.syncURL + 'getNotepads.php', { token: res }, function(data) {
+				$('#connect-to-sync').hide();
+				for (var i = 0; i < data.length; i++) {
+					var notepadTitle = data[i];
+					$('#sync-list-results').append('<li style="opacity: 0;"><h5 style="display: inline;"><a href="javascript:downloadNotepad(\'{0}\');">{0}</a></h5> <a href="javascript:msRemoveNotepad(\'{0}\');">(Remove Notepad)</a></li><br />'.format(notepadTitle));
+				}
+				Materialize.showStaggeredList('#sync-list-results');
+			}, 'json').fail(() => {
+				msLogout();
+			});
+		}
+		else {
+			$('#open-from-sync-button').hide();
+		}
+	});
+}
+
+function downloadNotepad(filename) {
+	$('#open-microsync').modal('close');
+	notepad = parser.createNotepad(filename.split('.npx')[0]);
+	notepad.lastModified = moment().subtract(100, 'years').format();
+	window.initNotepad();
 }
 
 var latestResults = [];
@@ -682,6 +839,7 @@ function newSection() {
 	var title = $('#new-section-title').val();
 	var index = parents[parents.length - 1].sections.push(parser.createSection(title)) - 1;
 	loadSection(index);
+	notepad.lastModified = moment().format();
 	saveToBrowser();
 
 	$('#new-section-title').val('');
@@ -694,6 +852,7 @@ function newNote() {
 	var index = notesInParent.push(newNote) - 1;
 	$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(index, newNote.title));
 	loadNote(index);
+	notepad.lastModified = moment().format();
 	saveToBrowser();
 
 	$('#new-note-title').val('');
@@ -729,12 +888,14 @@ function deleteOpen() {
 			else if (parents.length > 1 && !note) {
 				//Delete Section
 				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) { return s !== parents[parents.length - 1] });
+				notepad.lastModified = moment().format();
 				saveToBrowser();
 				loadParent(parents.length - 2);
 			}
 			else if (note) {
 				//Delete Note
 				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) { return n !== note });
+				notepad.lastModified = moment().format();
 				saveToBrowser();
 				loadParent(parents.length - 1);
 			}
@@ -747,6 +908,7 @@ function deleteElement() {
 		if (answer && lastEditedElement) {
 			note.elements = note.elements.filter(function(e) { return (e !== lastEditedElement); });
 			$('#' + lastEditedElement.args.id).remove();
+			notepad.lastModified = moment().format();
 			saveToBrowser();
 		}
 	});
@@ -757,14 +919,28 @@ function exportOpen() {
 	saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
 }
 
-function exportNotepads() {
+function exportNotepads(type) {
 	var zip = new JSZip();
+	var ext = "npxz";
 	notepadStorage.iterate(function(value, key, i) {
-		var blob = new Blob([parser.restoreNotepad(value).toXML()], { type: "text/xml;charset=utf-8" });
-		zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+		switch (type) {
+			case "npx":
+				var blob = new Blob([parser.restoreNotepad(JSON.parse(value)).toXML()], { type: "text/xml;charset=utf-8" });
+				zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+				break;
+			case "md":
+				ext = 'zip';
+				for (var i = 0; i < parser.restoreNotepad(JSON.parse(value)).toMarkdown().length; i++) {
+					var note = parser.restoreNotepad(JSON.parse(value)).toMarkdown()[i];
+
+					var blob = new Blob([note.md], { type: "text/markdown;charset=utf-8" });
+					zip.file('{0}/{1}.md'.format(key.replace(/[^a-z0-9 ]/gi, ''), note.title.replace(/[^a-z0-9 ]/gi, '')), blob);
+				}
+				break;
+		}
 	}, function() {
 		zip.generateAsync({ type: "blob" }).then(function(blob) {
-			saveAs(blob, "notepads.npxz");
+			saveAs(blob, "notepads." + ext);
 		});
 	});
 }
@@ -788,43 +964,64 @@ function downloadFile(elementID) {
 function updateTitle() {
 	if (parents.length === 1) {
 		//Delete old Notepad
-		appStorage.removeItem('lastNotepadTitle', function() {
-			switch (window.platform) {
-				case "web":
-					notepadStorage.removeItem(notepad.title, function() {
-						notepad.title = $('#title-input').val();
-						$('#parents > span:nth-child(1)').html(notepad.title);
-						saveToBrowser();
-						setTimeout(function() {
-							location.reload();
-						}, 500);
-					});
-					break;
+		appStorage.getItem('syncToken', (err, token) => {
+			function clientUpdate() {
+				appStorage.removeItem('lastNotepadTitle', function() {
+					switch (window.platform) {
+						case "web":
+							notepadStorage.removeItem(notepad.title, function() {
+								notepad.title = $('#title-input').val();
+								$('#parents > span:nth-child(1)').html(notepad.title);
+								saveToBrowser();
+								setTimeout(function() {
+									location.reload();
+								}, 500);
+							});
+							break;
 
-				case "uwp":
-					Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
-						.then(function(folder) {
-							return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
-						}).then(function(file) {
-							return file.deleteAsync();
-						}).done(function() {
-							notepad.title = $('#title-input').val();
-							saveToBrowser(undefined, true);
-						});
-					break;
+						case "uwp":
+							Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir)
+								.then(function(folder) {
+									return folder.getFileAsync('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+								}).then(function(file) {
+									return file.deleteAsync();
+								}).done(function() {
+									notepad.title = $('#title-input').val();
+									saveToBrowser(undefined, true);
+								});
+							break;
+					}
+				});
+			}
+
+			if (!err && token !== null) {
+				$.post(window.syncURL + 'updateTitle.php', {
+					token: token,
+					filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
+					newFilename: '{0}.npx'.format($('#title-input').val().replace(/[^a-z0-9 ]/gi, ''))
+				}).always((res) => {
+					console.log(res);
+					clientUpdate();
+				});
+			}
+			else {
+				clientUpdate();
 			}
 		});
+
 	}
 	else if (parents.length > 1 && !note) {
 		//Rename Section
 		parents[parents.length - 1].title = $('#title-input').val();
 		$('#parents > span:nth-last-child(2)').html(parents[parents.length - 1].title);
+		notepad.lastModified = moment().format();
 		saveToBrowser();
 	}
 	else if (note) {
 		//Rename Note
 		note.title = $('#title-input').val();
 		$('#open-note').html(note.title);
+		notepad.lastModified = moment().format();
 		saveToBrowser();
 	}
 }
@@ -920,6 +1117,7 @@ function loadSection(id, providedSection) {
 
 function loadNote(id, delta) {
 	if (!delta) {
+		window.scrollTo(0, 0);
 		noteID = id;
 		oldNote = note;
 		note = parents[parents.length - 1].notes[id];
@@ -969,11 +1167,12 @@ function loadNote(id, delta) {
 	setTimeout(function() {
 		MathJax.Hub.Typeset();
 		initDrawings();
+		updateNote(undefined, true);
 	}, 1000);
 	updateInstructions();
 }
 
-function updateNote(id) {
+function updateNote(id, init) {
 	for (k in note.elements) {
 		var element = note.elements[k];
 		var sel = $('#' + element.args.id);
@@ -985,6 +1184,7 @@ function updateNote(id) {
 		}
 
 		resizePage($('#' + element.args.id));
+		if (!init) notepad.lastModified = moment().format();
 		saveToBrowser();
 	}
 }
@@ -1050,32 +1250,37 @@ function insertRecording() {
 	$('#insert').modal('close');
 	$('#empty-viewer').hide();
 }
-rec.addEventListener('streamReady', function(event) {
-	rec.start();
-	$('#stop-recording-btn').show();
-});
-rec.addEventListener("dataAvailable", function(e) {
-	var blob = new Blob([e.detail], { type: 'audio/ogg' });
-	var url = URL.createObjectURL(blob);
 
-	var id = insert('recording');
-	for (var i = 0; i < note.elements.length; i++) {
-		var element = note.elements[i];
-		if (id === element.args.id) {
-			blobToDataURL(blob, function(dataURI) {
-				element.content = dataURI;
-				saveToBrowser();
-			});
-			break;
+try {
+	rec.addEventListener('streamReady', function(event) {
+		rec.start();
+		$('#stop-recording-btn').show();
+	});
+	rec.addEventListener("dataAvailable", function(e) {
+		var blob = new Blob([e.detail], { type: 'audio/ogg' });
+		var url = URL.createObjectURL(blob);
+
+		var id = insert('recording');
+		for (var i = 0; i < note.elements.length; i++) {
+			var element = note.elements[i];
+			if (id === element.args.id) {
+				blobToDataURL(blob, function(dataURI) {
+					element.content = dataURI;
+					notepad.lastModified = moment().format();
+					saveToBrowser();
+				});
+				break;
+			}
 		}
-	}
 
-	$('#' + id + ' > audio').attr('src', url);
-	edgeFix(blob, id);
-});
+		$('#' + id + ' > audio').attr('src', url);
+		edgeFix(blob, id);
+	});
+}
+catch (err) { }
 
 function edgeFix(blob, id) {
-	if (window.navigator.userAgent.indexOf("Edge") > -1) {
+	if (window.navigator.userAgent.indexOf("Edge") > -1 || (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
 		//MS Edge sucks and can't opus. For them we'll use .wav
 		var fileReader = new FileReader();
 		fileReader.onload = function() {
@@ -1219,11 +1424,13 @@ function saveToBrowser(retry) {
 		but only Chrome and Opera support it. For now I'll use IndexedDB with a sneaky async library.
 	 */
 	$('.save-status').html('Saving&hellip;');
+	msHasNotepad();
+
 	$('#viewer ul').each(function(i) {
 		$(this).addClass('browser-default')
 	});
 
-	notepadStorage.setItem(notepad.title, notepad, function() {
+	notepadStorage.setItem(notepad.title, stringify(notepad), function() {
 		updateNotepadList();
 		$('.save-status').html('All changes saved');
 	});
@@ -1233,8 +1440,18 @@ function saveToBrowser(retry) {
 
 function loadFromBrowser(title) {
 	notepadStorage.getItem(title, function(err, res) {
-		notepad = parser.restoreNotepad(res);
+		if (err || res === null) return;
+
+		notepad = parser.restoreNotepad(JSON.parse(res));
 		window.initNotepad();
+
+		getXmlObject(function(xmlObj) {
+			syncWorker.postMessage({
+				req: "setOld",
+				xmlObj: xmlObj
+			});
+			msHasNotepad();
+		});
 	});
 }
 
@@ -1246,6 +1463,17 @@ function handleUpload(event) {
 		case "npx":
 			readFileInputEventAsText(event, function(text) {
 				parser.parse(text, ["asciimath"]);
+				while (!parser.notepad) if (parser.notepad) break;
+				notepad = parser.notepad;
+
+				window.initNotepad();
+				saveToBrowser();
+			});
+			break;
+
+		case "enex":
+			readFileInputEventAsText(event, function(text) {
+				parser.parseFromEvernote(text, ["asciimath"]);
 				while (!parser.notepad) if (parser.notepad) break;
 				notepad = parser.notepad;
 
@@ -1344,6 +1572,433 @@ function zoom(zoomIn) {
 	$('#viewer').css('transform', 'scale(' + curScale + ')');
 }
 
+uploadWorker.onmessage = function(event) {
+	var msg = event.data;
+
+	switch (msg.req) {
+		case "done":
+			putRequests.shift();
+			cueUpload();
+			break;
+
+		case "progress":
+			if (msg.percentage < 100) {
+				$('#parents > span:first-child').html(notepad.title + ' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">{0}ing: {1}%</a>)'.format(msg.type, msg.percentage));
+			}
+			else {
+				$('#parents > span:first-child').html(notepad.title + ' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+			}
+			break;
+	}
+}
+
+function cueUpload() {
+	if (putRequests.length > 0) uploadWorker.postMessage(putRequests[0]);
+}
+
+/** Sync Functions */
+syncWorker.onmessage = function(event) {
+	var msg = event.data;
+
+	switch (msg.req) {
+		case "hasAddedNotepad":
+			var isTrue = (msg.text === 'true');
+			if (isTrue) {
+				// $('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+				$('#not-syncing-pitch').hide();
+				$('#sync-options').show();
+				msSync();
+			}
+			else {
+				$('#parents > span:first-child').html(notepad.title + ' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Enable µSync</a>)');
+				$('#not-syncing-pitch').show();
+				$('#sync-options').hide();
+			}
+
+			appStorage.getItem('syncToken', (err, token) => {
+				if (err || token === null) $('#add-notepad-msg').hide();
+
+				var req1 = $.get(window.syncURL + 'payments/isSubscribed.php?token=' + token);
+				var req2 = $.get(window.syncURL + 'getFreeSlots.php?token=' + token);
+				$.when(req1, req2).done((isSubscribed, freeSlots) => {
+					if (isSubscribed[0] === "true" && freeSlots[0] > 0) {
+						$('#add-notepad-msg').html('Start Syncing this Notepad ({0} slot(s) left)'.format(freeSlots[0]));
+						$('#add-notepad-msg').show();
+						$('#buy-slots-msg').hide();
+					}
+					else {
+						$('#add-notepad-msg').hide();
+					}
+
+					if (isSubscribed[0] === "true") {
+						$('#start-sub-btn').hide();
+						$('#cancel-sub-btn').css('display', 'unset');
+					}
+					else {
+						$('#start-sub-btn').show();
+						$('#cancel-sub-btn').css('display', 'none');
+					}
+				}).fail(() => {
+					$('#add-notepad-msg').hide();
+				});
+			});
+			break;
+
+		case "signup":
+			if (msg.code === 201) {
+				alert("Account Created! Login to get started.");
+				$('#login').modal('open');
+			}
+			else {
+				alert(msg.text);
+			}
+			break;
+
+		case "login":
+			if (msg.code === 200) {
+				console.log(JSON.stringify(msg));
+				appStorage.setItem('syncToken', msg.text, function() {
+					window.location.reload();
+				});
+			}
+			else {
+				alert(msg.text);
+			}
+			break;
+
+		case "addNotepad":
+			switch (msg.code) {
+				case 201:
+					window.location.reload();
+					break;
+
+				default:
+					alert(msg.text);
+					break;
+			}
+			break;
+
+		case "sync":
+			if (msg.code === 200) {
+				if (msg.text.length === 0) {
+					$('#parents > span:first-child').html(notepad.title + ' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+					return;
+				}
+				var res = JSON.parse(msg.text);
+				switch (res.type) {
+					case "upload":
+						// getXmlObject(function(xmlObj) {
+						// 	syncWorker.postMessage({
+						// 		req: "upload",
+						// 		notepad: xmlObj,
+						// 		url: res.url
+						// 	});
+						// });
+						appStorage.getItem('syncToken', function(err, token) {
+							if (err || token === null) return;
+							syncWorker.postMessage({
+								req: "upload",
+								notepad: notepad,
+								url: res.url,
+								syncURL: window.syncURL,
+								token: token,
+								method: syncMethod
+							});
+						});
+						break;
+
+					case "download":
+						confirmAsync("A newer version of this notepad has been synced. Do you want to download it?").then(function(answer) {
+							if (answer) {
+								appStorage.getItem('syncToken', function(err, token) {
+									if (err || token === null) return;
+									syncWorker.postMessage({
+										req: "download",
+										notepad: notepad,
+										url: res.url,
+										syncURL: window.syncURL,
+										token: token,
+										method: syncMethod
+									});
+								});
+							}
+						});
+						break;
+				}
+			}
+			else {
+				if (msg.text !== "Notepads are unprocessable if they have not been added") alert(msg.text);
+			}
+			break;
+
+		case "upload":
+			if (msg.code === 200) {
+				$('#parents > span:first-child').html(notepad.title + ' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+			}
+			break;
+
+		case "download":
+			if (msg.code === 200) {
+				if (msg.text.length === 0) return;
+				parser.parse(msg.text, ["asciimath"]);
+				while (!parser.notepad) if (parser.notepad) break;
+				notepad = parser.notepad;
+
+				window.initNotepad();
+				$('#parents > span:first-child').html(notepad.title + ' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+				saveToBrowser();
+			}
+			break;
+
+		case "progress":
+			if (msg.percentage < 100) {
+				$('#parents > span:first-child').html(notepad.title + ' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">{0}ing: {1}%</a>)'.format(msg.type, msg.percentage));
+			}
+			else {
+				$('#parents > span:first-child').html(notepad.title + ' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+			}
+			break;
+
+		case "error":
+			$('#parents > span:first-child').html(notepad.title + ' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Sync Error</a>)');
+			$('#error-modal-text').html(msg.text);
+			$('#error-modal').modal('open');
+			break;
+
+		case "cueGET":
+		case "cuePUT":
+			setTimeout(function() {
+				putRequests.push(msg);
+
+				if (putRequests.length === 1) {
+					cueUpload();
+				}
+			}, 0);
+			break;
+	}
+}
+
+function msLogin(type) {
+	var un = $('#username-input').val();
+	$('#username-input').val('');
+	var pw = $('#password-input').val();
+	$('#password-input').val('');
+
+	syncWorker.postMessage({
+		syncURL: window.syncURL,
+		req: type,
+		username: un,
+		password: pw
+	});
+}
+
+function msAddNotepad() {
+	appStorage.getItem('syncToken', function(err, res) {
+		if (err || res === null) return;
+
+		syncWorker.postMessage({
+			syncURL: window.syncURL,
+			req: 'addNotepad',
+			token: res,
+			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
+			lastModified: moment().subtract(100, 'years').format()
+		});
+	});
+}
+
+function msSync() {
+	appStorage.getItem('syncToken', function(err, res) {
+		if (err || res === null) return;
+
+		$('#parents > span:first-child').html(notepad.title + ' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Syncing&hellip;</a>)');
+		syncWorker.postMessage({
+			syncURL: window.syncURL,
+			req: 'sync',
+			token: res,
+			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
+			notepad: notepad,
+			method: syncMethod
+		});
+	});
+}
+
+function msHasNotepad() {
+	appStorage.getItem('syncToken', function(err, res) {
+		if (err || res === null) return;
+
+		syncWorker.postMessage({
+			syncURL: window.syncURL,
+			req: "hasAddedNotepad",
+			token: res,
+			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''))
+		});
+	});
+}
+
+function msLogout() {
+	appStorage.removeItem("syncToken", () => {
+		window.location.reload();
+	});
+}
+
+function msRemoveNotepad(filename) {
+	confirmAsync("This will permanently remove your notepad from our servers. Are you sure you want to continue?").then(a => {
+		if (a) {
+			appStorage.getItem("syncToken", function(err, token) {
+				if (err || token === null) {
+					alert("Error getting token");
+					msLogout();
+					return;
+				}
+
+				$.post(window.syncURL + "removeNotepad.php", {
+					filename: filename,
+					token: token
+				}, () => {
+					window.location.reload();
+				}).fail(() => {
+					alert("There was an error completing your request");
+				});
+			});
+		}
+	});
+}
+
+function msGetOrderID(plan) {
+	var prodNum;
+	var prodName;
+	var price;
+	switch (plan) {
+		case "s":
+			prodNum = 1;
+			prodName = "Single";
+			price = '1.00';
+			break;
+		case "sp":
+			prodNum = 2;
+			prodName = "Study Pack";
+			price = '2.95';
+			break;
+		case "pp":
+			prodNum = 3;
+			prodName = "Power Pack";
+			price = '9.50';
+			break;
+	}
+
+	$('#microsync-checkout-form > form > input[name="li_0_name"]').attr('value', 'µSync ({0})'.format(prodName));
+	$('#microsync-checkout-form > form > input[name="li_0_price"]').attr('value', price);
+
+	$('#microsync-checkout-form > form > input[value="product"]').attr('name', 'li_{0}_type'.format(prodNum));
+	$('#microsync-checkout-form > form > input[name="li_0_name"]').attr('name', 'li_{0}_name'.format(prodNum));
+	$('#microsync-checkout-form > form > input[name="li_0_price"]').attr('name', 'li_{0}_price'.format(prodNum));
+	$('#microsync-checkout-form > form > input[name="li_0_quantity"]').attr('name', 'li_{0}_quantity'.format(prodNum));
+
+	appStorage.getItem("syncToken", (err, token) => {
+		if (err || token === null) return;
+
+		$.post(window.syncURL + 'payments/newOrderID.php', { token: token }, data => {
+			$('#microsync-checkout-form > form > input[name="merchant_order_id"]').val(data);
+		});
+	});
+}
+
+function syncOptions(option) {
+	switch (option) {
+		case "removeNotepad":
+			msRemoveNotepad('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+			break;
+
+		case "removeAllData":
+			confirmAsync("This will permanently remove all of your notepads from our servers. Are you sure you want to continue?").then(a => {
+				if (a) {
+					$.post(window.syncURL + "deleteAccountData.php", {
+						username: $('#verify-username-input').val(),
+						password: $('#verify-password-input').val()
+					}, () => {
+						window.location.reload();
+					}).fail(() => {
+						alert("There was an error completing your request");
+					});
+				}
+			});
+			break;
+
+		case "revokeAllTokens":
+			$.post(window.syncURL + "revokeAllTokens.php", {
+				username: $('#verify-username-input').val(),
+				password: $('#verify-password-input').val()
+			}, () => {
+				msLogout();
+			}).fail(() => {
+				alert("There was an error completing your request");
+			});
+			break;
+
+		case "changePassword":
+			$.post(window.syncURL + "changePassword.php", {
+				username: $('#change-username-input').val(),
+				password: $('#old-password-input').val(),
+				newPassword: $('#new-password-input').val()
+			}, () => {
+				alert("Your password has been changed");
+			}).fail(() => {
+				alert("There was an error completing your request");
+			});
+			break;
+	}
+}
+
+function getXmlObject(callback) {
+	setTimeout(function() {
+		callback(notepad.toXMLObject());
+	}, 0);
+}
+
+function formatMd(type) {
+	switch (type) {
+		case "bold":
+			$('#md-textarea').surroundSelectedText("**", "**");
+			break;
+
+		case "italic":
+			$('#md-textarea').surroundSelectedText("*", "*");
+			break;
+
+		case "b-list":
+			$('#md-textarea').surroundSelectedText("- ", "");
+			break;
+
+		case "n-list":
+			$('#md-textarea').surroundSelectedText("1. ", "");
+			break;
+
+		case "t-list":
+			$('#md-textarea').surroundSelectedText("- [] ", "");
+			break;
+
+		case "indent":
+			$('#md-textarea').surroundSelectedText("\t", "");
+			break;
+
+		case "equation":
+			$('#md-textarea').surroundSelectedText(" ===", "=== ");
+			break;
+
+		case "strikethrough":
+			$('#md-textarea').surroundSelectedText("~~", "~~");
+			break;
+
+		case "link":
+			$('#md-textarea').replaceSelectedText("[{0}]({1})".format($('#md-textarea').getSelection().text, "https://example.com"));
+			break;
+
+		case "table":
+			$('#md-textarea').replaceSelectedText("| Header 1 | Header 2 |\n|---|---|\n| Column 1 | Column 2 |\n| Row 2 |  |");
+			break;
+	}
+}
+
 /** Utility functions */
 function toBase64(str) {
 	return window.btoa(unescape(encodeURIComponent(str)));
@@ -1375,6 +2030,17 @@ function confirmAsync(question) {
 			});
 			break;
 	}
+}
+
+function stringify(obj) {
+	var seen = [];
+	return JSON.stringify(obj, (key, val) => {
+		if (val != null && typeof val === "object") {
+			if (seen.indexOf(val) > -1) return;
+			seen.push(val);
+		}
+		return val;
+	});
 }
 
 //Thanks to http://stackoverflow.com/a/4673436/998467

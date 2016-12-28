@@ -120,8 +120,9 @@ function refreshStorageDir() {
 				});
 			});
 		});
+		updateNotepadList();
 	}, function(err) {
-		alert("Error accessing storage folder. Reverting to default: {0}".format(err));
+		alert("Error accessing storage folder. Reverting to default ({0})".format(err));
 		appStorage.setItem('storageDir', Windows.Storage.ApplicationData.current.localFolder.createFolderAsync("µPad Notepads", Windows.Storage.CreationCollisionOption.openIfExists).then(function(f) {
 			storageDir = f.path;
 			refreshStorageDir();
@@ -151,7 +152,7 @@ function changeStorageLocation() {
 }
 
 function updateNotepadList() {
-	if (isUpdating) return;
+	if (isUpdating || !storageDir) return;
 	Windows.Storage.StorageFolder.getFolderFromPathAsync(storageDir).then(function (folder) { return folder.getFilesAsync(); }).done(function (files) {
 		isUpdating = true;
 		$('#notepadList').html('');
@@ -187,6 +188,8 @@ function saveToFilesystem(blob, filename, reload, bulk) {
 
 function saveToBrowser(retry, fileLoad, bulk) {	
 	$('.save-status').html('Saving&hellip;');
+	msHasNotepad();
+
 	$('#viewer ul').each(function(i) {
 		$(this).addClass('browser-default');
 	});
@@ -243,5 +246,53 @@ function loadFromBrowser(title) {
 			while (!parser.notepad) if (parser.notepad) break;
 			notepad = parser.notepad;
 			window.initNotepad();
+
+			getXmlObject(xmlObj => {
+				syncWorker.postMessage({
+					req: "setOld",
+					xmlObj: xmlObj
+				});
+				msHasNotepad();
+			});
 		});
+}
+
+function msGetOrderID(plan) {
+	var prodNum;
+	var prodName;
+	var price;
+	switch (plan) {
+		case "s":
+			prodNum = 1;
+			prodName = "Single";
+			price = '1.00';
+			break;
+		case "sp":
+			prodNum = 2;
+			prodName = "Study Pack";
+			price = '2.95';
+			break;
+		case "pp":
+			prodNum = 3;
+			prodName = "Power Pack";
+			price = '9.50';
+			break;
+	}
+
+	$('#microsync-checkout-form > form > input[name="li_0_name"]').attr('value', 'µSync ({0})'.format(prodName));
+	$('#microsync-checkout-form > form > input[name="li_0_price"]').attr('value', price);
+
+	$('#microsync-checkout-form > form > input[value="product"]').attr('name', 'li_{0}_type'.format(prodNum));
+	$('#microsync-checkout-form > form > input[name="li_0_name"]').attr('name', 'li_{0}_name'.format(prodNum));
+	$('#microsync-checkout-form > form > input[name="li_0_price"]').attr('name', 'li_{0}_price'.format(prodNum));
+	$('#microsync-checkout-form > form > input[name="li_0_quantity"]').attr('name', 'li_{0}_quantity'.format(prodNum));
+
+	appStorage.getItem("syncToken", (err, token) => {
+		if (err || token === null) return;
+
+		$.post(window.syncURL + 'payments/newOrderID.php', { token: token }, data => {
+			$('#microsync-checkout-form > form > input[name="merchant_order_id"]').val(data);
+			$('#microsync-checkout-form > form').submit();
+		});
+	});
 }

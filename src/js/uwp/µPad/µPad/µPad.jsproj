@@ -62,12 +62,14 @@
     <AppxManifest Include="package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="css\libs\pricing.css" />
     <Content Include="css\materialize.min.css" />
     <Content Include="css\notepadStyle.css" />
     <Content Include="default.html" />
     <Content Include="enex logo.png" />
     <Content Include="fonts\equation.svg" />
     <Content Include="fonts\icons.woff2" />
+    <Content Include="fonts\md.svg" />
     <Content Include="fonts\MSWord.svg" />
     <Content Include="fonts\roboto\Roboto-Bold.eot" />
     <Content Include="fonts\roboto\Roboto-Bold.ttf" />
@@ -96,11 +98,13 @@
     <Content Include="images\Square71x71Logo.scale-200.png" />
     <Content Include="images\StoreLogo.scale-200.png" />
     <Content Include="images\Wide310x150Logo.scale-200.png" />
+    <Content Include="img\npxz.png" />
     <Content Include="img\white-lines.png" />
     <Content Include="js\client.js" />
     <Content Include="js\default.js" />
-    <Content Include="css\default.css" />
     <Content Include="js\libs\ASCIIMathML.js" />
+    <Content Include="js\libs\encoding.js" />
+    <Content Include="js\libs\FileSaver.min.js" />
     <Content Include="js\libs\interact.min.js" />
     <Content Include="js\libs\jquery-3.1.1.min.js" />
     <Content Include="js\libs\jquery.modal.min.js" />
@@ -912,7 +916,10 @@
     <Content Include="js\libs\MathJax\localization\en\MathML.js" />
     <Content Include="js\libs\MathJax\localization\en\TeX.js" />
     <Content Include="js\libs\MathJax\MathJax.js" />
+    <Content Include="js\libs\md5.js" />
     <Content Include="js\libs\moment.js" />
+    <Content Include="js\libs\mousetrap.min.js" />
+    <Content Include="js\libs\rangyinputs-jquery.js" />
     <Content Include="js\libs\recorderjs\decoderWorker.min.js" />
     <Content Include="js\libs\recorderjs\encoderWorker.min.js" />
     <Content Include="js\libs\recorderjs\recorder.min.js" />
@@ -921,6 +928,9 @@
     <Content Include="js\libs\trim-canvas.js" />
     <Content Include="js\parser.js" />
     <Content Include="js\saveWorker.js" />
+    <Content Include="js\syncWorker.js" />
+    <Content Include="js\uploadWorker.js" />
+    <Content Include="css\default.css" />
     <Content Include="npx logo.png" />
     <Content Include="npxz logo.png" />
     <None Include="µPad_StoreKey.pfx" />
