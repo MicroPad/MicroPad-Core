@@ -503,7 +503,10 @@ window.onload = function() {
 
 	/** Search Notes */
 	$('#search').modal({
-		complete: function() {
+		ready: () => {
+			$('#search-text').focus();
+		},
+		complete: () => {
 			$('#search-text').val('');
 			$('#search-results').html('');
 		}
@@ -1579,6 +1582,7 @@ uploadWorker.onmessage = function(event) {
 			break;
 
 		case "progress":
+			msg.percentage = msg.percentage.toFixed(1);
 			if (msg.percentage < 100) {
 				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">{0}ing: {1}%</a>)'.format(msg.type, msg.percentage));
 			}
@@ -1748,6 +1752,7 @@ syncWorker.onmessage = function(event) {
 			break;
 
 		case "progress":
+			msg.percentage = msg.percentage.toFixed(1);
 			if (msg.percentage < 100) {
 				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">{0}ing: {1}%</a>)'.format(msg.type, msg.percentage));
 			}
