@@ -5286,7 +5286,7 @@ exports.Note.prototype.toMarkdown = function() {
 
 			case "file":
 			case "recording":
-				mdNote += "[{0}]({1}){2}\n\n".format(element.args.filename, element.args.content, citation);
+				mdNote += "[{0}]({1}){2}\n\n".format(element.args.filename, element.content, citation);
 				break;
 		}
 	}
