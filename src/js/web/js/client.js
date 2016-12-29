@@ -1976,7 +1976,7 @@ function formatMd(type) {
 			break;
 
 		case "t-list":
-			$('#md-textarea').surroundSelectedText("- [] ", "");
+			$('#md-textarea').surroundSelectedText("- [ ] ", "");
 			break;
 
 		case "indent":
