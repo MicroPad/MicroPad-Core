@@ -671,6 +671,10 @@ window.onload = function() {
 			$('#preloader').remove();
 		}, 1000);
 	}, 500);
+
+	if (navigator.storage && navigator.storage.persist) {
+		navigator.storage.persist();
+	}
 };
 /**** END OF ONLOAD CODE */
 
