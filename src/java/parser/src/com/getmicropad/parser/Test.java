@@ -77,18 +77,19 @@ public class Test {
                 "  </section>\n" +
                 "</notepad>\n";
 
+		//Convert to NotepadType
+	    JAXBContext context = null;
 	    try {
-		    //Convert to NotepadType
-		    JAXBContext context = JAXBContext.newInstance(NotepadType.class);
+		    context = JAXBContext.newInstance(NotepadType.class);
 		    Unmarshaller unmarshaller = context.createUnmarshaller();
 		    NotepadType notepad = (NotepadType)JAXBIntrospector.getValue(unmarshaller.unmarshal(new ByteArrayInputStream(testXML.getBytes())));
 
 		    //Convert back to XML
 		    ByteArrayOutputStream output = new ByteArrayOutputStream();
-		    notepad.toXML(output);
-		    System.out.println(output.toString());
-	    }
-	    catch (JAXBException | IOException e) {
+		    if (notepad.toXML(output)) {
+			    System.out.println(output.toString());
+		    }
+	    } catch (JAXBException e) {
 		    e.printStackTrace();
 	    }
     }

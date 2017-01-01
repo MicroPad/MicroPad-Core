@@ -133,13 +133,20 @@ public class NotepadType {
         this.lastModified = value;
     }
 
-    public void toXML(ByteArrayOutputStream output) throws JAXBException, IOException {
-	    JAXBContext context = JAXBContext.newInstance(this.getClass());
-	    Marshaller marshaller = context.createMarshaller();
-	    marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-	    marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "https://getmicropad.com/schema.xsd");
-	    marshaller.marshal(this, output);
-	    output.close();
+    public boolean toXML(ByteArrayOutputStream output) {
+        try {
+            JAXBContext context = JAXBContext.newInstance(this.getClass());
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "https://getmicropad.com/schema.xsd");
+            marshaller.marshal(this, output);
+            output.close();
+            return true;
+        }
+        catch (IOException | JAXBException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }
