@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 <!-- Only ONE notepad should be defined per file. Applications that read µPad XML should ignore all other notepads in the file -->
-<notepad xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://nick.geek.nz/projects/uPad/schema.xsd" title="Example Notepad">
+<notepad xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Example Notepad">
   <!-- Unlimited sections can be defined (including sections within sections) -->
   <section title="Random Notes">
     <note title="Features" time="2016-11-10T16:13:04+13:00">
