@@ -5,6 +5,8 @@ import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.stream.Format;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
@@ -14,6 +16,10 @@ public class Main {
 
         Section s1 = new Section("test section");
         Note n1 = new Note("Blarghh");
+	    List<String> addonList = new ArrayList<>();
+	    addonList.add("asciimath");
+	    addonList.add("teast");
+        n1.setAddons(addonList);
         Note n2 = new Note("More");
 	    BasicElement be = new ImageElement("base64", "image1", "10px", "10px", "400px", "400px");
         n2.elements.add(be);

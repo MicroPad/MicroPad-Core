@@ -15,6 +15,9 @@ import java.util.List;
 
 @Element
 public class Note {
+	@Element
+	private Addons addons = new Addons();
+
 	@ElementListUnion({
 			@ElementList(inline=true, type=MarkdownElement.class, entry="markdown", required=false),
 			@ElementList(inline=true, type=DrawingElement.class, entry="drawing", required=false),
@@ -65,5 +68,13 @@ public class Note {
 
 	public void setTime(XMLGregorianCalendar date) {
 		this.time = date;
+	}
+
+	public List<String> getAddons() {
+		return this.addons.imports;
+	}
+
+	public void setAddons(List<String> addons) {
+		this.addons = new Addons(addons);
 	}
 }
