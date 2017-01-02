@@ -11,23 +11,22 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-@Root
-
+@Root(name="notepad")
 public class Notepad implements Parent {
 	@ElementList(inline=true, type=Section.class, entry="section", required=false)
 	public List<Section> sections;
 
-	@Attribute(name="xmlns:xsi")
-	private String namespace = "http://www.w3.org/2001/XMLSchema-instance";
-
-	@Attribute(name="xsi:noNamespaceSchemaLocation")
-	private String schemaLocation = "https://getmicropad.com/schema.xsd";
+	@Attribute
+	@Namespace(reference = "http://www.w3.org/2001/XMLSchema-instance", prefix = "xsi")
+	private String noNamespaceSchemaLocation = "https://getmicropad.com/schema.xsd";
 
 	@Attribute
 	private String title;
 
 	@Attribute(required = false)
 	private XMLGregorianCalendar lastModified;
+
+	public Notepad() {}
 
 	public Notepad(String title) {
 		this.title = title;

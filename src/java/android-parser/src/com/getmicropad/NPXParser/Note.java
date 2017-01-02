@@ -1,9 +1,6 @@
 package com.getmicropad.NPXParser;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.ElementListUnion;
+import org.simpleframework.xml.*;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -13,10 +10,15 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-@Element
+@Root(name="note")
 public class Note {
 	@Element
 	private Addons addons = new Addons();
+
+//	@ElementList(inline = false, entry = "source")
+//	public List<Source> bibliography = new ArrayList<>();
+	@Element
+	public Bibliography bibliography = new Bibliography();
 
 	@ElementListUnion({
 			@ElementList(inline=true, type=MarkdownElement.class, entry="markdown", required=false),
@@ -32,6 +34,9 @@ public class Note {
 
 	@Attribute
 	private XMLGregorianCalendar time;
+
+	public Note() {
+	}
 
 	public Note(String title) {
 		this.title = title;
@@ -70,11 +75,11 @@ public class Note {
 		this.time = date;
 	}
 
-	public List<String> getAddons() {
+	public List<Import> getAddons() {
 		return this.addons.imports;
 	}
 
-	public void setAddons(List<String> addons) {
+	public void setAddons(List<Import> addons) {
 		this.addons = new Addons(addons);
 	}
 }

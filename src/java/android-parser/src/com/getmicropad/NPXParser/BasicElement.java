@@ -8,7 +8,7 @@ import org.simpleframework.xml.Text;
 import java.util.ArrayList;
 
 public class BasicElement implements NoteElement {
-	@Text(data = true)
+	@Text
 	private String content;
 
 	@Attribute
@@ -25,6 +25,10 @@ public class BasicElement implements NoteElement {
 
 	@Attribute
 	private String height;
+
+	public BasicElement() {
+
+	};
 
 	public BasicElement(String content, String id, String x, String y, String width, String height) {
 		this.content = content;

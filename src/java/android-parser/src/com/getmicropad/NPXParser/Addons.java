@@ -2,19 +2,22 @@ package com.getmicropad.NPXParser;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Path;
+import org.simpleframework.xml.Root;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Element
+@Root
 public class Addons {
-	@ElementList(entry = "import", inline = true)
-	public List<String> imports = new ArrayList<>();
+	@Path("note/addons")
+	@ElementList(name = "addons", entry = "import", inline = true, type = Import.class)
+	public List<Import> imports = new ArrayList<>();
 
 	public Addons() {
 	}
 
-	public Addons(List<String> addons) {
+	public Addons(List<Import> addons) {
 		this.imports = addons;
 	}
 }

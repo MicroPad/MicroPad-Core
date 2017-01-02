@@ -18,6 +18,10 @@ public class Section implements Parent {
 	@Attribute
 	private String title;
 
+	public Section() {
+
+	}
+
 	public Section(String title) {
 		this.title = title;
 		this.sections = new ArrayList<>();
