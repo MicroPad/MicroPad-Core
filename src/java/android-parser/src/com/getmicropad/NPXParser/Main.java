@@ -15,6 +15,9 @@ public class Main {
         Section s1 = new Section("test section");
         Note n1 = new Note("Blarghh");
         Note n2 = new Note("More");
+	    BasicElement be = new ImageElement("base64", "image1", "10px", "10px", "400px", "400px");
+        n2.elements.add(be);
+        n2.elements.add(new MarkdownElement("This is some\n\nescaped text", "markdown1", "10px", "10px", "400px", "400px", "16px"));
         s1.notes.add(n1);
 	    s1.notes.add(n2);
         notepad.sections.add(s1);

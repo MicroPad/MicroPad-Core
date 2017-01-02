@@ -2,15 +2,28 @@ package com.getmicropad.NPXParser;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.ElementListUnion;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 @Element
 public class Note {
+	@ElementListUnion({
+			@ElementList(inline=true, type=MarkdownElement.class, entry="markdown", required=false),
+			@ElementList(inline=true, type=DrawingElement.class, entry="drawing", required=false),
+			@ElementList(inline=true, type=ImageElement.class, entry="image", required=false),
+			@ElementList(inline=true, type=FileElement.class, entry="file", required=false),
+			@ElementList(inline=true, type=RecordingElement.class, entry="recording", required=false)
+	})
+	public List<NoteElement> elements = new ArrayList<>();
+
 	@Attribute
 	private String title;
 
