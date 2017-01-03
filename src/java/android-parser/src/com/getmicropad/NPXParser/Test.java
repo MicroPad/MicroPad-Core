@@ -12,7 +12,6 @@ import java.util.List;
 public class Test {
 
 	public static void main(String[] args) {
-		Serializer serializer = new Persister(new NPXMatcher(), new Format("<?xml version=\"1.0\" encoding= \"UTF-8\" ?>"));
 		Notepad notepad = new Notepad("Test");
 
 		Section s1 = new Section("test section");
