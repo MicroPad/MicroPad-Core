@@ -1,1 +1,1 @@
-include ':app', ':parser', ':jaxb-android-2.2.7', ':android-parser'
+include ':app', ':parser', ':jaxb-android-2.2.7'

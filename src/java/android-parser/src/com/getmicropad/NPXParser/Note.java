@@ -32,7 +32,7 @@ public class Note {
 	@Attribute
 	private String title;
 
-	@Attribute
+	@Attribute(required = false)
 	private XMLGregorianCalendar time;
 
 	public Note() {

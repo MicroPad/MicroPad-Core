@@ -33,12 +33,10 @@ public class Test {
 		s2.sections.add(new Section("Inception"));
 		notepad.sections.add(s2);
 
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		try {
-			serializer.write(notepad, byteArrayOutputStream);
-			System.out.println(byteArrayOutputStream.toString());
-			notepad = serializer.read(Notepad.class, new File("Test.npx"));
-			notepad.getTitle();
+			System.out.println(Parser.toXml(notepad));
+			notepad = Parser.parseNpx(new File("Test.npx"));
+			System.out.println(notepad.getTitle());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
