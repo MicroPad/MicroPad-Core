@@ -12,13 +12,13 @@ import java.util.List;
 
 @Root(name="note")
 public class Note {
-	@Element
-	private Addons addons = new Addons();
+	@Path("addons")
+	@ElementList(inline=true, type=String.class, entry="import", name="addons", required = false)
+	public List<String> addons = new ArrayList<>();
 
-//	@ElementList(inline = false, entry = "source")
-//	public List<Source> bibliography = new ArrayList<>();
-	@Element
-	public Bibliography bibliography = new Bibliography();
+	@Path("bibliography")
+	@ElementList(inline=true, type=Source.class, entry="source", name="bibliography", required = false)
+	public List<Source> bibliography = new ArrayList<>();
 
 	@ElementListUnion({
 			@ElementList(inline=true, type=MarkdownElement.class, entry="markdown", required=false),
@@ -75,11 +75,11 @@ public class Note {
 		this.time = date;
 	}
 
-	public List<Import> getAddons() {
-		return this.addons.imports;
+	public List<String> getAddons() {
+		return this.addons;
 	}
 
-	public void setAddons(List<Import> addons) {
-		this.addons = new Addons(addons);
+	public void setAddons(List<String> addons) {
+		this.addons = addons;
 	}
 }
