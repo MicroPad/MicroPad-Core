@@ -4,14 +4,15 @@
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:gravity="left"
-              android:weightSum="100">
+              android:gravity="start"
+              android:weightSum="100"
+              android:baselineAligned="false">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="30">
+        android:layout_weight="29.7">
 
         <Button
             android:text="@string/new_np_btn"
@@ -27,5 +28,20 @@
             android:id="@+id/main_list"/>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.3"
+        android:background="@color/colorPrimary"></LinearLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="70"
+        android:background="@drawable/bg"
+        android:elevation="10dp">
+
+    </FrameLayout>
 
 </LinearLayout>
