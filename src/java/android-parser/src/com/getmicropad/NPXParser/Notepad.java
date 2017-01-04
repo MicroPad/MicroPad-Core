@@ -1,9 +1,8 @@
 package com.getmicropad.NPXParser;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.DatatypeFactoryImpl;
+import org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl;
 import org.simpleframework.xml.*;
 
-import javax.xml.crypto.Data;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
