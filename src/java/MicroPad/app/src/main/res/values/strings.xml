@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">μPad</string>
+    <string name="import_btn">Import Notepad</string>
+    <string name="new_np_btn">New Notepad</string>
 </resources>

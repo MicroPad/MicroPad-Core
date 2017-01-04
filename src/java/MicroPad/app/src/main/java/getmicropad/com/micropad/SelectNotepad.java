@@ -15,6 +15,5 @@ public class SelectNotepad extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_select_notepad);
-//		TextView textView = (TextView)findViewById(R.id.textView1);
 	}
 }

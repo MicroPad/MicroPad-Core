@@ -66,12 +66,10 @@ public class NLevelAdapter extends BaseAdapter {
 				NLevelAdapter.this.notifyDataSetChanged();
 			}
 		}
-
-
 	}
 
 	public List<NLevelListItem> filterItems() {
-		List<NLevelListItem> tempfiltered = new ArrayList<NLevelListItem>();
+		List<NLevelListItem> tempfiltered = new ArrayList<>();
 		OUTER: for (NLevelListItem item : list) {
 			//add expanded items and top level items
 			//if parent is null then its a top level item
