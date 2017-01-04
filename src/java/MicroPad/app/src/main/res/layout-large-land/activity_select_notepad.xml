@@ -35,13 +35,11 @@
         android:layout_weight="0.3"
         android:background="@color/colorPrimary"></LinearLayout>
 
-    <FrameLayout
+    <include
+        layout="@layout/viewer_layout"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="70"
-        android:background="@drawable/bg"
-        android:elevation="10dp">
-
-    </FrameLayout>
+        android:elevation="10dp"></include>
 
 </LinearLayout>
