@@ -75,4 +75,12 @@ public class Notepad implements Parent {
 	public void setLastModified(XMLGregorianCalendar date) {
 		this.lastModified = date;
 	}
+
+	public List<Section> getSections() {
+		return this.sections;
+	}
+
+	public void setSections(List<Section> sections) {
+		this.sections = sections;
+	}
 }

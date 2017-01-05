@@ -41,4 +41,12 @@ public class Section implements Parent {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
+	public List<Section> getSections() {
+		return this.sections;
+	}
+
+	public void setSections(List<Section> sections) {
+		this.sections = sections;
+	}
 }

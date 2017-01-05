@@ -3,10 +3,11 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
-              android:id="@+id/listItemContainer">
+              android:id="@+id/notepad_list_item">
 
     <TextView
         android:id="@+id/title_text"
+        android:text="Example Notepad"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
