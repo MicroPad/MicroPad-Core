@@ -12,6 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/import_btn"
+        android:backgroundTint="@color/colorAccent"
+        android:textColor="#fff"
         />
 
     <ListView
