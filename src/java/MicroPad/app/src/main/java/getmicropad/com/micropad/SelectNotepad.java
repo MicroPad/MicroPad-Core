@@ -40,6 +40,7 @@ public class SelectNotepad extends BaseActivity {
 	Notepad notepad;
 	List<NLevelItem> list;
 	ListView mainList;
+	NLevelAdapter adapter;
 	Random rng = new Random();
 
 	@Override
@@ -52,8 +53,8 @@ public class SelectNotepad extends BaseActivity {
 		LayoutInflater inflater = LayoutInflater.from(this);
 
 
-		NLevelAdapter adapter = new NLevelAdapter(list);
-		this.mainList.setAdapter(adapter);
+		this.adapter = new NLevelAdapter(list);
+		this.mainList.setAdapter(this.adapter);
 //		updateListFake(inflater);
 		List<Notepad> notepads = new ArrayList<>();
 		try {
@@ -89,21 +90,21 @@ public class SelectNotepad extends BaseActivity {
 		updateList(inflater, notepads);
 
 		this.mainList.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
-			((NLevelAdapter)this.mainList.getAdapter()).toggle(position);
-			((NLevelAdapter)this.mainList.getAdapter()).getFilter().filter();
+			this.adapter.toggle(position);
+			this.adapter.getFilter().filter();
 
 			switch (view.getTag(R.id.TAG_OBJECT_TYPE).toString()) {
 				case "notepad":
-					this.notepad = (Notepad)((NLevelItem)((NLevelAdapter)this.mainList.getAdapter()).getItem(position)).getWrappedObject();
+					this.setNotepad((Notepad)((NLevelItem)((NLevelAdapter)this.mainList.getAdapter()).getItem(position)).getWrappedObject());
+					this.parentTree.clear();
 					return;
 
 				case "section":
-					String t = view.getTag(R.id.TAG_OBJECT_PATH).toString();
-//					Parent test = (Parent)(((NLevelAdapter)this.mainList.getAdapter()).getItem(position).getParent());
+					this.updateParentTree(view, this.adapter, position);
 					return;
 
 				case "note":
-					t = view.getTag(R.id.TAG_OBJECT_PATH).toString();
+					this.updateParentTree(view, this.adapter, position);
 					if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_LARGE && (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_XLARGE) {
 						//Phone
 					}
@@ -184,14 +185,21 @@ public class SelectNotepad extends BaseActivity {
 		if (((Parent)parentItem.getWrappedObject()).getSections() != null) {
 			for (int i = 0; i < ((Parent)parentItem.getWrappedObject()).getSections().size(); i++) {
 				Section section = ((Parent)parentItem.getWrappedObject()).getSections().get(i);
-				addToPath(depth, i);
 
+				int finalI = i;
 				NLevelItem sectionItem = new NLevelItem(section, parentItem, (NLevelItem item) -> {
 					View view = inflater.inflate(R.layout.section_list_item, null);
 					String name = ((Section)item.getWrappedObject()).getTitle();
 					view.setTag(R.id.TAG_OBJECT_TYPE, "section");
 					view.setTag(R.id.TAG_OBJECT_TITLE, name);
-					view.setTag(R.id.TAG_OBJECT_PATH, TextUtils.join(":", path));
+
+					addToPath(depth, finalI);
+					String pathStr = "";
+					for (Integer index : this.path) {
+						if (pathStr.length() > 0) pathStr += ":";
+						pathStr += index.toString();
+					}
+					view.setTag(R.id.TAG_OBJECT_PATH, pathStr);
 
 					/** Generate a colour for the level of nesting */
 					String levelStr = ((Parent)parentItem.getWrappedObject()).getTitle();
@@ -208,7 +216,7 @@ public class SelectNotepad extends BaseActivity {
 				});
 				this.list.add(sectionItem);
 
-				depth++;
+				this.depth++;
 				if (section.getSections() != null && section.getSections().size() > 0) {
 					addSectionToList(inflater, sectionItem);
 				}
@@ -216,15 +224,22 @@ public class SelectNotepad extends BaseActivity {
 				if (section.notes != null) {
 					for (int j = 0; j < section.notes.size(); j++) {
 						Note note = section.notes.get(j);
-						addToPath(depth, j);
 
+						int finalJ = j;
 						NLevelItem noteItem = new NLevelItem(note, sectionItem, (NLevelItem item) -> {
 							if (item.isExpanded()) item.toggle();
 							View view = inflater.inflate(R.layout.section_list_item, null);
 							String name = ((Note) item.getWrappedObject()).getTitle();
 							view.setTag(R.id.TAG_OBJECT_TYPE, "note");
 							view.setTag(R.id.TAG_OBJECT_TITLE, name);
-							view.setTag(R.id.TAG_OBJECT_PATH, TextUtils.join(":", path));
+
+							addToPath(this.depth, finalJ);
+							String pathStr = "";
+							for (Integer index : this.path) {
+								if (pathStr.length() > 0) pathStr += ":";
+								pathStr += index.toString();
+							}
+							view.setTag(R.id.TAG_OBJECT_PATH, pathStr);
 
 							/** Generate a colour for the level of nesting */
 							String levelStr = ((Parent) parentItem.getWrappedObject()).getTitle() + ":" + ((Section) sectionItem.getWrappedObject()).getTitle();
@@ -241,7 +256,7 @@ public class SelectNotepad extends BaseActivity {
 						this.list.add(noteItem);
 					}
 				}
-				depth--;
+				this.depth--;
 //				this.path.remove(this.path.size()-1);
 			}
 		}
