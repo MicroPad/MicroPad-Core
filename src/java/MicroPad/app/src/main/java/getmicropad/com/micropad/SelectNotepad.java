@@ -92,18 +92,20 @@ public class SelectNotepad extends BaseActivity {
 		this.mainList.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
 			this.adapter.toggle(position);
 			this.adapter.getFilter().filter();
+			Object item = ((NLevelItem)((NLevelAdapter)this.mainList.getAdapter()).getItem(position)).getWrappedObject();
 
 			switch (view.getTag(R.id.TAG_OBJECT_TYPE).toString()) {
 				case "notepad":
-					this.setNotepad((Notepad)((NLevelItem)((NLevelAdapter)this.mainList.getAdapter()).getItem(position)).getWrappedObject());
-					this.parentTree.clear();
+					this.setNotepad((Notepad)item);
 					return;
 
 				case "section":
+					this.setSection((Section)item);
 					this.updateParentTree(view, this.adapter, position);
 					return;
 
 				case "note":
+					this.setNote((Note)item);
 					this.updateParentTree(view, this.adapter, position);
 					if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_LARGE && (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_XLARGE) {
 						//Phone
@@ -116,6 +118,20 @@ public class SelectNotepad extends BaseActivity {
 
 		this.mainList.setLongClickable(true);
 		registerForContextMenu(this.mainList);
+	}
+
+	protected void updateNotepad(Section section, List<Section> parentList, int parentTreeIndex, LayoutInflater inflater) {
+		super.updateNotepad(section, parentList, parentTreeIndex);
+		List<Notepad> notepads = new ArrayList<>();
+		notepads.add(this.getNotepad());
+		updateList(inflater, notepads);
+	}
+
+	protected void updateNotepad(Note note, List<Section> parentList, int parentTreeIndex, LayoutInflater inflater) {
+		super.updateNotepad(note, parentList, parentTreeIndex);
+		List<Notepad> notepads = new ArrayList<>();
+		notepads.add(this.getNotepad());
+		updateList(inflater, notepads);
 	}
 
 	@Override
