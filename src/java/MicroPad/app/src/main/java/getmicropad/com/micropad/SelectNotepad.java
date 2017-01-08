@@ -1,8 +1,10 @@
 package getmicropad.com.micropad;
 
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -25,6 +27,8 @@ import com.getmicropad.NPXParser.Parent;
 import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.Section;
 import com.getmicropad.NPXParser.Source;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -105,6 +109,8 @@ public class SelectNotepad extends BaseActivity {
 					return;
 
 				case "note":
+					NLevelItem parentSectionItem = (NLevelItem)adapter.getItem(position).getParent();
+					this.setSection((Section)parentSectionItem.getWrappedObject());
 					this.setNote((Note)item);
 					this.updateParentTree(view, this.adapter, position);
 					if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_LARGE && (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_XLARGE) {
@@ -137,7 +143,12 @@ public class SelectNotepad extends BaseActivity {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		if (v.getId()==R.id.main_list) {
+		if (v.getId() == R.id.main_list) {
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+			Object selectedObj = ((NLevelItem)this.adapter.getItem(info.position)).getWrappedObject();
+			if (Parent.class.isInstance(selectedObj)) menu.add(0, 0, 0, "New Section");
+			if (Section.class.isInstance(selectedObj)) menu.add(0, 0, 0, "New Note");
+
 			MenuInflater inflater = getMenuInflater();
 			inflater.inflate(R.menu.list_context, menu);
 		}
@@ -146,15 +157,40 @@ public class SelectNotepad extends BaseActivity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+		NLevelItem selItem = ((NLevelItem)this.adapter.getItem(info.position));
 		switch (item.getItemId()) {
 			case R.id.delete_context:
 				switch (info.targetView.getTag(R.id.TAG_OBJECT_TYPE).toString()) {
-					//TODO: Delete stuff
 					case "notepad":
+						new AlertDialog.Builder(this)
+								.setTitle("Confirm Deletion")
+								.setMessage("Are you sure you want to delete this?")
+								.setIcon(new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_delete_forever))
+								.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
+									//TODO: Delete notepad from storage and reload
+									List<Notepad> notepads = new ArrayList<>();
+									updateList(getLayoutInflater(), notepads);
+								}).setNegativeButton(android.R.string.no, null).show();
 						return true;
 					case "section":
+						updateParentTree(info.targetView, this.adapter, info.position);
+						new AlertDialog.Builder(this)
+								.setTitle("Confirm Deletion")
+								.setMessage("Are you sure you want to delete this?")
+								.setIcon(new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_delete_forever))
+								.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
+									updateNotepad((Section)null, ((Parent)((NLevelItem)selItem.getParent()).getWrappedObject()).getSections(), 0, getLayoutInflater());
+								}).setNegativeButton(android.R.string.no, null).show();
 						return true;
 					case "note":
+						updateParentTree(info.targetView, this.adapter, info.position);
+						new AlertDialog.Builder(this)
+								.setTitle("Confirm Deletion")
+								.setMessage("Are you sure you want to delete this?")
+								.setIcon(new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_delete_forever))
+								.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
+									updateNotepad((Note)null, ((Section)((NLevelItem)selItem.getParent()).getWrappedObject()).getSections(), 0, getLayoutInflater());
+								}).setNegativeButton(android.R.string.no, null).show();
 						return true;
 				}
 				return true;
@@ -181,7 +217,7 @@ public class SelectNotepad extends BaseActivity {
 		for (Notepad notepad : notepads) {
 			NLevelItem notepadItem = new NLevelItem(notepad, null, (NLevelItem item) -> {
 				View view = inflater.inflate(R.layout.notepad_list_item, null);
-				String name = ((Notepad)item.getWrappedObject()).getTitle();
+				String name = "{gmd-collections-bookmark} "+((Notepad)item.getWrappedObject()).getTitle();
 				parentMap.put(name, new ArrayList<>());
 				view.setTag(R.id.TAG_OBJECT_TYPE, "notepad");
 				view.setTag(R.id.TAG_OBJECT_TITLE, name);
@@ -205,7 +241,7 @@ public class SelectNotepad extends BaseActivity {
 				int finalI = i;
 				NLevelItem sectionItem = new NLevelItem(section, parentItem, (NLevelItem item) -> {
 					View view = inflater.inflate(R.layout.section_list_item, null);
-					String name = ((Section)item.getWrappedObject()).getTitle();
+					String name = "{gmd-book} "+((Section)item.getWrappedObject()).getTitle();
 					view.setTag(R.id.TAG_OBJECT_TYPE, "section");
 					view.setTag(R.id.TAG_OBJECT_TITLE, name);
 
@@ -245,7 +281,7 @@ public class SelectNotepad extends BaseActivity {
 						NLevelItem noteItem = new NLevelItem(note, sectionItem, (NLevelItem item) -> {
 							if (item.isExpanded()) item.toggle();
 							View view = inflater.inflate(R.layout.section_list_item, null);
-							String name = ((Note) item.getWrappedObject()).getTitle();
+							String name = "{gmd-note} "+((Note) item.getWrappedObject()).getTitle();
 							view.setTag(R.id.TAG_OBJECT_TYPE, "note");
 							view.setTag(R.id.TAG_OBJECT_TITLE, name);
 

@@ -1,5 +1,6 @@
 package getmicropad.com.micropad;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
@@ -7,6 +8,7 @@ import com.getmicropad.NPXParser.Note;
 import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parent;
 import com.getmicropad.NPXParser.Section;
+import com.mikepenz.iconics.context.IconicsContextWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,11 @@ public class BaseActivity extends AppCompatActivity {
 	Section section;
 	Note note;
 	List<Integer> parentTree = new ArrayList<>();
+
+	@Override
+	protected void attachBaseContext(Context newBase) {
+		super.attachBaseContext(IconicsContextWrapper.wrap(newBase));
+	}
 
 	protected void updateParentTree(View view, NLevelAdapter adapter, int position) {
 		this.parentTree.clear();
@@ -38,17 +45,28 @@ public class BaseActivity extends AppCompatActivity {
 	protected void updateNotepad(Section section, List<Section> parentList, int parentTreeIndex) {
 		if (parentTreeIndex == this.parentTree.size()-1) {
 			//We're at the section we want to update
-			parentList.set(parentTreeIndex, section);
+			if (section != null) {
+				parentList.set(parentTreeIndex, section);
+			}
+			else {
+				parentList.remove((int)this.parentTree.get(parentTreeIndex));
+			}
+			return;
 		}
 		if (parentTreeIndex == this.parentTree.size()) return;
 
 		parentTreeIndex++;
-		updateNotepad(section, parentList.get(parentTreeIndex).getSections(), parentTreeIndex);
+		updateNotepad(section, parentList.get(this.parentTree.get(parentTreeIndex)).getSections(), parentTreeIndex);
 	}
 
 	protected void updateNotepad(Note note, List<Section> parentList, int parentTreeIndex) {
 		if (parentTreeIndex == this.parentTree.size()-2) {
-			parentList.get(parentTreeIndex).notes.set(parentTreeIndex+1, note);
+			if (note != null) {
+				parentList.get(parentTreeIndex).notes.set(parentTreeIndex + 1, note);
+			}
+			else {
+				parentList.get(parentTreeIndex).notes.remove(parentTreeIndex + 1);
+			}
 			return;
 		}
 

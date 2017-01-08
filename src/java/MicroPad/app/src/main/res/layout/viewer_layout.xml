@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:id="@+id/viewer"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:id="@+id/viewer"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:background="@drawable/bg">
@@ -16,9 +17,22 @@ android:background="@drawable/bg">
             android:fillViewport="true">
 
             <FrameLayout
-                android:id="@+id/viewer_content"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent">
+
+            </FrameLayout>
         </ScrollView>
     </HorizontalScrollView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="10dp"
+            android:clickable="true"
+            app:fabSize="normal"
+            app:ico_color="#fff"
+            app:ico_icon="gmd-add"
+            android:id="@+id/add_element_btn"
+            app:rippleColor="#fff"/>
 </FrameLayout>

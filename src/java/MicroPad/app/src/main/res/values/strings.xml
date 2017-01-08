@@ -1,11 +1,12 @@
 <resources>
-    <item type="id" name="TAG_OBJECT_TYPE" />
-    <item type="id" name="TAG_OBJECT_TITLE" />
-    <item type="id" name="TAG_OBJECT_PATH" />
+    <item name="TAG_OBJECT_TYPE" type="id"/>
+    <item name="TAG_OBJECT_TITLE" type="id"/>
+    <item name="TAG_OBJECT_PATH" type="id"/>
 
     <string name="app_name">μPad</string>
     <string name="import_btn">Import Notepad</string>
-    <string name="new_np_btn">New Notepad</string>
+    <string name="new_np_btn">NEW NOTEPAD</string>
     <string name="delete">Delete</string>
     <string name="rename">Rename</string>
+    <string name="title_activity_viewer">µPad</string>
 </resources>
