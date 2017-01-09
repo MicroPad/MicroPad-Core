@@ -189,7 +189,7 @@ public class SelectNotepad extends BaseActivity {
 								.setMessage("Are you sure you want to delete this?")
 								.setIcon(new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_delete_forever))
 								.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
-									updateNotepad((Note)null, ((Section)((NLevelItem)selItem.getParent()).getWrappedObject()).getSections(), 0, getLayoutInflater());
+									updateNotepad((Note)null, ((Parent)((NLevelItem)selItem.getParent().getParent()).getWrappedObject()).getSections(), 0, getLayoutInflater());
 								}).setNegativeButton(android.R.string.no, null).show();
 						return true;
 				}
