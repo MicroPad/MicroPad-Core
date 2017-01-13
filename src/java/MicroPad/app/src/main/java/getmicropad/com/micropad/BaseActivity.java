@@ -42,38 +42,53 @@ public class BaseActivity extends AppCompatActivity {
 		}
 	}
 
-	protected void updateNotepad(Section section, List<Section> parentList, int parentTreeIndex) {
-		if (parentTreeIndex == this.parentTree.size()-1) {
-			//We're at the section we want to update
-			if (section != null) {
-				parentList.set(parentTreeIndex, section);
-			}
-			else {
-				parentList.remove((int)this.parentTree.get(parentTreeIndex));
-			}
-			return;
-		}
-		if (parentTreeIndex == this.parentTree.size()) return;
-
-		parentTreeIndex++;
-		updateNotepad(section, parentList.get(this.parentTree.get(parentTreeIndex)).getSections(), parentTreeIndex);
+	protected void addToParentTree(int toAdd) {
+		this.parentTree.add(toAdd);
 	}
 
-	protected void updateNotepad(Note note, List<Section> parentList, int parentTreeIndex) {
-		if (parentTreeIndex == this.parentTree.size()-2) {
-			if (note != null) {
-				parentList.get(parentTreeIndex).notes.set(parentTreeIndex + 1, note);
+	protected void updateNotepad(Section section) {
+		List<Section> parentList = getNotepad().getSections();
+		for (int i = 0; i < this.parentTree.size(); i++) {
+			if (i == this.parentTree.size() - 1) {
+				if (section != null) {
+					parentList.set(this.parentTree.get(i), section);
+				}
+				else {
+					parentList.remove((int)this.parentTree.get(i));
+				}
+				return;
 			}
-			else {
-				parentList.get(parentTreeIndex).notes.remove(parentTreeIndex + 1);
-			}
-			return;
+
+			parentList = parentList.get(this.parentTree.get(i)).getSections();
 		}
+	}
 
-		if (parentTreeIndex == this.parentTree.size()) return;
+	protected void updateNotepad(Note note) {
+		List<Section> parentList = getNotepad().getSections();
+		for (int i = 0; i < this.parentTree.size(); i++) {
+			if (i == this.parentTree.size() - 2) {
+				if (note != null) {
+					parentList.get(this.parentTree.get(i)).notes.set(this.parentTree.get(i+1), note);
+				}
+				else {
+					parentList.get(this.parentTree.get(i)).notes.remove((int)this.parentTree.get(i+1));
+				}
+				return;
+			}
 
-		parentTreeIndex++;
-		updateNotepad(note, parentList.get(parentTreeIndex).getSections(), parentTreeIndex);
+			parentList = parentList.get(this.parentTree.get(i)).getSections();
+		}
+	}
+
+	protected void addToNotepad() {
+		List<Section> parentList = getNotepad().getSections();
+		for (int i = 0; i < this.parentTree.size(); i++) {
+			if (i == this.parentTree.size() - 1) {
+				return;
+			}
+
+			parentList = parentList.get(this.parentTree.get(i)).getSections();
+		}
 	}
 
 	protected void setNotepad(Notepad notepad) {
@@ -98,5 +113,9 @@ public class BaseActivity extends AppCompatActivity {
 
 	protected Note getNote() {
 		return this.note;
+	}
+
+	protected List<Integer> getParentTree() {
+		return this.parentTree;
 	}
 }

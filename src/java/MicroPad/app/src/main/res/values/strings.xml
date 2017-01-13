@@ -2,6 +2,8 @@
     <item name="TAG_OBJECT_TYPE" type="id"/>
     <item name="TAG_OBJECT_TITLE" type="id"/>
     <item name="TAG_OBJECT_PATH" type="id"/>
+    <item name="new_section_context" type="id"/>
+    <item name="new_note_context" type="id"/>
 
     <string name="app_name">μPad</string>
     <string name="import_btn">Import Notepad</string>
