@@ -10,7 +10,7 @@ import java.util.List;
 
 @Element(name="source")
 public class Source {
-	@Text
+	@Text(required=false)
 	private String url;
 
 	@Attribute
