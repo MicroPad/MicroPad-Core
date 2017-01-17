@@ -3,18 +3,23 @@ package getmicropad.com.micropad;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.getmicropad.NPXParser.Note;
 import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parent;
+import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.Section;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -127,14 +132,41 @@ public class BaseActivity extends AppCompatActivity {
 		}
 	}
 
-	protected boolean saveNotepad() {
-		this.getNotepad().setLastModified(new Date());
-		return this.filesystemManager.saveNotepad(this.getNotepad());
+	protected void saveNotepad() {
+		NotepadSaver notepadSaver = new NotepadSaver();
+		notepadSaver.execute(this.getNotepad());
+	}
+
+	protected class NotepadSaver extends AsyncTask<Object, String, Boolean> {
+		private CharSequence oldTitle;
+
+		@Override
+		protected void onPreExecute() {
+			//Show progress bar
+			this.oldTitle = getTitle();
+			setTitle(oldTitle+" (Saving...)");
+		}
+
+		@Override
+		protected Boolean doInBackground(Object... params) {
+			return filesystemManager.saveNotepad((Notepad)params[0]);
+		}
+
+		@Override
+		protected void onPostExecute(Boolean res) {
+			setTitle(oldTitle);
+
+			if (!res) new AlertDialog.Builder(BaseActivity.this)
+					.setTitle("Error")
+					.setMessage("Error saving notepad")
+					.setCancelable(true)
+					.setPositiveButton("Close", (dialog, which) -> {})
+					.show();
+		}
 	}
 
 	protected void setNotepad(Notepad notepad) {
 		this.notepad = notepad;
-		this.saveNotepad();
 	}
 
 	protected Notepad getNotepad(){

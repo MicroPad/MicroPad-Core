@@ -427,7 +427,7 @@ public class NotepadActivity extends BaseActivity {
 			progressBar.setVisibility(View.GONE);
 
 			if (notepad == null) {
-				new AlertDialog.Builder(getApplicationContext())
+				new AlertDialog.Builder(NotepadActivity.this)
 						.setTitle("Error")
 						.setMessage("Error parsing notepad")
 						.setCancelable(true)
