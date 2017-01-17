@@ -436,6 +436,7 @@ public class NotepadActivity extends BaseActivity {
 			}
 			else {
 				setNotepad(notepad);
+				setTitle(notepad.getTitle());
 				updateList(getLayoutInflater(), notepad);
 			}
 		}
