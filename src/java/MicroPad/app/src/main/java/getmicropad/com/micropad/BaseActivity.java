@@ -1,6 +1,11 @@
 package getmicropad.com.micropad;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
@@ -11,6 +16,7 @@ import com.getmicropad.NPXParser.Section;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class BaseActivity extends AppCompatActivity {
@@ -18,17 +24,39 @@ public class BaseActivity extends AppCompatActivity {
 	Section section;
 	Note note;
 	List<Integer> parentTree = new ArrayList<>();
+	FilesystemManager filesystemManager = new FilesystemManager();
+	static final int PERMISSION_REQ_FILESYSTEM = 0;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
 		super.attachBaseContext(IconicsContextWrapper.wrap(newBase));
 	}
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		/* Request permissions */
+		if ((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) | ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)) != PackageManager.PERMISSION_GRANTED)  {
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQ_FILESYSTEM);
+		}
+		else {
+			this.filesystemManager = new FilesystemManager();
+		}
+	}
+
 	protected void updateParentTree(View view, NLevelAdapter adapter, int position) {
 		this.parentTree.clear();
 		String t = view.getTag(R.id.TAG_OBJECT_PATH).toString();
 		NLevelItem parentItem = (NLevelItem)adapter.getItem(position).getParent();
-		Parent p = (Parent)parentItem.getWrappedObject();
+		Parent p;
+		if (parentItem != null) {
+			p = (Parent)parentItem.getWrappedObject();
+		}
+		else {
+			p = this.getNotepad();
+		}
+
 		while (p != null) {
 			this.parentTree.add(0, Integer.parseInt(t));
 
@@ -38,7 +66,12 @@ public class BaseActivity extends AppCompatActivity {
 
 			t = parentItem.getView().getTag(R.id.TAG_OBJECT_PATH).toString();
 			parentItem = (NLevelItem)parentItem.getParent();
-			p = (Parent)parentItem.getWrappedObject();
+			if (parentItem != null) {
+				p = (Parent)parentItem.getWrappedObject();
+			}
+			else {
+				p = this.getNotepad();
+			}
 		}
 	}
 
@@ -56,6 +89,7 @@ public class BaseActivity extends AppCompatActivity {
 				else {
 					parentList.remove((int)this.parentTree.get(i));
 				}
+				this.saveNotepad();
 				return;
 			}
 
@@ -73,6 +107,7 @@ public class BaseActivity extends AppCompatActivity {
 				else {
 					parentList.get(this.parentTree.get(i)).notes.remove((int)this.parentTree.get(i+1));
 				}
+				this.saveNotepad();
 				return;
 			}
 
@@ -84,6 +119,7 @@ public class BaseActivity extends AppCompatActivity {
 		List<Section> parentList = getNotepad().getSections();
 		for (int i = 0; i < this.parentTree.size(); i++) {
 			if (i == this.parentTree.size() - 1) {
+				this.saveNotepad();
 				return;
 			}
 
@@ -91,8 +127,14 @@ public class BaseActivity extends AppCompatActivity {
 		}
 	}
 
+	protected boolean saveNotepad() {
+		this.getNotepad().setLastModified(new Date());
+		return this.filesystemManager.saveNotepad(this.getNotepad());
+	}
+
 	protected void setNotepad(Notepad notepad) {
 		this.notepad = notepad;
+		this.saveNotepad();
 	}
 
 	protected Notepad getNotepad(){

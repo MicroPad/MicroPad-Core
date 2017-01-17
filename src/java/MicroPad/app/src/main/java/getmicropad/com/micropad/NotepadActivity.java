@@ -16,9 +16,11 @@ import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.getmicropad.NPXParser.Note;
@@ -37,18 +39,23 @@ import java.util.Map;
 import java.util.Random;
 
 public class NotepadActivity extends BaseActivity {
-	List<Notepad> notepads = new ArrayList<>();
 	List<NLevelItem> list;
 	ListView mainList;
 	NLevelAdapter adapter;
-	Random rng = new Random();
-	static final int PERMISSION_REQ_FILESYSTEM = 0;
-	FilesystemManager filesystemManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_select_notepad);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		/* Request permissions */
+		if ((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) | ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)) != PackageManager.PERMISSION_GRANTED)  {
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQ_FILESYSTEM);
+		}
+		else {
+			this.parseNotepad();
+		}
 
 		this.mainList = (ListView)findViewById(R.id.main_list);
 		this.list = new ArrayList<>();
@@ -56,27 +63,12 @@ public class NotepadActivity extends BaseActivity {
 		this.adapter = new NLevelAdapter(list);
 		this.mainList.setAdapter(this.adapter);
 
-		/* Request permissions */
-		if ((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) | ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)) != PackageManager.PERMISSION_GRANTED)  {
-			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQ_FILESYSTEM);
-		}
-		else {
-			this.filesystemManager = new FilesystemManager();
-			this.getNotepads();
-		}
-
-
-
 		this.mainList.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
 			this.adapter.toggle(position);
 			this.adapter.getFilter().filter();
 			Object item = ((NLevelItem)((NLevelAdapter)this.mainList.getAdapter()).getItem(position)).getWrappedObject();
 
 			switch (view.getTag(R.id.TAG_OBJECT_TYPE).toString()) {
-				case "notepad":
-					this.setNotepad((Notepad)item);
-					return;
-
 				case "section":
 					this.setSection((Section)item);
 					this.updateParentTree(view, this.adapter, position);
@@ -102,34 +94,41 @@ public class NotepadActivity extends BaseActivity {
 		FloatingActionButton newNotepadBtn = (FloatingActionButton)findViewById(R.id.add_notepad_btn);
 		newNotepadBtn.setOnClickListener(view -> {
 			EditText titleInput = new EditText(this);
+			int paddingInDp = (int)(10*getResources().getDisplayMetrics().density + 0.5f);
+			titleInput.setPadding(paddingInDp, paddingInDp, paddingInDp, paddingInDp);
 			new AlertDialog.Builder(this)
 					.setView(titleInput)
-					.setTitle("New Notepad")
-					.setPositiveButton("Create", (dialogInterface, whichButton) -> {
-						//TODO: Filesystem
-					}).setNegativeButton(android.R.string.cancel, null).show();
+					.setTitle("New Section")
+					.setPositiveButton("Create", (dialogInterface, whichButton) -> this.createNewSection(titleInput.getText().toString(), this.getNotepad()))
+					.setNegativeButton(android.R.string.cancel, null).show();
 		});
 	}
 
 	protected void updateNotepad(Section section, LayoutInflater inflater) {
 		super.updateNotepad(section);
-		List<Notepad> notepads = new ArrayList<>();
-		notepads.add(this.getNotepad());
-		updateList(inflater, notepads);
+		updateList(inflater, this.getNotepad());
 	}
 
 	protected void updateNotepad(Note note, LayoutInflater inflater) {
 		super.updateNotepad(note);
-		List<Notepad> notepads = new ArrayList<>();
-		notepads.add(this.getNotepad());
-		updateList(inflater, notepads);
+		updateList(inflater, this.getNotepad());
 	}
 
 	protected void addToNotepad(LayoutInflater inflater) {
 		super.addToNotepad();
-		List<Notepad> notepads = new ArrayList<>();
-		notepads.add(this.getNotepad());
-		updateList(inflater, notepads);
+		updateList(inflater, this.getNotepad());
+	}
+
+	private void createNewSection(String title, Parent parent) {
+		List<Section> parentSections = parent.getSections();
+		if (parentSections == null) {
+			parent.setSections(new ArrayList<>());
+			parentSections = parent.getSections();
+		}
+
+		parentSections.add(new Section(title));
+		addToParentTree(parentSections.size()-1);
+		addToNotepad(getLayoutInflater());
 	}
 
 	@Override
@@ -153,17 +152,6 @@ public class NotepadActivity extends BaseActivity {
 		switch (item.getItemId()) {
 			case R.id.delete_context:
 				switch (info.targetView.getTag(R.id.TAG_OBJECT_TYPE).toString()) {
-					case "notepad":
-						new AlertDialog.Builder(this)
-								.setTitle("Confirm Deletion")
-								.setMessage("Are you sure you want to delete this?")
-								.setIcon(new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_delete_forever))
-								.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
-									//TODO: Delete notepad from storage and reload
-									List<Notepad> notepads = new ArrayList<>();
-									updateList(getLayoutInflater(), notepads);
-								}).setNegativeButton(android.R.string.no, null).show();
-						return true;
 					case "section":
 						updateParentTree(info.targetView, this.adapter, info.position);
 						new AlertDialog.Builder(this)
@@ -190,24 +178,21 @@ public class NotepadActivity extends BaseActivity {
 			case R.id.new_section_context:
 				updateParentTree(info.targetView, this.adapter, info.position);
 				EditText renameInput = new EditText(this);
+				int paddingInDp = (int)(10*getResources().getDisplayMetrics().density + 0.5f);
+				renameInput.setPadding(paddingInDp, paddingInDp, paddingInDp, paddingInDp);
 				new AlertDialog.Builder(this)
 						.setView(renameInput)
 						.setTitle("New Section")
 						.setPositiveButton("Create", (dialogInterface, whichButton) -> {
-							List<Section> parentSections = ((Parent)selItem.getWrappedObject()).getSections();
-							if (parentSections == null) {
-								((Parent) selItem.getWrappedObject()).setSections(new ArrayList<>());
-								parentSections = ((Parent)selItem.getWrappedObject()).getSections();
-							}
-							parentSections.add(new Section(renameInput.getText().toString()));
-							addToParentTree(parentSections.size()-1);
-							addToNotepad(getLayoutInflater());
+							this.createNewSection(renameInput.getText().toString(), (Parent)selItem.getWrappedObject());
 						}).setNegativeButton(android.R.string.cancel, null).show();
 				return true;
 
 			case R.id.new_note_context:
 				updateParentTree(info.targetView, this.adapter, info.position);
 				renameInput = new EditText(this);
+				paddingInDp = (int)(10*getResources().getDisplayMetrics().density + 0.5f);
+				renameInput.setPadding(paddingInDp, paddingInDp, paddingInDp, paddingInDp);
 				new AlertDialog.Builder(this)
 						.setView(renameInput)
 						.setTitle("New Note")
@@ -226,24 +211,11 @@ public class NotepadActivity extends BaseActivity {
 
 			case R.id.rename_context:
 				switch (info.targetView.getTag(R.id.TAG_OBJECT_TYPE).toString()) {
-					case "notepad":
-						renameInput = new EditText(this);
-						new AlertDialog.Builder(this)
-								.setView(renameInput)
-								.setTitle("Rename Notepad")
-								.setPositiveButton("Rename", (dialogInterface, whichButton) -> {
-									//TODO: Rename in the FS
-									Notepad notepad = this.getNotepad();
-									notepad.setTitle(renameInput.getText().toString());
-									List<Notepad> notepads = new ArrayList<>();
-									notepads.add(this.getNotepad());
-									updateList(getLayoutInflater(), notepads);
-								}).setNegativeButton(android.R.string.cancel, null).show();
-						return true;
-
 					case "section":
 						updateParentTree(info.targetView, this.adapter, info.position);
 						renameInput = new EditText(this);
+						paddingInDp = (int)(10*getResources().getDisplayMetrics().density + 0.5f);
+						renameInput.setPadding(paddingInDp, paddingInDp, paddingInDp, paddingInDp);
 						new AlertDialog.Builder(this)
 								.setView(renameInput)
 								.setTitle("Rename Section")
@@ -257,6 +229,8 @@ public class NotepadActivity extends BaseActivity {
 					case "note":
 						updateParentTree(info.targetView, this.adapter, info.position);
 						renameInput = new EditText(this);
+						paddingInDp = (int)(10*getResources().getDisplayMetrics().density + 0.5f);
+						renameInput.setPadding(paddingInDp, paddingInDp, paddingInDp, paddingInDp);
 						new AlertDialog.Builder(this)
 								.setView(renameInput)
 								.setTitle("Rename Note")
@@ -274,7 +248,6 @@ public class NotepadActivity extends BaseActivity {
 		}
 	}
 
-	Map<String, List<Integer>> parentMap = new HashMap<>();
 	List<Integer> path = new ArrayList<>();
 	private void addToPath(int pos, int val) {
 		if (this.path.size() <= depth) {
@@ -287,113 +260,121 @@ public class NotepadActivity extends BaseActivity {
 
 	int depth = 0;
 
-	private void updateList(LayoutInflater inflater, List<Notepad> notepads) {
+	private void updateList(LayoutInflater inflater, Notepad notepad) {
 		this.list.clear();
-		for (Notepad notepad : notepads) {
-			NLevelItem notepadItem = new NLevelItem(notepad, null, (NLevelItem item) -> {
-				View view = inflater.inflate(R.layout.notepad_list_item, null);
-				String name = "{gmd-collections-bookmark} "+((Notepad)item.getWrappedObject()).getTitle();
-				parentMap.put(name, new ArrayList<>());
-				view.setTag(R.id.TAG_OBJECT_TYPE, "notepad");
-				view.setTag(R.id.TAG_OBJECT_TITLE, name);
-				TextView titleText = (TextView)view.findViewById(R.id.title_text);
-				if (item.isExpanded()) titleText.setTypeface(null, Typeface.BOLD);
-				titleText.setText(name);
-				return view;
-			});
-			this.list.add(notepadItem);
 
-			addSectionToList(inflater, notepadItem);
-		}
+		addSectionToList(inflater, null);
 		this.path.clear();
 		((NLevelAdapter)mainList.getAdapter()).getFilter().filter();
 	}
 	private void addSectionToList(LayoutInflater inflater, NLevelItem parentItem) {
-		if (((Parent)parentItem.getWrappedObject()).getSections() != null) {
-			for (int i = 0; i < ((Parent)parentItem.getWrappedObject()).getSections().size(); i++) {
-				Section section = ((Parent)parentItem.getWrappedObject()).getSections().get(i);
-
-				int finalI = i;
-				NLevelItem sectionItem = new NLevelItem(section, parentItem, (NLevelItem item) -> {
-					View view = inflater.inflate(R.layout.section_list_item, null);
-					String name = "{gmd-book} "+((Section)item.getWrappedObject()).getTitle();
-					view.setTag(R.id.TAG_OBJECT_TYPE, "section");
-					view.setTag(R.id.TAG_OBJECT_TITLE, name);
-
-					addToPath(depth, finalI);
-					String pathStr = "";
-					for (Integer index : this.path) {
-						if (pathStr.length() > 0) pathStr += ":";
-						pathStr += index.toString();
-					}
-					view.setTag(R.id.TAG_OBJECT_PATH, pathStr);
-
-					/** Generate a colour for the level of nesting */
-					String levelStr = ((Parent)parentItem.getWrappedObject()).getTitle();
-					int hashcode = levelStr.hashCode() % 16777216;
-					String hexHashCode = Integer.toHexString(hashcode);
-					while (hexHashCode.length() < 6) hexHashCode += "0";
-					int colour = Color.parseColor("#"+hexHashCode);
-
-					View indentBar = view.findViewById(R.id.indent_bar);
-					indentBar.setBackgroundColor(colour);
-
-					TextView titleText = (TextView)view.findViewById(R.id.title_text);
-					if (item.isExpanded()) titleText.setTypeface(null, Typeface.BOLD);
-					titleText.setText(name);
-					return view;
-				});
-				this.list.add(sectionItem);
-
-				this.depth++;
-				if (section.getSections() != null && section.getSections().size() > 0) {
-					addSectionToList(inflater, sectionItem);
-				}
-
-				if (section.notes != null) {
-					for (int j = 0; j < section.notes.size(); j++) {
-						Note note = section.notes.get(j);
-
-						int finalJ = j;
-						NLevelItem noteItem = new NLevelItem(note, sectionItem, (NLevelItem item) -> {
-							if (item.isExpanded()) item.toggle();
-							View view = inflater.inflate(R.layout.section_list_item, null);
-							String name = "{gmd-note} "+((Note) item.getWrappedObject()).getTitle();
-							view.setTag(R.id.TAG_OBJECT_TYPE, "note");
-							view.setTag(R.id.TAG_OBJECT_TITLE, name);
-
-							addToPath(this.depth, finalJ);
-							String pathStr = "";
-							for (Integer index : this.path) {
-								if (pathStr.length() > 0) pathStr += ":";
-								pathStr += index.toString();
-							}
-							view.setTag(R.id.TAG_OBJECT_PATH, pathStr);
-
-							/** Generate a colour for the level of nesting */
-							String levelStr = ((Parent) parentItem.getWrappedObject()).getTitle() + ":" + ((Section) sectionItem.getWrappedObject()).getTitle();
-							int hashcode = levelStr.hashCode() % 16777216;
-							String hexHashCode = Integer.toHexString(hashcode);
-							while (hexHashCode.length() < 6) hexHashCode += "0";
-							int colour = Color.parseColor("#"+hexHashCode);
-
-							View indentBar = view.findViewById(R.id.indent_bar);
-							indentBar.setBackgroundColor(colour);
-
-							TextView titleText = (TextView) view.findViewById(R.id.title_text);
-							titleText.setText(name);
-							return view;
-						});
-						this.list.add(noteItem);
-					}
-				}
-				this.depth--;
-//				this.path.remove(this.path.size()-1);
+		List<Section> sectionList;
+		if (parentItem != null) {
+			sectionList = ((Parent) parentItem.getWrappedObject()).getSections();
+		}
+		else {
+			sectionList = getNotepad().getSections();
+			if (sectionList == null) {
+				getNotepad().setSections(new ArrayList<>());
+				sectionList = getNotepad().getSections();
 			}
+		}
+
+		for (int i = 0; i < sectionList.size(); i++) {
+			Section section = sectionList.get(i);
+
+			int finalI = i;
+			NLevelItem sectionItem = new NLevelItem(section, parentItem, (NLevelItem item) -> {
+				View view = inflater.inflate(R.layout.section_list_item, null);
+				String name = "{gmd-book} " + ((Section) item.getWrappedObject()).getTitle();
+				view.setTag(R.id.TAG_OBJECT_TYPE, "section");
+				view.setTag(R.id.TAG_OBJECT_TITLE, name);
+
+				addToPath(depth, finalI);
+				String pathStr = "";
+				for (Integer index : this.path) {
+					if (pathStr.length() > 0) pathStr += ":";
+					pathStr += index.toString();
+				}
+				view.setTag(R.id.TAG_OBJECT_PATH, pathStr);
+
+				/** Generate a colour for the level of nesting */
+				String levelStr;
+				if (parentItem != null) {
+					levelStr = ((Parent) parentItem.getWrappedObject()).getTitle();
+				}
+				else {
+					levelStr = this.getNotepad().getTitle();
+				}
+				int hashcode = levelStr.hashCode() % 16777216;
+				String hexHashCode = Integer.toHexString(hashcode);
+				while (hexHashCode.length() < 6) hexHashCode += "0";
+				int colour = Color.parseColor("#" + hexHashCode);
+
+				View indentBar = view.findViewById(R.id.indent_bar);
+				indentBar.setBackgroundColor(colour);
+
+				TextView titleText = (TextView) view.findViewById(R.id.title_text);
+				if (item.isExpanded()) titleText.setTypeface(null, Typeface.BOLD);
+				titleText.setText(name);
+				return view;
+			});
+			this.list.add(sectionItem);
+
+			this.depth++;
+			if (section.getSections() != null && section.getSections().size() > 0) {
+				addSectionToList(inflater, sectionItem);
+			}
+
+			if (section.notes != null) {
+				for (int j = 0; j < section.notes.size(); j++) {
+					Note note = section.notes.get(j);
+
+					int finalJ = j;
+					NLevelItem noteItem = new NLevelItem(note, sectionItem, (NLevelItem item) -> {
+						if (item.isExpanded()) item.toggle();
+						View view = inflater.inflate(R.layout.section_list_item, null);
+						String name = "{gmd-note} " + ((Note) item.getWrappedObject()).getTitle();
+						view.setTag(R.id.TAG_OBJECT_TYPE, "note");
+						view.setTag(R.id.TAG_OBJECT_TITLE, name);
+
+						addToPath(this.depth, finalJ);
+						String pathStr = "";
+						for (Integer index : this.path) {
+							if (pathStr.length() > 0) pathStr += ":";
+							pathStr += index.toString();
+						}
+						view.setTag(R.id.TAG_OBJECT_PATH, pathStr);
+
+						//Generate a colour for the level of nesting
+						String levelStr;
+						if (parentItem != null) {
+							levelStr = ((Parent) parentItem.getWrappedObject()).getTitle() + ":" + ((Section) sectionItem.getWrappedObject()).getTitle();
+						}
+						else {
+							levelStr = this.getNotepad().getTitle() + ":" + ((Section) sectionItem.getWrappedObject()).getTitle();
+						}
+						int hashcode = levelStr.hashCode() % 16777216;
+						String hexHashCode = Integer.toHexString(hashcode);
+						while (hexHashCode.length() < 6) hexHashCode += "0";
+						int colour = Color.parseColor("#" + hexHashCode);
+
+						View indentBar = view.findViewById(R.id.indent_bar);
+						indentBar.setBackgroundColor(colour);
+
+						TextView titleText = (TextView) view.findViewById(R.id.title_text);
+						titleText.setText(name);
+						return view;
+					});
+					this.list.add(noteItem);
+				}
+			}
+			this.depth--;
+//				this.path.remove(this.path.size()-1);
 		}
 	}
 
-	private void getNotepads() {
+	private void parseNotepad() {
 		File notpadFile = (File)getIntent().getExtras().get("NOTEPAD_FILE");
 		NpxReader npxReader = new NpxReader();
 		npxReader.execute(notpadFile, 1);
@@ -405,7 +386,7 @@ public class NotepadActivity extends BaseActivity {
 			case PERMISSION_REQ_FILESYSTEM:
 				if (grantResults.length > 1 && (grantResults[0] | grantResults[1]) == PackageManager.PERMISSION_GRANTED) {
 					this.filesystemManager = new FilesystemManager();
-					this.getNotepads();
+					this.parseNotepad();
 				}
 				else {
 					new AlertDialog.Builder(this)
@@ -416,23 +397,23 @@ public class NotepadActivity extends BaseActivity {
 							})
 							.show();
 				}
-				return;
 		}
 	}
 
 	private class NpxReader extends AsyncTask<Object, String, Notepad> {
 		private Notepad res;
-		private int totalFiles = 0;
+		private ProgressBar progressBar;
 
 		@Override
 		protected void onPreExecute() {
-			//TODO: Show progress bar
+			//Show progress bar
+			progressBar = (ProgressBar)findViewById(R.id.progress);
+			progressBar.setIndeterminate(true);
+			progressBar.setVisibility(View.VISIBLE);
 		}
 
 		@Override
 		protected Notepad doInBackground(Object... params) {
-			totalFiles = (int)params[1];
-
 			try {
 				res = Parser.parseNpx((File)params[0]);
 			} catch (Exception e) {
@@ -443,9 +424,9 @@ public class NotepadActivity extends BaseActivity {
 
 		@Override
 		protected void onPostExecute(Notepad notepad) {
-			//TODO: Hide progress bar
+			progressBar.setVisibility(View.GONE);
+
 			if (notepad == null) {
-				totalFiles--;
 				new AlertDialog.Builder(getApplicationContext())
 						.setTitle("Error")
 						.setMessage("Error parsing notepad")
@@ -454,8 +435,8 @@ public class NotepadActivity extends BaseActivity {
 						.show();
 			}
 			else {
-				notepads.add(notepad);
-				if (notepads.size() == totalFiles) updateList(getLayoutInflater(), notepads);
+				setNotepad(notepad);
+				updateList(getLayoutInflater(), notepad);
 			}
 		}
 	}

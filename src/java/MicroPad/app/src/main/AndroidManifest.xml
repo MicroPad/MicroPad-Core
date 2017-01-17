@@ -16,6 +16,16 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".NotepadActivity"
+            android:label="@string/app_name"
+            android:parentActivityName=".SelectNotepad">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="getmicropad.com.micropad.SelectNotepad"/>
+        </activity>
+
         <activity
             android:name=".ViewerActivity"
             android:label="@string/title_activity_viewer"

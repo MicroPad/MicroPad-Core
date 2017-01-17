@@ -1,5 +1,6 @@
 package getmicropad.com.micropad;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 
@@ -7,6 +8,11 @@ import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parser;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +45,24 @@ public class FilesystemManager {
 	}
 
 	public File[] getNotepadFiles() {
-		File[] contents = this.workingDirectory.listFiles((File file, String name) -> name.toLowerCase().endsWith(".npx"));
-		return contents;
+		return this.workingDirectory.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File file, String name) {
+				return name.toLowerCase().endsWith(".npx");
+			}
+		});
+	}
+
+	public boolean saveNotepad(Notepad notepad) {
+		try {
+			File notepadFile = new File(this.workingDirectory.getAbsolutePath()+"/"+notepad.getTitle().replaceAll("/[^a-z0-9 ]/gi/", "")+".npx");
+			if (!notepadFile.exists() && !notepadFile.createNewFile()) return false;
+
+			Parser.toXml(notepad, notepadFile);
+		} catch (Exception e) {
+			return false;
+		}
+
+		return true;
 	}
 }

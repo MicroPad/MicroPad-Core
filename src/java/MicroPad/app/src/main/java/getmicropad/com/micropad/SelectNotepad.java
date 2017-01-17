@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.getmicropad.NPXParser.Note;
@@ -72,13 +73,15 @@ public class SelectNotepad extends AppCompatActivity {
 			this.getNotepads();
 		}
 
+		this.mainList.setLongClickable(true);
+		registerForContextMenu(this.mainList);
 
 		this.mainList.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
 			this.adapter.toggle(position);
 			this.adapter.getFilter().filter();
 			File notepadFile = (File)((NLevelItem)((NLevelAdapter)this.mainList.getAdapter()).getItem(position)).getWrappedObject();
 
-			//TODO: Open Notepad
+			//Open Notepad
 			Intent intent = new Intent(getBaseContext(), NotepadActivity.class);
 			intent.putExtra("NOTEPAD_FILE", notepadFile);
 			startActivity(intent);
@@ -87,13 +90,101 @@ public class SelectNotepad extends AppCompatActivity {
 		FloatingActionButton newNotepadBtn = (FloatingActionButton)findViewById(R.id.add_notepad_btn);
 		newNotepadBtn.setOnClickListener(view -> {
 			EditText titleInput = new EditText(this);
+			int paddingInDp = (int)(10*getResources().getDisplayMetrics().density + 0.5f);
+			titleInput.setPadding(paddingInDp, paddingInDp, paddingInDp, paddingInDp);
 			new AlertDialog.Builder(this)
 					.setView(titleInput)
 					.setTitle("New Notepad")
 					.setPositiveButton("Create", (dialogInterface, whichButton) -> {
-						//TODO: Filesystem
+						if (this.filesystemManager.saveNotepad(new Notepad(titleInput.getText().toString()))) {
+							this.getNotepads();
+						}
+						else {
+							new AlertDialog.Builder(getApplicationContext())
+									.setTitle("Error")
+									.setMessage("Error saving notepad")
+									.setCancelable(true)
+									.setPositiveButton("Close", (dialog, which) -> {})
+									.show();
+						}
 					}).setNegativeButton(android.R.string.cancel, null).show();
 		});
+	}
+
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		if (v.getId() == R.id.main_list) {
+			MenuInflater inflater = getMenuInflater();
+			inflater.inflate(R.menu.list_context, menu);
+		}
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+		NLevelItem selItem = ((NLevelItem)this.adapter.getItem(info.position));
+		File notepadFile = (File)selItem.getWrappedObject();
+		switch (item.getItemId()) {
+			case R.id.delete_context:
+				new AlertDialog.Builder(this)
+						.setTitle("Confirm Deletion")
+						.setMessage("Are you sure you want to delete this?")
+						.setIcon(new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_delete_forever))
+						.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
+							if (notepadFile.delete()) {
+								this.getNotepads();
+							}
+							else {
+								new AlertDialog.Builder(getApplicationContext())
+										.setTitle("Error")
+										.setMessage("Error deleting notepad")
+										.setCancelable(true)
+										.setPositiveButton("Close", (dialog, which) -> {})
+										.show();
+							}
+						}).setNegativeButton(android.R.string.no, null).show();
+				return true;
+
+			case R.id.rename_context:
+				EditText renameInput = new EditText(this);
+				int paddingInDp = (int)(10*getResources().getDisplayMetrics().density + 0.5f);
+				renameInput.setPadding(paddingInDp, paddingInDp, paddingInDp, paddingInDp);
+				new AlertDialog.Builder(this)
+						.setView(renameInput)
+						.setTitle("Rename Notepad")
+						.setPositiveButton("Rename", (dialogInterface, whichButton) -> {
+							//Parse Notepad
+							try {
+								Notepad notepad = Parser.parseNpx(notepadFile);
+								notepad.setTitle(renameInput.getText().toString());
+
+								if (notepadFile.delete() && this.filesystemManager.saveNotepad(notepad)) {
+									this.getNotepads();
+								}
+								else {
+									new AlertDialog.Builder(getApplicationContext())
+											.setTitle("Error")
+											.setMessage("Error parsing notepad")
+											.setCancelable(true)
+											.setPositiveButton("Close", (dialog, which) -> {})
+											.show();
+								}
+							} catch (Exception e) {
+								new AlertDialog.Builder(getApplicationContext())
+										.setTitle("Error")
+										.setMessage("Error parsing notepad")
+										.setCancelable(true)
+										.setPositiveButton("Close", (dialog, which) -> {})
+										.show();
+							}
+						}).setNegativeButton(android.R.string.cancel, null).show();
+				return true;
+
+			default:
+				return super.onContextItemSelected(item);
+		}
 	}
 
 	private void updateList(LayoutInflater inflater, File[] notepads) {
