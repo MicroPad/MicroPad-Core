@@ -1,13 +1,14 @@
 package getmicropad.com.micropad;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-public class ViewerActivity extends AppCompatActivity {
+import java.io.File;
+
+public class ViewerActivity extends BaseActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +23,9 @@ public class ViewerActivity extends AppCompatActivity {
 						.setAction("Action", null).show();
 			}
 		});
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-	}
+		getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
+		NoteLoader noteLoader = new NoteLoader();
+		noteLoader.execute(getIntent().getExtras().get("NOTEPAD_FILE"), getIntent().getExtras().get("NOTE_XML"));
+	}
 }

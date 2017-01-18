@@ -1,6 +1,7 @@
 package getmicropad.com.micropad;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -33,6 +34,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,7 @@ public class NotepadActivity extends BaseActivity {
 	List<NLevelItem> list;
 	ListView mainList;
 	NLevelAdapter adapter;
+	File notepadFile;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,12 @@ public class NotepadActivity extends BaseActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		/* Request permissions */
+		if (savedInstanceState != null) {
+			this.notepadFile = (File)savedInstanceState.getSerializable("NOTEPAD_FILE");
+		}
+		else {
+			this.notepadFile = (File)getIntent().getExtras().get("NOTEPAD_FILE");
+		}
 		if ((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) | ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)) != PackageManager.PERMISSION_GRANTED)  {
 			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQ_FILESYSTEM);
 		}
@@ -79,11 +88,32 @@ public class NotepadActivity extends BaseActivity {
 					this.setSection((Section)parentSectionItem.getWrappedObject());
 					this.setNote((Note)item);
 					this.updateParentTree(view, this.adapter, position);
+
+					Notepad tmpNp = new Notepad("tmp", new Date());
+					Section tmpS = new Section("tmp");
+					tmpS.notes.add((Note)item);
+					tmpNp.getSections().add(tmpS);
+
 					if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_LARGE && (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_XLARGE) {
 						//Phone
+						Intent intent = new Intent(this, ViewerActivity.class);
+
+						intent.putExtra("NOTEPAD_FILE", this.notepadFile);
+						try {
+							intent.putExtra("NOTE_XML", Parser.toXml(tmpNp));
+							startActivity(intent);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 					else {
 						//Tablet
+						NoteLoader noteLoader = new NoteLoader();
+						try {
+							noteLoader.execute(this.notepadFile, Parser.toXml(tmpNp));
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 			}
 		});
@@ -120,6 +150,7 @@ public class NotepadActivity extends BaseActivity {
 	}
 
 	private void createNewSection(String title, Parent parent) {
+		this.getParentTree().clear();
 		List<Section> parentSections = parent.getSections();
 		if (parentSections == null) {
 			parent.setSections(new ArrayList<>());
@@ -370,14 +401,13 @@ public class NotepadActivity extends BaseActivity {
 				}
 			}
 			this.depth--;
-//				this.path.remove(this.path.size()-1);
 		}
 	}
 
 	private void parseNotepad() {
-		File notpadFile = (File)getIntent().getExtras().get("NOTEPAD_FILE");
+		File file = this.notepadFile;
 		NpxReader npxReader = new NpxReader();
-		npxReader.execute(notpadFile, 1);
+		npxReader.execute(file, 1);
 	}
 
 	@Override
@@ -398,6 +428,13 @@ public class NotepadActivity extends BaseActivity {
 							.show();
 				}
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		savedInstanceState.putSerializable("NOTEPAD_FILE", this.notepadFile);
+
+		super.onSaveInstanceState(savedInstanceState);
 	}
 
 	private class NpxReader extends AsyncTask<Object, String, Notepad> {

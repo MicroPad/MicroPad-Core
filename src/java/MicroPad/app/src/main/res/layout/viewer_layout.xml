@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
              android:id="@+id/viewer"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:background="@drawable/bg">
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@drawable/bg">
+
+    <ProgressBar
+        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/progress"
+        android:indeterminate="true"
+        tools:visibility="visible"
+        android:visibility="gone"/>
 
     <HorizontalScrollView
         android:layout_width="match_parent"
@@ -18,7 +28,9 @@ android:background="@drawable/bg">
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:id="@+id/note_container"
+                android:visibility="gone">
 
             </FrameLayout>
         </ScrollView>

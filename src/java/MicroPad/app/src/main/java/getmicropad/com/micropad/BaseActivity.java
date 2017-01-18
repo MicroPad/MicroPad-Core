@@ -3,16 +3,25 @@ package getmicropad.com.micropad;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.getmicropad.NPXParser.ImageElement;
+import com.getmicropad.NPXParser.MarkdownElement;
 import com.getmicropad.NPXParser.Note;
+import com.getmicropad.NPXParser.NoteElement;
 import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parent;
 import com.getmicropad.NPXParser.Parser;
@@ -48,6 +57,33 @@ public class BaseActivity extends AppCompatActivity {
 		else {
 			this.filesystemManager = new FilesystemManager();
 		}
+	}
+
+	protected void loadNote(Note note) {
+		this.setNote(note);
+		FrameLayout noteContainer = (FrameLayout)findViewById(R.id.note_container);
+		noteContainer.setVisibility(View.GONE);
+
+		FrameLayout viewer = (FrameLayout)findViewById(R.id.viewer);
+		if (note.elements.size() > 0) viewer.setBackgroundResource(0);
+
+		/* Elements */
+		for (NoteElement element : note.elements) {
+			if (element instanceof  MarkdownElement) {
+
+			}
+			else if (element instanceof ImageElement) {
+				byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
+				Bitmap decodedBmp = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
+
+				ImageView imageView = new ImageView(this);
+				imageView.setImageBitmap(decodedBmp);
+				imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+				noteContainer.addView(imageView);
+			}
+		}
+
+		noteContainer.setVisibility(View.VISIBLE);
 	}
 
 	protected void updateParentTree(View view, NLevelAdapter adapter, int position) {
@@ -183,6 +219,7 @@ public class BaseActivity extends AppCompatActivity {
 
 	protected void setNote(Note note) {
 		this.note = note;
+		setTitle(this.note.getTitle());
 	}
 
 	protected Note getNote() {
@@ -191,5 +228,49 @@ public class BaseActivity extends AppCompatActivity {
 
 	protected List<Integer> getParentTree() {
 		return this.parentTree;
+	}
+
+	protected class NoteLoader extends AsyncTask<Object, String, Notepad> {
+		private Notepad res;
+		private Note note;
+		private ProgressBar progressBar;
+
+		@Override
+		protected void onPreExecute() {
+			//Show progress bar
+			progressBar = (ProgressBar)findViewById(R.id.progress);
+			progressBar.setIndeterminate(true);
+			progressBar.setVisibility(View.VISIBLE);
+		}
+
+		@Override
+		protected Notepad doInBackground(Object... params) {
+			try {
+				res = Parser.parseNpx((File)params[0]);
+				this.note = Parser.parseNpx((String)params[1]).getSections().get(0).notes.get(0);
+			} catch (Exception e) {
+				return null;
+			}
+
+			return res;
+		}
+
+		@Override
+		protected void onPostExecute(Notepad notepad) {
+			progressBar.setVisibility(View.GONE);
+
+			if (notepad == null) {
+				new AlertDialog.Builder(BaseActivity.this)
+						.setTitle("Error")
+						.setMessage("Error parsing notepad")
+						.setCancelable(true)
+						.setPositiveButton("Close", (dialog, which) -> {})
+						.show();
+			}
+			else {
+				setNotepad(notepad);
+				loadNote(this.note);
+			}
+		}
 	}
 }

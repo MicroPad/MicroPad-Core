@@ -29,11 +29,10 @@
         <activity
             android:name=".ViewerActivity"
             android:label="@string/title_activity_viewer"
-            android:parentActivityName=".SelectNotepad"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".NotepadActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="getmicropad.com.micropad.SelectNotepad"/>
+                android:value="getmicropad.com.micropad.NotepadActivity"/>
         </activity>
     </application>
 

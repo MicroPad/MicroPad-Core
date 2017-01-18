@@ -31,7 +31,7 @@
                 android:layout_gravity="end|right|bottom"
                 android:layout_margin="10dp"
                 android:clickable="true"
-                app:fabSize="mini"
+                app:fabSize="normal"
                 app:ico_color="#fff"
                 app:ico_icon="gmd-add"
                 android:id="@+id/add_notepad_btn"
