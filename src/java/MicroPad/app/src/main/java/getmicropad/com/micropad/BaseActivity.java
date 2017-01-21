@@ -18,9 +18,12 @@ import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 
+import com.getmicropad.NPXParser.DrawingElement;
 import com.getmicropad.NPXParser.ImageElement;
 import com.getmicropad.NPXParser.MarkdownElement;
 import com.getmicropad.NPXParser.Note;
@@ -67,19 +70,21 @@ public class BaseActivity extends AppCompatActivity {
 	protected void loadNote(Note note) {
 		this.setNote(note);
 		FrameLayout noteContainer = (FrameLayout)findViewById(R.id.note_container);
-		noteContainer.setVisibility(View.GONE);
+		noteContainer.setVisibility(View.INVISIBLE);
 
 		FrameLayout viewer = (FrameLayout)findViewById(R.id.viewer);
 		if (note.elements.size() > 0) viewer.setBackgroundResource(0);
 
 		/* Elements */
 		for (NoteElement element : note.elements) {
-			if (element instanceof  MarkdownElement) {
-
-			}
-			else if (element instanceof ImageElement) {
+			if (element instanceof ImageElement || element instanceof DrawingElement) {
 				byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
 				Bitmap decodedBmp = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
+
+				if (element instanceof DrawingElement) {
+					//TODO: Crop whitespace
+					decodedBmp = Helpers.TrimBitmap(decodedBmp);
+				}
 
 				ImageView imageView = new ImageView(this);
 				imageView.setImageBitmap(decodedBmp);
@@ -96,19 +101,24 @@ public class BaseActivity extends AppCompatActivity {
 					e.printStackTrace();
 				}
 				noteContainer.addView(imageView);
-				resizeCanvas(noteContainer, imageView);
+				imageView.post(() -> resizeCanvas(imageView));
 			}
 		}
 
 		noteContainer.setVisibility(View.VISIBLE);
 	}
 
-	protected void resizeCanvas(FrameLayout canvas, View view) {
+	protected void resizeCanvas(View view) {
+		FrameLayout noteContainer = (FrameLayout)findViewById(R.id.note_container);
 		float newWidth = (view.getX()+view.getWidth()+1000);
 		float newHeight = (view.getY()+view.getHeight()+1000);
 
-		if (canvas.getWidth() < newWidth) canvas.getLayoutParams().width = (int)newWidth;
-		if (canvas.getHeight() < newHeight) canvas.getLayoutParams().height = (int)newHeight;
+		if (noteContainer.getWidth() < newWidth) noteContainer.getLayoutParams().width = (int)newWidth;
+		if (noteContainer.getHeight() < newHeight) {
+			noteContainer.getLayoutParams().height = (int)newHeight;
+			noteContainer.setMinimumHeight((int)newHeight);
+		}
+		noteContainer.requestLayout();
 	}
 
 	public int getIntFromString(String str) throws ParseException {
@@ -286,6 +296,41 @@ public class BaseActivity extends AppCompatActivity {
 			progressBar = (ProgressBar)findViewById(R.id.progress);
 			progressBar.setIndeterminate(true);
 			progressBar.setVisibility(View.VISIBLE);
+
+			//Set up scrollview
+			final HorizontalScrollView hScroll = (HorizontalScrollView)findViewById(R.id.hscroll);
+			final ScrollView vScroll = (ScrollView)findViewById(R.id.vscroll);
+			vScroll.setOnTouchListener((v, event) -> false); //Inner scroll listener
+			hScroll.setOnTouchListener(new View.OnTouchListener() { //outer scroll listener
+				private float mx, my, curX, curY;
+				private boolean started = false;
+
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					curX = event.getX();
+					curY = event.getY();
+					int dx = (int) (mx - curX);
+					int dy = (int) (my - curY);
+					switch (event.getAction()) {
+						case MotionEvent.ACTION_MOVE:
+							if (started) {
+								vScroll.scrollBy(0, dy);
+								hScroll.scrollBy(dx, 0);
+							} else {
+								started = true;
+							}
+							mx = curX;
+							my = curY;
+							break;
+						case MotionEvent.ACTION_UP:
+							vScroll.scrollBy(0, dy);
+							hScroll.scrollBy(dx, 0);
+							started = false;
+							break;
+					}
+					return true;
+				}
+			});
 		}
 
 		@Override
