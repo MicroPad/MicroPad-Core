@@ -7,6 +7,8 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ViewerActivity extends BaseActivity {
 
@@ -26,6 +28,6 @@ public class ViewerActivity extends BaseActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
 		NoteLoader noteLoader = new NoteLoader();
-		noteLoader.execute(getIntent().getExtras().get("NOTEPAD_FILE"), getIntent().getExtras().get("NOTE_XML"));
+		noteLoader.execute(getIntent().getExtras().get("NOTEPAD_FILE"), new ArrayList<>(Arrays.asList((Integer[])getIntent().getExtras().get("PATH"))));
 	}
 }

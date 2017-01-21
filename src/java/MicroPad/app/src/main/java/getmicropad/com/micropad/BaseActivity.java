@@ -12,8 +12,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -29,6 +32,8 @@ import com.getmicropad.NPXParser.Section;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 
 import java.io.File;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -78,12 +83,36 @@ public class BaseActivity extends AppCompatActivity {
 
 				ImageView imageView = new ImageView(this);
 				imageView.setImageBitmap(decodedBmp);
+				imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+				imageView.setAdjustViewBounds(true);
 				imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+				try {
+					if (element.getWidth().endsWith("px")) imageView.getLayoutParams().width = this.getIntFromString(element.getWidth());
+					if (element.getHeight().endsWith("px")) imageView.getLayoutParams().height = this.getIntFromString(element.getHeight());
+					imageView.setX(this.getIntFromString(element.getX()));
+					imageView.setY(this.getIntFromString(element.getY()));
+				}
+				catch (ParseException e) {
+					e.printStackTrace();
+				}
 				noteContainer.addView(imageView);
+				resizeCanvas(noteContainer, imageView);
 			}
 		}
 
 		noteContainer.setVisibility(View.VISIBLE);
+	}
+
+	protected void resizeCanvas(FrameLayout canvas, View view) {
+		float newWidth = (view.getX()+view.getWidth()+1000);
+		float newHeight = (view.getY()+view.getHeight()+1000);
+
+		if (canvas.getWidth() < newWidth) canvas.getLayoutParams().width = (int)newWidth;
+		if (canvas.getHeight() < newHeight) canvas.getLayoutParams().height = (int)newHeight;
+	}
+
+	public int getIntFromString(String str) throws ParseException {
+		return (NumberFormat.getInstance().parse(str)).intValue();
 	}
 
 	protected void updateParentTree(View view, NLevelAdapter adapter, int position) {
@@ -139,7 +168,7 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	protected void updateNotepad(Note note) {
-		List<Section> parentList = getNotepad().getSections();
+		List<Section> parentList = this.getNotepad().getSections();
 		for (int i = 0; i < this.parentTree.size(); i++) {
 			if (i == this.parentTree.size() - 2) {
 				if (note != null) {
@@ -157,7 +186,7 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	protected void addToNotepad() {
-		List<Section> parentList = getNotepad().getSections();
+		List<Section> parentList = this.getNotepad().getSections();
 		for (int i = 0; i < this.parentTree.size(); i++) {
 			if (i == this.parentTree.size() - 1) {
 				this.saveNotepad();
@@ -166,6 +195,18 @@ public class BaseActivity extends AppCompatActivity {
 
 			parentList = parentList.get(this.parentTree.get(i)).getSections();
 		}
+	}
+
+	protected Note getNoteFromPath() {
+		List<Section> parentList = this.getNotepad().getSections();
+		for (int i = 0; i < getParentTree().size(); i++) {
+			if (i == getParentTree().size() - 2) {
+				return parentList.get(getParentTree().get(i)).notes.get(getParentTree().get(i+1));
+			}
+
+			parentList = parentList.get(getParentTree().get(i)).getSections();
+		}
+		return null;
 	}
 
 	protected void saveNotepad() {
@@ -230,6 +271,10 @@ public class BaseActivity extends AppCompatActivity {
 		return this.parentTree;
 	}
 
+	protected void setParentTree(List<Integer> tree) {
+		this.parentTree = tree;
+	}
+
 	protected class NoteLoader extends AsyncTask<Object, String, Notepad> {
 		private Notepad res;
 		private Note note;
@@ -246,13 +291,17 @@ public class BaseActivity extends AppCompatActivity {
 		@Override
 		protected Notepad doInBackground(Object... params) {
 			try {
-				res = Parser.parseNpx((File)params[0]);
-				this.note = Parser.parseNpx((String)params[1]).getSections().get(0).notes.get(0);
+				this.res = Parser.parseNpx((File)params[0]);
+				setNotepad(this.res);
+
 			} catch (Exception e) {
 				return null;
 			}
+			setParentTree((ArrayList<Integer>)params[1]);
+			this.note = getNoteFromPath();
+//				this.note = Parser.parseNpx((String)params[1]).getSections().get(0).notes.get(0);
 
-			return res;
+			return this.res;
 		}
 
 		@Override
@@ -268,7 +317,6 @@ public class BaseActivity extends AppCompatActivity {
 						.show();
 			}
 			else {
-				setNotepad(notepad);
 				loadNote(this.note);
 			}
 		}

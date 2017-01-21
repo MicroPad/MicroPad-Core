@@ -100,7 +100,7 @@ public class NotepadActivity extends BaseActivity {
 
 						intent.putExtra("NOTEPAD_FILE", this.notepadFile);
 						try {
-							intent.putExtra("NOTE_XML", Parser.toXml(tmpNp));
+							intent.putExtra("PATH", this.getParentTree().toArray(new Integer[this.getParentTree().size()]));
 							startActivity(intent);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -109,11 +109,11 @@ public class NotepadActivity extends BaseActivity {
 					else {
 						//Tablet
 						NoteLoader noteLoader = new NoteLoader();
-						try {
-							noteLoader.execute(this.notepadFile, Parser.toXml(tmpNp));
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						noteLoader.execute(this.notepadFile, this.getParentTree());
+//						try {
+//						} catch (Exception e) {
+//							e.printStackTrace();
+//						}
 					}
 			}
 		});
