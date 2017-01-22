@@ -1,6 +1,7 @@
 package getmicropad.com.micropad;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -67,6 +69,7 @@ public class BaseActivity extends AppCompatActivity {
 		}
 	}
 
+	@SuppressLint("SetJavaScriptEnabled")
 	protected void loadNote(Note note) {
 		this.setNote(note);
 		FrameLayout noteContainer = (FrameLayout)findViewById(R.id.note_container);
@@ -77,13 +80,48 @@ public class BaseActivity extends AppCompatActivity {
 
 		/* Elements */
 		for (NoteElement element : note.elements) {
-			if (element instanceof ImageElement || element instanceof DrawingElement) {
+			if (element instanceof MarkdownElement) {
+				WebView webView = new WebView(this);
+				webView.getSettings().setJavaScriptEnabled(true);
+				webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+
+				webView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+				try {
+					if (element.getWidth().endsWith("px")) webView.getLayoutParams().width = this.getIntFromString(element.getWidth());
+					if (element.getHeight().endsWith("px")) webView.getLayoutParams().height = this.getIntFromString(element.getHeight());
+					webView.setX(this.getIntFromString(element.getX()));
+					webView.setY(this.getIntFromString(element.getY()));
+				}
+				catch (ParseException e) {
+					e.printStackTrace();
+				}
+				noteContainer.addView(webView);
+				webView.post(() -> {
+					resizeCanvas(webView);
+
+					webView.loadUrl("file:///android_asset/www/markdown.html");
+					webView.setWebViewClient(new WebViewClient() {
+						public void onPageFinished(WebView view, String url) {
+							webView.loadUrl(String.format("javascript:display(\"%s\", \"%s\", \"%s\", \"%s\")", element.getContent(), element.getWidth(), element.getHeight(), ((MarkdownElement)element).getFontSize()));
+							try {
+								Thread.sleep(1000);
+							}
+							catch (InterruptedException e) {}
+							noteContainer.requestLayout();
+						}
+					});
+				});
+			}
+			else if (element instanceof ImageElement || element instanceof DrawingElement) {
 				byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
 				Bitmap decodedBmp = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
 
 				if (element instanceof DrawingElement) {
-					//TODO: Crop whitespace
-					decodedBmp = Helpers.TrimBitmap(decodedBmp);
+					//Crop whitespace
+					try {
+						decodedBmp = Helpers.TrimBitmap(decodedBmp);
+					}
+					catch (Exception e) {}
 				}
 
 				ImageView imageView = new ImageView(this);
@@ -298,39 +336,39 @@ public class BaseActivity extends AppCompatActivity {
 			progressBar.setVisibility(View.VISIBLE);
 
 			//Set up scrollview
-			final HorizontalScrollView hScroll = (HorizontalScrollView)findViewById(R.id.hscroll);
-			final ScrollView vScroll = (ScrollView)findViewById(R.id.vscroll);
-			vScroll.setOnTouchListener((v, event) -> false); //Inner scroll listener
-			hScroll.setOnTouchListener(new View.OnTouchListener() { //outer scroll listener
-				private float mx, my, curX, curY;
-				private boolean started = false;
-
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					curX = event.getX();
-					curY = event.getY();
-					int dx = (int) (mx - curX);
-					int dy = (int) (my - curY);
-					switch (event.getAction()) {
-						case MotionEvent.ACTION_MOVE:
-							if (started) {
-								vScroll.scrollBy(0, dy);
-								hScroll.scrollBy(dx, 0);
-							} else {
-								started = true;
-							}
-							mx = curX;
-							my = curY;
-							break;
-						case MotionEvent.ACTION_UP:
-							vScroll.scrollBy(0, dy);
-							hScroll.scrollBy(dx, 0);
-							started = false;
-							break;
-					}
-					return true;
-				}
-			});
+//			final HorizontalScrollView hScroll = (HorizontalScrollView)findViewById(R.id.hscroll);
+//			final ScrollView vScroll = (ScrollView)findViewById(R.id.vscroll);
+//			vScroll.setOnTouchListener((v, event) -> false); //Inner scroll listener
+//			hScroll.setOnTouchListener(new View.OnTouchListener() { //outer scroll listener
+//				private float mx, my, curX, curY;
+//				private boolean started = false;
+//
+//				@Override
+//				public boolean onTouch(View v, MotionEvent event) {
+//					curX = event.getX();
+//					curY = event.getY();
+//					int dx = (int) (mx - curX);
+//					int dy = (int) (my - curY);
+//					switch (event.getAction()) {
+//						case MotionEvent.ACTION_MOVE:
+//							if (started) {
+//								vScroll.scrollBy(0, dy);
+//								hScroll.scrollBy(dx, 0);
+//							} else {
+//								started = true;
+//							}
+//							mx = curX;
+//							my = curY;
+//							break;
+//						case MotionEvent.ACTION_UP:
+//							vScroll.scrollBy(0, dy);
+//							hScroll.scrollBy(dx, 0);
+//							started = false;
+//							break;
+//					}
+//					return true;
+//				}
+//			});
 		}
 
 		@Override
