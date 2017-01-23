@@ -13,9 +13,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -41,7 +45,9 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BaseActivity extends AppCompatActivity {
 	Notepad notepad;
@@ -49,6 +55,7 @@ public class BaseActivity extends AppCompatActivity {
 	Note note;
 	List<Integer> parentTree = new ArrayList<>();
 	FilesystemManager filesystemManager = new FilesystemManager();
+	Map<String, WebView> webviews = new HashMap<>();
 	static final int PERMISSION_REQ_FILESYSTEM = 0;
 
 	@Override
@@ -81,14 +88,25 @@ public class BaseActivity extends AppCompatActivity {
 		/* Elements */
 		for (NoteElement element : note.elements) {
 			if (element instanceof MarkdownElement) {
-				WebView webView = new WebView(this);
+				MarkdownWebView webView = new MarkdownWebView(this);
 				webView.getSettings().setJavaScriptEnabled(true);
-				webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+//				webView.addJavascriptInterface(new MarkdownInterface(this, webView), "Native");
+				webView.addJavascriptInterface(this, "Native");
+				webView.setWebChromeClient(new WebChromeClient() {
+					@Override
+					public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+						Log.wtf("m3k", consoleMessage.message() + " -- From line "
+								+ consoleMessage.lineNumber() + " of "
+								+ consoleMessage.sourceId());
+						return super.onConsoleMessage(consoleMessage);
+					}
+				});
+//				webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
 
-				webView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+				webView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 				try {
-					if (element.getWidth().endsWith("px")) webView.getLayoutParams().width = this.getIntFromString(element.getWidth());
-					if (element.getHeight().endsWith("px")) webView.getLayoutParams().height = this.getIntFromString(element.getHeight());
+//					if (element.getWidth().endsWith("px")) webView.getLayoutParams().width = this.getIntFromString(element.getWidth());
+//					if (element.getHeight().endsWith("px")) webView.getLayoutParams().height = this.getIntFromString(element.getHeight());
 					webView.setX(this.getIntFromString(element.getX()));
 					webView.setY(this.getIntFromString(element.getY()));
 				}
@@ -102,15 +120,16 @@ public class BaseActivity extends AppCompatActivity {
 					webView.loadUrl("file:///android_asset/www/markdown.html");
 					webView.setWebViewClient(new WebViewClient() {
 						public void onPageFinished(WebView view, String url) {
-							webView.loadUrl(String.format("javascript:display(\"%s\", \"%s\", \"%s\", \"%s\")", element.getContent(), element.getWidth(), element.getHeight(), ((MarkdownElement)element).getFontSize()));
-							try {
-								Thread.sleep(1000);
-							}
-							catch (InterruptedException e) {}
-							noteContainer.requestLayout();
+							webView.loadUrl(String.format("javascript:display(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")", element.getId(), element.getContent(), element.getWidth(), element.getHeight(), ((MarkdownElement)element).getFontSize()));
+//							try {
+//								Thread.sleep(1000);
+//							}
+//							catch (InterruptedException e) {}
+//							noteContainer.requestLayout();
 						}
 					});
 				});
+				this.webviews.put(element.getId(), webView);
 			}
 			else if (element instanceof ImageElement || element instanceof DrawingElement) {
 				byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
@@ -144,6 +163,19 @@ public class BaseActivity extends AppCompatActivity {
 		}
 
 		noteContainer.setVisibility(View.VISIBLE);
+	}
+
+	@JavascriptInterface
+	public void renderingDone(String id, long width, long height) {
+		WebView webView = this.webviews.get(id);
+
+		webView.getLayoutParams().width = (int)width;
+		webView.getLayoutParams().height = (int)height;
+		runOnUiThread(() -> {
+			webView.requestLayout();
+			FrameLayout noteContainer = (FrameLayout)findViewById(R.id.note_container);
+			noteContainer.requestLayout();
+		});
 	}
 
 	protected void resizeCanvas(View view) {

@@ -1,6 +1,10 @@
 <html>
 <head>
 	<style>
+		html, body {
+			width: 100%;
+			height: 100%;
+		}
 	</style>
 </head>
 <body>
@@ -53,14 +57,15 @@
 			extensions: ['math']
 		});
 
-		function display(markdown, width, height, fontSize) {
+		function display(id, markdown, width, height, fontSize) {
 			var contentDiv = document.getElementById("content");
 			contentDiv.style.cssText = "width: {0}; height: {1}; font-size: {2};".format(width, height, fontSize);
-			contentDiv.innerHtml = md.makeHtml(markdown);
+			contentDiv.innerHTML = md.makeHtml(markdown);
 			asciimath.translate(undefined, true);
+			MathJax.Hub.Typeset();
 
 			setTimeout(() => {
-				MathJax.Hub.Typeset();
+				Native.renderingDone(id, contentDiv.clientHeight, contentDiv.clientHeight);
 			}, 1000);
 		}
 	</script>
