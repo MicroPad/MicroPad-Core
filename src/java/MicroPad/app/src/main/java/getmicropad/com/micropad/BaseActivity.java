@@ -14,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.getmicropad.NPXParser.DrawingElement;
 import com.getmicropad.NPXParser.ImageElement;
@@ -39,6 +41,9 @@ import com.getmicropad.NPXParser.Parent;
 import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.Section;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
+import com.yydcdut.rxmarkdown.RxMDConfiguration;
+import com.yydcdut.rxmarkdown.RxMarkdown;
+import com.yydcdut.rxmarkdown.factory.TextFactory;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -48,6 +53,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class BaseActivity extends AppCompatActivity {
 	Notepad notepad;
@@ -76,7 +85,6 @@ public class BaseActivity extends AppCompatActivity {
 		}
 	}
 
-	@SuppressLint("SetJavaScriptEnabled")
 	protected void loadNote(Note note) {
 		this.setNote(note);
 		FrameLayout noteContainer = (FrameLayout)findViewById(R.id.note_container);
@@ -88,48 +96,56 @@ public class BaseActivity extends AppCompatActivity {
 		/* Elements */
 		for (NoteElement element : note.elements) {
 			if (element instanceof MarkdownElement) {
-				MarkdownWebView webView = new MarkdownWebView(this);
-				webView.getSettings().setJavaScriptEnabled(true);
-//				webView.addJavascriptInterface(new MarkdownInterface(this, webView), "Native");
-				webView.addJavascriptInterface(this, "Native");
-				webView.setWebChromeClient(new WebChromeClient() {
-					@Override
-					public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-						Log.wtf("m3k", consoleMessage.message() + " -- From line "
-								+ consoleMessage.lineNumber() + " of "
-								+ consoleMessage.sourceId());
-						return super.onConsoleMessage(consoleMessage);
-					}
-				});
-//				webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+				TextView textView = new TextView(this);
 
-				webView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+				RxMarkdown.with(element.getContent(), this)
+						.config(new RxMDConfiguration.Builder(this).build())
+						.factory(TextFactory.create())
+						.intoObservable()
+						.subscribeOn(Schedulers.computation())
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribe(new Subscriber<CharSequence>() {
+							@Override
+							public void onCompleted() {
+							}
+
+							@Override
+							public void onError(Throwable e) {
+							}
+
+							@Override
+							public void onNext(CharSequence charSequence) {
+								textView.setText(charSequence, TextView.BufferType.SPANNABLE);
+								resizeCanvas(textView);
+							}
+						});
+
+//				textView.setMinimumWidth(170);
+//				textView.setMinimumHeight(50);
+				FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
 				try {
-//					if (element.getWidth().endsWith("px")) webView.getLayoutParams().width = this.getIntFromString(element.getWidth());
-//					if (element.getHeight().endsWith("px")) webView.getLayoutParams().height = this.getIntFromString(element.getHeight());
-					webView.setX(this.getIntFromString(element.getX()));
-					webView.setY(this.getIntFromString(element.getY()));
+					layoutParams.leftMargin = this.getIntFromString(element.getX());
+					layoutParams.topMargin = this.getIntFromString(element.getY());
+					textView.setLayoutParams(layoutParams);
+
+					textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, this.getIntFromString(((MarkdownElement) element).getFontSize()));
+
+					if (element.getWidth().endsWith("px")) textView.getLayoutParams().width = this.getIntFromString(element.getWidth());
+					if (element.getHeight().endsWith("px")) textView.getLayoutParams().height = this.getIntFromString(element.getHeight());
 				}
 				catch (ParseException e) {
 					e.printStackTrace();
 				}
-				noteContainer.addView(webView);
-				webView.post(() -> {
-					resizeCanvas(webView);
 
-					webView.loadUrl("file:///android_asset/www/markdown.html");
-					webView.setWebViewClient(new WebViewClient() {
-						public void onPageFinished(WebView view, String url) {
-							webView.loadUrl(String.format("javascript:display(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")", element.getId(), element.getContent(), element.getWidth(), element.getHeight(), ((MarkdownElement)element).getFontSize()));
-//							try {
-//								Thread.sleep(1000);
-//							}
-//							catch (InterruptedException e) {}
-//							noteContainer.requestLayout();
-						}
-					});
-				});
-				this.webviews.put(element.getId(), webView);
+				if (element.getWidth().endsWith("px") || element.getHeight().endsWith("px")) {
+					textView.setSingleLine(false);
+				}
+				else {
+					textView.setSingleLine(true);
+				}
+
+				noteContainer.addView(textView);
+				textView.post(() -> resizeCanvas(textView));
 			}
 			else if (element instanceof ImageElement || element instanceof DrawingElement) {
 				byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
@@ -147,12 +163,14 @@ public class BaseActivity extends AppCompatActivity {
 				imageView.setImageBitmap(decodedBmp);
 				imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 				imageView.setAdjustViewBounds(true);
-				imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+				FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
 				try {
+					layoutParams.leftMargin = this.getIntFromString(element.getX());
+					layoutParams.topMargin = this.getIntFromString(element.getY());
+					imageView.setLayoutParams(layoutParams);
+
 					if (element.getWidth().endsWith("px")) imageView.getLayoutParams().width = this.getIntFromString(element.getWidth());
 					if (element.getHeight().endsWith("px")) imageView.getLayoutParams().height = this.getIntFromString(element.getHeight());
-					imageView.setX(this.getIntFromString(element.getX()));
-					imageView.setY(this.getIntFromString(element.getY()));
 				}
 				catch (ParseException e) {
 					e.printStackTrace();
@@ -163,19 +181,6 @@ public class BaseActivity extends AppCompatActivity {
 		}
 
 		noteContainer.setVisibility(View.VISIBLE);
-	}
-
-	@JavascriptInterface
-	public void renderingDone(String id, long width, long height) {
-		WebView webView = this.webviews.get(id);
-
-		webView.getLayoutParams().width = (int)width;
-		webView.getLayoutParams().height = (int)height;
-		runOnUiThread(() -> {
-			webView.requestLayout();
-			FrameLayout noteContainer = (FrameLayout)findViewById(R.id.note_container);
-			noteContainer.requestLayout();
-		});
 	}
 
 	protected void resizeCanvas(View view) {
