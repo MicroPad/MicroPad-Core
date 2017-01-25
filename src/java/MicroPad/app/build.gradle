@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "getmicropad.com.micropad"
-        minSdkVersion 17
+        minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -33,13 +33,11 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:percent:25.1.0'
+    compile 'com.android.support:customtabs:25.1.0'
 
-    compile (name: 'rxmarkdown-debug', ext: 'aar')
     compile "com.mikepenz:iconics-core:2.8.2@aar"
     compile 'com.mikepenz:google-material-typeface:2.2.0.3.original@aar'
-
-    compile 'io.reactivex:rxandroid:1.2.0'
-    compile 'io.reactivex:rxjava:1.1.5'
 
     testCompile 'junit:junit:4.12'
 }

@@ -6,30 +6,27 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.percent.PercentFrameLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.ConsoleMessage;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.getmicropad.NPXParser.DrawingElement;
 import com.getmicropad.NPXParser.ImageElement;
@@ -41,22 +38,16 @@ import com.getmicropad.NPXParser.Parent;
 import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.Section;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
-import com.yydcdut.rxmarkdown.RxMDConfiguration;
-import com.yydcdut.rxmarkdown.RxMarkdown;
-import com.yydcdut.rxmarkdown.factory.TextFactory;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class BaseActivity extends AppCompatActivity {
 	Notepad notepad;
@@ -85,6 +76,7 @@ public class BaseActivity extends AppCompatActivity {
 		}
 	}
 
+	@SuppressLint("SetJavaScriptEnabled")
 	protected void loadNote(Note note) {
 		this.setNote(note);
 		FrameLayout noteContainer = (FrameLayout)findViewById(R.id.note_container);
@@ -96,56 +88,82 @@ public class BaseActivity extends AppCompatActivity {
 		/* Elements */
 		for (NoteElement element : note.elements) {
 			if (element instanceof MarkdownElement) {
-				TextView textView = new TextView(this);
+				Button button = new Button(this);
+				button.setText(String.format("Show \"%s\"...", element.getContent().substring(0, 5)));
 
-				RxMarkdown.with(element.getContent(), this)
-						.config(new RxMDConfiguration.Builder(this).build())
-						.factory(TextFactory.create())
-						.intoObservable()
-						.subscribeOn(Schedulers.computation())
-						.observeOn(AndroidSchedulers.mainThread())
-						.subscribe(new Subscriber<CharSequence>() {
-							@Override
-							public void onCompleted() {
-							}
-
-							@Override
-							public void onError(Throwable e) {
-							}
-
-							@Override
-							public void onNext(CharSequence charSequence) {
-								textView.setText(charSequence, TextView.BufferType.SPANNABLE);
-								resizeCanvas(textView);
-							}
-						});
-
-//				textView.setMinimumWidth(170);
-//				textView.setMinimumHeight(50);
 				FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
 				try {
 					layoutParams.leftMargin = this.getIntFromString(element.getX());
 					layoutParams.topMargin = this.getIntFromString(element.getY());
-					textView.setLayoutParams(layoutParams);
-
-					textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, this.getIntFromString(((MarkdownElement) element).getFontSize()));
-
-					if (element.getWidth().endsWith("px")) textView.getLayoutParams().width = this.getIntFromString(element.getWidth());
-					if (element.getHeight().endsWith("px")) textView.getLayoutParams().height = this.getIntFromString(element.getHeight());
+					button.setLayoutParams(layoutParams);
 				}
 				catch (ParseException e) {
 					e.printStackTrace();
 				}
 
-				if (element.getWidth().endsWith("px") || element.getHeight().endsWith("px")) {
-					textView.setSingleLine(false);
-				}
-				else {
-					textView.setSingleLine(true);
-				}
+				button.setOnClickListener(view -> {
+					//TODO: Show markdown WebView
+					WebView webView = (WebView)findViewById(R.id.markdown_viewer);
+					webView.getSettings().setJavaScriptEnabled(true);
 
-				noteContainer.addView(textView);
-				textView.post(() -> resizeCanvas(textView));
+//					webView.setWebChromeClient(new WebChromeClient() {
+//						@Override
+//						public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+//							Log.wtf("m3k", consoleMessage.message() + " -- From line "
+//									+ consoleMessage.lineNumber() + " of "
+//									+ consoleMessage.sourceId());
+//							return super.onConsoleMessage(consoleMessage);
+//						}
+//					});
+
+					CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+//					builder.setStartAnimations(getApplicationContext(), android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+//					builder.setExitAnimations(getApplicationContext(), android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+					CustomTabsIntent customTabsIntent = builder.build();
+
+					webView.setWebViewClient(new WebViewClient() {
+						public void onPageFinished(WebView view, String url) {
+							try {
+								webView.evaluateJavascript(String.format("display(\"%s\", \"%s\")", URLEncoder.encode(element.getContent(), "UTF-8").replace("+", "%20"), ((MarkdownElement) element).getFontSize()), (s) -> {});
+							}
+							catch (UnsupportedEncodingException e) {}
+						}
+
+						@Override
+						public boolean shouldOverrideUrlLoading(WebView view, String url) {
+							if (url != null) {
+								handleURI(Uri.parse(url));
+								return true;
+							}
+							return false;
+						}
+
+						@Override
+						public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+								handleURI(request.getUrl());
+								return true;
+							}
+							return false;
+						}
+
+						private void handleURI(final Uri uri) {
+							customTabsIntent.launchUrl(getApplicationContext(), uri);
+						}
+					});
+
+					webView.loadUrl("file:///android_asset/www/markdown.html");
+
+					Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+					PercentFrameLayout markdownContainer = (PercentFrameLayout)findViewById(R.id.markdown_container);
+//					webView.bringToFront();
+					markdownContainer.startAnimation(slideUp);
+					markdownContainer.setVisibility(View.VISIBLE);
+					markdownContainer.bringToFront();
+				});
+
+				noteContainer.addView(button);
+				button.post(() -> resizeCanvas(button));
 			}
 			else if (element instanceof ImageElement || element instanceof DrawingElement) {
 				byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
