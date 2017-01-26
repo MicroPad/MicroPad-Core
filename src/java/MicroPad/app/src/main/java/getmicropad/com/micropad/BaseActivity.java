@@ -3,6 +3,7 @@ package getmicropad.com.micropad;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,12 +11,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.customtabs.CustomTabsIntent;
 import android.support.percent.PercentFrameLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.view.View;
 import android.view.animation.Animation;
@@ -89,17 +90,22 @@ public class BaseActivity extends AppCompatActivity {
 		for (NoteElement element : note.elements) {
 			if (element instanceof MarkdownElement) {
 				Button button = new Button(this);
-				button.setText(String.format("Show \"%s\"...", element.getContent().substring(0, 5)));
 
 				FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
 				try {
 					layoutParams.leftMargin = this.getIntFromString(element.getX());
 					layoutParams.topMargin = this.getIntFromString(element.getY());
 					button.setLayoutParams(layoutParams);
+
+					if (element.getWidth().endsWith("px")) button.setWidth(this.getIntFromString(element.getWidth()));
+					if (element.getHeight().endsWith("px")) button.getLayoutParams().height = this.getIntFromString(element.getHeight());
 				}
 				catch (ParseException e) {
 					e.printStackTrace();
 				}
+				button.setText(String.format("Show:\n%s", element.getContent()));
+				button.setMaxLines(2);
+				button.setEllipsize(TextUtils.TruncateAt.END);
 
 				button.setOnClickListener(view -> {
 					//TODO: Show markdown WebView
@@ -115,11 +121,6 @@ public class BaseActivity extends AppCompatActivity {
 //							return super.onConsoleMessage(consoleMessage);
 //						}
 //					});
-
-					CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-//					builder.setStartAnimations(getApplicationContext(), android.R.anim.slide_out_right, android.R.anim.slide_in_left);
-//					builder.setExitAnimations(getApplicationContext(), android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-					CustomTabsIntent customTabsIntent = builder.build();
 
 					webView.setWebViewClient(new WebViewClient() {
 						public void onPageFinished(WebView view, String url) {
@@ -148,7 +149,8 @@ public class BaseActivity extends AppCompatActivity {
 						}
 
 						private void handleURI(final Uri uri) {
-							customTabsIntent.launchUrl(getApplicationContext(), uri);
+							Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+							startActivity(intent);
 						}
 					});
 
