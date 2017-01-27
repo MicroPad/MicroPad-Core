@@ -62,7 +62,7 @@ var md = new showdown.Converter({
 	strikethrough: true,
 	tables: true,
 	tasklists: true,
-	prefixHeaderId: 'mdheader',
+	prefixHeaderId: 'mdheader_',
 	smoothLivePreview: true,
 	extensions: ['math']
 });
