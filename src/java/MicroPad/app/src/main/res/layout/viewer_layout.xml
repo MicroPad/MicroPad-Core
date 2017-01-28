@@ -7,6 +7,20 @@
              android:layout_height="match_parent"
              android:background="@drawable/bg">
 
+    <android.support.percent.PercentFrameLayout
+        android:id="@+id/editor_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+    </android.support.percent.PercentFrameLayout>
+
+    <WebView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/note_webview"/>
+
     <ProgressBar
         style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
@@ -16,51 +30,15 @@
         tools:visibility="visible"
         android:visibility="gone"/>
 
-    <android.support.percent.PercentFrameLayout
-        android:id="@+id/markdown_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <WebView
-            android:id="@+id/markdown_viewer"
-            app:layout_widthPercent="100%"
-            app:layout_heightPercent="75%"
-            app:layout_marginTopPercent="25%"/>
-    </android.support.percent.PercentFrameLayout>
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:id="@+id/hscroll">
-
-        <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:id="@+id/vscroll">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/note_container"
-                android:visibility="gone">
-
-            </FrameLayout>
-        </ScrollView>
-    </HorizontalScrollView>
-
-        <android.support.design.widget.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_margin="10dp"
-            android:clickable="true"
-            app:fabSize="normal"
-            app:ico_color="#fff"
-            app:ico_icon="gmd-add"
-            android:id="@+id/add_element_btn"
-            app:rippleColor="#fff"/>
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="10dp"
+        android:clickable="true"
+        app:fabSize="normal"
+        app:ico_color="#fff"
+        app:ico_icon="gmd-add"
+        android:id="@+id/add_element_btn"
+        app:rippleColor="#fff"/>
 </FrameLayout>

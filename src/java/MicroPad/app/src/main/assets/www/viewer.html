@@ -1,6 +1,6 @@
 <html>
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="viewport" content="initial-scale=1.0,maximum-scale=10.0">
 	<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
 	<style>
 		#MathJax_Message {
@@ -92,6 +92,33 @@
 			extensions: ['math']
 		});
 
+		//Thanks to http://stackoverflow.com/a/12300351/998467
+		function dataURItoBlob(dataURI) {
+			// convert base64 to raw binary data held in a string
+			// doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+			var byteString = atob(dataURI.split(',')[1]);
+
+			// separate out the mime component
+			var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+			// write the bytes of the string to an ArrayBuffer
+			var ab = new ArrayBuffer(byteString.length);
+			var ia = new Uint8Array(ab);
+			for (var i = 0; i < byteString.length; i++) {
+				ia[i] = byteString.charCodeAt(i);
+			}
+
+			// write the ArrayBuffer to a blob, and you're done
+			var blob = new Blob([ab], { type: mimeString });
+			return blob;
+		}
+
+		function blobToDataURL(blob, callback) {
+			var a = new FileReader();
+			a.onload = function(e) { callback(e.target.result); }
+			a.readAsDataURL(blob);
+		}
+
 		function resizePage(element) {
 			if (parseInt($(element).css('left')) + $(element).width() + 1000 > parseInt($('#content').css('width'))) {
 				$('#content').css('width', parseInt($(element).css('left')) + $(element).width() + 1000 + 'px');
@@ -107,10 +134,10 @@
 			contentDiv.innerHTML += '<div id="{0}" class="drag z-depth-2" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(id, x, y, width, height);
 			var elementDiv = document.getElementById(id);
 
-			content = decodeURIComponent(content);
 
 			switch (id.split(/[0-9]/)[0]) {
 				case "markdown":
+					content = decodeURIComponent(content);
 					elementDiv.style.fontSize = extraArgs.fontSize;
 					elementDiv.innerHTML += md.makeHtml(content);
 					asciimath.translate(undefined, true);
@@ -119,12 +146,18 @@
 						MathJax.Hub.Typeset();
 					}, 1000);
 					break;
+
+				case "drawing":
+				case "image":
+					elementDiv.innerHTML += '<img style="width: {1}; height: {2};" src="{0}" />'.format(URL.createObjectURL(dataURItoBlob(content)), width, height);
+					break;
 			}
 			resizePage(elementDiv);
 
 			$('.drag').draggable({
 				handle: ".handle",
 				stack: ".drag",
+				scroll: false,
 				start: event => {
 					$(event.currentTarget).removeClass('z-depth-2');
 					$(event.currentTarget).addClass('z-depth-4');
@@ -134,11 +167,12 @@
 				},
 				drag: event => {
 					resizePage(event.target);
-					//TODO: Send to Java
 				},
 				stop: event => {
 					$(event.target).removeClass('z-depth-4');
 					$(event.target).addClass('z-depth-2');
+					
+					Native.updateElementPosition(event.target.id, event.target.style.left, event.target.style.top, event.target.style.width, event.target.style.height);
 				}
 			});
 		}

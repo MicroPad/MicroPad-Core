@@ -18,9 +18,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.webkit.ConsoleMessage;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -29,6 +33,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.annimon.stream.Stream;
+import com.getmicropad.NPXParser.BasicElement;
 import com.getmicropad.NPXParser.DrawingElement;
 import com.getmicropad.NPXParser.ImageElement;
 import com.getmicropad.NPXParser.MarkdownElement;
@@ -40,6 +46,7 @@ import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.Section;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -80,140 +87,96 @@ public class BaseActivity extends AppCompatActivity {
 	@SuppressLint("SetJavaScriptEnabled")
 	protected void loadNote(Note note) {
 		this.setNote(note);
-		FrameLayout noteContainer = (FrameLayout)findViewById(R.id.note_container);
-		noteContainer.setVisibility(View.INVISIBLE);
+		WebView noteContainer = (WebView)findViewById(R.id.note_webview);
+		noteContainer.getSettings().setJavaScriptEnabled(true);
+		noteContainer.addJavascriptInterface(this, "Native");
+		noteContainer.getSettings().setSupportZoom(true);
+		noteContainer.getSettings().setBuiltInZoomControls(true);
+		noteContainer.getSettings().setDisplayZoomControls(false);
+		noteContainer.setWebChromeClient(new WebChromeClient() {
+			@Override
+			public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+				Log.wtf("m3k", consoleMessage.message() + " -- From line "
+						+ consoleMessage.lineNumber() + " of "
+						+ consoleMessage.sourceId());
+				return super.onConsoleMessage(consoleMessage);
+			}
+		});
 
-		FrameLayout viewer = (FrameLayout)findViewById(R.id.viewer);
-		if (note.elements.size() > 0) viewer.setBackgroundResource(0);
-
-		/* Elements */
-		for (NoteElement element : note.elements) {
-			if (element instanceof MarkdownElement) {
-				Button button = new Button(this);
-
-				FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+		noteContainer.setWebViewClient(new WebViewClient() {
+			public void onPageFinished(WebView view, String url) {
 				try {
-					layoutParams.leftMargin = this.getIntFromString(element.getX());
-					layoutParams.topMargin = this.getIntFromString(element.getY());
-					button.setLayoutParams(layoutParams);
-
-					if (element.getWidth().endsWith("px")) button.setWidth(this.getIntFromString(element.getWidth()));
-					if (element.getHeight().endsWith("px")) button.getLayoutParams().height = this.getIntFromString(element.getHeight());
-				}
-				catch (ParseException e) {
-					e.printStackTrace();
-				}
-				button.setText(String.format("Show:\n%s", element.getContent()));
-				button.setMaxLines(2);
-				button.setEllipsize(TextUtils.TruncateAt.END);
-
-				button.setOnClickListener(view -> {
-					//TODO: Show markdown WebView
-					WebView webView = (WebView)findViewById(R.id.markdown_viewer);
-					webView.getSettings().setJavaScriptEnabled(true);
-
-//					webView.setWebChromeClient(new WebChromeClient() {
-//						@Override
-//						public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-//							Log.wtf("m3k", consoleMessage.message() + " -- From line "
-//									+ consoleMessage.lineNumber() + " of "
-//									+ consoleMessage.sourceId());
-//							return super.onConsoleMessage(consoleMessage);
-//						}
-//					});
-
-					webView.setWebViewClient(new WebViewClient() {
-						public void onPageFinished(WebView view, String url) {
+					for (NoteElement element : note.elements) {
+						String extraArgs = "{}";
+						String content = element.getContent();
+						if (element instanceof MarkdownElement) {
+							extraArgs = String.format("{fontSize: \"%s\"}", ((MarkdownElement) element).getFontSize());
+							content = URLEncoder.encode(content, "UTF-8").replace("+", "%20");
+						}
+						else if (element instanceof DrawingElement) {
 							try {
-								webView.evaluateJavascript(String.format("display(\"%s\", \"%s\")", URLEncoder.encode(element.getContent(), "UTF-8").replace("+", "%20"), ((MarkdownElement) element).getFontSize()), (s) -> {});
+								byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
+								Bitmap decodedBmp = Helpers.TrimBitmap(BitmapFactory.decodeByteArray(decoded, 0, decoded.length));
+								ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+								decodedBmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+								content = "data:image/png;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
 							}
-							catch (UnsupportedEncodingException e) {}
+							catch (Exception e) {}
 						}
 
-						@Override
-						public boolean shouldOverrideUrlLoading(WebView view, String url) {
-							if (url != null) {
-								handleURI(Uri.parse(url));
-								return true;
-							}
-							return false;
-						}
-
-						@Override
-						public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-								handleURI(request.getUrl());
-								return true;
-							}
-							return false;
-						}
-
-						private void handleURI(final Uri uri) {
-							Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-							startActivity(intent);
-						}
-					});
-
-					webView.loadUrl("file:///android_asset/www/markdown.html");
-
-					Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
-					PercentFrameLayout markdownContainer = (PercentFrameLayout)findViewById(R.id.markdown_container);
-//					webView.bringToFront();
-					markdownContainer.startAnimation(slideUp);
-					markdownContainer.setVisibility(View.VISIBLE);
-					markdownContainer.bringToFront();
-				});
-
-				noteContainer.addView(button);
-				button.post(() -> resizeCanvas(button));
-			}
-			else if (element instanceof ImageElement || element instanceof DrawingElement) {
-				byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
-				Bitmap decodedBmp = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
-
-				if (element instanceof DrawingElement) {
-					//Crop whitespace
-					try {
-						decodedBmp = Helpers.TrimBitmap(decodedBmp);
+						noteContainer.evaluateJavascript(String.format("displayElement(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %s)", element.getId(), content, element.getX(), element.getY(), element.getWidth(), element.getHeight(), extraArgs), (s) -> {});
 					}
-					catch (Exception e) {}
 				}
-
-				ImageView imageView = new ImageView(this);
-				imageView.setImageBitmap(decodedBmp);
-				imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-				imageView.setAdjustViewBounds(true);
-				FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-				try {
-					layoutParams.leftMargin = this.getIntFromString(element.getX());
-					layoutParams.topMargin = this.getIntFromString(element.getY());
-					imageView.setLayoutParams(layoutParams);
-
-					if (element.getWidth().endsWith("px")) imageView.getLayoutParams().width = this.getIntFromString(element.getWidth());
-					if (element.getHeight().endsWith("px")) imageView.getLayoutParams().height = this.getIntFromString(element.getHeight());
-				}
-				catch (ParseException e) {
-					e.printStackTrace();
-				}
-				noteContainer.addView(imageView);
-				imageView.post(() -> resizeCanvas(imageView));
+				catch (UnsupportedEncodingException e) {}
 			}
-		}
 
-		noteContainer.setVisibility(View.VISIBLE);
+			@Override
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				if (url != null) {
+					handleURI(Uri.parse(url));
+					return true;
+				}
+				return false;
+			}
+
+			@Override
+			public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					handleURI(request.getUrl());
+					return true;
+				}
+				return false;
+			}
+
+			private void handleURI(final Uri uri) {
+				Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+				startActivity(intent);
+			}
+		});
+		noteContainer.loadUrl("file:///android_asset/www/viewer.html");
 	}
 
-	protected void resizeCanvas(View view) {
-		FrameLayout noteContainer = (FrameLayout)findViewById(R.id.note_container);
-		float newWidth = (view.getX()+view.getWidth()+1000);
-		float newHeight = (view.getY()+view.getHeight()+1000);
-
-		if (noteContainer.getWidth() < newWidth) noteContainer.getLayoutParams().width = (int)newWidth;
-		if (noteContainer.getHeight() < newHeight) {
-			noteContainer.getLayoutParams().height = (int)newHeight;
-			noteContainer.setMinimumHeight((int)newHeight);
+	@JavascriptInterface
+	public void updateElementPosition(String id, String x, String y, String width, String height) {
+		ElementPositionUpdater elementPositionUpdater = new ElementPositionUpdater();
+		elementPositionUpdater.execute(id, x, y, width, height);
+	}
+	protected class ElementPositionUpdater extends AsyncTask<Object, Void, Void> {
+		@Override
+		protected Void doInBackground(Object... params) {
+			Stream.of(getNote().elements).filter(element -> element.getId().equals(params[0])).forEach(element -> {
+				element.setX((String)params[1]);
+				element.setY((String)params[2]);
+				element.setWidth((String)params[3]);
+				element.setHeight((String)params[4]);
+			});
+			return null;
 		}
-		noteContainer.requestLayout();
+
+		@Override
+		protected void onPostExecute(Void v) {
+			updateNotepad(getNote());
+		}
 	}
 
 	public int getIntFromString(String str) throws ParseException {
@@ -325,8 +288,9 @@ public class BaseActivity extends AppCompatActivity {
 		@Override
 		protected void onPreExecute() {
 			//Show progress bar
-			this.oldTitle = getTitle();
-			setTitle(oldTitle+" (Saving...)");
+			this.oldTitle = getNotepad().getTitle();
+			if (getNote() != null) this.oldTitle = getNote().getTitle();
+			setTitle(this.oldTitle+" (Saving...)");
 		}
 
 		@Override
