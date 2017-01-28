@@ -158,29 +158,23 @@ public class BaseActivity extends AppCompatActivity {
 
 	@JavascriptInterface
 	public void updateElementPosition(String id, String x, String y, String width, String height) {
-		ElementPositionUpdater elementPositionUpdater = new ElementPositionUpdater();
-		elementPositionUpdater.execute(id, x, y, width, height);
-	}
-	protected class ElementPositionUpdater extends AsyncTask<Object, Void, Void> {
-		@Override
-		protected Void doInBackground(Object... params) {
-			Stream.of(getNote().elements).filter(element -> element.getId().equals(params[0])).forEach(element -> {
-				element.setX((String)params[1]);
-				element.setY((String)params[2]);
-				element.setWidth((String)params[3]);
-				element.setHeight((String)params[4]);
-			});
-			return null;
-		}
+		new AsyncTask<Object, Void, Void>() {
+			@Override
+			protected Void doInBackground(Object... params) {
+				Stream.of(getNote().elements).filter(element -> element.getId().equals(params[0])).forEach(element -> {
+					element.setX((String)params[1]);
+					element.setY((String)params[2]);
+					element.setWidth((String)params[3]);
+					element.setHeight((String)params[4]);
+				});
+				return null;
+			}
 
-		@Override
-		protected void onPostExecute(Void v) {
-			updateNotepad(getNote());
-		}
-	}
-
-	public int getIntFromString(String str) throws ParseException {
-		return (NumberFormat.getInstance().parse(str)).intValue();
+			@Override
+			protected void onPostExecute(Void v) {
+				updateNotepad(getNote());
+			}
+		}.execute(id, x, y, width, height);
 	}
 
 	protected void updateParentTree(View view, NLevelAdapter adapter, int position) {
@@ -278,37 +272,34 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	protected void saveNotepad() {
-		NotepadSaver notepadSaver = new NotepadSaver();
-		notepadSaver.execute(this.getNotepad());
-	}
+		new AsyncTask<Object, String, Boolean>() {
+			private CharSequence oldTitle;
 
-	protected class NotepadSaver extends AsyncTask<Object, String, Boolean> {
-		private CharSequence oldTitle;
+			@Override
+			protected void onPreExecute() {
+				//Show progress bar
+				this.oldTitle = getNotepad().getTitle();
+				if (getNote() != null) this.oldTitle = getNote().getTitle();
+				setTitle(this.oldTitle+" (Saving...)");
+			}
 
-		@Override
-		protected void onPreExecute() {
-			//Show progress bar
-			this.oldTitle = getNotepad().getTitle();
-			if (getNote() != null) this.oldTitle = getNote().getTitle();
-			setTitle(this.oldTitle+" (Saving...)");
-		}
+			@Override
+			protected Boolean doInBackground(Object... params) {
+				return filesystemManager.saveNotepad((Notepad)params[0]);
+			}
 
-		@Override
-		protected Boolean doInBackground(Object... params) {
-			return filesystemManager.saveNotepad((Notepad)params[0]);
-		}
+			@Override
+			protected void onPostExecute(Boolean res) {
+				setTitle(oldTitle);
 
-		@Override
-		protected void onPostExecute(Boolean res) {
-			setTitle(oldTitle);
-
-			if (!res) new AlertDialog.Builder(BaseActivity.this)
-					.setTitle("Error")
-					.setMessage("Error saving notepad")
-					.setCancelable(true)
-					.setPositiveButton("Close", (dialog, which) -> {})
-					.show();
-		}
+				if (!res) new AlertDialog.Builder(BaseActivity.this)
+						.setTitle("Error")
+						.setMessage("Error saving notepad")
+						.setCancelable(true)
+						.setPositiveButton("Close", (dialog, which) -> {})
+						.show();
+			}
+		}.execute(this.getNotepad());
 	}
 
 	protected void setNotepad(Notepad notepad) {
@@ -355,41 +346,6 @@ public class BaseActivity extends AppCompatActivity {
 			progressBar = (ProgressBar)findViewById(R.id.progress);
 			progressBar.setIndeterminate(true);
 			progressBar.setVisibility(View.VISIBLE);
-
-			//Set up scrollview
-//			final HorizontalScrollView hScroll = (HorizontalScrollView)findViewById(R.id.hscroll);
-//			final ScrollView vScroll = (ScrollView)findViewById(R.id.vscroll);
-//			vScroll.setOnTouchListener((v, event) -> false); //Inner scroll listener
-//			hScroll.setOnTouchListener(new View.OnTouchListener() { //outer scroll listener
-//				private float mx, my, curX, curY;
-//				private boolean started = false;
-//
-//				@Override
-//				public boolean onTouch(View v, MotionEvent event) {
-//					curX = event.getX();
-//					curY = event.getY();
-//					int dx = (int) (mx - curX);
-//					int dy = (int) (my - curY);
-//					switch (event.getAction()) {
-//						case MotionEvent.ACTION_MOVE:
-//							if (started) {
-//								vScroll.scrollBy(0, dy);
-//								hScroll.scrollBy(dx, 0);
-//							} else {
-//								started = true;
-//							}
-//							mx = curX;
-//							my = curY;
-//							break;
-//						case MotionEvent.ACTION_UP:
-//							vScroll.scrollBy(0, dy);
-//							hScroll.scrollBy(dx, 0);
-//							started = false;
-//							break;
-//					}
-//					return true;
-//				}
-//			});
 		}
 
 		@Override

@@ -3,6 +3,9 @@ package getmicropad.com.micropad;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+
 public class Helpers {
 	public static Bitmap TrimBitmap(Bitmap bmp) {
 		int imgHeight = bmp.getHeight();
@@ -75,5 +78,9 @@ public class Helpers {
 				endHeight - startHeight
 		);
 
+	}
+
+	public static int getIntFromString(String str) throws ParseException {
+		return (NumberFormat.getInstance().parse(str)).intValue();
 	}
 }
