@@ -1,4 +1,4 @@
-package getmicropad.com.micropad;
+package com.getmicropad.micropad;
 
 import android.Manifest;
 import android.content.Intent;
@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -35,10 +34,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public class NotepadActivity extends BaseActivity {
 	List<NLevelItem> list;
@@ -132,6 +128,12 @@ public class NotepadActivity extends BaseActivity {
 					.setPositiveButton("Create", (dialogInterface, whichButton) -> this.createNewSection(titleInput.getText().toString(), this.getNotepad()))
 					.setNegativeButton(android.R.string.cancel, null).show();
 		});
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (this.getNotepad() != null) setTitle(this.getNotepad().getTitle());
 	}
 
 	protected void updateNotepad(Section section, LayoutInflater inflater) {

@@ -1,12 +1,10 @@
-package getmicropad.com.micropad;
+package com.getmicropad.micropad;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 

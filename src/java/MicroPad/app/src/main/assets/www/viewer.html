@@ -7,6 +7,23 @@
 			display: none;
 		}
 
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+			background-color: #fff;
+		}
+
+		input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]), input[type=password]:focus:not([readonly]), input[type=email]:focus:not([readonly]), input[type=url]:focus:not([readonly]), input[type=time]:focus:not([readonly]), input[type=date]:focus:not([readonly]), input[type=datetime]:focus:not([readonly]), input[type=datetime-local]:focus:not([readonly]), input[type=tel]:focus:not([readonly]), input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]) {
+			border-color: #ffb300; !important;
+			box-shadow: 0 1px 0 0 #ffb300;
+		}
+
+		[type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+			position: static;
+			left: 0px;
+			opacity: 1;
+		}
+
 		#content {
 			position: relative;
 			width: 100%;
@@ -78,7 +95,7 @@
 						return text;
 					}
 				}
-			]
+			];
 		});
 
 		var md = new showdown.Converter({
@@ -99,7 +116,7 @@
 			var byteString = atob(dataURI.split(',')[1]);
 
 			// separate out the mime component
-			var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+			var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
 			// write the bytes of the string to an ArrayBuffer
 			var ab = new ArrayBuffer(byteString.length);
@@ -115,7 +132,7 @@
 
 		function blobToDataURL(blob, callback) {
 			var a = new FileReader();
-			a.onload = function(e) { callback(e.target.result); }
+			a.onload = function(e) { callback(e.target.result); };
 			a.readAsDataURL(blob);
 		}
 
@@ -128,9 +145,16 @@
 			}
 		}
 
+		function downloadElement(id) {
+			Native.downloadElement(id);
+		}
+
 		function displayElement(id, content, x, y, width, height, extraArgs) {
 			var contentDiv = document.getElementById("content");
 			$(contentDiv).removeClass('empty');
+
+			if ($('#'+id).length) $('#'+id).remove();
+
 			contentDiv.innerHTML += '<div id="{0}" class="drag z-depth-2" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(id, x, y, width, height);
 			var elementDiv = document.getElementById(id);
 
@@ -144,12 +168,23 @@
 
 					setTimeout(() => {
 						MathJax.Hub.Typeset();
+						$('#content ul').each(function(i) {
+							$(this).addClass('browser-default');
+						});
 					}, 1000);
 					break;
 
 				case "drawing":
 				case "image":
 					elementDiv.innerHTML += '<img style="width: {1}; height: {2};" src="{0}" />'.format(URL.createObjectURL(dataURItoBlob(content)), width, height);
+					break;
+
+				case "recording":
+					elementDiv.innerHTML += '<p>{1}</p><a href="javascript:downloadElement(\'{0}\');" class="btn blue waves-effect waves-light" style="width: 100%;"><span style="color: #fff">Open Recording</span></a>'.format(id, content);
+					break;
+
+				case "file":
+					elementDiv.innerHTML += '{1}<br /><a href="javascript:downloadElement(\'{0}\');" class="btn blue waves-effect waves-light" style="width: 100%;"><span style="color: #fff">Open File</span></a>'.format(id, content);
 					break;
 			}
 			resizePage(elementDiv);
@@ -171,7 +206,7 @@
 				stop: event => {
 					$(event.target).removeClass('z-depth-4');
 					$(event.target).addClass('z-depth-2');
-					
+
 					Native.updateElementPosition(event.target.id, event.target.style.left, event.target.style.top, event.target.style.width, event.target.style.height);
 				}
 			});

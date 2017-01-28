@@ -1431,7 +1431,7 @@ function saveToBrowser(retry) {
 	msHasNotepad();
 
 	$('#viewer ul').each(function(i) {
-		$(this).addClass('browser-default')
+		$(this).addClass('browser-default');
 	});
 
 	notepadStorage.setItem(notepad.title, stringify(notepad), function() {

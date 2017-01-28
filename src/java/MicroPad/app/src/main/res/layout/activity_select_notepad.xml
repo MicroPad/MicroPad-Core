@@ -6,7 +6,7 @@
     android:id="@+id/activity_select_notepad"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="getmicropad.com.micropad.SelectNotepad"
+    tools:context="com.getmicropad.micropad.SelectNotepad"
     android:background="@drawable/bg">
 
     <LinearLayout

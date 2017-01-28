@@ -1,42 +1,35 @@
-package getmicropad.com.micropad;
+package com.getmicropad.micropad;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.percent.PercentFrameLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.annimon.stream.Stream;
-import com.getmicropad.NPXParser.BasicElement;
 import com.getmicropad.NPXParser.DrawingElement;
-import com.getmicropad.NPXParser.ImageElement;
+import com.getmicropad.NPXParser.FileElement;
 import com.getmicropad.NPXParser.MarkdownElement;
 import com.getmicropad.NPXParser.Note;
 import com.getmicropad.NPXParser.NoteElement;
@@ -48,10 +41,11 @@ import com.mikepenz.iconics.context.IconicsContextWrapper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,9 +113,14 @@ public class BaseActivity extends AppCompatActivity {
 								Bitmap decodedBmp = Helpers.TrimBitmap(BitmapFactory.decodeByteArray(decoded, 0, decoded.length));
 								ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 								decodedBmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-								content = "data:image/png;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+								content = "data:image/png;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
 							}
-							catch (Exception e) {}
+							catch (Exception e) {
+								continue;
+							}
+						}
+						else if (element instanceof FileElement) {
+							content = ((FileElement) element).getFilename();
 						}
 
 						noteContainer.evaluateJavascript(String.format("displayElement(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %s)", element.getId(), content, element.getX(), element.getY(), element.getWidth(), element.getHeight(), extraArgs), (s) -> {});
@@ -175,6 +174,30 @@ public class BaseActivity extends AppCompatActivity {
 				updateNotepad(getNote());
 			}
 		}.execute(id, x, y, width, height);
+	}
+
+	@JavascriptInterface
+	public void downloadElement(String id) {
+		Stream.of(getNote().elements).filter(element -> element.getId().equals(id)).forEach(element -> {
+			for (File f : getCacheDir().listFiles()) f.delete();
+			String path = getCacheDir().getAbsolutePath()+"/"+((FileElement)element).getFilename();
+			String mime = element.getContent().split("base64")[0];
+			mime = mime.substring(5, mime.length()-1);
+
+			byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
+			try (OutputStream stream = new FileOutputStream(path)) {
+				stream.write(decoded);
+
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_VIEW);
+				intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				intent.setDataAndType(Uri.fromFile(new File(path)), mime);
+				startActivity(intent);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	protected void updateParentTree(View view, NLevelAdapter adapter, int position) {
@@ -320,7 +343,7 @@ public class BaseActivity extends AppCompatActivity {
 
 	protected void setNote(Note note) {
 		this.note = note;
-		setTitle(this.note.getTitle());
+		if (note != null) setTitle(this.note.getTitle());
 	}
 
 	protected Note getNote() {
@@ -380,5 +403,14 @@ public class BaseActivity extends AppCompatActivity {
 				loadNote(this.note);
 			}
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (this.getNote() != null && ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_LARGE && (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_XLARGE)) {
+			this.setNote(null);
+			setTitle(this.getNotepad().getTitle());
+		}
+		super.onBackPressed();
 	}
 }

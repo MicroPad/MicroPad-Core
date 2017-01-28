@@ -1,6 +1,5 @@
-package getmicropad.com.micropad;
+package com.getmicropad.micropad;
 
-import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 
@@ -8,11 +7,7 @@ import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parser;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 

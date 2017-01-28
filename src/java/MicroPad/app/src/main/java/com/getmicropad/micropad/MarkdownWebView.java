@@ -1,4 +1,4 @@
-package getmicropad.com.micropad;
+package com.getmicropad.micropad;
 
 import android.content.Context;
 import android.util.AttributeSet;

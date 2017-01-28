@@ -1,13 +1,9 @@
-package getmicropad.com.micropad;
+package com.getmicropad.micropad;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -22,24 +18,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.getmicropad.NPXParser.Note;
 import com.getmicropad.NPXParser.Notepad;
-import com.getmicropad.NPXParser.Parent;
 import com.getmicropad.NPXParser.Parser;
-import com.getmicropad.NPXParser.Section;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public class SelectNotepad extends AppCompatActivity {
 	List<NLevelItem> list;
