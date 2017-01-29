@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
@@ -191,7 +192,7 @@ public class BaseActivity extends AppCompatActivity {
 				Intent intent = new Intent();
 				intent.setAction(Intent.ACTION_VIEW);
 				intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-				intent.setDataAndType(Uri.fromFile(new File(path)), mime);
+				intent.setDataAndType(FileProvider.getUriForFile(this, this.getApplicationContext().getPackageName()+".fileprovider", new File(path)), mime);
 				startActivity(intent);
 			}
 			catch (IOException e) {
