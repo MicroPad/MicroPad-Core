@@ -38,6 +38,7 @@ import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parent;
 import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.Section;
+import com.getmicropad.NPXParser.Source;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 
 import java.io.ByteArrayOutputStream;
@@ -125,6 +126,10 @@ public class BaseActivity extends AppCompatActivity {
 						}
 
 						noteContainer.evaluateJavascript(String.format("displayElement(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %s)", element.getId(), content, element.getX(), element.getY(), element.getWidth(), element.getHeight(), extraArgs), (s) -> {});
+					}
+
+					for (Source source : note.bibliography) {
+						noteContainer.evaluateJavascript(String.format("displaySource(\"%s\", \"%s\", \"%s\")", source.getId(), source.getItem(), source.getUrl()), (s) -> {});
 					}
 
 					new Thread(() -> {

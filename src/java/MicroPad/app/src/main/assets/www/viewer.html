@@ -203,6 +203,10 @@
 				},
 				drag: event => {
 					resizePage(event.target);
+
+					if ($('#source_'+event.target.id).length) {
+						$('#source_'+event.target.id).attr("style", 'left: {0}; top: {1};'.format(parseInt(event.target.style.left)+$(event.target).width()+10+"px", event.target.style.top));
+					}
 				},
 				stop: event => {
 					$(event.target).removeClass('z-depth-4');
@@ -213,8 +217,11 @@
 			});
 		}
 
-		function addSource(elementID, url) {
-			// $('#'+elementID)
+		function displaySource(id, item, link) {
+			if ($('#source_'+item).length) $('#soruce_'+item).remove();
+
+			var itemEl = document.getElementById(item);
+			$('#content').append('<div id="source_{0}" style="left: {1}; top: {2};"><a href="{4}">[{3}]</a></div>'.format(item, parseInt(itemEl.style.left)+$(itemEl).width()+10+"px", itemEl.style.top, id, link));
 		}
 	</script>
 </body>
