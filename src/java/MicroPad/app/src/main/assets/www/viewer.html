@@ -176,7 +176,7 @@
 
 				case "drawing":
 				case "image":
-					elementDiv.innerHTML += '<img style="width: {1}; height: {2};" src="{0}" />'.format(URL.createObjectURL(dataURItoBlob(content)), width, height);
+					elementDiv.innerHTML += '<img style="overflow: none; width: {1}; height: {2};" src="{0}" />'.format(URL.createObjectURL(dataURItoBlob(content)), width, height);
 					break;
 
 				case "recording":

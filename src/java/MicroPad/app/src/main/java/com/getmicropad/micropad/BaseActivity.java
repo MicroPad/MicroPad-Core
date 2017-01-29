@@ -126,6 +126,17 @@ public class BaseActivity extends AppCompatActivity {
 
 						noteContainer.evaluateJavascript(String.format("displayElement(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %s)", element.getId(), content, element.getX(), element.getY(), element.getWidth(), element.getHeight(), extraArgs), (s) -> {});
 					}
+
+					new Thread(() -> {
+						try {
+							Thread.sleep(1000);
+
+							runOnUiThread(() -> {
+								findViewById(R.id.progress).setVisibility(View.GONE);
+								noteContainer.setVisibility(View.VISIBLE);
+							});
+						} catch (InterruptedException e) {}
+					}).start();
 				}
 				catch (UnsupportedEncodingException e) {}
 			}
@@ -390,8 +401,6 @@ public class BaseActivity extends AppCompatActivity {
 
 		@Override
 		protected void onPostExecute(Notepad notepad) {
-			progressBar.setVisibility(View.GONE);
-
 			if (notepad == null) {
 				new AlertDialog.Builder(BaseActivity.this)
 						.setTitle("Error")
