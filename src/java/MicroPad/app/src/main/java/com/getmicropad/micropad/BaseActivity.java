@@ -173,6 +173,13 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	@JavascriptInterface
+	public void openEditor(String id) {
+		Stream.of(getNote().elements).filter(element -> element.getId().equals(id)).forEach(element -> {
+
+		});
+	}
+
+	@JavascriptInterface
 	public void updateElementPosition(String id, String x, String y, String width, String height) {
 		new AsyncTask<Object, Void, Void>() {
 			@Override
