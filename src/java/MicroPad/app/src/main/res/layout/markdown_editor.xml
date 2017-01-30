@@ -1,41 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:text="{gmd-format-list_bulleted}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/bullet_button"
-            android:layout_weight="1"
-            tools:text="BL"/>
-
-        <Button
-            android:text="{gmd-playlist_add_check}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/todo_button"
-            android:layout_weight="1"
-            tools:text="TL"/>
-
-        <Button
-            android:text="{gmd-format-indent-increase}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/indent_btn"
-            android:layout_weight="1"
-            tools:text="IN"/>
-
-    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"

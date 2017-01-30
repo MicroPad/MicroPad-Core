@@ -2,6 +2,9 @@ package com.getmicropad.micropad;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.text.Layout;
+import android.text.Selection;
+import android.widget.EditText;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -82,5 +85,16 @@ public class Helpers {
 
 	public static int getIntFromString(String str) throws ParseException {
 		return (NumberFormat.getInstance().parse(str)).intValue();
+	}
+
+	public static int getCurrentCursorLine(EditText editText) {
+		int selectionStart = Selection.getSelectionStart(editText.getText());
+		Layout layout = editText.getLayout();
+
+		if (!(selectionStart == -1)) {
+			return layout.getLineForOffset(selectionStart);
+		}
+
+		return -1;
 	}
 }

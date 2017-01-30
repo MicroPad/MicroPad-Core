@@ -259,6 +259,7 @@ public class BaseActivity extends AppCompatActivity {
 
 				//TODO: Handle formatting bar
 
+
 				builder.setPositiveButton("Close", (dialog, which) -> {
 					((MarkdownElement) element).setFontSize(fontInput.getText().toString());
 					runOnUiThread(() -> {
