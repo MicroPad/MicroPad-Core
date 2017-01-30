@@ -11,4 +11,9 @@
     <string name="delete">Delete</string>
     <string name="rename">Rename</string>
     <string name="title_activity_viewer">µPad</string>
+    <string name="markdown_hint">Content (in Markdown)</string>
+    <string name="source_hint">Source Website</string>
+    <string name="width_hint">Width</string>
+    <string name="height_hint">Height</string>
+    <string name="font_hint">Font Size</string>
 </resources>

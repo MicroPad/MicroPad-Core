@@ -164,14 +164,11 @@
 					content = decodeURIComponent(content);
 					elementDiv.style.fontSize = extraArgs.fontSize;
 					elementDiv.innerHTML += md.makeHtml(content);
+					$('#content ul').each(function(i) {
+						$(this).addClass('browser-default');
+					});
 					asciimath.translate(undefined, true);
-
-					setTimeout(() => {
-						MathJax.Hub.Typeset();
-						$('#content ul').each(function(i) {
-							$(this).addClass('browser-default');
-						});
-					}, 1000);
+					MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 					break;
 
 				case "drawing":
@@ -218,7 +215,7 @@
 		}
 
 		function displaySource(id, item, link) {
-			if ($('#source_'+item).length) $('#soruce_'+item).remove();
+			if ($('#source_'+item).length) $('#source_'+item).remove();
 
 			var itemEl = document.getElementById(item);
 			$('#content').append('<div id="source_{0}" style="left: {1}; top: {2};"><a href="{4}">[{3}]</a></div>'.format(item, parseInt(itemEl.style.left)+$(itemEl).width()+10+"px", itemEl.style.top, id, link));

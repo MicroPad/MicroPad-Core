@@ -19,6 +19,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
@@ -26,6 +27,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.annimon.stream.Stream;
@@ -49,9 +51,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class BaseActivity extends AppCompatActivity {
 	Notepad notepad;
@@ -59,8 +59,8 @@ public class BaseActivity extends AppCompatActivity {
 	Note note;
 	List<Integer> parentTree = new ArrayList<>();
 	FilesystemManager filesystemManager = new FilesystemManager();
-	Map<String, WebView> webviews = new HashMap<>();
 	static final int PERMISSION_REQ_FILESYSTEM = 0;
+	WebView noteContainer;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
@@ -82,8 +82,11 @@ public class BaseActivity extends AppCompatActivity {
 
 	@SuppressLint("SetJavaScriptEnabled")
 	protected void loadNote(Note note) {
+		if (note.bibliography == null) note.bibliography = new ArrayList<>();
+		if (note.addons == null) note.addons = new ArrayList<>();
 		this.setNote(note);
-		WebView noteContainer = (WebView)findViewById(R.id.note_webview);
+
+		noteContainer = (WebView)findViewById(R.id.note_webview);
 		noteContainer.getSettings().setJavaScriptEnabled(true);
 		noteContainer.addJavascriptInterface(this, "Native");
 		noteContainer.getSettings().setSupportZoom(true);
@@ -101,49 +104,21 @@ public class BaseActivity extends AppCompatActivity {
 
 		noteContainer.setWebViewClient(new WebViewClient() {
 			public void onPageFinished(WebView view, String url) {
-				try {
-					for (NoteElement element : note.elements) {
-						String extraArgs = "{}";
-						String content = element.getContent();
-						if (element instanceof MarkdownElement) {
-							extraArgs = String.format("{fontSize: \"%s\"}", ((MarkdownElement) element).getFontSize());
-							content = URLEncoder.encode(content, "UTF-8").replace("+", "%20");
-						}
-						else if (element instanceof DrawingElement) {
-							try {
-								byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
-								Bitmap decodedBmp = Helpers.TrimBitmap(BitmapFactory.decodeByteArray(decoded, 0, decoded.length));
-								ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-								decodedBmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-								content = "data:image/png;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
-							}
-							catch (Exception e) {
-								continue;
-							}
-						}
-						else if (element instanceof FileElement) {
-							content = ((FileElement) element).getFilename();
-						}
-
-						noteContainer.evaluateJavascript(String.format("displayElement(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %s)", element.getId(), content, element.getX(), element.getY(), element.getWidth(), element.getHeight(), extraArgs), (s) -> {});
-					}
-
-					for (Source source : note.bibliography) {
-						noteContainer.evaluateJavascript(String.format("displaySource(\"%s\", \"%s\", \"%s\")", source.getId(), source.getItem(), source.getUrl()), (s) -> {});
-					}
-
-					new Thread(() -> {
-						try {
-							Thread.sleep(1000);
-
-							runOnUiThread(() -> {
-								findViewById(R.id.progress).setVisibility(View.GONE);
-								noteContainer.setVisibility(View.VISIBLE);
-							});
-						} catch (InterruptedException e) {}
-					}).start();
+				for (NoteElement element : note.elements) {
+					displayElement(element);
 				}
-				catch (UnsupportedEncodingException e) {}
+				refreshBilbiography();
+
+				new Thread(() -> {
+					try {
+						Thread.sleep(1000);
+
+						runOnUiThread(() -> {
+							findViewById(R.id.progress).setVisibility(View.GONE);
+							noteContainer.setVisibility(View.VISIBLE);
+						});
+					} catch (InterruptedException e) { }
+				}).start();
 			}
 
 			@Override
@@ -172,10 +147,129 @@ public class BaseActivity extends AppCompatActivity {
 		noteContainer.loadUrl("file:///android_asset/www/viewer.html");
 	}
 
+	protected void displayElement(NoteElement element) {
+		String extraArgs = "{}";
+		String content = element.getContent();
+		if (element instanceof MarkdownElement) {
+			extraArgs = String.format("{fontSize: \"%s\"}", ((MarkdownElement) element).getFontSize());
+			try {
+				content = URLEncoder.encode(content, "UTF-8").replace("+", "%20");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				return;
+			}
+		}
+		else if (element instanceof DrawingElement) {
+			try {
+				byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
+				Bitmap decodedBmp = Helpers.TrimBitmap(BitmapFactory.decodeByteArray(decoded, 0, decoded.length));
+				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+				decodedBmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+				content = "data:image/png;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+			}
+			catch (Exception e) {
+				return;
+			}
+		}
+		else if (element instanceof FileElement) {
+			content = ((FileElement) element).getFilename();
+		}
+
+		noteContainer.evaluateJavascript(String.format("displayElement(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %s)", element.getId(), content, element.getX(), element.getY(), element.getWidth(), element.getHeight(), extraArgs), (s) -> {});
+	}
+
+	protected void refreshBilbiography() {
+		for (Source source : note.bibliography) {
+			noteContainer.evaluateJavascript(String.format("displaySource(\"%s\", \"%s\", \"%s\")", source.getId(), source.getItem(), source.getUrl()), (s) -> {});
+		}
+	}
+
+	protected NoteElement updateElement(NoteElement element, String content, String width, String height, String source) {
+		this.getNote().elements.remove(element);
+		element.setContent(content);
+		element.setWidth(width);
+		element.setHeight(height);
+
+		boolean hasSet = false;
+		Source[] res = Stream.of(this.getNote().bibliography).filter(s -> s.getItem().equals(element.getId())).toArray(Source[]::new);
+		if (res.length > 0) {
+			Source s = res[0];
+			if (s.getUrl() == null || s.getUrl().length() == 0) {
+				if (source.length() > 0) {
+					s.setUrl(source);
+					hasSet = true;
+				}
+				else {
+					this.getNote().bibliography.remove(s);
+				}
+			}
+			else {
+				if (source.length() > 0) {
+					s.setUrl(source);
+					hasSet = true;
+				}
+				else {
+					this.getNote().bibliography.remove(s);
+				}
+			}
+
+			if (hasSet) {
+				this.getNote().bibliography.remove(s);
+				this.getNote().bibliography.add(s);
+			}
+		}
+		if (!hasSet && source.length() > 0) {
+			this.getNote().bibliography.add(new Source(getNote().bibliography.size()+1, element.getId(), source));
+		}
+
+		this.getNote().elements.add(element);
+		runOnUiThread(() -> updateNotepad(this.getNote()));
+		return element;
+	}
+
 	@JavascriptInterface
 	public void openEditor(String id) {
 		Stream.of(getNote().elements).filter(element -> element.getId().equals(id)).forEach(element -> {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this)
+					.setTitle("Edit Element")
+					.setCancelable(true);
+			LayoutInflater inflater = this.getLayoutInflater();
 
+			if (element instanceof MarkdownElement) {
+				View dialogView = inflater.inflate(R.layout.markdown_editor, null);
+				builder.setView(dialogView);
+
+				EditText markdownInput = (EditText)dialogView.findViewById(R.id.markdown_input);
+				EditText sourceInput = (EditText)dialogView.findViewById(R.id.source_input);
+				EditText fontInput = (EditText)dialogView.findViewById(R.id.font_input);
+				EditText widthInput = (EditText)dialogView.findViewById(R.id.width_input);
+				EditText heightInput = (EditText)dialogView.findViewById(R.id.height_input);
+
+				markdownInput.setText(element.getContent());
+				fontInput.setText(((MarkdownElement) element).getFontSize());
+				widthInput.setText(element.getWidth());
+				heightInput.setText(element.getHeight());
+				Stream.of(getNote().bibliography).filter(source -> source.getItem().equals(id)).forEach(source -> {
+					if (source.getUrl() == null || source.getUrl().length() == 0) {
+						getNote().bibliography.remove(source);
+						return;
+					}
+					sourceInput.setText(source.getUrl());
+				});
+
+				//TODO: Handle formatting bar
+
+				builder.setPositiveButton("Close", (dialog, which) -> {
+					((MarkdownElement) element).setFontSize(fontInput.getText().toString());
+					runOnUiThread(() -> {
+						displayElement(updateElement(element, markdownInput.getText().toString(), widthInput.getText().toString(), heightInput.getText().toString(), sourceInput.getText().toString()));
+						refreshBilbiography();
+					});
+				});
+			}
+
+			AlertDialog dialog = builder.create();
+			dialog.show();
 		});
 	}
 
