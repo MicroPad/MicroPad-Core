@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView"
+                tools:text="Current File: blahblah.png" />
+
+            <Button
+                android:text="@string/pickimage_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/button" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:ems="10"
+                android:id="@+id/source_input"
+                android:layout_weight="1"
+                android:inputType="textWebEmailAddress"
+                android:hint="@string/source_hint"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:id="@+id/width_input"
+                    android:layout_weight="1"
+                    android:inputType="textNoSuggestions"
+                    android:hint="@string/width_hint"/>
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions"
+                    android:ems="10"
+                    android:id="@+id/height_input"
+                    android:layout_weight="1"
+                    android:hint="@string/height_hint"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>

@@ -16,4 +16,6 @@
     <string name="width_hint">Width</string>
     <string name="height_hint">Height</string>
     <string name="font_hint">Font Size</string>
+    <string name="pickfile_hint">Browse Files...</string>
+    <string name="pickimage_hint">Browse Images...</string>
 </resources>
