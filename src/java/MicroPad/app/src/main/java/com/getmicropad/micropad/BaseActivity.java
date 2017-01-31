@@ -33,6 +33,7 @@ import android.widget.ProgressBar;
 import com.annimon.stream.Stream;
 import com.getmicropad.NPXParser.DrawingElement;
 import com.getmicropad.NPXParser.FileElement;
+import com.getmicropad.NPXParser.ImageElement;
 import com.getmicropad.NPXParser.MarkdownElement;
 import com.getmicropad.NPXParser.Note;
 import com.getmicropad.NPXParser.NoteElement;
@@ -259,11 +260,39 @@ public class BaseActivity extends AppCompatActivity {
 
 				//TODO: Handle formatting bar
 
-
-				builder.setPositiveButton("Close", (dialog, which) -> {
+				builder.setPositiveButton("Save", (dialog, which) -> {
 					((MarkdownElement) element).setFontSize(fontInput.getText().toString());
 					runOnUiThread(() -> {
 						displayElement(updateElement(element, markdownInput.getText().toString(), widthInput.getText().toString(), heightInput.getText().toString(), sourceInput.getText().toString()));
+						refreshBilbiography();
+					});
+				});
+			}
+			else if (element instanceof ImageElement) {
+				View dialogView = inflater.inflate(R.layout.markdown_editor, null);
+				builder.setView(dialogView);
+
+				EditText sourceInput = (EditText)dialogView.findViewById(R.id.source_input);
+				EditText widthInput = (EditText)dialogView.findViewById(R.id.width_input);
+				EditText heightInput = (EditText)dialogView.findViewById(R.id.height_input);
+
+				widthInput.setText(element.getWidth());
+				heightInput.setText(element.getHeight());
+				Stream.of(getNote().bibliography).filter(source -> source.getItem().equals(id)).forEach(source -> {
+					if (source.getUrl() == null || source.getUrl().length() == 0) {
+						getNote().bibliography.remove(source);
+						return;
+					}
+					sourceInput.setText(source.getUrl());
+				});
+
+				String content = element.getContent();
+
+				//TODO: Handle 'browse' button
+
+				builder.setPositiveButton("Save", (dialog, which) -> {
+					runOnUiThread(() -> {
+						displayElement(updateElement(element, content, widthInput.getText().toString(), heightInput.getText().toString(), sourceInput.getText().toString()));
 						refreshBilbiography();
 					});
 				});

@@ -18,17 +18,17 @@
             android:orientation="vertical">
 
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/textView"
-                tools:text="Current File: blahblah.png" />
-
             <Button
                 android:text="@string/pickimage_hint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/button" />
+                android:id="@+id/browse_button" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/filename_text"
+                tools:text="blahblah.png" />
 
             <EditText
                 android:layout_width="match_parent"

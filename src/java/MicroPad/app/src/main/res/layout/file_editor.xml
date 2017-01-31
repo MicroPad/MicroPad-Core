@@ -18,19 +18,19 @@
             android:orientation="vertical">
 
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/textView"
-                tools:text="Current File: blahblah.pdf" />
+	        <Button
+		        android:text="@string/pickfile_hint"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:id="@+id/browse_button" />
 
-            <Button
-                android:text="@string/pickfile_hint"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/button" />
+	        <TextView
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:id="@+id/filename_text"
+		        tools:text="blahblah.pdf" />
 
-            <EditText
+	        <EditText
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:ems="10"
