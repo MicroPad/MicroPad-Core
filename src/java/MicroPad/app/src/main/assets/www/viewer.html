@@ -178,11 +178,11 @@
 					break;
 
 				case "recording":
-					elementDiv.innerHTML += '<p>{1}</p><a href="javascript:downloadElement(\'{0}\');" class="btn blue waves-effect waves-light" style="width: 100%;"><span style="color: #fff">Open Recording</span></a>'.format(id, content);
+					elementDiv.innerHTML += '<p>{1}</p><a href="javascript:downloadElement(\'{0}\');" class="btn blue waves-effect waves-light" style="width: 100%;"><span style="padding: 15px; color: #fff">Open Recording</span></a>'.format(id, content);
 					break;
 
 				case "file":
-					elementDiv.innerHTML += '{1}<br /><a href="javascript:downloadElement(\'{0}\');" class="btn blue waves-effect waves-light" style="width: 100%;"><span style="color: #fff">Open File</span></a>'.format(id, content);
+					elementDiv.innerHTML += '{1}<br /><a href="javascript:downloadElement(\'{0}\');" class="btn blue waves-effect waves-light" style="width: 100%;"><span style="padding: 15px; color: #fff">Open File</span></a>'.format(id, content);
 					break;
 			}
 			resizePage(elementDiv);
@@ -224,6 +224,7 @@
 		$('#content').on('click', 'div', event => {
 			var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
 			if (path[0].tagName.toLowerCase() === 'a') return;
+			if (path[1] && path[1].tagName.toLowerCase() === 'a') return;
 			Native.openEditor(event.currentTarget.id);
 		})
 	</script>

@@ -41,5 +41,7 @@ dependencies {
 
     compile 'com.annimon:stream:1.1.4'
 
+    compile 'com.nononsenseapps:filepicker:3.1.0'
+
     testCompile 'junit:junit:4.12'
 }

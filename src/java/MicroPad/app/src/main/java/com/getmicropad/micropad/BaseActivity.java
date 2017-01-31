@@ -6,12 +6,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -29,6 +33,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.annimon.stream.Stream;
 import com.getmicropad.NPXParser.DrawingElement;
@@ -43,13 +48,17 @@ import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.Section;
 import com.getmicropad.NPXParser.Source;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
+import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +70,8 @@ public class BaseActivity extends AppCompatActivity {
 	List<Integer> parentTree = new ArrayList<>();
 	FilesystemManager filesystemManager = new FilesystemManager();
 	static final int PERMISSION_REQ_FILESYSTEM = 0;
+	static final int IMAGE_SELECTOR = 1;
+	static final int FILE_SELECTOR = 2;
 	WebView noteContainer;
 
 	@Override
@@ -228,79 +239,173 @@ public class BaseActivity extends AppCompatActivity {
 		return element;
 	}
 
+	String currentContent;
+	View dialogView;
+	String newFilename;
 	@JavascriptInterface
 	public void openEditor(String id) {
-		Stream.of(getNote().elements).filter(element -> element.getId().equals(id)).forEach(element -> {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this)
-					.setTitle("Edit Element")
-					.setCancelable(true);
-			LayoutInflater inflater = this.getLayoutInflater();
+		runOnUiThread(() -> {
+			Stream.of(getNote().elements).filter(element -> element.getId().equals(id)).forEach(element -> {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this)
+						.setTitle("Edit Element")
+						.setCancelable(true);
+				LayoutInflater inflater = this.getLayoutInflater();
 
-			if (element instanceof MarkdownElement) {
-				View dialogView = inflater.inflate(R.layout.markdown_editor, null);
-				builder.setView(dialogView);
+				if (element instanceof MarkdownElement) {
+					dialogView = inflater.inflate(R.layout.markdown_editor, null);
+					builder.setView(dialogView);
 
-				EditText markdownInput = (EditText)dialogView.findViewById(R.id.markdown_input);
-				EditText sourceInput = (EditText)dialogView.findViewById(R.id.source_input);
-				EditText fontInput = (EditText)dialogView.findViewById(R.id.font_input);
-				EditText widthInput = (EditText)dialogView.findViewById(R.id.width_input);
-				EditText heightInput = (EditText)dialogView.findViewById(R.id.height_input);
+					EditText markdownInput = (EditText)dialogView.findViewById(R.id.markdown_input);
+					EditText sourceInput = (EditText)dialogView.findViewById(R.id.source_input);
+					EditText fontInput = (EditText)dialogView.findViewById(R.id.font_input);
+					EditText widthInput = (EditText)dialogView.findViewById(R.id.width_input);
+					EditText heightInput = (EditText)dialogView.findViewById(R.id.height_input);
 
-				markdownInput.setText(element.getContent());
-				fontInput.setText(((MarkdownElement) element).getFontSize());
-				widthInput.setText(element.getWidth());
-				heightInput.setText(element.getHeight());
-				Stream.of(getNote().bibliography).filter(source -> source.getItem().equals(id)).forEach(source -> {
-					if (source.getUrl() == null || source.getUrl().length() == 0) {
-						getNote().bibliography.remove(source);
-						return;
-					}
-					sourceInput.setText(source.getUrl());
-				});
+					markdownInput.setText(element.getContent());
+					fontInput.setText(((MarkdownElement) element).getFontSize());
+					widthInput.setText(element.getWidth());
+					heightInput.setText(element.getHeight());
+					Stream.of(getNote().bibliography).filter(source -> source.getItem().equals(id)).forEach(source -> {
+						if (source.getUrl() == null || source.getUrl().length() == 0) {
+							getNote().bibliography.remove(source);
+							return;
+						}
+						sourceInput.setText(source.getUrl());
+					});
 
-				//TODO: Handle formatting bar
+					//TODO: Handle formatting bar
 
-				builder.setPositiveButton("Save", (dialog, which) -> {
-					((MarkdownElement) element).setFontSize(fontInput.getText().toString());
-					runOnUiThread(() -> {
+					builder.setPositiveButton("Save", (dialog, which) -> {
+						((MarkdownElement) element).setFontSize(fontInput.getText().toString());
 						displayElement(updateElement(element, markdownInput.getText().toString(), widthInput.getText().toString(), heightInput.getText().toString(), sourceInput.getText().toString()));
 						refreshBilbiography();
 					});
-				});
-			}
-			else if (element instanceof ImageElement) {
-				View dialogView = inflater.inflate(R.layout.markdown_editor, null);
-				builder.setView(dialogView);
+				}
+				else if (element instanceof ImageElement) {
+					dialogView = inflater.inflate(R.layout.image_editor, null);
+					builder.setView(dialogView);
 
-				EditText sourceInput = (EditText)dialogView.findViewById(R.id.source_input);
-				EditText widthInput = (EditText)dialogView.findViewById(R.id.width_input);
-				EditText heightInput = (EditText)dialogView.findViewById(R.id.height_input);
+					EditText sourceInput = (EditText)dialogView.findViewById(R.id.source_input);
+					EditText widthInput = (EditText)dialogView.findViewById(R.id.width_input);
+					EditText heightInput = (EditText)dialogView.findViewById(R.id.height_input);
 
-				widthInput.setText(element.getWidth());
-				heightInput.setText(element.getHeight());
-				Stream.of(getNote().bibliography).filter(source -> source.getItem().equals(id)).forEach(source -> {
-					if (source.getUrl() == null || source.getUrl().length() == 0) {
-						getNote().bibliography.remove(source);
-						return;
-					}
-					sourceInput.setText(source.getUrl());
-				});
+					widthInput.setText(element.getWidth());
+					heightInput.setText(element.getHeight());
+					Stream.of(getNote().bibliography).filter(source -> source.getItem().equals(id)).forEach(source -> {
+						if (source.getUrl() == null || source.getUrl().length() == 0) {
+							getNote().bibliography.remove(source);
+							return;
+						}
+						sourceInput.setText(source.getUrl());
+					});
 
-				String content = element.getContent();
+					currentContent = element.getContent();
 
-				//TODO: Handle 'browse' button
+					//Handle 'browse' button
+					dialogView.findViewById(R.id.browse_button).setOnClickListener(v -> {
+						Intent intent = new Intent();
+						intent.setType("image/*");
+						intent.setAction(Intent.ACTION_PICK);
+						startActivityForResult(intent, IMAGE_SELECTOR);
+					});
 
-				builder.setPositiveButton("Save", (dialog, which) -> {
-					runOnUiThread(() -> {
-						displayElement(updateElement(element, content, widthInput.getText().toString(), heightInput.getText().toString(), sourceInput.getText().toString()));
+					builder.setPositiveButton("Save", (dialog, which) -> {
+						displayElement(updateElement(element, currentContent, widthInput.getText().toString(), heightInput.getText().toString(), sourceInput.getText().toString()));
+						currentContent = null;
 						refreshBilbiography();
 					});
-				});
-			}
+				}
+				else if (element instanceof FileElement) {
+					dialogView = inflater.inflate(R.layout.file_editor, null);
+					builder.setView(dialogView);
 
-			AlertDialog dialog = builder.create();
-			dialog.show();
+					EditText sourceInput = (EditText)dialogView.findViewById(R.id.source_input);
+
+					Stream.of(getNote().bibliography).filter(source -> source.getItem().equals(id)).forEach(source -> {
+						if (source.getUrl() == null || source.getUrl().length() == 0) {
+							getNote().bibliography.remove(source);
+							return;
+						}
+						sourceInput.setText(source.getUrl());
+					});
+
+					currentContent = element.getContent();
+					newFilename = ((FileElement) element).getFilename();
+
+					//Handle 'browse' button
+					dialogView.findViewById(R.id.browse_button).setOnClickListener(v -> {
+						Intent intent = new Intent(this, FilePickerActivity.class);
+						intent.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+						startActivityForResult(intent, FILE_SELECTOR);
+					});
+
+					builder.setPositiveButton("Save", (dialog, which) -> {
+						((FileElement) element).setFilename(newFilename);
+						displayElement(updateElement(element, currentContent, "auto", "auto", sourceInput.getText().toString()));
+						currentContent = null;
+						newFilename = null;
+						refreshBilbiography();
+					});
+				}
+
+				AlertDialog dialog = builder.create();
+				dialog.show();
+			});
 		});
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case IMAGE_SELECTOR:
+				if (data != null && resultCode == RESULT_OK) {
+					Uri selFile = data.getData();
+
+					try {
+						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selFile);
+						ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+						bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+						currentContent = "data:image/png;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+						runOnUiThread(() -> ((TextView)dialogView.findViewById(R.id.filename_text)).setText(getFilenameFromUri(selFile)));
+
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				break;
+
+			case FILE_SELECTOR:
+				if (resultCode == RESULT_OK) {
+					Uri selFile = data.getData();
+					InputStream inputStream = null;
+					try {
+						inputStream = getContentResolver().openInputStream(selFile);
+						byte[] tempStorage = new byte[1024];
+						int bLength;
+						ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+						while ((bLength = inputStream.read(tempStorage)) != -1) {
+							byteArrayOutputStream.write(tempStorage, 0, bLength);
+						}
+						byteArrayOutputStream.flush();
+
+						newFilename = URLDecoder.decode(new File(selFile.toString()).getName(), "UTF-8");
+						String mime = URLConnection.guessContentTypeFromName(newFilename);
+						if (mime == null) mime = URLConnection.guessContentTypeFromStream(inputStream);
+						if (mime == null) mime = "*/*";
+						currentContent = "data:"+mime+";base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+						runOnUiThread(() -> ((TextView)dialogView.findViewById(R.id.filename_text)).setText(newFilename));
+						byteArrayOutputStream.close();
+						inputStream.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+						if (inputStream != null) {
+							try {
+								inputStream.close();
+							} catch (IOException e1) {}
+						}
+					}
+				}
+		}
 	}
 
 	@JavascriptInterface
@@ -549,6 +654,26 @@ public class BaseActivity extends AppCompatActivity {
 				loadNote(this.note);
 			}
 		}
+	}
+
+	protected String getFilenameFromUri(Uri contentURI) {
+		String uriString = contentURI.toString();
+		File myFile = new File(uriString);
+
+		if (uriString.startsWith("content://")) {
+			Cursor cursor = null;
+			try {
+				cursor = getContentResolver().query(contentURI, null, null, null, null);
+				if (cursor != null && cursor.moveToFirst()) {
+					return cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+				}
+			} finally {
+				cursor.close();
+			}
+		} else if (uriString.startsWith("file://")) {
+			return myFile.getName();
+		}
+		return "file.ext";
 	}
 
 	@Override
