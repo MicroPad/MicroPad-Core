@@ -47,6 +47,8 @@ import com.getmicropad.NPXParser.Parent;
 import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.Section;
 import com.getmicropad.NPXParser.Source;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
@@ -281,6 +283,25 @@ public class BaseActivity extends AppCompatActivity {
 						refreshBilbiography();
 					});
 				}
+				else if (element instanceof DrawingElement) {
+					dialogView = inflater.inflate(R.layout.drawing_editor, null);
+					builder.setView(dialogView);
+
+					EditText sourceInput = (EditText)dialogView.findViewById(R.id.source_input);
+
+					Stream.of(getNote().bibliography).filter(source -> source.getItem().equals(id)).forEach(source -> {
+						if (source.getUrl() == null || source.getUrl().length() == 0) {
+							getNote().bibliography.remove(source);
+							return;
+						}
+						sourceInput.setText(source.getUrl());
+					});
+
+					builder.setPositiveButton("Save", (dialog, which) -> {
+						displayElement(updateElement(element, element.getContent(), element.getWidth(), element.getHeight(), sourceInput.getText().toString()));
+						refreshBilbiography();
+					});
+				}
 				else if (element instanceof ImageElement) {
 					dialogView = inflater.inflate(R.layout.image_editor, null);
 					builder.setView(dialogView);
@@ -347,6 +368,18 @@ public class BaseActivity extends AppCompatActivity {
 						refreshBilbiography();
 					});
 				}
+
+				builder.setNegativeButton("Delete", (dialog, which) -> {
+					new AlertDialog.Builder(this)
+							.setTitle("Confirm Deletion")
+							.setMessage("Are you sure you want to delete this?")
+							.setIcon(new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_delete_forever))
+							.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
+								getNote().elements.remove(element);
+								noteContainer.evaluateJavascript(String.format("removeElement(\"%s\")", element.getId()), s -> {});
+								updateNotepad(getNote());
+							}).setNegativeButton(android.R.string.no, null).show();
+				});
 
 				AlertDialog dialog = builder.create();
 				dialog.show();

@@ -18,4 +18,5 @@
     <string name="font_hint">Font Size</string>
     <string name="pickfile_hint">Browse Files...</string>
     <string name="pickimage_hint">Browse Images...</string>
+    <string name="record_btn">Start Recording...</string>
 </resources>

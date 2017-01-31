@@ -221,12 +221,17 @@
 			$('#content').append('<div id="source_{0}" style="left: {1}; top: {2};"><a href="{4}">[{3}]</a></div>'.format(item, parseInt(itemEl.style.left)+$(itemEl).width()+10+"px", itemEl.style.top, id, link));
 		}
 
+		function removeElement(id) {
+			if ($('#'+id).length) $('#'+id).remove();
+			if ($('#source_'+id).length) $('#source_'+id).remove();
+		}
+
 		$('#content').on('click', 'div', event => {
 			var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
 			if (path[0].tagName.toLowerCase() === 'a') return;
 			if (path[1] && path[1].tagName.toLowerCase() === 'a') return;
 			Native.openEditor(event.currentTarget.id);
-		})
+		});
 	</script>
 </body>
 </html>
