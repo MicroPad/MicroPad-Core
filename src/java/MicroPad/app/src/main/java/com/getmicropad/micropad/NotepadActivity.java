@@ -350,6 +350,8 @@ public class NotepadActivity extends BaseActivity {
 				TextView titleText = (TextView) view.findViewById(R.id.title_text);
 				if (item.isExpanded()) titleText.setTypeface(null, Typeface.BOLD);
 				titleText.setText(name);
+
+				view.findViewById(R.id.overflow_button).setOnClickListener(v -> openContextMenu(view));
 				return view;
 			});
 			this.list.add(sectionItem);
@@ -397,6 +399,8 @@ public class NotepadActivity extends BaseActivity {
 
 						TextView titleText = (TextView) view.findViewById(R.id.title_text);
 						titleText.setText(name);
+
+						view.findViewById(R.id.overflow_button).setOnClickListener(v -> openContextMenu(view));
 						return view;
 					});
 					this.list.add(noteItem);

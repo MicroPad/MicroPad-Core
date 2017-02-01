@@ -149,6 +149,12 @@
 			Native.downloadElement(id);
 		}
 
+		$('#content').click(e => {
+			if (e.target.id == "content") {
+				Native.openInsertMenu(e.pageX, e.pageY);
+			}
+		});
+
 		function displayElement(id, content, x, y, width, height, extraArgs) {
 			var contentDiv = document.getElementById("content");
 			$(contentDiv).removeClass('empty');

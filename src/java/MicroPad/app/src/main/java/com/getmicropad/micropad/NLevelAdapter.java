@@ -1,6 +1,7 @@
 package com.getmicropad.micropad;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -37,6 +38,10 @@ public class NLevelAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int arg0, View arg1, ViewGroup arg2) {
+		getItem(arg0).getView().findViewById(R.id.overflow_button).setOnClickListener(v -> {
+			Log.wtf("m3k", "working");
+//			((Activity)this.context).openOptionsMenu();
+		});
 
 		return getItem(arg0).getView();
 	}

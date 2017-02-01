@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical"
-              android:id="@+id/notepad_list_item">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:orientation="vertical"
+                android:id="@+id/notepad_list_item"
+                android:descendantFocusability="blocksDescendants">
+
+    <Button
+        android:id="@+id/overflow_button"
+        android:text="{gmd-more-vert}"
+        tools:text=":"
+        android:layout_width="32sp"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"/>
 
     <TextView
         android:id="@+id/title_text"
@@ -12,6 +24,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:textSize="18sp"
-        android:layout_alignParentTop="true"/>
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"/>
 
 </RelativeLayout>

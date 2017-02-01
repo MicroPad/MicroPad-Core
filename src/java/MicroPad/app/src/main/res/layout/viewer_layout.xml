@@ -1,17 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
              android:id="@+id/viewer"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:background="@drawable/bg">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="5dp"
+        android:textSize="42sp"
+        android:textAlignment="center"
+        android:text="@string/note_helper"/>
+
     <android.support.percent.PercentFrameLayout
-        android:id="@+id/editor_container"
+        android:id="@+id/insert_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
         tools:visibility="visible">
+
+        <ListView
+            android:id="@+id/insert_list"
+            android:background="#fff"
+            android:elevation="4dp"
+            app:layout_widthPercent="100%"
+            app:layout_heightPercent="40%"
+            app:layout_marginTopPercent="60%">
+
+        </ListView>
 
     </android.support.percent.PercentFrameLayout>
 

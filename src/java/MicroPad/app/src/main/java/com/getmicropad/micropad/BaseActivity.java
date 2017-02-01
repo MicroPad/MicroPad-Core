@@ -2,6 +2,7 @@ package com.getmicropad.micropad;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.support.percent.PercentFrameLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -25,14 +27,20 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -65,7 +73,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -83,6 +90,8 @@ public class BaseActivity extends AppCompatActivity {
 	static final int IMAGE_SELECTOR = 1;
 	static final int FILE_SELECTOR = 2;
 	WebView noteContainer;
+	List<String> types;
+	ListAdapter insertAdapter;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
@@ -107,6 +116,20 @@ public class BaseActivity extends AppCompatActivity {
 		if (note.bibliography == null) note.bibliography = new ArrayList<>();
 		if (note.addons == null) note.addons = new ArrayList<>();
 		this.setNote(note);
+
+		new Thread(() -> {
+			types = new ArrayList<>();
+			types.add("Text (Markdown)");
+			types.add("Image");
+			types.add("File");
+			types.add("Recording");
+			insertAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types);
+
+			runOnUiThread(() -> {
+				ListView insertList = (ListView)findViewById(R.id.insert_list);
+				insertList.setAdapter(insertAdapter);
+			});
+		}).start();
 
 		noteContainer = (WebView)findViewById(R.id.note_webview);
 		noteContainer.getSettings().setJavaScriptEnabled(true);
@@ -254,8 +277,7 @@ public class BaseActivity extends AppCompatActivity {
 	String newFilename;
 	@JavascriptInterface
 	public void openEditor(String id) {
-		runOnUiThread(() -> {
-			Stream.of(getNote().elements).filter(element -> element.getId().equals(id)).forEach(element -> {
+		runOnUiThread(() -> Stream.of(getNote().elements).filter(element -> element.getId().equals(id)).forEach(element -> {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this)
 						.setTitle("Edit Element")
 						.setCancelable(true);
@@ -374,7 +396,7 @@ public class BaseActivity extends AppCompatActivity {
 							recordBtn.setVisibility(View.GONE);
 							stopRecordBtn.setVisibility(View.VISIBLE);
 
-							newFilename = this.getNote().getTitle()+" "+ DateFormat.getDateTimeInstance().format(new Date())+".ogg";
+							newFilename = this.getNote().getTitle()+" "+android.text.format.DateFormat.format("yyyy-MM-dd hh:mm:ss a", new Date())+".ogg";
 							opusRecorder.startRecording(getCacheDir().getAbsolutePath()+"/"+newFilename);
 						}
 					});
@@ -464,62 +486,77 @@ public class BaseActivity extends AppCompatActivity {
 
 				AlertDialog dialog = builder.create();
 				dialog.show();
-			});
-		});
+			}));
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch (requestCode) {
-			case IMAGE_SELECTOR:
-				if (data != null && resultCode == RESULT_OK) {
-					Uri selFile = data.getData();
+		ProgressDialog dialog = new ProgressDialog(this);
+		runOnUiThread(() -> {
+			dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			dialog.setMessage("Getting Data...\nThis may take a while");
+			dialog.setIndeterminate(true);
+			dialog.setCanceledOnTouchOutside(false);
+			dialog.show();
+		});
+		new Thread(() -> {
+			switch (requestCode) {
+				case IMAGE_SELECTOR:
+					if (data != null && resultCode == RESULT_OK) {
+						Uri selFile = data.getData();
 
-					try {
-						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selFile);
-						ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-						bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-						currentContent = "data:image/png;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
-						runOnUiThread(() -> ((TextView)dialogView.findViewById(R.id.filename_text)).setText(getFilenameFromUri(selFile)));
+						try {
+							Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selFile);
+							ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+							bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+							currentContent = "data:image/png;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+							runOnUiThread(() -> {
+								((TextView)dialogView.findViewById(R.id.filename_text)).setText(getFilenameFromUri(selFile));
+								dialog.dismiss();
+							});
 
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				break;
-
-			case FILE_SELECTOR:
-				if (resultCode == RESULT_OK) {
-					Uri selFile = data.getData();
-					InputStream inputStream = null;
-					try {
-						inputStream = getContentResolver().openInputStream(selFile);
-						byte[] tempStorage = new byte[1024];
-						int bLength;
-						ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-						while ((bLength = inputStream.read(tempStorage)) != -1) {
-							byteArrayOutputStream.write(tempStorage, 0, bLength);
-						}
-						byteArrayOutputStream.flush();
-
-						newFilename = URLDecoder.decode(new File(selFile.toString()).getName(), "UTF-8");
-						String mime = URLConnection.guessContentTypeFromName(newFilename);
-						if (mime == null) mime = URLConnection.guessContentTypeFromStream(inputStream);
-						if (mime == null) mime = "*/*";
-						currentContent = "data:"+mime+";base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
-						runOnUiThread(() -> ((TextView)dialogView.findViewById(R.id.filename_text)).setText(newFilename));
-						byteArrayOutputStream.close();
-						inputStream.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-						if (inputStream != null) {
-							try {
-								inputStream.close();
-							} catch (IOException e1) {}
+						} catch (IOException e) {
+							e.printStackTrace();
 						}
 					}
-				}
-		}
+					break;
+
+				case FILE_SELECTOR:
+					if (resultCode == RESULT_OK) {
+						Uri selFile = data.getData();
+						InputStream inputStream = null;
+						try {
+							inputStream = getContentResolver().openInputStream(selFile);
+							byte[] tempStorage = new byte[1024];
+							int bLength;
+							ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+							while ((bLength = inputStream.read(tempStorage)) != -1) {
+								byteArrayOutputStream.write(tempStorage, 0, bLength);
+							}
+							byteArrayOutputStream.flush();
+
+							newFilename = URLDecoder.decode(new File(selFile.toString()).getName(), "UTF-8");
+							String mime = URLConnection.guessContentTypeFromName(newFilename);
+							if (mime == null) mime = URLConnection.guessContentTypeFromStream(inputStream);
+							if (mime == null) mime = "*/*";
+							currentContent = "data:"+mime+";base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+							byteArrayOutputStream.close();
+							inputStream.close();
+							runOnUiThread(() -> {
+								((TextView)dialogView.findViewById(R.id.filename_text)).setText(newFilename);
+								dialog.dismiss();
+							});
+						} catch (IOException e) {
+							e.printStackTrace();
+							if (inputStream != null) {
+								try {
+									inputStream.close();
+								} catch (IOException e1) {}
+							}
+						}
+					}
+			}
+		}).start();
 	}
 
 	@JavascriptInterface
@@ -564,6 +601,83 @@ public class BaseActivity extends AppCompatActivity {
 			catch (IOException e) {
 				e.printStackTrace();
 			}
+		});
+	}
+
+	boolean insertMenuOpen = false;
+	@JavascriptInterface
+	public void openInsertMenu(int x, int y) {
+		runOnUiThread(() -> {
+			Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+			Animation slideDown = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+			PercentFrameLayout insertContainer = (PercentFrameLayout)findViewById(R.id.insert_container);
+
+			if (insertMenuOpen) {
+				insertMenuOpen = false;
+				insertContainer.setAnimation(slideDown);
+				insertContainer.setVisibility(View.GONE);
+				return;
+			}
+			insertMenuOpen = true;
+
+			ListView list = (ListView)findViewById(R.id.insert_list);
+			list.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
+				int mdCount = 1;
+				int imgCount = 1;
+				int fileCount = 1;
+				int recCount = 1;
+				for (NoteElement element : this.getNote().elements) {
+					if (element instanceof MarkdownElement) mdCount++;
+					if (element instanceof ImageElement) imgCount++;
+					if (element instanceof FileElement && !(element instanceof RecordingElement)) fileCount++;
+					if (element instanceof RecordingElement) recCount++;
+				}
+
+				NoteElement newElement = null;
+				switch (this.types.get(position)) {
+					case "Text (Markdown)":
+						newElement = new MarkdownElement();
+						((MarkdownElement)newElement).setFontSize("16px");
+						newElement.setId("markdown"+mdCount);
+						break;
+
+					case "Image":
+						newElement = new ImageElement();
+						newElement.setId("image"+imgCount);
+						break;
+
+					case "File":
+						newElement = new FileElement();
+						((FileElement)newElement).setFilename("");
+						newElement.setId("file"+fileCount);
+						break;
+
+					case "Recording":
+						newElement = new RecordingElement();
+						((RecordingElement)newElement).setFilename("");
+						newElement.setId("recording"+recCount);
+						break;
+				}
+				//Close the view
+				insertMenuOpen = false;
+				insertContainer.setAnimation(slideDown);
+				insertContainer.setVisibility(View.GONE);
+
+				if (newElement == null) return;
+				newElement.setX(x+"px");
+				newElement.setY(y+"px");
+				newElement.setWidth("auto");
+				newElement.setHeight("auto");
+				newElement.setContent("");
+				this.getNote().elements.add(newElement);
+				displayElement(newElement);
+				updateNotepad(this.getNote());
+				openEditor(newElement.getId());
+			});
+
+			insertContainer.startAnimation(slideUp);
+			insertContainer.setVisibility(View.VISIBLE);
+			insertContainer.bringToFront();
 		});
 	}
 
@@ -810,6 +924,14 @@ public class BaseActivity extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {
+		if (insertMenuOpen) {
+			Animation slideDown = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+			PercentFrameLayout insertContainer = (PercentFrameLayout)findViewById(R.id.insert_container);
+			insertMenuOpen = false;
+			insertContainer.setAnimation(slideDown);
+			insertContainer.setVisibility(View.GONE);
+			return;
+		}
 		if (this.getNote() != null && ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_LARGE && (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_XLARGE)) {
 			this.setNote(null);
 			setTitle(this.getNotepad().getTitle());

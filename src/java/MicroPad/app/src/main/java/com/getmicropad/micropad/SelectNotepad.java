@@ -186,6 +186,8 @@ public class SelectNotepad extends AppCompatActivity {
 				view.setTag(R.id.TAG_OBJECT_TITLE, name);
 				TextView titleText = (TextView)view.findViewById(R.id.title_text);
 				titleText.setText(name);
+
+				view.findViewById(R.id.overflow_button).setOnClickListener(v -> openContextMenu(view));
 				return view;
 			});
 			this.list.add(notepadItem);

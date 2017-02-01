@@ -20,4 +20,5 @@
     <string name="pickimage_hint">Browse Images...</string>
     <string name="record_btn">Start Recording...</string>
     <string name="stop_rec_hint">Stop Recording</string>
+    <string name="note_helper">Tap anywhere on the page to insert an element</string>
 </resources>
