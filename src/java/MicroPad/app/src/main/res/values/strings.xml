@@ -19,4 +19,5 @@
     <string name="pickfile_hint">Browse Files...</string>
     <string name="pickimage_hint">Browse Images...</string>
     <string name="record_btn">Start Recording...</string>
+    <string name="stop_rec_hint">Stop Recording</string>
 </resources>

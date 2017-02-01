@@ -31,6 +31,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -45,6 +46,7 @@ import com.getmicropad.NPXParser.NoteElement;
 import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parent;
 import com.getmicropad.NPXParser.Parser;
+import com.getmicropad.NPXParser.RecordingElement;
 import com.getmicropad.NPXParser.Section;
 import com.getmicropad.NPXParser.Source;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -54,6 +56,7 @@ import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,8 +65,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import top.oply.opuslib.OpusRecorder;
 
 public class BaseActivity extends AppCompatActivity {
 	Notepad notepad;
@@ -72,6 +79,7 @@ public class BaseActivity extends AppCompatActivity {
 	List<Integer> parentTree = new ArrayList<>();
 	FilesystemManager filesystemManager = new FilesystemManager();
 	static final int PERMISSION_REQ_FILESYSTEM = 0;
+	static final int PERMISSION_REQ_RECORD = 1;
 	static final int IMAGE_SELECTOR = 1;
 	static final int FILE_SELECTOR = 2;
 	WebView noteContainer;
@@ -333,6 +341,79 @@ public class BaseActivity extends AppCompatActivity {
 					builder.setPositiveButton("Save", (dialog, which) -> {
 						displayElement(updateElement(element, currentContent, widthInput.getText().toString(), heightInput.getText().toString(), sourceInput.getText().toString()));
 						currentContent = null;
+						refreshBilbiography();
+					});
+				}
+				else if (element instanceof RecordingElement) {
+					dialogView = inflater.inflate(R.layout.recording_editor, null);
+					builder.setView(dialogView);
+
+					EditText sourceInput = (EditText)dialogView.findViewById(R.id.source_input);
+
+					Stream.of(getNote().bibliography).filter(source -> source.getItem().equals(id)).forEach(source -> {
+						if (source.getUrl() == null || source.getUrl().length() == 0) {
+							getNote().bibliography.remove(source);
+							return;
+						}
+						sourceInput.setText(source.getUrl());
+					});
+
+					currentContent = element.getContent();
+					newFilename = ((FileElement) element).getFilename();
+
+					//Handle 'record' button
+					Button recordBtn = (Button)dialogView.findViewById(R.id.recording_button);
+					Button stopRecordBtn = (Button)dialogView.findViewById(R.id.stop_recording_button);
+					OpusRecorder opusRecorder = OpusRecorder.getInstance();
+
+					recordBtn.setOnClickListener(v -> {
+						if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)  {
+							ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSION_REQ_RECORD);
+						}
+						else {
+							recordBtn.setVisibility(View.GONE);
+							stopRecordBtn.setVisibility(View.VISIBLE);
+
+							newFilename = this.getNote().getTitle()+" "+ DateFormat.getDateTimeInstance().format(new Date())+".ogg";
+							opusRecorder.startRecording(getCacheDir().getAbsolutePath()+"/"+newFilename);
+						}
+					});
+					stopRecordBtn.setOnClickListener(v -> {
+						stopRecordBtn.setVisibility(View.GONE);
+						recordBtn.setVisibility(View.VISIBLE);
+
+						opusRecorder.stopRecording();
+
+						FileInputStream inputStream = null;
+						try {
+							inputStream = new FileInputStream(new File(getCacheDir().getAbsolutePath()+"/"+newFilename));
+							byte[] tempStorage = new byte[1024];
+							int bLength;
+							ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+							while ((bLength = inputStream.read(tempStorage)) != -1) {
+								byteArrayOutputStream.write(tempStorage, 0, bLength);
+							}
+							byteArrayOutputStream.flush();
+
+							currentContent = "data:audio/ogg;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+							byteArrayOutputStream.close();
+							inputStream.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+							if (inputStream != null) {
+								try {
+									inputStream.close();
+								} catch (IOException e1) {}
+							}
+						}
+					});
+
+					builder.setPositiveButton("Save", (dialog, which) -> {
+						((RecordingElement) element).setFilename(newFilename);
+						displayElement(updateElement(element, currentContent, "auto", "auto", sourceInput.getText().toString()));
+						currentContent = null;
+						newFilename = null;
+						opusRecorder.release();
 						refreshBilbiography();
 					});
 				}
@@ -707,6 +788,24 @@ public class BaseActivity extends AppCompatActivity {
 			return myFile.getName();
 		}
 		return "file.ext";
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+		switch (requestCode) {
+			case PERMISSION_REQ_FILESYSTEM:
+				if (grantResults.length < 1 || (grantResults[0]) != PackageManager.PERMISSION_GRANTED) {
+					new AlertDialog.Builder(this)
+							.setTitle("Permission Denied")
+							.setMessage("Error accessing the device's storage")
+							.setPositiveButton("Close", (dialog, which) -> {
+								System.exit(0);
+							})
+							.show();
+				}
+		}
 	}
 
 	@Override

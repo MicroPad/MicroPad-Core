@@ -414,6 +414,8 @@ public class NotepadActivity extends BaseActivity {
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
 		switch (requestCode) {
 			case PERMISSION_REQ_FILESYSTEM:
 				if (grantResults.length > 1 && (grantResults[0] | grantResults[1]) == PackageManager.PERMISSION_GRANTED) {
