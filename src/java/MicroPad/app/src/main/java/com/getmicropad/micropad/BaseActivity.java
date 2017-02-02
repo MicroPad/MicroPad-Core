@@ -99,6 +99,7 @@ public class BaseActivity extends AppCompatActivity {
 	List<String> types;
 	ListAdapter insertAdapter;
 	NotepadSearcher notepadSearcher;
+	boolean isSaving = false;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
@@ -788,7 +789,7 @@ public class BaseActivity extends AppCompatActivity {
 
 			@Override
 			protected void onPreExecute() {
-				//Show progress bar
+				isSaving = true;
 				this.oldTitle = getNotepad().getTitle();
 				if (getNote() != null) this.oldTitle = getNote().getTitle();
 				setTitle(this.oldTitle+" (Saving...)");
@@ -801,6 +802,7 @@ public class BaseActivity extends AppCompatActivity {
 
 			@Override
 			protected void onPostExecute(Boolean res) {
+				isSaving = false;
 				setTitle(oldTitle);
 
 				if (!res) new AlertDialog.Builder(BaseActivity.this)
@@ -922,9 +924,7 @@ public class BaseActivity extends AppCompatActivity {
 					new AlertDialog.Builder(this)
 							.setTitle("Permission Denied")
 							.setMessage("Error accessing the device's storage")
-							.setPositiveButton("Close", (dialog, which) -> {
-								System.exit(0);
-							})
+							.setPositiveButton("Close", (dialog, which) -> System.exit(0))
 							.show();
 				}
 		}
@@ -991,6 +991,16 @@ public class BaseActivity extends AppCompatActivity {
 			insertContainer.setVisibility(View.GONE);
 			return;
 		}
+
+		if (this.isSaving) {
+			new AlertDialog.Builder(this)
+					.setTitle("Saving...")
+					.setMessage("Your cannot exit until your notepad has finished saving")
+					.setPositiveButton("Close", (dialog, which) -> {})
+					.show();
+			return;
+		}
+
 		if (this.getNote() != null && ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_LARGE && (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_XLARGE)) {
 			this.setNote(null);
 			setTitle(this.getNotepad().getTitle());

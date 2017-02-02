@@ -531,7 +531,9 @@ public class NotepadActivity extends BaseActivity {
 									}
 								}
 								else {
-									loadNote((Note)adapterView.getItemAtPosition(pos));
+									Note resNote = (Note)adapterView.getItemAtPosition(pos);
+									setParentTree(notepadSearcher.getTree(resNote));
+									loadNote(resNote);
 									dialog.dismiss();
 								}
 							});
