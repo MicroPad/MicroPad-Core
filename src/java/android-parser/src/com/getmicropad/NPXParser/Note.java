@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Root(name="note")
 public class Note {
@@ -81,5 +83,14 @@ public class Note {
 
 	public void setAddons(List<String> addons) {
 		this.addons = addons;
+	}
+
+	public Note search(String query) {
+		query = query.replaceAll("/[\\-\\[\\]\\/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\\^\\$\\|]/g", "\\$&");
+		String regexStr = "\\b"+query;
+		Pattern pattern = Pattern.compile(regexStr, Pattern.CASE_INSENSITIVE);
+		Matcher matcher = pattern.matcher(this.getTitle());
+		if (matcher.find()) return this;
+		return null;
 	}
 }
