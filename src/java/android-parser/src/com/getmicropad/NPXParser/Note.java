@@ -37,6 +37,8 @@ public class Note {
 	@Attribute(required = false)
 	private XMLGregorianCalendar time;
 
+	private Parent parent;
+
 	public Note() {
 	}
 
@@ -92,5 +94,17 @@ public class Note {
 		Matcher matcher = pattern.matcher(this.getTitle());
 		if (matcher.find()) return this;
 		return null;
+	}
+
+	public Parent getParent() {
+		return this.parent;
+	}
+
+	public void setParent(Parent parent){
+		this.parent = parent;
+	}
+
+	public String toString() {
+		return this.getTitle();
 	}
 }

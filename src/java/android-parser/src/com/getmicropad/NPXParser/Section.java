@@ -18,6 +18,8 @@ public class Section implements Parent {
 	@Attribute
 	private String title;
 
+	public Parent parent;
+
 	public Section() {
 
 	}
@@ -48,5 +50,13 @@ public class Section implements Parent {
 
 	public void setSections(List<Section> sections) {
 		this.sections = sections;
+	}
+
+	public Parent getParent() {
+		return this.parent;
+	}
+
+	public void setParent(Parent parent){
+		this.parent = parent;
 	}
 }

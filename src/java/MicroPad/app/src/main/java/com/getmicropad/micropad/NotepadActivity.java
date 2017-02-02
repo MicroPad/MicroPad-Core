@@ -12,13 +12,17 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -106,10 +110,6 @@ public class NotepadActivity extends BaseActivity {
 						//Tablet
 						NoteLoader noteLoader = new NoteLoader();
 						noteLoader.execute(this.notepadFile, this.getParentTree());
-//						try {
-//						} catch (Exception e) {
-//							e.printStackTrace();
-//						}
 					}
 			}
 		});
@@ -484,6 +484,66 @@ public class NotepadActivity extends BaseActivity {
 				setTitle(notepad.getTitle());
 				updateList(getLayoutInflater(), notepad);
 			}
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.app_bar_search:
+				AlertDialog.Builder builder = new AlertDialog.Builder(this)
+						.setTitle("Search")
+						.setPositiveButton("Close", (d, w) -> {})
+						.setCancelable(true);
+				LayoutInflater inflater = this.getLayoutInflater();
+				View view = inflater.inflate(R.layout.search_layout, null);
+				builder.setView(view);
+				AlertDialog dialog = builder.create();
+
+				((EditText)view.findViewById(R.id.search_input)).addTextChangedListener(new TextWatcher() {
+					@Override
+					public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+					@Override
+					public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+					@Override
+					public void afterTextChanged(Editable editable) {
+						List<Note> res = notepadSearcher.search(editable.toString());
+
+						ListAdapter searchAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, res);
+						runOnUiThread(() -> {
+							ListView searchList = (ListView)view.findViewById(R.id.search_list);
+							searchList.setAdapter(searchAdapter);
+
+							searchList.setOnItemClickListener((adapterView, v, pos, a4) -> {
+								if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_LARGE && (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) != Configuration.SCREENLAYOUT_SIZE_XLARGE) {
+									//Phone
+									Intent intent = new Intent(NotepadActivity.this, ViewerActivity.class);
+
+									intent.putExtra("NOTEPAD_FILE", notepadFile);
+									try {
+										setParentTree(notepadSearcher.getTree(adapterView.getItemAtPosition(pos)));
+										intent.putExtra("PATH", getParentTree().toArray(new Integer[getParentTree().size()]));
+										startActivity(intent);
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+								else {
+									loadNote((Note)adapterView.getItemAtPosition(pos));
+									dialog.dismiss();
+								}
+							});
+						});
+					}
+				});
+
+				dialog.show();
+				return true;
+
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 }

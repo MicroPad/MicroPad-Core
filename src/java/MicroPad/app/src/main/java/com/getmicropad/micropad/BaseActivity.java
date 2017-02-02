@@ -23,9 +23,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -52,6 +57,7 @@ import com.getmicropad.NPXParser.MarkdownElement;
 import com.getmicropad.NPXParser.Note;
 import com.getmicropad.NPXParser.NoteElement;
 import com.getmicropad.NPXParser.Notepad;
+import com.getmicropad.NPXParser.NotepadSearcher;
 import com.getmicropad.NPXParser.Parent;
 import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.RecordingElement;
@@ -92,6 +98,7 @@ public class BaseActivity extends AppCompatActivity {
 	WebView noteContainer;
 	List<String> types;
 	ListAdapter insertAdapter;
+	NotepadSearcher notepadSearcher;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
@@ -807,6 +814,7 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	protected void setNotepad(Notepad notepad) {
+		notepadSearcher = new NotepadSearcher(notepad);
 		this.notepad = notepad;
 	}
 
@@ -919,6 +927,57 @@ public class BaseActivity extends AppCompatActivity {
 							})
 							.show();
 				}
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.notepad_menu, menu);
+		return true;
+	}
+
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.app_bar_search:
+				AlertDialog.Builder builder = new AlertDialog.Builder(this)
+						.setTitle("Search")
+						.setPositiveButton("Close", (d, w) -> {})
+						.setCancelable(true);
+				LayoutInflater inflater = this.getLayoutInflater();
+				View view = inflater.inflate(R.layout.search_layout, null);
+				builder.setView(view);
+				AlertDialog dialog = builder.create();
+
+				((EditText)view.findViewById(R.id.search_input)).addTextChangedListener(new TextWatcher() {
+					@Override
+					public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+					@Override
+					public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+					@Override
+					public void afterTextChanged(Editable editable) {
+						List<Note> res = notepadSearcher.search(editable.toString());
+
+						ListAdapter searchAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, res);
+						runOnUiThread(() -> {
+							ListView searchList = (ListView)view.findViewById(R.id.search_list);
+							searchList.setAdapter(searchAdapter);
+
+							searchList.setOnItemClickListener((adapterView, v, pos, a4) -> {
+								loadNote((Note)adapterView.getItemAtPosition(pos));
+								dialog.dismiss();
+							});
+						});
+					}
+				});
+
+				dialog.show();
+				return true;
+
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
