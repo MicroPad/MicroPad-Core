@@ -87,7 +87,6 @@ import top.oply.opuslib.OpusRecorder;
 
 public class BaseActivity extends AppCompatActivity {
 	Notepad notepad;
-	Section section;
 	Note note;
 	List<Integer> parentTree = new ArrayList<>();
 	FilesystemManager filesystemManager = new FilesystemManager();
@@ -822,14 +821,6 @@ public class BaseActivity extends AppCompatActivity {
 
 	protected Notepad getNotepad(){
 		return this.notepad;
-	}
-
-	protected void setSection(Section section) {
-		this.section = section;
-	}
-
-	protected Section getSection() {
-		return this.section;
 	}
 
 	protected void setNote(Note note) {

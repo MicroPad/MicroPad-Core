@@ -79,13 +79,11 @@ public class NotepadActivity extends BaseActivity {
 
 			switch (view.getTag(R.id.TAG_OBJECT_TYPE).toString()) {
 				case "section":
-					this.setSection((Section)item);
 					this.updateParentTree(view, this.adapter, position);
 					return;
 
 				case "note":
 					NLevelItem parentSectionItem = (NLevelItem)adapter.getItem(position).getParent();
-					this.setSection((Section)parentSectionItem.getWrappedObject());
 					this.setNote((Note)item);
 					this.updateParentTree(view, this.adapter, position);
 
