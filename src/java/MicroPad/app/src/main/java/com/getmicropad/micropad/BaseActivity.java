@@ -688,6 +688,26 @@ public class BaseActivity extends AppCompatActivity {
 		});
 	}
 
+	protected String getFilenameFromUri(Uri contentURI) {
+		String uriString = contentURI.toString();
+		File myFile = new File(uriString);
+
+		if (uriString.startsWith("content://")) {
+			Cursor cursor = null;
+			try {
+				cursor = getContentResolver().query(contentURI, null, null, null, null);
+				if (cursor != null && cursor.moveToFirst()) {
+					return cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+				}
+			} finally {
+				cursor.close();
+			}
+		} else if (uriString.startsWith("file://")) {
+			return myFile.getName();
+		}
+		return "file.ext";
+	}
+
 	protected void updateParentTree(View view, NLevelAdapter adapter, int position) {
 		this.parentTree.clear();
 		String t = view.getTag(R.id.TAG_OBJECT_PATH).toString();
@@ -883,26 +903,6 @@ public class BaseActivity extends AppCompatActivity {
 				loadNote(this.note);
 			}
 		}
-	}
-
-	protected String getFilenameFromUri(Uri contentURI) {
-		String uriString = contentURI.toString();
-		File myFile = new File(uriString);
-
-		if (uriString.startsWith("content://")) {
-			Cursor cursor = null;
-			try {
-				cursor = getContentResolver().query(contentURI, null, null, null, null);
-				if (cursor != null && cursor.moveToFirst()) {
-					return cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-				}
-			} finally {
-				cursor.close();
-			}
-		} else if (uriString.startsWith("file://")) {
-			return myFile.getName();
-		}
-		return "file.ext";
 	}
 
 	@Override
