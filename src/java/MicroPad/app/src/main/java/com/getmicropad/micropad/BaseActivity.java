@@ -966,7 +966,9 @@ public class BaseActivity extends AppCompatActivity {
 							searchList.setAdapter(searchAdapter);
 
 							searchList.setOnItemClickListener((adapterView, v, pos, a4) -> {
-								loadNote((Note)adapterView.getItemAtPosition(pos));
+								Note resNote = (Note)adapterView.getItemAtPosition(pos);
+								setParentTree(notepadSearcher.getTree(resNote));
+								loadNote(resNote);
 								dialog.dismiss();
 							});
 						});
