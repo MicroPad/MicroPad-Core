@@ -21,4 +21,7 @@
     <string name="record_btn">Start Recording...</string>
     <string name="stop_rec_hint">Stop Recording</string>
     <string name="note_helper">Tap anywhere on the page to insert an element</string>
+    <string name="sync">Sync</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
 </resources>

@@ -44,6 +44,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -925,6 +926,15 @@ public class BaseActivity extends AppCompatActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.notepad_menu, menu);
+
+		Animation rotate = AnimationUtils.loadAnimation(getBaseContext(), R.anim.rotate);
+		rotate.setRepeatCount(Animation.INFINITE);
+		ImageView syncBtn = (ImageView)menu.findItem(R.id.app_bar_sync).getActionView();
+		syncBtn.setImageResource(android.R.drawable.stat_notify_sync);
+		syncBtn.setOnClickListener(v -> {
+			v.startAnimation(rotate);
+
+		});
 		return true;
 	}
 
