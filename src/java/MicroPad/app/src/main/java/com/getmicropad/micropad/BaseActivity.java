@@ -86,19 +86,19 @@ import java.util.List;
 import top.oply.opuslib.OpusRecorder;
 
 public class BaseActivity extends AppCompatActivity {
-	Notepad notepad;
-	Note note;
-	List<Integer> parentTree = new ArrayList<>();
-	FilesystemManager filesystemManager = new FilesystemManager();
 	static final int PERMISSION_REQ_FILESYSTEM = 0;
 	static final int PERMISSION_REQ_RECORD = 1;
 	static final int IMAGE_SELECTOR = 1;
 	static final int FILE_SELECTOR = 2;
+	boolean isSaving = false;
+	Notepad notepad;
+	Note note;
+	List<Integer> parentTree = new ArrayList<>();
+	FilesystemManager filesystemManager = new FilesystemManager();
 	WebView noteContainer;
 	List<String> types;
 	ListAdapter insertAdapter;
 	NotepadSearcher notepadSearcher;
-	boolean isSaving = false;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
