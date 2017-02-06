@@ -1010,8 +1010,12 @@ public class BaseActivity extends AppCompatActivity {
 															if (lineNumber.equals("lastModified")) continue;
 															if (localMap.isNull(lineNumber) || !((JSONObject)remoteMap.get(lineNumber)).get("md5").equals(((JSONObject)localMap.get(lineNumber)).get("md5"))) {
 																//TODO: Download Chunk
+																syncBtn.clearAnimation();
+																isSyncing = false;
 															}
 														} catch (JSONException e) {
+															syncBtn.clearAnimation();
+															isSyncing = false;
 															e.printStackTrace();
 														}
 													}
