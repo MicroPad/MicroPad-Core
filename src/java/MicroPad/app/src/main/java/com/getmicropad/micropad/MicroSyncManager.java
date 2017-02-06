@@ -1,13 +1,11 @@
 package com.getmicropad.micropad;
 
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
 
-import java.io.IOException;
+import org.json.JSONObject;
 
 import okhttp3.HttpUrl;
 import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -15,29 +13,28 @@ import retrofit2.http.POST;
 
 public class MicroSyncManager {
 	private HttpUrl syncUri;
-	private LinkedTreeMap oldMap;
+	private JSONObject oldMap;
 	private Gson gson;
 	private Retrofit retrofit;
-	private MicroSyncService service;
+	public MicroSyncService service;
 
 	public MicroSyncManager(String syncUri) {
 		this.syncUri = HttpUrl.parse(syncUri);
-		this.oldMap = new LinkedTreeMap();
+		this.oldMap = new JSONObject();
 		this.gson = new Gson();
 		this.retrofit = new Retrofit.Builder()
 				.baseUrl(this.syncUri)
+				.addConverterFactory(new StringConverterFactory())
 				.build();
 		this.service = this.retrofit.create(MicroSyncService.class);
 	}
 
-	public SyncMessage login(String username, String password) {
-		try {
-			Response<String> res = service.login(username, password).execute();
-			return new SyncMessage("login", res.code(), res.body());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return new SyncMessage("login", 504, "");
-		}
+	public JSONObject getOldMap() {
+		return this.oldMap;
+	}
+
+	public void setOldMap(JSONObject oldMap) {
+		this.oldMap = oldMap;
 	}
 
 	public interface MicroSyncService {

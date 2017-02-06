@@ -45,6 +45,16 @@
         style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/sync_progress"
+        android:layout_gravity="bottom"
+        android:indeterminate="false"
+        tools:visibility="visible"
+        android:visibility="gone"/>
+
+    <ProgressBar
+        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/progress"
         android:indeterminate="true"
         tools:visibility="visible"

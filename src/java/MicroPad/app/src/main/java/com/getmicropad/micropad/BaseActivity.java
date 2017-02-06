@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.support.design.widget.Snackbar;
 import android.support.percent.PercentFrameLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -50,6 +52,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.annimon.stream.Stream;
 import com.getmicropad.NPXParser.DrawingElement;
 import com.getmicropad.NPXParser.FileElement;
@@ -64,10 +70,14 @@ import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.RecordingElement;
 import com.getmicropad.NPXParser.Section;
 import com.getmicropad.NPXParser.Source;
+import com.google.gson.Gson;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 import com.nononsenseapps.filepicker.FilePickerActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -80,10 +90,17 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import top.oply.opuslib.OpusRecorder;
 
 public class BaseActivity extends AppCompatActivity {
@@ -92,14 +109,19 @@ public class BaseActivity extends AppCompatActivity {
 	static final int IMAGE_SELECTOR = 1;
 	static final int FILE_SELECTOR = 2;
 	boolean isSaving = false;
+	boolean isSyncing = false;
+	boolean isNotepadSyncing = false;
 	Notepad notepad;
 	Note note;
 	List<Integer> parentTree = new ArrayList<>();
 	FilesystemManager filesystemManager = new FilesystemManager();
-	WebView noteContainer;
 	List<String> types;
 	ListAdapter insertAdapter;
 	NotepadSearcher notepadSearcher;
+	MicroSyncManager syncer;
+	SharedPreferences prefs;
+	WebView noteContainer;
+	ImageView syncBtn;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
@@ -109,6 +131,9 @@ public class BaseActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.prefs = getPreferences(MODE_PRIVATE);
+		this.syncer = new MicroSyncManager("https://getmicropad.com/sync/api/");
+		AndroidNetworking.initialize(getApplicationContext());
 
 		/* Request permissions */
 		if ((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) | ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)) != PackageManager.PERMISSION_GRANTED)  {
@@ -838,6 +863,7 @@ public class BaseActivity extends AppCompatActivity {
 	protected void setNotepad(Notepad notepad) {
 		notepadSearcher = new NotepadSearcher(notepad);
 		this.notepad = notepad;
+		initNotepadSync();
 	}
 
 	protected Notepad getNotepad(){
@@ -906,6 +932,158 @@ public class BaseActivity extends AppCompatActivity {
 		}
 	}
 
+	protected void syncNotepad() {
+		String token = prefs.getString("token", null);
+		if (token == null || !isNotepadSyncing) return;
+
+		Animation rotate = AnimationUtils.loadAnimation(getBaseContext(), R.anim.rotate);
+		rotate.setRepeatCount(Animation.INFINITE);
+		this.syncBtn.startAnimation(rotate);
+
+		this.isSyncing = true;
+		this.syncer.service.sync(token, Helpers.getFilename(this.getNotepad().getTitle()), this.getNotepad().getLastModified().toXMLFormat(), "block").enqueue(new Callback<String>() {
+			@Override
+			public void onResponse(Call<String> call, Response<String> response) {
+				if (response.isSuccessful()) {
+					if (response.body().length() == 0) {
+						syncBtn.clearAnimation();
+						isSyncing = false;
+						return;
+					}
+					Gson gson = new Gson();
+					HashMap<String, String> res = new HashMap<>();
+					res = gson.fromJson(response.body(), res.getClass());
+					final HashMap<String, String> data = res;
+
+					new Thread(() -> {
+						try {
+							byte[] npxBytes = Parser.toXml(getNotepad()).getBytes(StandardCharsets.UTF_8);
+
+							if (npxBytes.length > 1000000000) {
+								syncBtn.clearAnimation();
+								isSyncing = false;
+
+								new AlertDialog.Builder(BaseActivity.this)
+										.setTitle("Error")
+										.setMessage("Wowza! Your notepad is so big we can't store it. It might be a good idea to split up your notepad.")
+										.setPositiveButton("Close", (dialog, which) -> {})
+										.show();
+								return;
+							}
+
+							JSONObject localMap = new JSONObject();
+							localMap.put("lastModified", getNotepad().getLastModified().toXMLFormat());
+							byte[][] chunks = new byte[(int)Math.ceil((double)npxBytes.length/1000000)][1000000];
+							int count = 0;
+							int pos = 0;
+							MessageDigest md5 = MessageDigest.getInstance("MD5");
+							while (pos < npxBytes.length) {
+								int newPos = Math.min(pos+1000000, npxBytes.length);
+								chunks[count] = Arrays.copyOfRange(npxBytes, pos, newPos);
+								pos = newPos;
+
+								byte[] digest = md5.digest(chunks[count]);
+								StringBuilder sb = new StringBuilder();
+								for (int i = 0; i < digest.length; ++i) {
+									sb.append(Integer.toHexString((digest[i] & 0xFF) | 0x100).substring(1,3));
+								}
+								JSONObject chunkMetadata = new JSONObject();
+								chunkMetadata.put("md5", sb.toString());
+								localMap.put(""+count, chunkMetadata);
+							}
+
+							switch (data.get("type")) {
+								case "upload":
+									break;
+
+								case "download":
+									for (File f : getCacheDir().listFiles()) f.delete();
+									AndroidNetworking.get(data.get("url"))
+											.setPriority(Priority.HIGH)
+											.build()
+											.getAsJSONObject(new JSONObjectRequestListener() {
+												@Override
+												public void onResponse(JSONObject remoteMap) {
+													for (int i = 0; i < remoteMap.names().length(); i++) {
+														try {
+															String lineNumber = remoteMap.names().getString(i);
+															if (lineNumber.equals("lastModified")) continue;
+															if (localMap.isNull(lineNumber) || !((JSONObject)remoteMap.get(lineNumber)).get("md5").equals(((JSONObject)localMap.get(lineNumber)).get("md5"))) {
+																//TODO: Download Chunk
+															}
+														} catch (JSONException e) {
+															e.printStackTrace();
+														}
+													}
+												}
+
+												@Override
+												public void onError(ANError error) {
+													Log.e("m3k", error.getErrorBody());
+												}
+											});
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}).start();
+				}
+				else {
+					isSyncing = false;
+					syncBtn.clearAnimation();
+					initNotepadSync();
+				}
+			}
+
+			@Override
+			public void onFailure(Call<String> call, Throwable t) {
+				isSyncing = false;
+				syncBtn.clearAnimation();
+				new AlertDialog.Builder(BaseActivity.this)
+						.setTitle("Error")
+						.setMessage("There was an error completing this request. Are you online?")
+						.setPositiveButton("Close", (dialog, which) -> {})
+						.show();
+			}
+		});
+	}
+
+	protected void initNotepadSync() {
+		this.isNotepadSyncing = false;
+		this.syncer.setOldMap(new JSONObject());
+		String token = prefs.getString("token", null);
+		if (token == null) return;
+
+		Animation rotate = AnimationUtils.loadAnimation(getBaseContext(), R.anim.rotate);
+		rotate.setRepeatCount(Animation.INFINITE);
+		this.syncBtn.startAnimation(rotate);
+
+		this.syncer.service.hasAddedNotepad(token, Helpers.getFilename(this.getNotepad().getTitle())).enqueue(new Callback<String>() {
+			@Override
+			public void onResponse(Call<String> call, Response<String> response) {
+				syncBtn.clearAnimation();
+				if (response.isSuccessful()) {
+					if (response.body().equals("true")) {
+						isNotepadSyncing = true;
+						syncNotepad();
+					}
+					else {
+						//TODO: Ask if they want to add the notepad
+					}
+				}
+				else {
+					prefs.edit().remove("token").apply();
+					Snackbar.make(findViewById(android.R.id.content), "Logged out of MicroSync (expired token)", Snackbar.LENGTH_LONG).show();
+				}
+			}
+
+			@Override
+			public void onFailure(Call<String> call, Throwable t) {
+				syncBtn.clearAnimation();
+			}
+		});
+	}
+
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -929,11 +1107,59 @@ public class BaseActivity extends AppCompatActivity {
 
 		Animation rotate = AnimationUtils.loadAnimation(getBaseContext(), R.anim.rotate);
 		rotate.setRepeatCount(Animation.INFINITE);
-		ImageView syncBtn = (ImageView)menu.findItem(R.id.app_bar_sync).getActionView();
+		this.syncBtn = (ImageView)menu.findItem(R.id.app_bar_sync).getActionView();
 		syncBtn.setImageResource(android.R.drawable.stat_notify_sync);
 		syncBtn.setOnClickListener(v -> {
-			v.startAnimation(rotate);
+			String token = prefs.getString("token", null);
+			if (token != null) {
+				initNotepadSync();
+			}
+			else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this)
+						.setTitle("Login/Register")
+						.setNegativeButton("Close", (d, w) -> {})
+						.setCancelable(true);
+				LayoutInflater loginInflater = this.getLayoutInflater();
+				View view = loginInflater.inflate(R.layout.login, null);
+				builder.setView(view);
 
+				builder.setPositiveButton("Login", (d, w) -> {
+					syncBtn.startAnimation(rotate);
+					String username = ((EditText)view.findViewById(R.id.username_input)).getText().toString();
+					String password = ((EditText)view.findViewById(R.id.password_input)).getText().toString();
+
+					syncer.service.login(username, password).enqueue(new Callback<String>() {
+						@Override
+						public void onResponse(Call<String> call, Response<String> response) {
+							syncBtn.clearAnimation();
+							if (response.isSuccessful()) {
+								prefs.edit().putString("token", response.body()).apply();
+								Snackbar.make(findViewById(android.R.id.content), "Logged into MicroSync as "+username, Snackbar.LENGTH_SHORT).show();
+							}
+							else {
+								new AlertDialog.Builder(BaseActivity.this)
+										.setTitle("Error")
+										.setMessage("There was an error completing this request. Is your username and password correct?")
+										.setPositiveButton("Close", (dialog, which) -> {})
+										.show();
+							}
+						}
+
+						@Override
+						public void onFailure(Call<String> call, Throwable t) {
+							syncBtn.clearAnimation();
+							new AlertDialog.Builder(BaseActivity.this)
+									.setTitle("Error")
+									.setMessage("There was an error completing this request. Are you online?")
+									.setPositiveButton("Close", (dialog, which) -> {})
+									.show();
+						}
+					});
+				});
+
+				AlertDialog dialog = builder.create();
+				dialog.show();
+			}
 		});
 		return true;
 	}
@@ -995,10 +1221,10 @@ public class BaseActivity extends AppCompatActivity {
 			return;
 		}
 
-		if (this.isSaving) {
+		if (this.isSaving || this.isSyncing) {
 			new AlertDialog.Builder(this)
 					.setTitle("Saving...")
-					.setMessage("Your cannot exit until your notepad has finished saving")
+					.setMessage("Your cannot exit until your notepad has finished saving/syncing")
 					.setPositiveButton("Close", (dialog, which) -> {})
 					.show();
 			return;

@@ -97,4 +97,8 @@ public class Helpers {
 
 		return -1;
 	}
+
+	public static String getFilename(String title) {
+		return title.replaceAll("/[^a-z0-9 ]/gi", "")+".npx";
+	}
 }
