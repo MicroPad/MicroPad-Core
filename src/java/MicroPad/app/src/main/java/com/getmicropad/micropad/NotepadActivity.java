@@ -486,6 +486,12 @@ public class NotepadActivity extends BaseActivity {
 	}
 
 	@Override
+	protected void setNotepad(Notepad notepad) {
+		super.setNotepad(notepad);
+		this.updateList(getLayoutInflater(), notepad);
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.app_bar_search:

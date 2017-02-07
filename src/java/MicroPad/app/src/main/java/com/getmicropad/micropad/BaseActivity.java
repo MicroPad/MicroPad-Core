@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.design.widget.Snackbar;
@@ -53,6 +54,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.ANRequest;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
@@ -131,7 +133,7 @@ public class BaseActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.prefs = getPreferences(MODE_PRIVATE);
+		this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		this.syncer = new MicroSyncManager("https://getmicropad.com/sync/api/");
 		AndroidNetworking.initialize(getApplicationContext());
 
@@ -850,12 +852,17 @@ public class BaseActivity extends AppCompatActivity {
 				isSaving = false;
 				setTitle(oldTitle);
 
-				if (!res) new AlertDialog.Builder(BaseActivity.this)
-						.setTitle("Error")
-						.setMessage("Error saving notepad")
-						.setCancelable(true)
-						.setPositiveButton("Close", (dialog, which) -> {})
-						.show();
+				if (res) {
+					syncNotepad();
+				}
+				else {
+					new AlertDialog.Builder(BaseActivity.this)
+							.setTitle("Error")
+							.setMessage("Error saving notepad")
+							.setCancelable(true)
+							.setPositiveButton("Close", (dialog, which) -> {})
+							.show();
+				}
 			}
 		}.execute(this.getNotepad());
 	}
@@ -863,7 +870,7 @@ public class BaseActivity extends AppCompatActivity {
 	protected void setNotepad(Notepad notepad) {
 		notepadSearcher = new NotepadSearcher(notepad);
 		this.notepad = notepad;
-		initNotepadSync();
+		runOnUiThread(this::initNotepadSync);
 	}
 
 	protected Notepad getNotepad(){
@@ -940,6 +947,12 @@ public class BaseActivity extends AppCompatActivity {
 		rotate.setRepeatCount(Animation.INFINITE);
 		this.syncBtn.startAnimation(rotate);
 
+		ProgressDialog progressDialog = new ProgressDialog(this);
+		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		progressDialog.setMessage("Getting Data...\nThis may take a while");
+		progressDialog.setIndeterminate(false);
+		progressDialog.setCanceledOnTouchOutside(false);
+
 		this.isSyncing = true;
 		this.syncer.service.sync(token, Helpers.getFilename(this.getNotepad().getTitle()), this.getNotepad().getLastModified().toXMLFormat(), "block").enqueue(new Callback<String>() {
 			@Override
@@ -994,38 +1007,87 @@ public class BaseActivity extends AppCompatActivity {
 
 							switch (data.get("type")) {
 								case "upload":
+									runOnUiThread(() -> {
+										syncBtn.clearAnimation();
+										isSyncing = false;
+									});
 									break;
 
 								case "download":
-									for (File f : getCacheDir().listFiles()) f.delete();
-									AndroidNetworking.get(data.get("url"))
-											.setPriority(Priority.HIGH)
-											.build()
-											.getAsJSONObject(new JSONObjectRequestListener() {
-												@Override
-												public void onResponse(JSONObject remoteMap) {
-													for (int i = 0; i < remoteMap.names().length(); i++) {
-														try {
-															String lineNumber = remoteMap.names().getString(i);
-															if (lineNumber.equals("lastModified")) continue;
-															if (localMap.isNull(lineNumber) || !((JSONObject)remoteMap.get(lineNumber)).get("md5").equals(((JSONObject)localMap.get(lineNumber)).get("md5"))) {
-																//TODO: Download Chunk
-																syncBtn.clearAnimation();
-																isSyncing = false;
-															}
-														} catch (JSONException e) {
-															syncBtn.clearAnimation();
-															isSyncing = false;
-															e.printStackTrace();
-														}
-													}
-												}
+									runOnUiThread(() -> new AlertDialog.Builder(BaseActivity.this)
+											.setTitle("Sync")
+											.setMessage("A newer version of this notepad is available. Do you want to get it?")
+											.setIcon(new IconicsDrawable(BaseActivity.this).icon(GoogleMaterial.Icon.gmd_cloud_download))
+											.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> AndroidNetworking.get(data.get("url"))
+													.setPriority(Priority.IMMEDIATE)
+													.build()
+													.getAsJSONObject(new JSONObjectRequestListener() {
+														@Override
+														public void onResponse(JSONObject remoteMap) {
+															new Thread(() -> {
+																String newNotepadXml = "";
+																for (int i = 0; i < remoteMap.names().length(); i++) {
+																	try {
+																		String lineNumber = remoteMap.names().getString(i);
+																		if (lineNumber.equals("lastModified")) continue;
+																		if (localMap.isNull(lineNumber) || !((JSONObject)remoteMap.get(lineNumber)).get("md5").equals(((JSONObject)localMap.get(lineNumber)).get("md5"))) {
+																			runOnUiThread(() -> {
+																				progressDialog.setProgress(0);
+																				progressDialog.show();
+																			});
 
-												@Override
-												public void onError(ANError error) {
-													Log.e("m3k", error.getErrorBody());
-												}
-											});
+																			//Download Chunk
+																			try {
+																				Response<String> chunkURL = syncer.service.getChunkDownload(token, Helpers.getFilename(getNotepad().getTitle()), lineNumber, (String)((JSONObject)remoteMap.get(lineNumber)).get("md5")).execute();
+																				if (chunkURL.isSuccessful()) {
+																					ANRequest chunkReq = AndroidNetworking.get(chunkURL.body())
+																							.setPriority(Priority.IMMEDIATE)
+																							.build();
+																					newNotepadXml += chunkReq.executeForString().getResult();
+																					runOnUiThread(() -> progressDialog.setProgress((Integer.parseInt(lineNumber)/(remoteMap.names().length()-1))*100));
+																				}
+																			} catch (IOException e) {
+																				e.printStackTrace();
+																			}
+																		}
+																	} catch (JSONException e) {
+																		runOnUiThread(() -> {
+																			syncBtn.clearAnimation();
+																			isSyncing = false;
+																		});
+																		e.printStackTrace();
+																		return;
+																	}
+																}
+
+																if (newNotepadXml.length() > 0) {
+																	try {
+																		Notepad newNotepad = Parser.parseNpx(newNotepadXml);
+																		runOnUiThread(() -> {
+																			setNotepad(newNotepad);
+																			saveNotepad();
+																		});
+																	} catch (Exception e) {
+																		e.printStackTrace();
+																	}
+																}
+
+																runOnUiThread(() -> {
+																	progressDialog.dismiss();
+																	syncBtn.clearAnimation();
+																	isSyncing = false;
+																});
+															}).start();
+														}
+
+														@Override
+														public void onError(ANError error) {
+															Log.e("m3k", error.getErrorBody());
+														}
+													})).setNegativeButton(android.R.string.no, (d, w) -> {
+												syncBtn.clearAnimation();
+												isSyncing = false;
+											}).show());
 							}
 						} catch (Exception e) {
 							e.printStackTrace();

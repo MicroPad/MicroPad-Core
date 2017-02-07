@@ -60,11 +60,11 @@ public class MicroSyncManager {
 
 		@FormUrlEncoded
 		@POST("getChunkUpload.php")
-		Call<String> getChunkUpload(@Field("token") String token, @Field("filename") String filename, @Field("index") int index, @Field("md5") String lineNumberMD5);
+		Call<String> getChunkUpload(@Field("token") String token, @Field("filename") String filename, @Field("index") String index, @Field("md5") String lineNumberMD5);
 
 		@FormUrlEncoded
 		@POST("getChunkDownload.php")
-		Call<String> getChunkDownload(@Field("token") String token, @Field("filename") String filename, @Field("index") int index, @Field("md5") String lineNumberMD5);
+		Call<String> getChunkDownload(@Field("token") String token, @Field("filename") String filename, @Field("index") String index, @Field("md5") String lineNumberMD5);
 
 		@FormUrlEncoded
 		@POST("getMapUpload.php")
