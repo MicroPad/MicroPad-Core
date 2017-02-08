@@ -1091,6 +1091,10 @@ public class BaseActivity extends AppCompatActivity {
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
+							runOnUiThread(() -> {
+								syncBtn.clearAnimation();
+								isSyncing = false;
+							});
 						}
 					}).start();
 				}
