@@ -831,6 +831,7 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	protected void saveNotepad() {
+		getNotepad().setLastModified(new Date());
 		new AsyncTask<Object, String, Boolean>() {
 			private CharSequence oldTitle;
 
@@ -949,7 +950,7 @@ public class BaseActivity extends AppCompatActivity {
 
 		ProgressDialog progressDialog = new ProgressDialog(this);
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		progressDialog.setMessage("Getting Data...\nThis may take a while");
+		progressDialog.setMessage("Syncing...\nThis may take a while");
 		progressDialog.setIndeterminate(false);
 		progressDialog.setCanceledOnTouchOutside(false);
 
@@ -1007,10 +1008,100 @@ public class BaseActivity extends AppCompatActivity {
 
 							switch (data.get("type")) {
 								case "upload":
-									runOnUiThread(() -> {
-										syncBtn.clearAnimation();
-										isSyncing = false;
-									});
+									if (localMap.toString().equals(syncer.getOldMap().toString())) {
+										runOnUiThread(() -> {
+											syncBtn.clearAnimation();
+											isSyncing = false;
+										});
+									}
+									syncer.setOldMap(localMap);
+
+									AndroidNetworking.get(data.get("url"))
+											.setPriority(Priority.IMMEDIATE)
+											.build()
+											.getAsJSONObject(new JSONObjectRequestListener() {
+												@Override
+												public void onResponse(JSONObject remoteMap) {
+													new Thread(() -> {
+//														if (((XMLGregorianCalendar)remoteMap.get("lastModified")).toGregorianCalendar().compareTo(((XMLGregorianCalendar)localMap.get("lastModified")).toGregorianCalendar()) > 0 || remoteMap.toString().equals(localMap.toString())) {
+//															runOnUiThread(() -> {
+//																syncBtn.clearAnimation();
+//																isSyncing = false;
+//															});
+//															return;
+//														}
+
+														for (int i = 0; i < localMap.names().length(); i++) {
+															try {
+																String lineNumber = localMap.names().getString(i);
+																if (lineNumber.equals("lastModified")) continue;
+																if (remoteMap.isNull(lineNumber) || !((JSONObject)localMap.get(lineNumber)).get("md5").equals(((JSONObject)remoteMap.get(lineNumber)).get("md5"))) {
+																	//Upload Chunk
+																	try {
+																		Response<String> chunkURL = syncer.service.getChunkUpload(token, Helpers.getFilename(getNotepad().getTitle()), lineNumber, (String)((JSONObject)localMap.get(lineNumber)).get("md5")).execute();
+																		if (chunkURL.isSuccessful()) {
+																			AndroidNetworking.put(chunkURL.body())
+																					.setPriority(Priority.IMMEDIATE)
+																					.setContentType("text/plain")
+																					.addStringBody(new String(chunks[Integer.parseInt(lineNumber)], "UTF-8"))
+																					.build()
+																					.executeForString();
+
+																		}
+																	} catch (IOException e) {
+																		e.printStackTrace();
+																	}
+																}
+															} catch (JSONException e) {
+																runOnUiThread(() -> {
+																	syncBtn.clearAnimation();
+																	isSyncing = false;
+																});
+																e.printStackTrace();
+																return;
+															}
+														}
+
+														try {
+															Response<String> mapUploadUrl = syncer.service.getMapUpload(token, Helpers.getFilename(getNotepad().getTitle())).execute();
+															if (mapUploadUrl.isSuccessful()) {
+																AndroidNetworking.put(mapUploadUrl.body())
+																		.setPriority(Priority.IMMEDIATE)
+																		.setContentType("text/plain")
+																		.addJSONObjectBody(localMap)
+																		.build()
+																		.executeForString();
+															}
+															else {
+																runOnUiThread(() -> {
+																	syncBtn.clearAnimation();
+																	isSyncing = false;
+																});
+															}
+														} catch (IOException e) {
+															e.printStackTrace();
+															runOnUiThread(() -> {
+																syncBtn.clearAnimation();
+																isSyncing = false;
+															});
+														}
+
+														runOnUiThread(() -> {
+															progressDialog.dismiss();
+															syncBtn.clearAnimation();
+															isSyncing = false;
+														});
+													}).start();
+												}
+
+												@Override
+												public void onError(ANError anError) {
+													runOnUiThread(() -> {
+														syncBtn.clearAnimation();
+														isSyncing = false;
+													});
+												}
+											});
 									break;
 
 								case "download":
@@ -1063,6 +1154,7 @@ public class BaseActivity extends AppCompatActivity {
 																if (newNotepadXml.length() > 0) {
 																	try {
 																		Notepad newNotepad = Parser.parseNpx(newNotepadXml);
+																		syncer.setOldMap(remoteMap);
 																		runOnUiThread(() -> {
 																			setNotepad(newNotepad);
 																			saveNotepad();
