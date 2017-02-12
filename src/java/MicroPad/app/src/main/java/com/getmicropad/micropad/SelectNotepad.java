@@ -3,8 +3,10 @@ package com.getmicropad.micropad;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.androidnetworking.AndroidNetworking;
 import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parser;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -37,6 +40,8 @@ public class SelectNotepad extends AppCompatActivity {
 	NLevelAdapter adapter;
 	static final int PERMISSION_REQ_FILESYSTEM = 0;
 	FilesystemManager filesystemManager;
+	SharedPreferences prefs;
+	MicroSyncManager syncer;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
@@ -47,6 +52,10 @@ public class SelectNotepad extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_select_notepad);
+
+		this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		this.syncer = new MicroSyncManager("https://getmicropad.com/sync/api/");
+		AndroidNetworking.initialize(getApplicationContext());
 
 		this.mainList = (ListView)findViewById(R.id.main_list);
 		this.list = new ArrayList<>();
@@ -109,6 +118,17 @@ public class SelectNotepad extends AppCompatActivity {
 		inflater.inflate(R.menu.select_notepad_menu, menu);
 
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.open_notepad:
+				return true;
+
+			default:
+				return super.onContextItemSelected(item);
+		}
 	}
 
 	@Override
