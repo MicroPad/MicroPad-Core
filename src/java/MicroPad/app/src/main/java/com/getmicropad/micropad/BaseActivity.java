@@ -93,9 +93,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -973,7 +971,6 @@ public class BaseActivity extends AppCompatActivity {
 					new Thread(() -> {
 						try {
 							byte[] npxBytes = Parser.toXml(getNotepad()).getBytes(StandardCharsets.UTF_8);
-
 							if (npxBytes.length > 1000000000) {
 								syncBtn.clearAnimation();
 								isSyncing = false;
@@ -985,37 +982,17 @@ public class BaseActivity extends AppCompatActivity {
 										.show();
 								return;
 							}
-
-							JSONObject localMap = new JSONObject();
-							localMap.put("lastModified", getNotepad().getLastModified().toXMLFormat());
-							byte[][] chunks = new byte[(int)Math.ceil((double)npxBytes.length/1000000)][1000000];
-							int count = 0;
-							int pos = 0;
-							MessageDigest md5 = MessageDigest.getInstance("MD5");
-							while (pos < npxBytes.length) {
-								int newPos = Math.min(pos+1000000, npxBytes.length);
-								chunks[count] = Arrays.copyOfRange(npxBytes, pos, newPos);
-								pos = newPos;
-
-								byte[] digest = md5.digest(chunks[count]);
-								StringBuilder sb = new StringBuilder();
-								for (int i = 0; i < digest.length; ++i) {
-									sb.append(Integer.toHexString((digest[i] & 0xFF) | 0x100).substring(1,3));
-								}
-								JSONObject chunkMetadata = new JSONObject();
-								chunkMetadata.put("md5", sb.toString());
-								localMap.put(""+count, chunkMetadata);
-							}
+							SyncObject syncObject = new SyncObject(npxBytes, getNotepad().getLastModified().toXMLFormat());
 
 							switch (data.get("type")) {
 								case "upload":
-									if (localMap.toString().equals(syncer.getOldMap().toString())) {
+									if (syncObject.getMap().toString().equals(syncer.getOldMap().toString())) {
 										runOnUiThread(() -> {
 											syncBtn.clearAnimation();
 											isSyncing = false;
 										});
 									}
-									syncer.setOldMap(localMap);
+									syncer.setOldMap(syncObject.getMap());
 
 									AndroidNetworking.get(data.get("url"))
 											.setPriority(Priority.IMMEDIATE)
@@ -1032,19 +1009,19 @@ public class BaseActivity extends AppCompatActivity {
 //															return;
 //														}
 
-														for (int i = 0; i < localMap.names().length(); i++) {
+														for (int i = 0; i < syncObject.getMap().names().length(); i++) {
 															try {
-																String lineNumber = localMap.names().getString(i);
+																String lineNumber = syncObject.getMap().names().getString(i);
 																if (lineNumber.equals("lastModified")) continue;
-																if (remoteMap.isNull(lineNumber) || !((JSONObject)localMap.get(lineNumber)).get("md5").equals(((JSONObject)remoteMap.get(lineNumber)).get("md5"))) {
+																if (remoteMap.isNull(lineNumber) || !((JSONObject)syncObject.getMap().get(lineNumber)).get("md5").equals(((JSONObject)remoteMap.get(lineNumber)).get("md5"))) {
 																	//Upload Chunk
 																	try {
-																		Response<String> chunkURL = syncer.service.getChunkUpload(token, Helpers.getFilename(getNotepad().getTitle()), lineNumber, (String)((JSONObject)localMap.get(lineNumber)).get("md5")).execute();
+																		Response<String> chunkURL = syncer.service.getChunkUpload(token, Helpers.getFilename(getNotepad().getTitle()), lineNumber, (String)((JSONObject)syncObject.getMap().get(lineNumber)).get("md5")).execute();
 																		if (chunkURL.isSuccessful()) {
 																			AndroidNetworking.put(chunkURL.body())
 																					.setPriority(Priority.IMMEDIATE)
 																					.setContentType("text/plain")
-																					.addStringBody(new String(chunks[Integer.parseInt(lineNumber)], "UTF-8"))
+																					.addStringBody(new String(syncObject.getChunks()[Integer.parseInt(lineNumber)], "UTF-8"))
 																					.build()
 																					.executeForString();
 
@@ -1069,7 +1046,7 @@ public class BaseActivity extends AppCompatActivity {
 																AndroidNetworking.put(mapUploadUrl.body())
 																		.setPriority(Priority.IMMEDIATE)
 																		.setContentType("text/plain")
-																		.addJSONObjectBody(localMap)
+																		.addJSONObjectBody(syncObject.getMap())
 																		.build()
 																		.executeForString();
 															}
@@ -1122,7 +1099,7 @@ public class BaseActivity extends AppCompatActivity {
 																	try {
 																		String lineNumber = remoteMap.names().getString(i);
 																		if (lineNumber.equals("lastModified")) continue;
-																		if (localMap.isNull(lineNumber) || !((JSONObject)remoteMap.get(lineNumber)).get("md5").equals(((JSONObject)localMap.get(lineNumber)).get("md5"))) {
+																		if (syncObject.getMap().isNull(lineNumber) || !((JSONObject)remoteMap.get(lineNumber)).get("md5").equals(((JSONObject)syncObject.getMap().get(lineNumber)).get("md5"))) {
 																			runOnUiThread(() -> {
 																				progressDialog.setProgress(0);
 																				progressDialog.show();

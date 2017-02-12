@@ -70,16 +70,4 @@ public class MicroSyncManager {
 		@POST("getMapUpload.php")
 		Call<String> getMapUpload(@Field("token") String token, @Field("filename") String filename);
 	}
-
-	public class SyncMessage {
-		public String req;
-		public int code;
-		public String text;
-
-		public SyncMessage(String req, int code, String text) {
-			this.req = req;
-			this.code = code;
-			this.text = text;
-		}
-	}
 }
