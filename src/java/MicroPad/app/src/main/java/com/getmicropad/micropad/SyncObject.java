@@ -15,16 +15,15 @@ public class SyncObject {
 		this.map.put("lastModified", lastModified);
 
 		this.chunks = new byte[(int)Math.ceil((double)npxBytes.length/1000000)][1000000];
-		byte[][] chunks = new byte[(int)Math.ceil((double)npxBytes.length/1000000)][1000000];
 		int count = 0;
 		int pos = 0;
 		MessageDigest md5 = MessageDigest.getInstance("MD5");
 		while (pos < npxBytes.length) {
 			int newPos = Math.min(pos+1000000, npxBytes.length);
-			chunks[count] = Arrays.copyOfRange(npxBytes, pos, newPos);
+			this.chunks[count] = Arrays.copyOfRange(npxBytes, pos, newPos);
 			pos = newPos;
 
-			byte[] digest = md5.digest(chunks[count]);
+			byte[] digest = md5.digest(this.chunks[count]);
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < digest.length; ++i) {
 				sb.append(Integer.toHexString((digest[i] & 0xFF) | 0x100).substring(1,3));

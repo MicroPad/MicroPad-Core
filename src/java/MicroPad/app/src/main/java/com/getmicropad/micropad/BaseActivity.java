@@ -1297,6 +1297,71 @@ public class BaseActivity extends AppCompatActivity {
 					});
 				});
 
+				builder.setNeutralButton("Sign up", (d, w) -> {
+					ProgressDialog dialog = new ProgressDialog(this);
+					dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+					dialog.setMessage("Loading...");
+					dialog.setIndeterminate(true);
+					dialog.setCanceledOnTouchOutside(false);
+					dialog.show();
+
+					String username = ((EditText) view.findViewById(R.id.username_input)).getText().toString();
+					String password = ((EditText) view.findViewById(R.id.password_input)).getText().toString();
+
+					syncer.service.signup(username, password).enqueue(new Callback<String>() {
+						@Override
+						public void onResponse(Call<String> call, Response<String> response) {
+							if (response.isSuccessful()) {
+								if (response.code() == 209) {
+									dialog.dismiss();
+									new AlertDialog.Builder(BaseActivity.this)
+											.setTitle("Error")
+											.setMessage("This username has already been taken")
+											.setPositiveButton("Close", null)
+											.show();
+									return;
+								}
+								new Thread(() -> syncer.service.login(username, password).enqueue(new Callback<String>() {
+									@Override
+									public void onResponse(Call<String> call, Response<String> loginResponse) {
+										dialog.dismiss();
+										prefs.edit().putString("token", loginResponse.body()).apply();
+										Snackbar.make(findViewById(android.R.id.content), "Logged into MicroSync as " + username, Snackbar.LENGTH_SHORT).show();
+									}
+
+									@Override
+									public void onFailure(Call<String> call, Throwable t) {
+										dialog.dismiss();
+										new AlertDialog.Builder(BaseActivity.this)
+												.setTitle("Error")
+												.setMessage("There was an error completing this request. Are you online?")
+												.setPositiveButton("Close", null)
+												.show();
+									}
+								})).start();
+							}
+							else {
+								dialog.dismiss();
+								new AlertDialog.Builder(BaseActivity.this)
+										.setTitle("Error")
+										.setMessage("There was an error completing this request")
+										.setPositiveButton("Close", null)
+										.show();
+							}
+						}
+
+						@Override
+						public void onFailure(Call<String> call, Throwable t) {
+							dialog.dismiss();
+							new AlertDialog.Builder(BaseActivity.this)
+									.setTitle("Error")
+									.setMessage("There was an error completing this request. Are you online?")
+									.setPositiveButton("Close", null)
+									.show();
+						}
+					});
+				});
+
 				AlertDialog dialog = builder.create();
 				dialog.show();
 			}

@@ -24,4 +24,7 @@
     <string name="sync">Sync</string>
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
+    <string name="terms">By signing up you agree to the Terms and Conditions and the Privacy Policy at https://getmicropad.com/policy.php</string>
+    <string name="logout">Logout</string>
+    <string name="open_sync_manager">Open Sync Manager</string>
 </resources>

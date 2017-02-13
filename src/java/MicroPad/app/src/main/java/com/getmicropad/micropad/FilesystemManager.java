@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FilesystemManager {
-	private File workingDirectory;
+	public File workingDirectory;
 
 	public FilesystemManager() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

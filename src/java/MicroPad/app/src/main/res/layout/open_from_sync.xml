@@ -1,32 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:layout_margin="10dp"
               android:padding="10dp">
 
-    <EditText
+    <Button
+        android:text="@string/open_sync_manager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textNoSuggestions"
-        android:ems="10"
-        android:id="@+id/username_input"
-        android:hint="@string/username_hint"/>
+        android:id="@+id/open_manager_button"/>
 
-    <EditText
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:fontFamily="sans-serif"
-        android:id="@+id/password_input"
-        android:hint="@string/password_hint"/>
+        android:id="@+id/progress"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:indeterminate="true"/>
 
-    <TextView
-        android:text="@string/terms"
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:autoLink="web"
-        android:id="@+id/terms_message"/>
+        android:id="@+id/synced_notepad_list"/>
 </LinearLayout>

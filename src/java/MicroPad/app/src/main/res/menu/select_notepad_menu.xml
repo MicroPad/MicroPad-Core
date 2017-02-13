@@ -5,4 +5,7 @@
     <item android:title="Open from MicroSync"
           app:showAsAction="always"
           android:id="@+id/open_notepad"/>
+    <item android:title="@string/logout"
+          android:id="@+id/logout_item"
+          android:visible="false"/>
 </menu>

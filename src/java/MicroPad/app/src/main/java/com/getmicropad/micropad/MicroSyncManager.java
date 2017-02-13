@@ -9,7 +9,9 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public class MicroSyncManager {
 	private HttpUrl syncUri;
@@ -24,6 +26,7 @@ public class MicroSyncManager {
 		this.gson = new Gson();
 		this.retrofit = new Retrofit.Builder()
 				.baseUrl(this.syncUri)
+//				.addConverterFactory(GsonConverterFactory.create())
 				.addConverterFactory(new StringConverterFactory())
 				.build();
 		this.service = this.retrofit.create(MicroSyncService.class);
@@ -69,5 +72,8 @@ public class MicroSyncManager {
 		@FormUrlEncoded
 		@POST("getMapUpload.php")
 		Call<String> getMapUpload(@Field("token") String token, @Field("filename") String filename);
+
+		@GET("getNotepads.php")
+		Call<String> getNotepads(@Query("token") String token);
 	}
 }

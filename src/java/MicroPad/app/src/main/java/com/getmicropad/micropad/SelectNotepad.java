@@ -1,13 +1,16 @@
 package com.getmicropad.micropad;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -19,20 +22,29 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.androidnetworking.AndroidNetworking;
 import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parser;
+import com.google.gson.Gson;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SelectNotepad extends AppCompatActivity {
 	List<NLevelItem> list;
@@ -117,6 +129,10 @@ public class SelectNotepad extends AppCompatActivity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.select_notepad_menu, menu);
 
+		if (prefs.getString("token", null) != null) {
+			menu.findItem(R.id.logout_item).setVisible(true);
+		}
+
 		return true;
 	}
 
@@ -124,11 +140,203 @@ public class SelectNotepad extends AppCompatActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.open_notepad:
+				String token = prefs.getString("token", null);
+				if (token != null) {
+					this.openFromSync(token);
+				}
+				else {
+					AlertDialog.Builder builder = new AlertDialog.Builder(this)
+							.setTitle("Login/Register")
+							.setNegativeButton("Close", null)
+							.setCancelable(true);
+					LayoutInflater loginInflater = this.getLayoutInflater();
+					View view = loginInflater.inflate(R.layout.login, null);
+					builder.setView(view);
+
+					builder.setPositiveButton("Login", (d, w) -> {
+						ProgressDialog dialog = new ProgressDialog(this);
+						dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+						dialog.setMessage("Loading...");
+						dialog.setIndeterminate(true);
+						dialog.setCanceledOnTouchOutside(false);
+						dialog.show();
+
+						String username = ((EditText) view.findViewById(R.id.username_input)).getText().toString();
+						String password = ((EditText) view.findViewById(R.id.password_input)).getText().toString();
+
+						syncer.service.login(username, password).enqueue(new Callback<String>() {
+							@Override
+							public void onResponse(Call<String> call, Response<String> response) {
+								dialog.dismiss();
+								if (response.isSuccessful()) {
+									prefs.edit().putString("token", response.body()).apply();
+									Snackbar.make(findViewById(android.R.id.content), "Logged into MicroSync as " + username, Snackbar.LENGTH_SHORT).show();
+									openFromSync(token);
+								}
+								else {
+									new AlertDialog.Builder(SelectNotepad.this)
+											.setTitle("Error")
+											.setMessage("There was an error completing this request. Is your username and password correct?")
+											.setPositiveButton("Close", null)
+											.show();
+								}
+							}
+
+							@Override
+							public void onFailure(Call<String> call, Throwable t) {
+								dialog.dismiss();
+								new AlertDialog.Builder(SelectNotepad.this)
+										.setTitle("Error")
+										.setMessage("There was an error completing this request. Are you online?")
+										.setPositiveButton("Close", null)
+										.show();
+							}
+						});
+					});
+
+					builder.setNeutralButton("Sign up", (d, w) -> {
+						ProgressDialog dialog = new ProgressDialog(this);
+						dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+						dialog.setMessage("Loading...");
+						dialog.setIndeterminate(true);
+						dialog.setCanceledOnTouchOutside(false);
+						dialog.show();
+
+						String username = ((EditText) view.findViewById(R.id.username_input)).getText().toString();
+						String password = ((EditText) view.findViewById(R.id.password_input)).getText().toString();
+
+						syncer.service.signup(username, password).enqueue(new Callback<String>() {
+							@Override
+							public void onResponse(Call<String> call, Response<String> response) {
+								if (response.isSuccessful()) {
+									if (response.code() == 209) {
+										dialog.dismiss();
+										new AlertDialog.Builder(SelectNotepad.this)
+												.setTitle("Error")
+												.setMessage("This username has already been taken")
+												.setPositiveButton("Close", null)
+												.show();
+										return;
+									}
+									new Thread(() -> syncer.service.login(username, password).enqueue(new Callback<String>() {
+										@Override
+										public void onResponse(Call<String> call, Response<String> loginResponse) {
+											dialog.dismiss();
+											prefs.edit().putString("token", loginResponse.body()).apply();
+											Snackbar.make(findViewById(android.R.id.content), "Logged into MicroSync as " + username, Snackbar.LENGTH_SHORT).show();
+											openFromSync(token);
+										}
+
+										@Override
+										public void onFailure(Call<String> call, Throwable t) {
+											dialog.dismiss();
+											new AlertDialog.Builder(SelectNotepad.this)
+													.setTitle("Error")
+													.setMessage("There was an error completing this request. Are you online?")
+													.setPositiveButton("Close", null)
+													.show();
+										}
+									})).start();
+								}
+								else {
+									dialog.dismiss();
+									new AlertDialog.Builder(SelectNotepad.this)
+											.setTitle("Error")
+											.setMessage("There was an error completing this request")
+											.setPositiveButton("Close", null)
+											.show();
+								}
+							}
+
+							@Override
+							public void onFailure(Call<String> call, Throwable t) {
+								dialog.dismiss();
+								new AlertDialog.Builder(SelectNotepad.this)
+										.setTitle("Error")
+										.setMessage("There was an error completing this request. Are you online?")
+										.setPositiveButton("Close", null)
+										.show();
+							}
+						});
+					});
+
+					AlertDialog dialog = builder.create();
+					dialog.show();
+				}
+				return true;
+
+			case R.id.logout_item:
+				prefs.edit().remove("token").apply();
+				item.setVisible(false);
 				return true;
 
 			default:
 				return super.onContextItemSelected(item);
 		}
+	}
+
+	protected void openFromSync(String token) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this)
+				.setTitle("Open from \u00B5Sync")
+				.setPositiveButton("Close", null)
+				.setCancelable(true);
+		LayoutInflater loginInflater = this.getLayoutInflater();
+		View view = loginInflater.inflate(R.layout.open_from_sync, null);
+
+		ProgressBar progressBar = (ProgressBar)view.findViewById(R.id.progress);
+		progressBar.setVisibility(View.VISIBLE);
+		view.findViewById(R.id.open_manager_button).setOnClickListener(v -> {
+			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://getmicropad.com/sync"));
+			startActivity(intent);
+		});
+
+		this.syncer.service.getNotepads(token).enqueue(new Callback<String>() {
+			@Override
+			public void onResponse(Call<String> call, Response<String> response) {
+				progressBar.setVisibility(View.GONE);
+				if (response.isSuccessful()) {
+					ListView syncedNotepadListView = (ListView)view.findViewById(R.id.synced_notepad_list);
+					List<String> syncedNotepadList = new Gson().fromJson(response.body(), ArrayList.class);
+					ListAdapter syncedNotepadListAdapter = new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_list_item_1, syncedNotepadList);
+					syncedNotepadListView.setAdapter(syncedNotepadListAdapter);
+
+					syncedNotepadListView.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
+						if (filesystemManager.saveNotepad(new Notepad(syncedNotepadList.get(position).split(".npx")[0], new Date(0)))) {
+							getNotepads();
+							Intent intent = new Intent(getBaseContext(), NotepadActivity.class);
+							intent.putExtra("NOTEPAD_FILE", new File(filesystemManager.workingDirectory.getAbsolutePath()+"/"+syncedNotepadList.get(position)));
+							startActivity(intent);
+						}
+						else {
+							new AlertDialog.Builder(getApplicationContext())
+									.setTitle("Error")
+									.setMessage("Error saving notepad")
+									.setCancelable(true)
+									.setPositiveButton("Close", (dialog, which) -> {})
+									.show();
+						}
+					});
+				}
+				else {
+					prefs.edit().remove("token").apply();
+					recreate();
+				}
+			}
+
+			@Override
+			public void onFailure(Call<String> call, Throwable t) {
+				progressBar.setVisibility(View.GONE);
+				new AlertDialog.Builder(SelectNotepad.this)
+						.setTitle("Error")
+						.setMessage("There was an error completing this request. Are you online?")
+						.setPositiveButton("Close", null)
+						.show();
+			}
+		});
+
+		builder.setView(view);
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 
 	@Override
