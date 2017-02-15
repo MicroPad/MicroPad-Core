@@ -8,9 +8,12 @@
              android:background="@drawable/bg">
 
     <TextView
+        android:id="@+id/hint_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"
         android:padding="5dp"
         android:textSize="42sp"
         android:textAlignment="center"

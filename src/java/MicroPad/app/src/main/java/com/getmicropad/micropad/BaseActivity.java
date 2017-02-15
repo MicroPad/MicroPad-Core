@@ -1192,7 +1192,7 @@ public class BaseActivity extends AppCompatActivity {
 		this.isNotepadSyncing = false;
 		this.syncer.setOldMap(new JSONObject());
 		String token = prefs.getString("token", null);
-		if (token == null) return;
+		if (token == null || this.syncBtn == null) return;
 
 		Animation rotate = AnimationUtils.loadAnimation(getBaseContext(), R.anim.rotate);
 		rotate.setRepeatCount(Animation.INFINITE);

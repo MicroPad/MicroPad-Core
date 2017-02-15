@@ -171,7 +171,7 @@ public class SelectNotepad extends AppCompatActivity {
 								if (response.isSuccessful()) {
 									prefs.edit().putString("token", response.body()).apply();
 									Snackbar.make(findViewById(android.R.id.content), "Logged into MicroSync as " + username, Snackbar.LENGTH_SHORT).show();
-									openFromSync(token);
+									openFromSync(response.body());
 								}
 								else {
 									new AlertDialog.Builder(SelectNotepad.this)
