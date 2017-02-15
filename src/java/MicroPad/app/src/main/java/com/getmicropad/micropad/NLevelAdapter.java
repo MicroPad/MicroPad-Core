@@ -38,11 +38,6 @@ public class NLevelAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int arg0, View arg1, ViewGroup arg2) {
-		getItem(arg0).getView().findViewById(R.id.overflow_button).setOnClickListener(v -> {
-			Log.wtf("m3k", "working");
-//			((Activity)this.context).openOptionsMenu();
-		});
-
 		return getItem(arg0).getView();
 	}
 
@@ -75,6 +70,7 @@ public class NLevelAdapter extends BaseAdapter {
 
 	public List<NLevelListItem> filterItems() {
 		List<NLevelListItem> tempfiltered = new ArrayList<>();
+		//TODO: Fix/Catch exception that can (seemingly randomly) occur here
 		OUTER: for (NLevelListItem item : list) {
 			//add expanded items and top level items
 			//if parent is null then its a top level item
