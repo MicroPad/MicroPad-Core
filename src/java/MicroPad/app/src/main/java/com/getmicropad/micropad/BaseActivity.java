@@ -1392,7 +1392,7 @@ public class BaseActivity extends AppCompatActivity {
 					public void afterTextChanged(Editable editable) {
 						List<Note> res = notepadSearcher.search(editable.toString());
 
-						ListAdapter searchAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, res);
+						ListAdapter searchAdapter = new ArrayAdapter<>(BaseActivity.this, android.R.layout.simple_list_item_1, res);
 						runOnUiThread(() -> {
 							ListView searchList = (ListView)view.findViewById(R.id.search_list);
 							searchList.setAdapter(searchAdapter);

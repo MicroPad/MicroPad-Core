@@ -297,7 +297,7 @@ public class SelectNotepad extends AppCompatActivity {
 				if (response.isSuccessful()) {
 					ListView syncedNotepadListView = (ListView)view.findViewById(R.id.synced_notepad_list);
 					List<String> syncedNotepadList = new Gson().fromJson(response.body(), ArrayList.class);
-					ListAdapter syncedNotepadListAdapter = new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_list_item_1, syncedNotepadList);
+					ListAdapter syncedNotepadListAdapter = new ArrayAdapter<>(SelectNotepad.this, android.R.layout.simple_list_item_1, syncedNotepadList);
 					syncedNotepadListView.setAdapter(syncedNotepadListAdapter);
 
 					syncedNotepadListView.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
