@@ -1117,7 +1117,8 @@ public class BaseActivity extends AppCompatActivity {
 														@Override
 														public void onResponse(JSONObject remoteMap) {
 															new Thread(() -> {
-																String newNotepadXml = "";
+																List<byte[]> newNotepadChunks = new ArrayList<>(Arrays.asList(syncObject.getChunks()));
+
 																for (int i = 0; i < remoteMap.names().length(); i++) {
 																	try {
 																		String lineNumber = remoteMap.names().getString(i);
@@ -1135,8 +1136,15 @@ public class BaseActivity extends AppCompatActivity {
 																					ANRequest chunkReq = AndroidNetworking.get(chunkURL.body())
 																							.setPriority(Priority.IMMEDIATE)
 																							.build();
-																					newNotepadXml += chunkReq.executeForString().getResult();
-																					runOnUiThread(() -> progressDialog.setProgress((Integer.parseInt(lineNumber)/(remoteMap.names().length()-1))*100));
+//																					newNotepadXml += chunkReq.executeForString().getResult();
+//																					newNotepadBytes[Integer.parseInt(lineNumber)] = ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8);
+																					if (newNotepadChunks.size() > Integer.parseInt(lineNumber)) {
+																						newNotepadChunks.set(Integer.parseInt(lineNumber), ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
+																					}
+																					else {
+																						newNotepadChunks.add(Integer.parseInt(lineNumber), ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
+																					}
+																					runOnUiThread(() -> progressDialog.setProgress((int)((((double)Integer.parseInt(lineNumber)+1)/(remoteMap.names().length()-1))*100)));
 																				}
 																			} catch (IOException e) {
 																				e.printStackTrace();
@@ -1152,17 +1160,20 @@ public class BaseActivity extends AppCompatActivity {
 																	}
 																}
 
-																if (newNotepadXml.length() > 0) {
-																	try {
-																		Notepad newNotepad = Parser.parseNpx(newNotepadXml);
-																		syncer.setOldMap(remoteMap);
-																		runOnUiThread(() -> {
-																			setNotepad(newNotepad);
-																			saveNotepad();
-																		});
-																	} catch (Exception e) {
-																		e.printStackTrace();
+																try {
+																	String newNotepadXml = "";
+																	for (byte[] chunk : newNotepadChunks) {
+																		newNotepadXml += new String(chunk, "UTF-8");
 																	}
+
+																	Notepad newNotepad = Parser.parseNpx(newNotepadXml);
+																	syncer.setOldMap(remoteMap);
+																	runOnUiThread(() -> {
+																		setNotepad(newNotepad);
+																		saveNotepad();
+																	});
+																} catch (Exception e) {
+																	e.printStackTrace();
 																}
 
 																runOnUiThread(() -> {
