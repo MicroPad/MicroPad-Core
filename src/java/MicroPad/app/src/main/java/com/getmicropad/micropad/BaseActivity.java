@@ -1136,8 +1136,6 @@ public class BaseActivity extends AppCompatActivity {
 																					ANRequest chunkReq = AndroidNetworking.get(chunkURL.body())
 																							.setPriority(Priority.IMMEDIATE)
 																							.build();
-//																					newNotepadXml += chunkReq.executeForString().getResult();
-//																					newNotepadBytes[Integer.parseInt(lineNumber)] = ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8);
 																					if (newNotepadChunks.size() > Integer.parseInt(lineNumber)) {
 																						newNotepadChunks.set(Integer.parseInt(lineNumber), ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
 																					}
