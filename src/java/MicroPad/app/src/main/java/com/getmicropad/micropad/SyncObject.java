@@ -31,6 +31,7 @@ public class SyncObject {
 			JSONObject chunkMetadata = new JSONObject();
 			chunkMetadata.put("md5", sb.toString());
 			this.map.put(""+count, chunkMetadata);
+			count++;
 		}
 	}
 

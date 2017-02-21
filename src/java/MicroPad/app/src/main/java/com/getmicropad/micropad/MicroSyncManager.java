@@ -75,5 +75,8 @@ public class MicroSyncManager {
 
 		@GET("getNotepads.php")
 		Call<String> getNotepads(@Query("token") String token);
+
+		@GET("getFreeSlots.php")
+		Call<String> getFreeSlots(@Query("token") String token);
 	}
 }

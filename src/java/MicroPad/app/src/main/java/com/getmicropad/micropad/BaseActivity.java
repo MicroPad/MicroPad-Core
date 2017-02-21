@@ -78,6 +78,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
+import org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -96,8 +97,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -1227,7 +1232,51 @@ public class BaseActivity extends AppCompatActivity {
 					}
 					else {
 						if (manual) {
-							//TODO: Ask if they want to add the notepad
+							//Ask if they want to add the notepad
+							syncBtn.startAnimation(rotate);
+							syncer.service.getFreeSlots(token).enqueue(new Callback<String>() {
+								@Override
+								public void onResponse(Call<String> call, Response<String> freeSlots) {
+									syncBtn.clearAnimation();
+
+									if (freeSlots.isSuccessful() && Integer.parseInt(freeSlots.body()) > 0) {
+										new AlertDialog.Builder(BaseActivity.this)
+												.setTitle("Add to MicroSync?")
+												.setMessage(String.format("Do you want to start syncing this notepad?\n%s free slot(s) left", freeSlots.body()))
+												.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
+													syncBtn.startAnimation(rotate);
+
+													GregorianCalendar calendar = new GregorianCalendar();
+													calendar.setTime(new Date(0));
+													try {
+														DatatypeFactory datatypeFactory = DatatypeFactoryImpl.newInstance();
+														syncer.service.addNotepad(token, Helpers.getFilename(getNotepad().getTitle()), datatypeFactory.newXMLGregorianCalendar(calendar).toXMLFormat()).enqueue(new Callback<String>() {
+															@Override
+															public void onResponse(Call<String> call, Response<String> response) {
+																syncBtn.clearAnimation();
+																if (response.isSuccessful()) {
+																	initNotepadSync(false);
+																}
+															}
+
+															@Override
+															public void onFailure(Call<String> call, Throwable t) {
+																syncBtn.clearAnimation();
+															}
+														});
+													} catch (DatatypeConfigurationException e) {
+														e.printStackTrace();
+														syncBtn.clearAnimation();
+													}
+												}).setNegativeButton(android.R.string.no, null).show();
+									}
+								}
+
+								@Override
+								public void onFailure(Call<String> call, Throwable t) {
+									syncBtn.clearAnimation();
+								}
+							});
 						}
 					}
 				}
