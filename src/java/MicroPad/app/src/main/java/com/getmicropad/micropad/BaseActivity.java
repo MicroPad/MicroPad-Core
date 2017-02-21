@@ -94,6 +94,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -108,6 +109,7 @@ public class BaseActivity extends AppCompatActivity {
 	static final int PERMISSION_REQ_RECORD = 1;
 	static final int IMAGE_SELECTOR = 1;
 	static final int FILE_SELECTOR = 2;
+	static final List<String> supportedAddons = Arrays.asList("asciimath");
 	boolean isSaving = false;
 	boolean isSyncing = false;
 	boolean isNotepadSyncing = false;
@@ -149,6 +151,16 @@ public class BaseActivity extends AppCompatActivity {
 		if (note.bibliography == null) note.bibliography = new ArrayList<>();
 		if (note.addons == null) note.addons = new ArrayList<>();
 		this.setNote(note);
+
+		boolean unsupportedNote = Stream.of(note.addons).anyMatch(addon -> !supportedAddons.contains(addon));
+		if (unsupportedNote) {
+			new AlertDialog.Builder(BaseActivity.this)
+					.setTitle("Warning")
+					.setMessage("This note may use addons which are not supported in this app")
+					.setCancelable(true)
+					.setPositiveButton("Close", null)
+					.show();
+		}
 
 		new Thread(() -> {
 			types = new ArrayList<>();
@@ -267,6 +279,12 @@ public class BaseActivity extends AppCompatActivity {
 		element.setContent(content);
 		element.setWidth(width);
 		element.setHeight(height);
+
+		if (element instanceof MarkdownElement) {
+			if (!this.getNote().getAddons().contains("asciimath")) {
+				this.getNote().getAddons().add("asciimath");
+			}
+		}
 
 		boolean hasSet = false;
 		Source[] res = Stream.of(this.getNote().bibliography).filter(s -> s.getItem().equals(element.getId())).toArray(Source[]::new);
