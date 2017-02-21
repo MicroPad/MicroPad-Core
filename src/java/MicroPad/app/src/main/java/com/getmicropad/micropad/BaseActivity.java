@@ -888,7 +888,7 @@ public class BaseActivity extends AppCompatActivity {
 	protected void setNotepad(Notepad notepad) {
 		notepadSearcher = new NotepadSearcher(notepad);
 		this.notepad = notepad;
-		runOnUiThread(this::initNotepadSync);
+		runOnUiThread(() -> this.initNotepadSync(false));
 	}
 
 	protected Notepad getNotepad(){
@@ -1189,7 +1189,7 @@ public class BaseActivity extends AppCompatActivity {
 				else {
 					isSyncing = false;
 					syncBtn.clearAnimation();
-					initNotepadSync();
+					initNotepadSync(false);
 				}
 			}
 
@@ -1206,7 +1206,7 @@ public class BaseActivity extends AppCompatActivity {
 		});
 	}
 
-	protected void initNotepadSync() {
+	protected void initNotepadSync(boolean manual) {
 		this.isNotepadSyncing = false;
 		this.syncer.setOldMap(new JSONObject());
 		String token = prefs.getString("token", null);
@@ -1226,7 +1226,9 @@ public class BaseActivity extends AppCompatActivity {
 						syncNotepad();
 					}
 					else {
-						//TODO: Ask if they want to add the notepad
+						if (manual) {
+							//TODO: Ask if they want to add the notepad
+						}
 					}
 				}
 				else {
@@ -1270,7 +1272,7 @@ public class BaseActivity extends AppCompatActivity {
 		syncBtn.setOnClickListener(v -> {
 			String token = prefs.getString("token", null);
 			if (token != null) {
-				initNotepadSync();
+				initNotepadSync(true);
 			}
 			else {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this)
