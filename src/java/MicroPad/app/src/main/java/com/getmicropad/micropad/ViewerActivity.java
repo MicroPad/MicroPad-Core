@@ -19,7 +19,12 @@ public class ViewerActivity extends BaseActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
 		NoteLoader noteLoader = new NoteLoader();
-		noteLoader.execute(getIntent().getExtras().get("NOTEPAD_FILE"), new ArrayList<>(Arrays.asList((Integer[])getIntent().getExtras().get("PATH"))));
+		try {
+			noteLoader.execute(getIntent().getExtras().get("NOTEPAD_FILE"), new ArrayList<>(Arrays.asList((Integer[])getIntent().getExtras().get("PATH"))));
+		}
+		catch (ClassCastException e) {
+			noteLoader.execute(getIntent().getExtras().get("NOTEPAD_FILE"), new ArrayList<>(Arrays.asList(Arrays.copyOf(((Object[])getIntent().getExtras().get("PATH")), ((Object[])getIntent().getExtras().get("PATH")).length, Integer[].class))));
+		}
 	}
 
 	@Override

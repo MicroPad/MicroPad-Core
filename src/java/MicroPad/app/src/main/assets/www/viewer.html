@@ -149,7 +149,7 @@
 			Native.downloadElement(id);
 		}
 
-		$('#content').click(e => {
+		$('#content').click(function(e) {
 			if (e.target.id == "content") {
 				Native.openInsertMenu(e.pageX, e.pageY);
 			}
@@ -197,21 +197,21 @@
 				handle: ".handle",
 				stack: ".drag",
 				scroll: false,
-				start: event => {
+				start: function(event) {
 					$(event.currentTarget).removeClass('z-depth-2');
 					$(event.currentTarget).addClass('z-depth-4');
 
 					navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
 					navigator.vibrate(100);
 				},
-				drag: event => {
+				drag: function(event) {
 					resizePage(event.target);
 
 					if ($('#source_'+event.target.id).length) {
 						$('#source_'+event.target.id).attr("style", 'left: {0}; top: {1};'.format(parseInt(event.target.style.left)+$(event.target).width()+10+"px", event.target.style.top));
 					}
 				},
-				stop: event => {
+				stop: function(event) {
 					$(event.target).removeClass('z-depth-4');
 					$(event.target).addClass('z-depth-2');
 
@@ -232,7 +232,7 @@
 			if ($('#source_'+id).length) $('#source_'+id).remove();
 		}
 
-		$('#content').on('click', 'div', event => {
+		$('#content').on('click', 'div', function(event) {
 			var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
 			if (path[0].tagName.toLowerCase() === 'a') return;
 			if (path[1] && path[1].tagName.toLowerCase() === 'a') return;
