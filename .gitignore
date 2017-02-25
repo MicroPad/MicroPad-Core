@@ -743,3 +743,5 @@ playground.xcworkspace
 
 # End of https://www.gitignore.io/api/macos,xcode,swift,objective-c
 
+secrets.xml
+
