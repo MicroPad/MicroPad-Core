@@ -1,8 +1,14 @@
 apply plugin: 'com.android.application'
 
+def getIabKey(){
+    def Properties props = new Properties()
+    props.load(new FileInputStream(new File('secrets.properties')))
+    return props['IAB_KEY']
+}
+
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.getmicropad.micropad"
         minSdkVersion 19
@@ -22,6 +28,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        applicationVariants.all { variant ->
+            variant.buildConfigField "String", "IAB_KEY", "\""+getIabKey()+"\""
         }
     }
 }

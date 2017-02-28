@@ -3,10 +3,8 @@ package com.getmicropad.micropad;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -18,8 +16,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -57,7 +53,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.vending.billing.IInAppBillingService;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.ANRequest;
 import com.androidnetworking.common.Priority;
@@ -134,8 +129,6 @@ public class BaseActivity extends AppCompatActivity {
 	SharedPreferences prefs;
 	WebView noteContainer;
 	ImageView syncBtn;
-	IInAppBillingService inAppBillingService;
-	ServiceConnection serviceConnection;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
@@ -156,36 +149,6 @@ public class BaseActivity extends AppCompatActivity {
 		else {
 			this.filesystemManager = new FilesystemManager();
 		}
-
-		/* Google Play Subscription Magic */
-		this.serviceConnection = new ServiceConnection() {
-			@Override
-			public void onServiceDisconnected(ComponentName name) {
-				inAppBillingService = null;
-			}
-
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				inAppBillingService = IInAppBillingService.Stub.asInterface(service);
-
-				ArrayList<String> skuList = new ArrayList<>();
-				skuList.add("single_pack_2");
-				skuList.add("study_pack");
-				skuList.add("power_pack");
-				Bundle querySkus = new Bundle();
-				querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
-				new Thread(() -> {
-					try {
-						Bundle skuDetails = inAppBillingService.getSkuDetails(3, getPackageName(), "subs", querySkus);
-					} catch (RemoteException e) {
-						e.printStackTrace();
-					}
-				}).start();
-			}
-		};
-		Intent serviceIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
-		serviceIntent.setPackage("com.android.vending");
-		getApplicationContext().bindService(serviceIntent, this.serviceConnection, Context.MODE_PRIVATE);
 	}
 
 	@SuppressLint("SetJavaScriptEnabled")
@@ -1560,6 +1523,5 @@ public class BaseActivity extends AppCompatActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (this.inAppBillingService != null) unbindService(this.serviceConnection);
 	}
 }

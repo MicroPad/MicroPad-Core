@@ -32,10 +32,14 @@ import android.widget.TextView;
 import com.androidnetworking.AndroidNetworking;
 import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parser;
+import com.getmicropad.micropad.util.IabHelper;
+import com.getmicropad.micropad.util.IabResult;
 import com.google.gson.Gson;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
+
+import org.xml.sax.helpers.ParserAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,6 +58,7 @@ public class SelectNotepad extends AppCompatActivity {
 	FilesystemManager filesystemManager;
 	SharedPreferences prefs;
 	MicroSyncManager syncer;
+	IabHelper iabHelper;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
@@ -119,6 +124,14 @@ public class SelectNotepad extends AppCompatActivity {
 									.show();
 						}
 					}).setNegativeButton(android.R.string.cancel, null).show();
+		});
+
+		/* Google Play Magic */
+		this.iabHelper = new IabHelper(this, BuildConfig.IAB_KEY);
+		this.iabHelper.startSetup(res -> {
+			if (res.isSuccess()) {
+
+			}
 		});
 	}
 
@@ -455,5 +468,16 @@ public class SelectNotepad extends AppCompatActivity {
 							.show();
 				}
 		}
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (this.iabHelper != null) try {
+			this.iabHelper.dispose();
+		} catch (IabHelper.IabAsyncInProgressException e) {
+			e.printStackTrace();
+		}
+		this.iabHelper = null;
 	}
 }
