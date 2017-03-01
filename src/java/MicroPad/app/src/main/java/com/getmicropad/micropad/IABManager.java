@@ -48,16 +48,18 @@ public class IabManager {
 					return;
 				}
 
-				switch (purchase.getSku()) {
-					case "single_pack_2":
-						break;
+				//TODO: Tell server to check the Google Play API for purchase details
 
-					case "study_pack":
-						break;
-
-					case "power_pack":
-						break;
-				}
+//				switch (purchase.getSku()) {
+//					case "single_pack_2":
+//						break;
+//
+//					case "study_pack":
+//						break;
+//
+//					case "power_pack":
+//						break;
+//				}
 			}
 		};
 	}
@@ -87,7 +89,7 @@ public class IabManager {
 
 					//Show purchase dialog
 					AlertDialog.Builder builder = new AlertDialog.Builder(context)
-							.setTitle("Open from \u00B5Sync")
+							.setTitle("Subscribe to \u00B5Sync")
 							.setPositiveButton("Close", null)
 							.setCancelable(true);
 					LayoutInflater loginInflater = LayoutInflater.from(context);
@@ -108,6 +110,24 @@ public class IabManager {
 					view.findViewById(R.id.buy_button1).setOnClickListener((v) -> {
 						try {
 							helper.launchPurchaseFlow((Activity)context, subSkuList.get(0), SINGLE, purchaseFinishedListener, prefs.getString("username", null));
+						} catch (IabHelper.IabAsyncInProgressException e) {
+							e.printStackTrace();
+							showError("Error purchasing from Google Play");
+						}
+					});
+
+					view.findViewById(R.id.buy_button2).setOnClickListener((v) -> {
+						try {
+							helper.launchPurchaseFlow((Activity)context, subSkuList.get(1), STUDY, purchaseFinishedListener, prefs.getString("username", null));
+						} catch (IabHelper.IabAsyncInProgressException e) {
+							e.printStackTrace();
+							showError("Error purchasing from Google Play");
+						}
+					});
+
+					view.findViewById(R.id.buy_button3).setOnClickListener((v) -> {
+						try {
+							helper.launchPurchaseFlow((Activity)context, subSkuList.get(2), POWER, purchaseFinishedListener, prefs.getString("username", null));
 						} catch (IabHelper.IabAsyncInProgressException e) {
 							e.printStackTrace();
 							showError("Error purchasing from Google Play");
