@@ -1291,6 +1291,7 @@ public class BaseActivity extends AppCompatActivity {
 				}
 				else {
 					prefs.edit().remove("token").apply();
+					prefs.edit().remove("username").apply();
 					Snackbar.make(findViewById(android.R.id.content), "Logged out of MicroSync (expired token)", Snackbar.LENGTH_LONG).show();
 				}
 			}
@@ -1352,6 +1353,7 @@ public class BaseActivity extends AppCompatActivity {
 							syncBtn.clearAnimation();
 							if (response.isSuccessful()) {
 								prefs.edit().putString("token", response.body()).apply();
+								prefs.edit().putString("username", username).apply();
 								Snackbar.make(findViewById(android.R.id.content), "Logged into MicroSync as "+username, Snackbar.LENGTH_SHORT).show();
 							}
 							else {
@@ -1404,6 +1406,7 @@ public class BaseActivity extends AppCompatActivity {
 									public void onResponse(Call<String> call, Response<String> loginResponse) {
 										dialog.dismiss();
 										prefs.edit().putString("token", loginResponse.body()).apply();
+										prefs.edit().putString("username", username).apply();
 										Snackbar.make(findViewById(android.R.id.content), "Logged into MicroSync as " + username, Snackbar.LENGTH_SHORT).show();
 									}
 

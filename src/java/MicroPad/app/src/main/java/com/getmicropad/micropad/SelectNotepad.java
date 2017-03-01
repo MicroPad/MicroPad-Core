@@ -32,14 +32,10 @@ import android.widget.TextView;
 import com.androidnetworking.AndroidNetworking;
 import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parser;
-import com.getmicropad.micropad.util.IabHelper;
-import com.getmicropad.micropad.util.IabResult;
 import com.google.gson.Gson;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
-
-import org.xml.sax.helpers.ParserAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,7 +54,7 @@ public class SelectNotepad extends AppCompatActivity {
 	FilesystemManager filesystemManager;
 	SharedPreferences prefs;
 	MicroSyncManager syncer;
-	IabHelper iabHelper;
+	IabManager iabManager;
 
 	@Override
 	protected void attachBaseContext(Context newBase) {
@@ -120,19 +116,24 @@ public class SelectNotepad extends AppCompatActivity {
 									.setTitle("Error")
 									.setMessage("Error saving notepad")
 									.setCancelable(true)
-									.setPositiveButton("Close", (dialog, which) -> {})
+									.setPositiveButton("Close", null)
 									.show();
 						}
 					}).setNegativeButton(android.R.string.cancel, null).show();
 		});
 
 		/* Google Play Magic */
-		this.iabHelper = new IabHelper(this, BuildConfig.IAB_KEY);
-		this.iabHelper.startSetup(res -> {
-			if (res.isSuccess()) {
-
+		this.iabManager = new IabManager(this);
+		new Thread(() -> {
+			while (!iabManager.getIabEnabled()) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
-		});
+			runOnUiThread(() -> this.iabManager.showPurchaseDialog());
+		}).start();
 	}
 
 	@Override
@@ -183,6 +184,7 @@ public class SelectNotepad extends AppCompatActivity {
 								dialog.dismiss();
 								if (response.isSuccessful()) {
 									prefs.edit().putString("token", response.body()).apply();
+									prefs.edit().putString("username", username).apply();
 									Snackbar.make(findViewById(android.R.id.content), "Logged into MicroSync as " + username, Snackbar.LENGTH_SHORT).show();
 									openFromSync(response.body());
 								}
@@ -236,6 +238,7 @@ public class SelectNotepad extends AppCompatActivity {
 										public void onResponse(Call<String> call, Response<String> loginResponse) {
 											dialog.dismiss();
 											prefs.edit().putString("token", loginResponse.body()).apply();
+											prefs.edit().putString("username", username).apply();
 											Snackbar.make(findViewById(android.R.id.content), "Logged into MicroSync as " + username, Snackbar.LENGTH_SHORT).show();
 											openFromSync(token);
 										}
@@ -280,6 +283,7 @@ public class SelectNotepad extends AppCompatActivity {
 
 			case R.id.logout_item:
 				prefs.edit().remove("token").apply();
+				prefs.edit().remove("username").apply();
 				item.setVisible(false);
 				return true;
 
@@ -473,11 +477,6 @@ public class SelectNotepad extends AppCompatActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (this.iabHelper != null) try {
-			this.iabHelper.dispose();
-		} catch (IabHelper.IabAsyncInProgressException e) {
-			e.printStackTrace();
-		}
-		this.iabHelper = null;
+		this.iabManager.destroy();
 	}
 }
