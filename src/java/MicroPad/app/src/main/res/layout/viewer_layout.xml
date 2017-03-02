@@ -7,18 +7,6 @@
              android:layout_height="match_parent"
              android:background="@drawable/bg">
 
-    <TextView
-        android:id="@+id/hint_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        tools:visibility="visible"
-        android:padding="5dp"
-        android:textSize="42sp"
-        android:textAlignment="center"
-        android:text="@string/note_helper"/>
-
     <android.support.percent.PercentFrameLayout
         android:id="@+id/insert_container"
         android:layout_width="match_parent"

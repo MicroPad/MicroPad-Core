@@ -54,10 +54,23 @@
 			overflow: auto;
 			transition: box-shadow .2s;
 		}
+
+		#instructions {
+			position: absolute;
+			top: calc(50% - 7.5vmin);
+			left: 50%;
+			transform: translate(-50%, -50%);
+			text-align: center;
+			font-weight: 200;
+			font-size: 15vmin;
+			width: 80%;
+		}
 	</style>
 </head>
 <body>
-	<div id="content" class="empty"></div>
+	<div id="content" class="empty">
+		<h1 id="instructions" class="valign">Tap anywhere on the page to insert an element</h1>
+	</div>
 
 	<!-- JS Libs -->
 	<script src="js/jquery-3.1.1.min.js"></script>
@@ -150,7 +163,7 @@
 		}
 
 		$('#content').click(function(e) {
-			if (e.target.id == "content") {
+			if (e.target.id == "content" || e.target.id == "instructions") {
 				Native.openInsertMenu(e.pageX, e.pageY);
 			}
 		});
@@ -158,6 +171,7 @@
 		function displayElement(id, content, x, y, width, height, extraArgs) {
 			var contentDiv = document.getElementById("content");
 			$(contentDiv).removeClass('empty');
+			$('#instructions').remove();
 
 			if ($('#'+id).length) $('#'+id).remove();
 

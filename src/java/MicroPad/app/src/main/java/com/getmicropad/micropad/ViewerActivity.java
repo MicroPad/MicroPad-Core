@@ -1,7 +1,6 @@
 package com.getmicropad.micropad;
 
 import android.os.Bundle;
-import android.view.View;
 
 import com.getmicropad.NPXParser.Notepad;
 
@@ -14,7 +13,6 @@ public class ViewerActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.viewer_layout);
-		findViewById(R.id.hint_text).setVisibility(View.VISIBLE);
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
