@@ -123,17 +123,17 @@ public class SelectNotepad extends AppCompatActivity {
 		});
 
 		/* Google Play Magic */
-		this.iabManager = new IabManager(this);
-		new Thread(() -> {
-			while (!iabManager.getIabEnabled()) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			runOnUiThread(() -> this.iabManager.showPurchaseDialog());
-		}).start();
+//		this.iabManager = new IabManager(this);
+//		new Thread(() -> {
+//			while (!iabManager.getIabEnabled()) {
+//				try {
+//					Thread.sleep(100);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			runOnUiThread(() -> this.iabManager.showPurchaseDialog());
+//		}).start();
 	}
 
 	@Override
