@@ -1,12 +1,13 @@
-var me = {};
-var oldMap = "";
-var oldXML = "{}";
-
 importScripts('libs/moment.js');
 importScripts('libs/localforage.min.js');
 importScripts('libs/encoding.js');
 importScripts('libs/md5.js');
 importScripts('parser.js');
+
+var me = {};
+var oldMap = "";
+var oldXML = "{}";
+var lastSyncMoment = moment(0);
 
 var appStorage = localforage.createInstance({
 	name: 'uPad',
@@ -67,6 +68,18 @@ onmessage = function(event) {
 				lastModified: msg.notepad.lastModified,
 				method: msg.method
 			}, function(res, code) {
+				if (res == "download") {
+					if (moment().isBefore(lastSyncMoment.add(3, 'seconds'))) {
+						postMessage({
+							req: msg.req,
+							text: "",
+							code: 200
+						});
+						return;
+					}
+				}
+				lastSyncMoment = moment();
+
 				postMessage({
 					req: msg.req,
 					text: res,
