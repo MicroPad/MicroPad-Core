@@ -116,7 +116,9 @@ window.onload = function() {
 		mutations.forEach(function(mutation) {
 			saveToBrowser();
 			for (k in mutation.addedNodes) {
-				var selElement = $('#' + mutation.addedNodes[k].id);
+				var selector = '#'+mutation.addedNodes[k].id;
+				if (selector.length <= 1) continue;
+				var selElement = $(selector);
 				resizePage(selElement);
 				updateInstructions();
 			}
@@ -176,7 +178,7 @@ window.onload = function() {
 						$('#md-textarea').unbind();
 						$('#md-textarea').bind('input propertychange', function() {
 							element.content = $('#md-textarea').val();
-							currentTarget.html(md.makeHtml(element.content));
+							currentTarget.html('<p class="handle">::::</p>'+md.makeHtml(element.content));
 							updateReference(event);
 						});
 
@@ -244,7 +246,7 @@ window.onload = function() {
 											element.content = $('#drawing-viewer')[0].toDataURL();
 
 											var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
-											currentTarget.attr('src', trimmed);
+											$("#"+element.args.id+" > img").attr('src', trimmed);
 
 											notepad.lastModified = moment().format();
 											saveToBrowser();
@@ -280,7 +282,7 @@ window.onload = function() {
 
 							reader.onload = function() {
 								element.content = reader.result;
-								currentTarget.attr('src', URL.createObjectURL(dataURItoBlob(element.content)));
+								$("#"+element.args.id+" > img").attr('src', URL.createObjectURL(dataURItoBlob(element.content)));
 								updateReference(event);
 							}
 						});
@@ -345,8 +347,8 @@ window.onload = function() {
 
 							reader.onload = function() {
 								element.content = reader.result;
-								$('#' + element.args.id + ' > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
-								$('#' + element.args.id + ' > a').html(element.args.filename);
+								$('#' + element.args.id + '> .fileHolder > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
+								$('#' + element.args.id + '> .fileHolder > a').html(element.args.filename);
 							}
 						});
 
@@ -382,17 +384,7 @@ window.onload = function() {
 	});
 
 	if (!isMobile()) {
-		interact('.interact').draggable({
-			onmove: dragMoveListener,
-			onend: function(event) {
-				updateNote(event.target.id);
-				justMoved = true;
-			},
-			inertia: false,
-			autoScroll: true
-		});
-
-		interact('.interact').resizable({
+		interact('.resize').resizable({
 			preserveAspectRatio: false,
 			edges: { left: false, right: true, bottom: false, top: false },
 			onend: function(event) {
@@ -409,22 +401,12 @@ window.onload = function() {
 		})
 	}
 
-	function dragMoveListener(event) {
-		if (isMobile()) return;
-		$(event.target).css('left', Math.max(parseInt($(event.target).css('left')) + event.dx, 0));
-		$(event.target).css('top', Math.max(parseInt($(event.target).css('top')) + event.dy, 0));
-
-		updateReference(event);
-		resizePage($(event.target));
-	}
-
 	function updateReference(event) {
 		if ($('#source_' + event.target.id).length) {
 			$('#source_' + event.target.id).css('left', parseInt($('#' + event.target.id).css('left')) + parseInt($('#' + event.target.id).css('width')) + 10 + "px");
 			$('#source_' + event.target.id).css('top', $('#' + event.target.id).css('top'));
 		}
 	}
-	window.dragMoveListener = dragMoveListener;
 
 	/** Pen Input Handler */
 	$(window).resize(function() {
@@ -1144,32 +1126,62 @@ function loadNote(id, delta) {
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
 		if (delta && $('#' + element.args.id).length) continue;
+		$('#viewer').append('<div id="{0}" class="interact resize drag z-depth-2 hoverable" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(element.args.id, element.args.x, element.args.y, element.args.width, element.args.height))
+		var elementDiv = document.getElementById(element.args.id);
+
 		switch (element.type) {
 			case "markdown":
-				$('#viewer').append('<div class="interact z-depth-2 hoverable" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3}; font-size: {4};">{5}</div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.fontSize, md.makeHtml(element.content), element.args.id));
+				elementDiv.style.fontSize = element.args.fontSize;
+				elementDiv.innerHTML += md.makeHtml(element.content);
 				asciimath.translate(undefined, true);
+				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 				break;
 			case "drawing":
-				$('#viewer').append('<img class="interact hoverable drawing" id="{0}" style="top: {1}; left: {2}; height: {3}; width: {4};" src="{5}" />'.format(element.args.id, element.args.y, element.args.x, 'auto', 'auto', element.content));
+				$(elementDiv).removeClass("resize");
+				elementDiv.style.padding = "0px";
+				elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" src="{0}" />'.format(element.content);
 				break;
 			case "image":
 				src = element.content;
 				if (!delta) src = URL.createObjectURL(dataURItoBlob(element.content));
-				$('#viewer').append('<img class="interact z-depth-2 hoverable" id="{4}" style="top: {0}; left: {1}; height: {2}; width: {3};" src="{5}" />'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.id, src));
+
+				elementDiv.style.padding = "0px";
+				elementDiv.innerHTML += '<img style="width: {1}; height: {2};" src="{0}" />'.format(src, element.args.width, element.args.height);
 				break;
 			case "file":
-				$('#viewer').append('<div class="interact z-depth-2 hoverable fileHolder" id="{5}" style="top: {0}; left: {1}; height: {2}; width: {3};"><a href="javascript:downloadFile(\'{5}\');">{4}</a></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.args.id));
+				elementDiv.innerHTML += '<div class="fileHolder" id="{4}" style="padding: 20px; height: {0}; width: {1};"><a href="javascript:downloadFile(\'{3}\');">{2}</a></div>'.format(element.args.height, element.args.width, element.args.filename, element.args.id);
 				break;
 			case "recording":
-				$('#viewer').append('<div class="z-depth-2 hoverable interact recording" id="{6}" style="top: {0}; left: {1}; height: {2}; width: {3};"><audio controls="true" src="{5}"></audio><p class="recording-text"><em>{4}</em></p></div>'.format(element.args.y, element.args.x, element.args.height, element.args.width, element.args.filename, element.content, element.args.id));
+				$(elementDiv).addClass('recording');
+				elementDiv.innerHTML += '<p class="recording-text"><em>{1}</em></p><audio controls="true" style="padding-top: 20px;" src="{0}"></audio>'.format(element.content, element.args.filename);
 				if (!delta) edgeFix(dataURItoBlob(element.content), element.args.id);
-				if (window.navigator.userAgent.indexOf("Edge") > -1) $('#' + element.args.id).removeClass('interact');
 				break;
 		}
 	}
+
+	$('.drag').draggable({
+		handle: ".handle",
+		stack: ".drag",
+		scroll: false,
+		start: function(event) {
+			navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+			navigator.vibrate(100);
+		},
+		drag: function(event) {
+			resizePage($(event.target));
+
+			if ($('#source_'+event.target.id).length) {
+				$('#source_'+event.target.id).attr("style", 'left: {0}; top: {1};'.format(parseInt(event.target.style.left)+$(event.target).width()+10+"px", event.target.style.top));
+			}
+		},
+		stop: function(event) {
+			updateNote(event.target.id);
+			justMoved = true;
+		}
+	});
+
 	updateBib();
 	setTimeout(function() {
-		MathJax.Hub.Typeset();
 		initDrawings();
 		updateNote(undefined, true);
 	}, 1000);

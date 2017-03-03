@@ -147,6 +147,18 @@ nav {
 	padding: 5px;
 	word-wrap: break-word;
 	overflow: auto;
+	transition: box-shadow .2s;
+}
+
+.handle {
+	position: absolute;
+	text-align: center;
+	user-select: none;
+	width: 100%;
+	left: 0;
+	right: 0;
+	margin: auto;
+	cursor: move;
 }
 
 #modal {
