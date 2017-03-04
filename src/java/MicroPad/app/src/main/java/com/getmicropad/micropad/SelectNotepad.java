@@ -240,7 +240,7 @@ public class SelectNotepad extends AppCompatActivity {
 											prefs.edit().putString("token", loginResponse.body()).apply();
 											prefs.edit().putString("username", username).apply();
 											Snackbar.make(findViewById(android.R.id.content), "Logged into MicroSync as " + username, Snackbar.LENGTH_SHORT).show();
-											openFromSync(token);
+											openFromSync(loginResponse.body());
 										}
 
 										@Override
