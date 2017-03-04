@@ -62,36 +62,9 @@ onmessage = function(event) {
 			break;
 
 		case "sync":
-			apiPost(msg.req+'.php', {
-				token: msg.token,
-				filename: msg.filename,
-				lastModified: msg.notepad.lastModified,
-				method: msg.method
-			}, function(res, code) {
-				if (res == "download") {
-					if (moment().isBefore(lastSyncMoment.add(3, 'seconds'))) {
-						postMessage({
-							req: msg.req,
-							text: "",
-							code: 200
-						});
-						return;
-					}
-				}
-				lastSyncMoment = moment();
-
-				postMessage({
-					req: msg.req,
-					text: res,
-					code: code
-				});
-			});
-			break;
-
-		case "upload":
-			var np = parser.restoreNotepad(msg.notepad);
-			switch (msg.method) {
-				case "block":
+			reqGET(me.syncURL+'getMapDownload.php?token={0}&filename={1}'.format(msg.token, msg.filename), (res, code) => {
+				if (code == 200) {
+					var np = parser.restoreNotepad(msg.notepad);
 					var npxUInt8Arr = new TextEncoder().encode(np.toXML());
 					var chunks = [];
 					var localMap = {lastModified: np.lastModified};
@@ -126,249 +99,154 @@ onmessage = function(event) {
 					}
 					oldMap = localMapJSON;
 
-					reqGET(msg.url, function(res, code) {
-						var remoteMap = JSON.parse(res);
-						if (!remoteMap.lastModified) remoteMap.lastModified = moment(localMap.lastModified).subtract(100, 'years').format();
-						if (moment(localMap.lastModified).isBefore(moment(remoteMap.lastModified))) {
+					reqGET(res, (remoteMapJSON, code) => {
+						var remoteMap = JSON.parse(remoteMapJSON);
+						if (moment(localMap.lastModified).isBefore(remoteMap.lastModified)) {
 							postMessage({
-								req: 'upload',
-								code: 200,
-								text: ''
-							});
-							return;
-						}
-
-						if (res !== localMapJSON) {
-							//Loop through the remote map to figure out which blocks are different
-							for (var lineNumber in localMap) {
-								if (lineNumber === 'lastModified') continue;
-								if (!remoteMap[lineNumber] || localMap[lineNumber].md5 !== remoteMap[lineNumber].md5) {
-									
-									apiPostSync('getChunkUpload.php', {
-										token: msg.token,
-										filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, '')),
-										index: lineNumber,
-										md5: localMap[lineNumber].md5
-									}, function(uploadURL, code) {
-										if (code === 200) {
-											//Add that chunk to the upload cue
-											postMessage({
-												req: "cuePUT",
-												syncURL: me.syncURL,
-												token: msg.token,
-												url: uploadURL,
-												data: new TextDecoder("utf-8").decode(chunks[lineNumber]),
-												md5: localMap[lineNumber].md5,
-												method: msg.method
-											});
-										}
-										else {
-											console.log(uploadURL);
-											postMessage({
-												req: 'upload',
-												code: code,
-												text: ''
-											});
-											return;
-										}
-									});
-								}
-							}
-							
-							//Add local map.json to the upload cue
-							apiPost('getMapUpload.php', {
-								token: msg.token,
-								filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, ''))
-							}, function(mapURL, code) {
-								if (code === 200) {
-									postMessage({
-										req: "cuePUT",
-										syncURL: me.syncURL,
-										token: msg.token,
-										url: mapURL,
-										data: localMapJSON,
-										method: msg.method
-									});
-								}
-								else {
-									console.log(mapURL);
-									postMessage({
-										req: 'upload',
-										code: code,
-										text: ''
-									});
-									return;
-								}
+								req: "askDownload",
+								localMap: localMap,
+								remoteMap: remoteMap,
+								chunks: chunks,
+								filename: msg.filename
 							});
 						}
 						else {
-							//The remote map is identical to this one
-							postMessage({
-								req: 'upload',
-								code: 200,
-								text: ''
-							});
-							return;
+							upload(msg.token, localMap, remoteMap, chunks, msg.filename);
 						}
 					});
-					break;
-
-				case "diff":
-					var diff = np.makeDiff(oldXML);
-					if (diff.length < 1) {
-						postMessage({
-							req: 'upload',
-							code: 200
-						});
-						return;
-					}
-
-					if (byteLength(diff) > 10000000 && byteLength(diff) <= 1000000000) {
-						//Diff >10MB; do a direct upload
-						apiPost('directUpload.php', {
-							token: msg.token,
-							filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, ''))
-						}, function(res, code) {
-							if (code === 200) {
-								postMessage({
-									req: "cuePUT",
-									token: msg.token,
-									syncURL: me.syncURL,
-									url: res,
-									data: np.toXML(),
-									method: msg.method
-								});
-							}
-							else {
-								console.log(res);
-								return;
-							}
-						});
-					}
-					else if (byteLength(diff) > 1000000000) {
-						//Diff >1GB; don't upload
-						postMessage({
-							req: 'error',
-							message: "Wowza! Your notepad is so big we can't store it.<br><br>It might be a good idea to split up your notepad."
-						});
-					}
-					else {
-						postMessage({
-							req: "cuePUT",
-							token: msg.token,
-							syncURL: me.syncURL,
-							url: msg.url,
-							data: diff,
-							method: msg.method
-						});
-					}
-
-					oldXML = np.toXML();
-					break;
-			}
+				}
+			});
 			break;
 
 		case "download":
-			switch(msg.method) {
-				case "block":
-					reqGET(msg.url, function(res, code) {
+			var localMap = msg.localMap;
+			var remoteMap = msg.remoteMap;
+			var chunks = msg.chunks;
+
+			//Loop through the remote map to figure out which blocks are different
+			for (var lineNumber in remoteMap) {
+				if (lineNumber === 'lastModified') continue;
+				if (!localMap[lineNumber] || remoteMap[lineNumber].md5 !== localMap[lineNumber].md5) {
+					apiPostSync('getChunkDownload.php', {
+						token: msg.token,
+						filename: msg.filename,
+						index: lineNumber,
+						md5: remoteMap[lineNumber].md5
+					}, function(downloadURL, code) {
 						if (code === 200) {
-							var np = parser.restoreNotepad(msg.notepad);
-							var npxUInt8Arr = new TextEncoder().encode(np.toXML());
-							var chunks = [];
-							var localMap = {lastModified: np.lastModified};
-
-							//Split the octet array (npxUInt8Arr) chunks of 1000000B (where 1B = 8b)
-							var pos = 0;
-							var count = 0;
-							while (!chunks[chunks.length-1] || chunks[chunks.length-1].length === 1000000) {
-								var chunk = npxUInt8Arr.slice(pos, pos+1000000);
-								chunks.push(chunk);
-								pos += chunk.length;
-
-								localMap[count++] = {md5: md5(new TextDecoder("utf-8").decode(chunk))};
-							}
-
-							var remoteMap = JSON.parse(res);
-							var localMapJSON = JSON.stringify(localMap);
-							oldMap = res;
-
-							if (res !== localMapJSON) {
-								//Loop through the remote map to figure out which blocks are different
-								for (var lineNumber in remoteMap) {
-									if (lineNumber === 'lastModified') continue;
-									if (!localMap[lineNumber] || remoteMap[lineNumber].md5 !== localMap[lineNumber].md5) {
-										apiPostSync('getChunkDownload.php', {
-											token: msg.token,
-											filename: '{0}.npx'.format(np.title.replace(/[^a-z0-9 ]/gi, '')),
-											index: lineNumber,
-											md5: remoteMap[lineNumber].md5
-										}, function(downloadURL, code) {
-											if (code === 200) {
-												//Download chunk
-												postMessage({
-													req: "progress",
-													type: "Download",
-													percentage: ((parseInt(lineNumber))/(Object.keys(remoteMap).length-1))*100
-												});
-												reqGetSync(downloadURL, function(res, code) {
-													chunks[lineNumber] = new TextEncoder().encode(res);
-													postMessage({
-														req: "progress",
-														type: "Download",
-														percentage: ((parseInt(lineNumber)+1)/(Object.keys(remoteMap).length-1))*100
-													});
-												});
-											}
-											else {
-												console.log(downloadURL);
-												return;
-											}
-										});
-									}
-								}
-
-								var newNotepadStr = "";
-								for (var i = 0; i < chunks.length; i++) {
-									var chunk = chunks[i];
-									newNotepadStr += new TextDecoder("utf-8").decode(chunk);
-								}
+							//Download chunk
+							postMessage({
+								req: "progress",
+								type: "Download",
+								percentage: ((parseInt(lineNumber))/(Object.keys(remoteMap).length-1))*100
+							});
+							reqGetSync(downloadURL, function(res, code) {
+								chunks[lineNumber] = new TextEncoder().encode(res);
 								postMessage({
-									req: 'download',
-									code: 200,
-									text: newNotepadStr
+									req: "progress",
+									type: "Download",
+									percentage: ((parseInt(lineNumber)+1)/(Object.keys(remoteMap).length-1))*100
 								});
-							}
-							else {
-								//The remote map is identical to this one
-								postMessage({
-									req: 'download',
-									code: 200,
-									text: np.toXML()
-								});
-								return;
-							}
+							});
+						}
+						else {
+							console.log(downloadURL);
+							return;
 						}
 					});
-					break;
-
-				case "diff":
-					reqGET(msg.url, function(res, code) {
-						if (code === 200 && res.length > 0) oldXML = res;
-						postMessage({
-							req: 'download',
-							code: code,
-							text: res
-						});
-					});
-					break;
+				}
 			}
+
+			var newNotepadStr = "";
+			for (var i = 0; i < chunks.length; i++) {
+				var chunk = chunks[i];
+				newNotepadStr += new TextDecoder("utf-8").decode(chunk);
+			}
+			postMessage({
+				req: 'download',
+				code: 200,
+				text: newNotepadStr
+			});
 			break;
 
 		case "setOldXML":
 			oldXML = parser.restoreNotepad(msg.notepad).toXML();
 			break;
 	}
+}
+
+function upload(token, localMap, remoteMap, chunks, filename) {
+	if (!remoteMap.lastModified) remoteMap.lastModified = moment(localMap.lastModified).subtract(100, 'years').format();
+	if (moment(localMap.lastModified).isBefore(moment(remoteMap.lastModified))) {
+		postMessage({
+			req: 'upload',
+			code: 200,
+			text: ''
+		});
+		return;
+	}
+
+	//Loop through the remote map to figure out which blocks are different
+	for (var lineNumber in localMap) {
+		if (lineNumber === 'lastModified') continue;
+		if (!remoteMap[lineNumber] || localMap[lineNumber].md5 !== remoteMap[lineNumber].md5) {
+			
+			apiPostSync('getChunkUpload.php', {
+				token: token,
+				filename: filename,
+				index: lineNumber,
+				md5: localMap[lineNumber].md5
+			}, function(uploadURL, code) {
+				if (code === 200) {
+					//Add that chunk to the upload cue
+					postMessage({
+						req: "cuePUT",
+						syncURL: me.syncURL,
+						token: token,
+						url: uploadURL,
+						data: new TextDecoder("utf-8").decode(chunks[lineNumber]),
+						md5: localMap[lineNumber].md5,
+						method: "block"
+					});
+				}
+				else {
+					console.log(uploadURL);
+					postMessage({
+						req: 'upload',
+						code: code,
+						text: ''
+					});
+					return;
+				}
+			});
+		}
+	}
+	
+	//Add local map.json to the upload cue
+	apiPost('getMapUpload.php', {
+		token: token,
+		filename: filename
+	}, function(mapURL, code) {
+		if (code === 200) {
+			postMessage({
+				req: "cuePUT",
+				syncURL: me.syncURL,
+				token: token,
+				url: mapURL,
+				data: oldMap,
+				method: "block"
+			});
+		}
+		else {
+			console.log(mapURL);
+			postMessage({
+				req: 'upload',
+				code: code,
+				text: ''
+			});
+			return;
+		}
+	});
 }
 
 function apiPost(url, params, callback) {

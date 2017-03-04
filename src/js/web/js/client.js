@@ -13,6 +13,7 @@ var wasMobile = isMobile();
 var stillLoading = false;
 var syncWorker = new Worker('js/syncWorker.js');
 var syncMethod = "block";
+var hasAddedNotepad = "unknown";
 
 var uploadWorker = new Worker('js/uploadWorker.js');
 var putRequests = [];
@@ -664,6 +665,7 @@ window.initNotepad = function() {
 	parents = [];
 	note = undefined;
 	noteID = undefined;
+	hasAddedNotepad = "unknown";
 	lastClick = { x: 0, y: 0 };
 	$('#sidenav-options').show();
 	// $('#search-button').show();
@@ -1620,8 +1622,9 @@ syncWorker.onmessage = function(event) {
 	switch (msg.req) {
 		case "hasAddedNotepad":
 			var isTrue = (msg.text === 'true');
+			hasAddedNotepad = isTrue;
+
 			if (isTrue) {
-				// $('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
 				$('#not-syncing-pitch').hide();
 				$('#sync-options').show();
 				msSync();
@@ -1697,55 +1700,30 @@ syncWorker.onmessage = function(event) {
 
 		case "sync":
 			if (msg.code === 200) {
-				if (msg.text.length === 0) {
-					$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
-					return;
-				}
-				var res = JSON.parse(msg.text);
-				switch (res.type) {
-					case "upload":
-						// getXmlObject(function(xmlObj) {
-						// 	syncWorker.postMessage({
-						// 		req: "upload",
-						// 		notepad: xmlObj,
-						// 		url: res.url
-						// 	});
-						// });
-						appStorage.getItem('syncToken', function(err, token) {
-							if (err || token === null) return;
-							syncWorker.postMessage({
-								req: "upload",
-								notepad: notepad,
-								url: res.url,
-								syncURL: window.syncURL,
-								token: token,
-								method: syncMethod
-							});
-						});
-						break;
-
-					case "download":
-						confirmAsync("A newer version of this notepad has been synced. Do you want to download it?").then(function(answer) {
-							if (answer) {
-								appStorage.getItem('syncToken', function(err, token) {
-									if (err || token === null) return;
-									syncWorker.postMessage({
-										req: "download",
-										notepad: notepad,
-										url: res.url,
-										syncURL: window.syncURL,
-										token: token,
-										method: syncMethod
-									});
-								});
-							}
-						});
-						break;
-				}
+				if (msg.text.length === 0) $('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
 			}
 			else {
 				if (msg.text !== "Notepads are unprocessable if they have not been added") alert(msg.text);
 			}
+			break;
+
+		case "askDownload":
+			confirmAsync("A newer version of this notepad has been synced. Do you want to download it?").then(function(answer) {
+				if (answer) {
+					appStorage.getItem('syncToken', function(err, token) {
+						if (err || token === null) return;
+						syncWorker.postMessage({
+							req: "download",
+							syncURL: window.syncURL,
+							token: token,
+							localMap: msg.localMap,
+							remoteMap: msg.remoteMap,
+							chunks: msg.chunks,
+							filename: msg.filename
+						});
+					});
+				}
+			});
 			break;
 
 		case "upload":
@@ -1841,16 +1819,21 @@ function msSync() {
 }
 
 function msHasNotepad() {
-	appStorage.getItem('syncToken', function(err, res) {
-		if (err || res === null) return;
+	if (hasAddedNotepad == "unknown") {
+		appStorage.getItem('syncToken', function(err, res) {
+			if (err || res === null) return;
 
-		syncWorker.postMessage({
-			syncURL: window.syncURL,
-			req: "hasAddedNotepad",
-			token: res,
-			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''))
+			syncWorker.postMessage({
+				syncURL: window.syncURL,
+				req: "hasAddedNotepad",
+				token: res,
+				filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''))
+			});
 		});
-	});
+	}
+	else if (hasAddedNotepad === true) {
+		msSync();
+	}
 }
 
 function msLogout() {
