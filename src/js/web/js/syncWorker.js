@@ -6,7 +6,9 @@ importScripts('parser.js');
 
 var me = {};
 var oldXML = "{}";
-var lastSyncMoment = moment(0);
+
+var lastSyncLocalMap = "";
+var lastSyncRemoteMap = "";
 
 var appStorage = localforage.createInstance({
 	name: 'uPad',
@@ -88,6 +90,17 @@ onmessage = function(event) {
 					}
 
 					reqGET(res, (remoteMapJSON, code) => {
+						if (remoteMapJSON === lastSyncRemoteMap && JSON.stringify(localMap) === lastSyncLocalMap) {
+							postMessage({
+								req: 'upload',
+								code: 200,
+								text: ''
+							});
+							return;
+						}
+						lastSyncRemoteMap = remoteMapJSON;
+						lastSyncLocalMap = JSON.stringify(localMap);
+
 						var remoteMap = JSON.parse(remoteMapJSON);
 						if (moment(localMap.lastModified).isBefore(remoteMap.lastModified)) {
 							postMessage({
