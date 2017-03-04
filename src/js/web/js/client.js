@@ -1723,6 +1723,9 @@ syncWorker.onmessage = function(event) {
 						});
 					});
 				}
+				else {
+					notepad.lastModified = moment().format();
+				}
 			});
 			break;
 
