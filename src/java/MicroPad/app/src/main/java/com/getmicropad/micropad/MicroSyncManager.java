@@ -73,6 +73,9 @@ public class MicroSyncManager {
 		@POST("getMapUpload.php")
 		Call<String> getMapUpload(@Field("token") String token, @Field("filename") String filename);
 
+		@GET("getMapDownload.php")
+		Call<String> getMapDownload(@Query("token") String token, @Query("filename") String filename);
+
 		@GET("getNotepads.php")
 		Call<String> getNotepads(@Query("token") String token);
 

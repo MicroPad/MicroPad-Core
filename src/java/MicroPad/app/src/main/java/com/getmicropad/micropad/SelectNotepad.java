@@ -477,6 +477,6 @@ public class SelectNotepad extends AppCompatActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		this.iabManager.destroy();
+//		this.iabManager.destroy();
 	}
 }
