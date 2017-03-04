@@ -110,8 +110,16 @@ onmessage = function(event) {
 								filename: msg.filename
 							});
 						}
-						else {
+						else if (moment(localMap.lastModified).isAfter(remoteMap.lastModified)) {
 							upload(msg.token, localMap, remoteMap, chunks, msg.filename);
+						}
+						else {
+							postMessage({
+								req: 'upload',
+								code: 200,
+								text: ''
+							});
+							return;
 						}
 					});
 				}
