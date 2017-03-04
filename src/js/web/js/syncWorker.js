@@ -5,7 +5,6 @@ importScripts('libs/md5.js');
 importScripts('parser.js');
 
 var me = {};
-var oldMap = "";
 var oldXML = "{}";
 var lastSyncMoment = moment(0);
 
@@ -87,17 +86,6 @@ onmessage = function(event) {
 						});
 						return;
 					}
-
-					var localMapJSON = JSON.stringify(localMap);
-					if (oldMap === localMapJSON) {
-						postMessage({
-							req: 'upload',
-							code: 200,
-							text: ''
-						});
-						return;
-					}
-					oldMap = localMapJSON;
 
 					reqGET(res, (remoteMapJSON, code) => {
 						var remoteMap = JSON.parse(remoteMapJSON);
@@ -241,7 +229,7 @@ function upload(token, localMap, remoteMap, chunks, filename) {
 				syncURL: me.syncURL,
 				token: token,
 				url: mapURL,
-				data: oldMap,
+				data: JSON.stringify(localMap),
 				method: "block"
 			});
 		}
