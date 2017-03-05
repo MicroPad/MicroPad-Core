@@ -484,6 +484,24 @@ window.onload = function() {
 		return -1;
 	}
 
+	$('#new-notepad').modal({
+		ready: () => {
+			$('#new-notepad-title').focus();
+		}
+	});
+
+	$('#new-section').modal({
+		ready: () => {
+			$('#new-section-title').focus();
+		}
+	});
+
+	$('#new-note').modal({
+		ready: () => {
+			$('#new-note-title').focus();
+		}
+	});
+
 	/** Search Notes */
 	$('#search').modal({
 		ready: () => {
