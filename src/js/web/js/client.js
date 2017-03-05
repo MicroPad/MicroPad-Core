@@ -741,8 +741,8 @@ function updateOpenList() {
 					$('#sync-list-results').append('<li style="opacity: 0;"><h5 style="display: inline;"><a href="javascript:downloadNotepad(\'{0}\');">{0}</a></h5> <a href="javascript:msRemoveNotepad(\'{0}\');">(Remove Notepad)</a></li><br />'.format(notepadTitle));
 				}
 				Materialize.showStaggeredList('#sync-list-results');
-			}, 'json').fail(() => {
-				msLogout();
+			}, 'json').fail(data => {
+				if (data.statusCode().status > 0) msLogout();
 			});
 		}
 		else {
