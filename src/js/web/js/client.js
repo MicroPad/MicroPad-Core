@@ -894,8 +894,12 @@ function deleteOpen() {
 function deleteElement() {
 	confirmAsync("Are you sure you want to delete this?").then(function(answer) {
 		if (answer && lastEditedElement) {
-			note.elements = note.elements.filter(function(e) { return (e !== lastEditedElement); });
-			$('#' + lastEditedElement.args.id).remove();
+			note.elements = note.elements.filter(e => { return (e !== lastEditedElement); });
+			note.bibliography = note.bibliography.filter(s => { return (s.item !== lastEditedElement.args.id); });
+
+			$('#'+lastEditedElement.args.id).remove();
+			if ($('#source_'+lastEditedElement.args.id).length) $('#source_'+lastEditedElement.args.id).remove();
+
 			notepad.lastModified = moment().format();
 			saveToBrowser();
 		}
@@ -1868,87 +1872,10 @@ function msRemoveNotepad(filename) {
 	});
 }
 
-function msGetOrderID(plan) {
-	var prodNum;
-	var prodName;
-	var price;
-	switch (plan) {
-		case "s":
-			prodNum = 1;
-			prodName = "Single";
-			price = '1.00';
-			break;
-		case "sp":
-			prodNum = 2;
-			prodName = "Study Pack";
-			price = '2.95';
-			break;
-		case "pp":
-			prodNum = 3;
-			prodName = "Power Pack";
-			price = '9.50';
-			break;
-	}
-
-	$('#microsync-checkout-form > form > input[name="li_0_name"]').attr('value', 'µSync ({0})'.format(prodName));
-	$('#microsync-checkout-form > form > input[name="li_0_price"]').attr('value', price);
-
-	$('#microsync-checkout-form > form > input[value="product"]').attr('name', 'li_{0}_type'.format(prodNum));
-	$('#microsync-checkout-form > form > input[name="li_0_name"]').attr('name', 'li_{0}_name'.format(prodNum));
-	$('#microsync-checkout-form > form > input[name="li_0_price"]').attr('name', 'li_{0}_price'.format(prodNum));
-	$('#microsync-checkout-form > form > input[name="li_0_quantity"]').attr('name', 'li_{0}_quantity'.format(prodNum));
-
-	appStorage.getItem("syncToken", (err, token) => {
-		if (err || token === null) return;
-
-		$.post(window.syncURL+'payments/newOrderID.php', {token: token}, data => {
-			$('#microsync-checkout-form > form > input[name="merchant_order_id"]').val(data);
-		});
-	});
-}
-
 function syncOptions(option) {
 	switch (option) {
 		case "removeNotepad":
 			msRemoveNotepad('{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
-			break;
-
-		case "removeAllData":
-			confirmAsync("This will permanently remove all of your notepads from our servers. Are you sure you want to continue?").then(a => {
-				if (a) {
-					$.post(window.syncURL+"deleteAccountData.php", {
-						username: $('#verify-username-input').val(),
-						password: $('#verify-password-input').val()
-					}, () => {
-						window.location.reload();
-					}).fail(() => {
-						alert("There was an error completing your request");
-					});
-				}
-			});
-			break;
-
-		case "revokeAllTokens":
-			$.post(window.syncURL+"revokeAllTokens.php", {
-				username: $('#verify-username-input').val(),
-				password: $('#verify-password-input').val()
-			}, () => {
-				msLogout();
-			}).fail(() => {
-				alert("There was an error completing your request");
-			});
-			break;
-
-		case "changePassword":
-			$.post(window.syncURL+"changePassword.php", {
-				username: $('#change-username-input').val(),
-				password: $('#old-password-input').val(),
-				newPassword: $('#new-password-input').val()
-			}, () => {
-				alert("Your password has been changed");
-			}).fail(() => {
-				alert("There was an error completing your request");
-			});
 			break;
 	}
 }

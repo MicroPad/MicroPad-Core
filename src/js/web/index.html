@@ -130,108 +130,10 @@
 				</div>
 			</div>
 
-			<div id="change-password-microsync" class="modal">
-				<div class="modal-content">
-					<h4>Change µSync Password</h4>
-
-					<div class="input-field">
-						<input id="change-username-input" autocomplete="off" autocorrect="off" autocapitalize="off" type="text" required />
-						<label for="change-username-input">Username</label>
-					</div>
-					<div class="input-field">
-						<input id="old-password-input" autocomplete="off" autocorrect="off" autocapitalize="off" type="password" required />
-						<label for="old-password-input">Old Password</label>
-					</div>
-					<div class="input-field">
-						<input id="new-password-input" type="password" required />
-						<label for="new-password-input">New Password</label>
-					</div>
-
-					<p style="max-width: 50ch;"><em>Note: Due to the way that we protect your privacy, we can't recover your password for you. Make sure that you won't forget it.</em></p>
-				</div>
-				<div class="modal-footer">
-					<a href="javascript:syncOptions('changePassword');" class="modal-action modal-close waves-effect waves-light btn-flat">Change Password</a>
-					<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Cancel</a>
-				</div>
-			</div>
-
-			<div id="change-subscription" class="modal" style="width: 90%; min-height: 85%;">
-				<div class="modal-content">
-					<!-- <div class="row">
-						<div class="col m4 s12">
-							<h3 style="display: inline;"><s style="font-size: 12px;">$1.49</s>$1.00</h3>🇳🇿<em>/month</em>
-						</div>
-						<div class="col m6 s12">
-							<h4 style="display: inline;"><input id="notepad-quantity" type="number" value="1" min="1" style="width: 30px;" /> Notepad(s)</h4><em> (up to 1GB)</em>
-						</div>
-						<div class="col m2 s12">
-							<a href="#!" class="btn blue waves-effect waves-light" onclick="msGetOrderID('s'); $('#microsync-checkout-form').slideDown('slow');">Next</a>
-						</div>
-					</div> -->
-					<div class="pricingTable">
-						<ul class="pricingTable-firstTable">
-							<li class="pricingTable-firstTable_table">
-								<h1 class="pricingTable-firstTable_table__header">Single</h1>
-								<p class="pricingTable-firstTable_table__pricing"><span>$</span><span id="s_price">1.00</span><span>Month</span></p>
-								<ul class="pricingTable-firstTable_table__options">
-									<li>1 Notepad</li>
-									<li>Up to 1GB per notepad</li>
-									<li>No romantic attachment</li>
-								</ul>
-								<div class="pricingTable-firstTable_table__getstart" onclick="msGetOrderID('s'); $('#microsync-checkout-form').slideDown('slow');">Get Started Now</div>
-							</li><li class="pricingTable-firstTable_table">
-								<h1 class="pricingTable-firstTable_table__header">Study Pack</h1>
-								<p class="pricingTable-firstTable_table__pricing"><span>$</span><span id="sp_price">2.95</span><span>Month</span></p>
-								<ul class="pricingTable-firstTable_table__options">
-									<li>3 Notepads</li>
-									<li>Up to 1GB per notepad</li>
-									<li>Allows room for school notepads and personal notepads</li>
-								</ul>
-								<div class="pricingTable-firstTable_table__getstart" onclick="msGetOrderID('sp'); $('#microsync-checkout-form').slideDown('slow');">Get Started Now</div>
-							</li><li class="pricingTable-firstTable_table">
-								<h1 class="pricingTable-firstTable_table__header">Power Pack</h1>
-								<p class="pricingTable-firstTable_table__pricing"><span>$</span><span id="pp_price">9.50</span><span>Month</span></p>
-								<ul class="pricingTable-firstTable_table__options">
-									<li>10 Notepads</li>
-									<li>Up to 1GB per notepad</li>
-									<li>Over 12,500,000 A4 pages worth of notepads</li>
-								</ul>
-								<div class="pricingTable-firstTable_table__getstart" onclick="msGetOrderID('pp'); $('#microsync-checkout-form').slideDown('slow');">Get Started Now</div>
-							</li>
-						</ul>
-					</div>
-					<em>Prices are in New Zealand Dollars
-					<br />µSync is discounted while µPad is in <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">alpha</a> (usually $1.49, $4.29, and $14.50).</em>
-					<div id="microsync-checkout-form">
-						<form action='https://2checkout.com/checkout/purchase' method='post'>
-							<input type='hidden' name='sid' value='103115725' />
-							<input type='hidden' name='mode' value='2CO' />
-							<input type='hidden' name='li_0_type' value='product' />
-							<input type='hidden' name='li_0_name' value='µSync' />
-							<input type='hidden' name='li_0_price' value='1.00' />
-							<input type='hidden' name='li_0_quantity' value='1' />
-							<input type='hidden' name='merchant_order_id' value=" />
-							<input type='text' name='card_holder_name' placeholder="Full Name" required />
-							<input type='text' name='street_address' placeholder="Street Address" required />
-							<input type='text' name='street_address2' placeholder="Street Address (Line 2)" />
-							<input type='text' name='city' placeholder="City" required />
-							<input type='text' name='state' placeholder="Region/State" required />
-							<input type='text' name='zip' placeholder="ZIP Code" required />
-							<input type='text' name='country' placeholder="Country" required />
-							<input type='email' name='email' placeholder="Email Address" required />
-							<input type='tel' name='phone' placeholder="Phone Number" required />
-							<button class="btn green waves-effect waves-light" name='submit' type='submit'>Checkout</button>
-						</form>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
-				</div>
-			</div>
-
 			<div id="sync-manager" class="modal">
 				<div class="modal-content">
 					<h4>Sync Manager</h4>
+					<a target="_blank" rel="noopener noreferrer" href="https://getmicropad.com/sync/manage.php"><h5>Open Account Options</h5></a>
 					
 					<h5>Notepad Options (<span id="notepadTitle"></span>)</h5>
 					<div id="not-syncing-pitch">
@@ -244,38 +146,6 @@
 							<li><a href="javascript:syncOptions('removeNotepad');">Stop syncing this notepad</a></li>
 						</ul>
 					</div>
-
-					<br /><div class="divider"></div>
-					
-					<h5>Account Options</h5>
-					<ul>
-						<li id="start-sub-btn"><a href="#!" class="modal-trigger" data-target="change-subscription">Start Subscription</a></li>
-						<li><a href="#!" class="modal-trigger" data-target="change-password-microsync">Change Password</a></li>
-						<li><a href="javascript:msLogout();">Sign out</a></li>
-					</ul>
-
-					<ul>
-						<strong style="color: #F44336;">Dangerous Account Options</strong>
-						<div class="row">
-							<div class="col m6 s12">
-								<li id="cancel-sub-btn" style="display: none;"><a href="javascript:syncOptions('cancelSubscription');">Cancel Subscription</a></li>
-								<li><a href="javascript:syncOptions('removeAllData');">Delete all data associated with my account</a></li>
-								<li><a href="javascript:syncOptions('revokeAllTokens');">Sign out all of my devices</a></li>
-							</div>
-
-							<div class="col m6 s12">
-								For these options to work you need to enter your username and password below:
-								<div class="input-field">
-									<input id="verify-username-input" autocomplete="off" autocorrect="off" autocapitalize="off" type="text" required />
-									<label for="verify-username-input">Username</label>
-								</div>
-								<div class="input-field">
-									<input id="verify-password-input" type="password" required />
-									<label for="verify-password-input">Password</label>
-								</div>
-							</div>
-						</div>
-					</ul>
 				</div>
 				<div class="modal-footer">
 					<a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
@@ -582,8 +452,6 @@
 		<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
 		<script type="text/javascript" async src="js/libs/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
 		<script src="js/libs/ASCIIMathML.js"></script>
-
-		<script src="https://www.2checkout.com/static/checkout/javascript/direct.min.js"></script>
 		
 		<script src="js/parser.js"></script>
 		<script src="js/client.js"></script>
