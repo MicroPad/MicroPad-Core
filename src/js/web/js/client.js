@@ -597,6 +597,12 @@ window.onload = function() {
 			$('#search').modal('open');
 		}
 	});
+	Mousetrap.bind('e', e => {
+		if (note && lastEditedElement) {
+			e.preventDefault();
+			$('#'+lastEditedElement.args.id).click();
+		}
+	});
 	Mousetrap.bind('mod+1', e => {
 		if (parents.length > 0) {
 			e.preventDefault();
