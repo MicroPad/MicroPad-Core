@@ -1193,10 +1193,6 @@ function loadNote(id, delta) {
 		handle: ".handle",
 		stack: ".drag",
 		scroll: false,
-		start: function(event) {
-			navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
-			navigator.vibrate(100);
-		},
 		drag: function(event) {
 			resizePage($(event.target));
 
