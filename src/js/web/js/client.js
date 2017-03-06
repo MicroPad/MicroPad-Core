@@ -209,6 +209,7 @@ window.onload = function() {
 						});
 
 						$('#mdEditor').modal({
+							inDuration: 100,
 							complete: function() {
 								asciimath.translate(undefined, true);
 								MathJax.Hub.Typeset();
