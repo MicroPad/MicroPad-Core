@@ -394,10 +394,12 @@ window.onload = function() {
 				justMoved = true;
 			}
 		}).on('resizemove', function(event) {
-			$(event.target).css('width', parseInt($(event.target).css('width')) + event.dx);
-			// $(event.target).css('height', parseInt($(event.target).css('height'))+event.dy);
-			$(event.target).css('height', 'auto');
-			resizePage($(event.target));
+			var resizeObj = event.target;
+			if ($(event.target).prop("tagName") == "IMG") resizeObj = $('#'+event.target.id.split("_")[1])[0];
+			$(resizeObj).css('width', parseInt($(resizeObj).css('width')) + event.dx);
+			$(resizeObj).css('height', 'auto');
+			resizePage($(resizeObj));
+			event.target = resizeObj;
 			updateReference(event);
 			justMoved = true;
 		})
@@ -1168,7 +1170,6 @@ function loadNote(id, delta) {
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 				break;
 			case "drawing":
-				$(elementDiv).removeClass("resize");
 				elementDiv.style.padding = "0px";
 				elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" src="{0}" />'.format(element.content);
 				break;
@@ -1177,7 +1178,7 @@ function loadNote(id, delta) {
 				if (!delta) src = URL.createObjectURL(dataURItoBlob(element.content));
 
 				elementDiv.style.padding = "0px";
-				elementDiv.innerHTML += '<img style="width: {1}; height: {2};" src="{0}" />'.format(src, element.args.width, element.args.height);
+				elementDiv.innerHTML += '<img id="img_{1}" class="resize" style="width: 100%; height: auto;" src="{0}" />'.format(src, element.args.id);
 				break;
 			case "file":
 				elementDiv.innerHTML += '<div class="fileHolder" id="{4}" style="padding: 20px; height: {0}; width: {1};"><a href="javascript:downloadFile(\'{3}\');">{2}</a></div>'.format(element.args.height, element.args.width, element.args.filename, element.args.id);
