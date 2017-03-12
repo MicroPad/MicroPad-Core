@@ -286,6 +286,9 @@ window.onload = function() {
 								element.content = reader.result;
 								$("#"+element.args.id+" > img").attr('src', URL.createObjectURL(dataURItoBlob(element.content)));
 								updateReference(event);
+								setTimeout(() => {
+									resizePage($("#"+element.args.id), true);
+								}, 500);
 							}
 						});
 
@@ -1462,12 +1465,21 @@ function readFileInputEventAsArrayBuffer(event, callback) {
 }
 
 /** Make sure the page is always larger than it's elements */
-function resizePage(selElement) {
-	if (parseInt(selElement.css('left')) + selElement.width() + 1000 > parseInt($('#viewer').css('width'))) {
-		$('#viewer').css('width', parseInt(selElement.css('left')) + selElement.width() + 1000 + 'px');
+function resizePage(selElement, isImage) {
+	if (!selElement[0]) return;
+	var elementWidth = selElement.width();
+	var elementHeight = selElement.height();
+
+	if (isImage) {
+		elementWidth = $('#'+selElement[0].id+' > img')[0].naturalWidth;
+		elementHeight = $('#'+selElement[0].id+' > img')[0].naturalHeight;
 	}
-	if (parseInt(selElement.css('top')) + selElement.height() + 1000 > parseInt($('#viewer').css('height'))) {
-		$('#viewer').css('height', parseInt(selElement.css('top')) + selElement.height() + 1000 + 'px');
+
+	if (selElement.position().left + elementWidth + 1000 > $('#viewer').width()) {
+		$('#viewer').css('width', parseInt(selElement.css('left')) + elementWidth + 1000 + 'px');
+	}
+	if (selElement.position().top + elementHeight + 1000 > $('#viewer').height()) {
+		$('#viewer').css('height', parseInt(selElement.css('top')) + elementHeight + 1000 + 'px');
 	}
 }
 
