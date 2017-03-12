@@ -1203,8 +1203,17 @@ function loadNote(id, delta) {
 			}
 		},
 		stop: function(event) {
+			var pos = $(event.target).position();
+			if (pos.top < 0) event.target.style.top = "0px";
+			if (pos.left < 0) event.target.style.left = "0px";
+
+			if ($('#source_'+event.target.id).length) {
+				$('#source_'+event.target.id).attr("style", 'left: {0}; top: {1};'.format(parseInt(event.target.style.left)+$(event.target).width()+10+"px", event.target.style.top));
+			}
+
 			updateNote(event.target.id);
 			justMoved = true;
+
 		}
 	});
 
