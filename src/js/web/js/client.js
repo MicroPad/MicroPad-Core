@@ -399,7 +399,7 @@ window.onload = function() {
 		}).on('resizemove', function(event) {
 			var resizeObj = event.target;
 			if ($(event.target).prop("tagName") == "IMG") resizeObj = $('#'+event.target.id.split("_")[1])[0];
-			$(resizeObj).css('width', parseInt($(resizeObj).css('width')) + event.dx);
+			$(resizeObj).css('width', parseInt($(resizeObj).css('width')) + 10 + event.dx);
 			$(resizeObj).css('height', 'auto');
 			resizePage($(resizeObj));
 			event.target = resizeObj;
