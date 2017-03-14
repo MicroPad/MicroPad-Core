@@ -36,6 +36,10 @@ nav {
 	cursor: pointer;
 }
 
+.dropdown-content {
+	overflow: auto !important;
+}
+
 #loadedContent {
 	width: 100%;
 	height: 100%;
