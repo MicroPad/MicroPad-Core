@@ -63,7 +63,7 @@ showdown.extension('graphs', function() {
 	return [
 		{
 			type: 'lang',
-			regex: /---([^]+?)---/gi,
+			regex: /=-=([^]+?)=-=/gi,
 			replace: function(s, match) {
 				matches.push("<embed width='400' height='400' src='img/d.svg' script='{0}'></embed>".format(match));
 				var n = matches.length - 1;
