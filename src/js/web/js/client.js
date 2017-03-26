@@ -31,7 +31,7 @@ var appStorage = localforage.createInstance({
 });
 
 /** Setup md parser */
-showdown.extension('math', function() {
+showdown.extension('maths', function() {
 	var matches = [];
 	return [
 		{
@@ -40,14 +40,14 @@ showdown.extension('math', function() {
 			replace: function(s, match) {
 				matches.push('===' + match + '===');
 				var n = matches.length - 1;
-				return '%PLACEHOLDER' + n + '%';
+				return '%PLACEHOLDER1' + n + 'ENDPLACEHOLDER1%';
 			}
 		},
 		{
 			type: 'output',
 			filter: function(text) {
 				for (var i = 0; i < matches.length; ++i) {
-					var pat = '%PLACEHOLDER' + i + '%';
+					var pat = '%PLACEHOLDER1' + i + 'ENDPLACEHOLDER1%';
 					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 				}
 				//reset array
@@ -57,6 +57,34 @@ showdown.extension('math', function() {
 		}
 	]
 });
+
+showdown.extension('graphs', function() {
+	var matches = [];
+	return [
+		{
+			type: 'lang',
+			regex: /---([^]+?)---/gi,
+			replace: function(s, match) {
+				matches.push("<embed width='400' height='400' src='img/d.svg' script='{0}'></embed>".format(match));
+				var n = matches.length - 1;
+				return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
+			}
+		},
+		{
+			type: 'output',
+			filter: function(text) {
+				for (var i = 0; i < matches.length; ++i) {
+					var pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
+					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+				}
+				//reset array
+				matches = [];
+				return text;
+			}
+		}
+	]
+});
+
 var md = new showdown.Converter({
 	parseImgDimensions: true,
 	simplifiedAutoLink: true,
@@ -65,7 +93,7 @@ var md = new showdown.Converter({
 	tasklists: true,
 	prefixHeaderId: 'mdheader_',
 	smoothLivePreview: true,
-	extensions: ['math']
+	extensions: ['maths', 'graphs']
 });
 
 $(document).ready(function() {
@@ -212,6 +240,7 @@ window.onload = function() {
 							inDuration: 100,
 							complete: function() {
 								asciimath.translate(undefined, true);
+								drawPictures();
 								MathJax.Hub.Typeset();
 
 								if (source) {
@@ -1170,6 +1199,7 @@ function loadNote(id, delta) {
 				elementDiv.style.fontSize = element.args.fontSize;
 				elementDiv.innerHTML += md.makeHtml(element.content);
 				asciimath.translate(undefined, true);
+				drawPictures();
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 				break;
 			case "drawing":
@@ -1295,6 +1325,7 @@ function insert(type, newElement) {
 
 	loadNote(noteID, true);
 	asciimath.translate(undefined, true);
+	drawPictures();
 	MathJax.Hub.Typeset();
 	$('#' + newElement.args.id).trigger('click');
 	return newElement.args.id;
