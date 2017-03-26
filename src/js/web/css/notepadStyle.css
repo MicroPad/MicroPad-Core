@@ -163,6 +163,7 @@ nav {
 	right: 0;
 	margin: auto;
 	cursor: move;
+	font-size: 16;
 }
 
 #modal {
