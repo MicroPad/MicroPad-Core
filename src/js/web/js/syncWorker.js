@@ -152,7 +152,8 @@ onmessage = function(event) {
 				if (code === 200) {
 					var downloadURLs = JSON.parse(downloadURLs);
 					for (lineNumber in downloadURLs) {
-						var downloadURL = downloadURLs[lineNumber];
+						lineNumber = parseInt(lineNumber.split("i")[1]);
+						var downloadURL = downloadURLs["i"+lineNumber];
 
 						//Download chunk
 						postMessage({
@@ -161,6 +162,7 @@ onmessage = function(event) {
 							percentage: ((parseInt(lineNumber))/(Object.keys(remoteMap).length-1))*100
 						});
 						reqGetSync(downloadURL, function(res, code) {
+							console.log("run");
 							chunks[lineNumber] = new TextEncoder().encode(res);
 							postMessage({
 								req: "progress",
@@ -182,7 +184,7 @@ onmessage = function(event) {
 					});
 				}
 				else {
-					console.log(downloadURL);
+					console.log(downloadURLs);
 					return;
 				}
 			});
@@ -206,30 +208,57 @@ function upload(token, localMap, remoteMap, chunks, filename) {
 	}
 
 	//Loop through the remote map to figure out which blocks are different
+	diffIndexes = "";
 	for (var lineNumber in localMap) {
 		if (lineNumber === 'lastModified') continue;
 		if (!remoteMap[lineNumber] || localMap[lineNumber].md5 !== remoteMap[lineNumber].md5) {
-			
-			apiPostSync('getChunkUpload.php', {
+			if (diffIndexes.length > 0) diffIndexes += ",";
+			diffIndexes += lineNumber;
+		}
+	}
+
+	apiPostSync('getChunkUpload.php', {
+		token: token,
+		filename: filename,
+		index: 0,
+		multidex: diffIndexes,
+		md5: localMap[0].md5
+	}, (uploadURLs, code) => {
+		if (code === 200) {
+			var uploadURLs = JSON.parse(uploadURLs);
+			for (lineNumber in uploadURLs) {
+				lineNumber = parseInt(lineNumber.split("i")[1]);
+				var uploadURL = uploadURLs["i"+lineNumber];
+
+				//Add that chunk to the upload cue
+				postMessage({
+					req: "cuePUT",
+					syncURL: me.syncURL,
+					token: token,
+					url: uploadURL,
+					data: new TextDecoder("utf-8").decode(chunks[lineNumber]),
+					md5: 1,
+					method: "block"
+				});
+			}
+
+			//Add local map.json to the upload cue
+			apiPost('getMapUpload.php', {
 				token: token,
-				filename: filename,
-				index: lineNumber,
-				md5: localMap[lineNumber].md5
-			}, function(uploadURL, code) {
+				filename: filename
+			}, function(mapURL, code) {
 				if (code === 200) {
-					//Add that chunk to the upload cue
 					postMessage({
 						req: "cuePUT",
 						syncURL: me.syncURL,
 						token: token,
-						url: uploadURL,
-						data: new TextDecoder("utf-8").decode(chunks[lineNumber]),
-						md5: localMap[lineNumber].md5,
+						url: mapURL,
+						data: JSON.stringify(localMap),
 						method: "block"
 					});
 				}
 				else {
-					console.log(uploadURL);
+					console.log(mapURL);
 					postMessage({
 						req: 'upload',
 						code: code,
@@ -239,25 +268,8 @@ function upload(token, localMap, remoteMap, chunks, filename) {
 				}
 			});
 		}
-	}
-	
-	//Add local map.json to the upload cue
-	apiPost('getMapUpload.php', {
-		token: token,
-		filename: filename
-	}, function(mapURL, code) {
-		if (code === 200) {
-			postMessage({
-				req: "cuePUT",
-				syncURL: me.syncURL,
-				token: token,
-				url: mapURL,
-				data: JSON.stringify(localMap),
-				method: "block"
-			});
-		}
 		else {
-			console.log(mapURL);
+			console.log(uploadURLs);
 			postMessage({
 				req: 'upload',
 				code: code,
