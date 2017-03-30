@@ -116,7 +116,7 @@ public class BaseActivity extends AppCompatActivity {
 	static final int PERMISSION_REQ_RECORD = 1;
 	static final int IMAGE_SELECTOR = 1;
 	static final int FILE_SELECTOR = 2;
-	static final List<String> supportedAddons = Arrays.asList("asciimath");
+	static final List<String> supportedAddons = Arrays.asList("asciimath", "temp");
 	boolean isSaving = false;
 	boolean isSyncing = false;
 	boolean isNotepadSyncing = false;

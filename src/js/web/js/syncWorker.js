@@ -133,48 +133,58 @@ onmessage = function(event) {
 			var chunks = msg.chunks;
 
 			//Loop through the remote map to figure out which blocks are different
+			diffIndexes = "";
 			for (var lineNumber in remoteMap) {
 				if (lineNumber === 'lastModified') continue;
 				if (!localMap[lineNumber] || remoteMap[lineNumber].md5 !== localMap[lineNumber].md5) {
-					apiPostSync('getChunkDownload.php', {
-						token: msg.token,
-						filename: msg.filename,
-						index: lineNumber,
-						md5: remoteMap[lineNumber].md5
-					}, function(downloadURL, code) {
-						if (code === 200) {
-							//Download chunk
-							postMessage({
-								req: "progress",
-								type: "Download",
-								percentage: ((parseInt(lineNumber))/(Object.keys(remoteMap).length-1))*100
-							});
-							reqGetSync(downloadURL, function(res, code) {
-								chunks[lineNumber] = new TextEncoder().encode(res);
-								postMessage({
-									req: "progress",
-									type: "Download",
-									percentage: ((parseInt(lineNumber)+1)/(Object.keys(remoteMap).length-1))*100
-								});
-							});
-						}
-						else {
-							console.log(downloadURL);
-							return;
-						}
-					});
+					if (diffIndexes.length > 0) diffIndexes += ",";
+					diffIndexes += lineNumber;
 				}
 			}
 
-			var newNotepadStr = "";
-			for (var i = 0; i < chunks.length; i++) {
-				var chunk = chunks[i];
-				newNotepadStr += new TextDecoder("utf-8").decode(chunk);
-			}
-			postMessage({
-				req: 'download',
-				code: 200,
-				text: newNotepadStr
+			apiPostSync('getChunkDownload.php', {
+				token: msg.token,
+				filename: msg.filename,
+				index: 0,
+				multidex: diffIndexes,
+				md5: remoteMap[0].md5
+			}, (downloadURLs, code) => {
+				if (code === 200) {
+					var downloadURLs = JSON.parse(downloadURLs);
+					for (lineNumber in downloadURLs) {
+						var downloadURL = downloadURLs[lineNumber];
+
+						//Download chunk
+						postMessage({
+							req: "progress",
+							type: "Download",
+							percentage: ((parseInt(lineNumber))/(Object.keys(remoteMap).length-1))*100
+						});
+						reqGetSync(downloadURL, function(res, code) {
+							chunks[lineNumber] = new TextEncoder().encode(res);
+							postMessage({
+								req: "progress",
+								type: "Download",
+								percentage: ((parseInt(lineNumber)+1)/(Object.keys(remoteMap).length-1))*100
+							});
+						});
+					}
+
+					var newNotepadStr = "";
+					for (var i = 0; i < chunks.length; i++) {
+						var chunk = chunks[i];
+						newNotepadStr += new TextDecoder("utf-8").decode(chunk);
+					}
+					postMessage({
+						req: 'download',
+						code: 200,
+						text: newNotepadStr
+					});
+				}
+				else {
+					console.log(downloadURL);
+					return;
+				}
 			});
 			break;
 

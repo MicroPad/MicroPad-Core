@@ -81,11 +81,12 @@
 	<script type="text/javascript" async src="js/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
 	<script src="js/showdown.min.js"></script>
 	<script src="js/ASCIIMathML.js"></script>
+	<script src="js/ASCIIsvg.js"></script>
 	<script type="text/javascript">String.prototype.format||(String.prototype.format=function(){var a=arguments;return this.replace(/{(\d+)}/g,function(b,c){return"undefined"!=typeof a[c]?a[c]:b})});</script>
 	
 	<!-- JS Code -->
 	<script type="text/javascript">
-		showdown.extension('math', function() {
+		showdown.extension('maths', function() {
 			var matches = [];
 			return [
 				{
@@ -112,6 +113,33 @@
 			];
 		});
 
+		showdown.extension('graphs', function() {
+			var matches = [];
+			return [
+				{
+					type: 'lang',
+					regex: /=-=([^]+?)=-=/gi,
+					replace: function(s, match) {
+						matches.push("<embed width='400' height='400' src='img/d.svg' script='{0}'></embed>".format(match));
+						var n = matches.length - 1;
+						return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
+					}
+				},
+				{
+					type: 'output',
+					filter: function(text) {
+						for (var i = 0; i < matches.length; ++i) {
+							var pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
+							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+						}
+						//reset array
+						matches = [];
+						return text;
+					}
+				}
+			]
+		});
+
 		var md = new showdown.Converter({
 			parseImgDimensions: true,
 			simplifiedAutoLink: true,
@@ -120,7 +148,7 @@
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			smoothLivePreview: true,
-			extensions: ['math']
+			extensions: ['maths', 'graphs']
 		});
 
 		//Thanks to http://stackoverflow.com/a/12300351/998467
@@ -189,6 +217,8 @@
 						$(this).addClass('browser-default');
 					});
 					asciimath.translate(undefined, true);
+					console.log("test");
+					drawPictures();
 					MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 					break;
 
