@@ -71,23 +71,29 @@ public class NLevelAdapter extends BaseAdapter {
 	public List<NLevelListItem> filterItems() {
 		List<NLevelListItem> tempfiltered = new ArrayList<>();
 		//TODO: Fix/Catch exception that can (seemingly randomly) occur here
-		OUTER: for (NLevelListItem item : list) {
-			//add expanded items and top level items
-			//if parent is null then its a top level item
-			if(item.getParent() == null) {
-				tempfiltered.add(item);
-			} else {
-				//go through each ancestor to make sure they are all expanded
-				NLevelListItem parent = item;
-				while ((parent = parent.getParent())!= null) {
-					if (!parent.isExpanded()){
-						//one parent was not expanded
-						//skip the rest and continue the OUTER for loop
-						continue OUTER;
+		try {
+			OUTER:
+			for (NLevelListItem item : list) {
+				//add expanded items and top level items
+				//if parent is null then its a top level item
+				if (item.getParent() == null) {
+					tempfiltered.add(item);
+				} else {
+					//go through each ancestor to make sure they are all expanded
+					NLevelListItem parent = item;
+					while ((parent = parent.getParent()) != null) {
+						if (!parent.isExpanded()) {
+							//one parent was not expanded
+							//skip the rest and continue the OUTER for loop
+							continue OUTER;
+						}
 					}
+					tempfiltered.add(item);
 				}
-				tempfiltered.add(item);
 			}
+		}
+		catch (Exception e) {
+			tempfiltered = filterItems();
 		}
 
 		return tempfiltered;

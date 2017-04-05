@@ -14,12 +14,12 @@ public class SyncObject {
 	public SyncObject(byte[] npxBytes, String lastModified) throws JSONException, NoSuchAlgorithmException {
 		this.map.put("lastModified", lastModified);
 
-		this.chunks = new byte[(int)Math.ceil((double)npxBytes.length/1000000)][1000000];
+		this.chunks = new byte[(int)Math.ceil((double)npxBytes.length/5000000)][5000000];
 		int count = 0;
 		int pos = 0;
 		MessageDigest md5 = MessageDigest.getInstance("MD5");
 		while (pos < npxBytes.length) {
-			int newPos = Math.min(pos+1000000, npxBytes.length);
+			int newPos = Math.min(pos+5000000, npxBytes.length);
 			this.chunks[count] = Arrays.copyOfRange(npxBytes, pos, newPos);
 			pos = newPos;
 
