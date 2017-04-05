@@ -73,15 +73,15 @@ onmessage = function(event) {
 					//Split the octet array (npxUInt8Arr) chunks of 1000000B (where 1B = 8b)
 					var pos = 0;
 					var count = 0;
-					while (!chunks[chunks.length-1] || chunks[chunks.length-1].length === 1000000) {
-						var chunk = npxUInt8Arr.slice(pos, pos+1000000);
+					while (!chunks[chunks.length-1] || chunks[chunks.length-1].length === 5000000) {
+						var chunk = npxUInt8Arr.slice(pos, pos+5000000);
 						chunks.push(chunk);
 						pos += chunk.length;
 
 						localMap[count++] = {md5: md5(new TextDecoder("utf-8").decode(chunk))};
 					}
 
-					if (chunks.length > 1000) {
+					if (chunks.length > 200) {
 						postMessage({
 							req: 'error',
 							text: "Wowza! Your notepad is so big we can't store it.<br><br>It might be a good idea to split up your notepad."
