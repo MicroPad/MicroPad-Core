@@ -72,7 +72,6 @@ import com.getmicropad.NPXParser.Parser;
 import com.getmicropad.NPXParser.RecordingElement;
 import com.getmicropad.NPXParser.Section;
 import com.getmicropad.NPXParser.Source;
-import com.google.gson.Gson;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -80,6 +79,7 @@ import com.mikepenz.iconics.context.IconicsContextWrapper;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.threeten.bp.ZonedDateTime;
@@ -100,7 +100,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -979,7 +978,6 @@ public class BaseActivity extends AppCompatActivity {
 		progressDialog.setIndeterminate(false);
 		progressDialog.setCanceledOnTouchOutside(false);
 
-		this.isSyncing = true;
 		this.syncer.service.getMapDownload(token, Helpers.getFilename(this.getNotepad().getTitle())).enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -1017,26 +1015,15 @@ public class BaseActivity extends AppCompatActivity {
 													ZonedDateTime remoteMapTime = ZonedDateTime.parse(remoteMap.getString("lastModified"));
 													if (localMapTime.isAfter(remoteMapTime)) {
 														//Upload
+														String uploadIndexes = "";
 														for (int i = 0; i < syncObject.getMap().names().length(); i++) {
 															try {
 																String lineNumber = syncObject.getMap().names().getString(i);
 																if (lineNumber.equals("lastModified")) continue;
 																if (remoteMap.isNull(lineNumber) || !((JSONObject)syncObject.getMap().get(lineNumber)).get("md5").equals(((JSONObject)remoteMap.get(lineNumber)).get("md5"))) {
 																	//Upload Chunk
-																	try {
-																		Response<String> chunkURL = syncer.service.getChunkUpload(token, Helpers.getFilename(getNotepad().getTitle()), lineNumber, (String)((JSONObject)syncObject.getMap().get(lineNumber)).get("md5")).execute();
-																		if (chunkURL.isSuccessful()) {
-																			AndroidNetworking.put(chunkURL.body())
-																					.setPriority(Priority.IMMEDIATE)
-																					.setContentType("text/plain")
-																					.addStringBody(new String(syncObject.getChunks()[Integer.parseInt(lineNumber)], "UTF-8"))
-																					.build()
-																					.executeForString();
-
-																		}
-																	} catch (IOException e) {
-																		e.printStackTrace();
-																	}
+																	if (uploadIndexes.length() > 0) uploadIndexes += ",";
+																	uploadIndexes += lineNumber;
 																}
 															} catch (JSONException e) {
 																runOnUiThread(() -> {
@@ -1046,6 +1033,25 @@ public class BaseActivity extends AppCompatActivity {
 																e.printStackTrace();
 																return;
 															}
+														}
+
+														try {
+															Response<String> chunkURLs = syncer.service.getChunkUpload(token, Helpers.getFilename(getNotepad().getTitle()), "0", uploadIndexes, "md5").execute();
+															if (chunkURLs.isSuccessful()) {
+																JSONObject chunkURLList = new JSONObject(chunkURLs.body());
+																JSONArray lineNumbers = chunkURLList.names();
+																isSyncing = true;
+																for (int i = 0; i < lineNumbers.length(); i++) {
+																	AndroidNetworking.put(chunkURLList.getString(lineNumbers.getString(i)))
+																			.setPriority(Priority.IMMEDIATE)
+																			.setContentType("text/plain")
+																			.addStringBody(new String(syncObject.getChunks()[i], "UTF-8"))
+																			.build()
+																			.executeForString();
+																}
+															}
+														} catch (IOException e) {
+															e.printStackTrace();
 														}
 
 														try {
@@ -1086,35 +1092,20 @@ public class BaseActivity extends AppCompatActivity {
 																.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
 																	new Thread(() -> {
 																		List<byte[]> newNotepadChunks = new ArrayList<>(Arrays.asList(syncObject.getChunks()));
+																		String downloadIndexes = "";
 
 																		for (int i = 0; i < remoteMap.names().length(); i++) {
 																			try {
 																				String lineNumber = remoteMap.names().getString(i);
 																				if (lineNumber.equals("lastModified")) continue;
 																				if (syncObject.getMap().isNull(lineNumber) || !((JSONObject)remoteMap.get(lineNumber)).get("md5").equals(((JSONObject)syncObject.getMap().get(lineNumber)).get("md5"))) {
+																					if (downloadIndexes.length() > 0) downloadIndexes += ",";
+																					downloadIndexes += lineNumber;
+
 																					runOnUiThread(() -> {
 																						progressDialog.setProgress(0);
 																						progressDialog.show();
 																					});
-
-																					//Download Chunk
-																					try {
-																						Response<String> chunkURL = syncer.service.getChunkDownload(token, Helpers.getFilename(getNotepad().getTitle()), lineNumber, (String)((JSONObject)remoteMap.get(lineNumber)).get("md5")).execute();
-																						if (chunkURL.isSuccessful()) {
-																							ANRequest chunkReq = AndroidNetworking.get(chunkURL.body())
-																									.setPriority(Priority.IMMEDIATE)
-																									.build();
-																							if (newNotepadChunks.size() > Integer.parseInt(lineNumber)) {
-																								newNotepadChunks.set(Integer.parseInt(lineNumber), ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
-																							}
-																							else {
-																								newNotepadChunks.add(Integer.parseInt(lineNumber), ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
-																							}
-																							runOnUiThread(() -> progressDialog.setProgress((int)((((double)Integer.parseInt(lineNumber)+1)/(remoteMap.names().length()-1))*100)));
-																						}
-																					} catch (IOException e) {
-																						e.printStackTrace();
-																					}
 																				}
 																			} catch (JSONException e) {
 																				runOnUiThread(() -> {
@@ -1124,6 +1115,32 @@ public class BaseActivity extends AppCompatActivity {
 																				e.printStackTrace();
 																				return;
 																			}
+																		}
+
+																		//Download Chunk
+																		try {
+																			Response<String> chunkURLs = syncer.service.getChunkDownload(token, Helpers.getFilename(getNotepad().getTitle()), "0", downloadIndexes, "md5").execute();
+																			if (chunkURLs.isSuccessful()) {
+																				JSONObject chunkURLList = new JSONObject(chunkURLs.body());
+																				JSONArray lineNumbers = chunkURLList.names();
+																				isSyncing = true;
+																				for (int i = 0; i < lineNumbers.length(); i++) {
+																					int currentLine = Integer.parseInt(lineNumbers.getString(i).substring(1));
+																					ANRequest chunkReq = AndroidNetworking.get(chunkURLList.getString(lineNumbers.getString(i)))
+																							.setPriority(Priority.IMMEDIATE)
+																							.build();
+																					if (newNotepadChunks.size() > currentLine) {
+																						newNotepadChunks.set(currentLine, ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
+																					}
+																					else {
+																						newNotepadChunks.add(currentLine, ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
+																					}
+
+																					runOnUiThread(() -> progressDialog.setProgress((int)(((double)currentLine/(remoteMap.names().length()-1))*100)));
+																				}
+																			}
+																		} catch (IOException | JSONException e) {
+																			e.printStackTrace();
 																		}
 
 																		try {
