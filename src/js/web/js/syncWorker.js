@@ -162,7 +162,6 @@ onmessage = function(event) {
 							percentage: ((parseInt(lineNumber))/(Object.keys(remoteMap).length-1))*100
 						});
 						reqGetSync(downloadURL, function(res, code) {
-							console.log("run");
 							chunks[lineNumber] = new TextEncoder().encode(res);
 							postMessage({
 								req: "progress",
