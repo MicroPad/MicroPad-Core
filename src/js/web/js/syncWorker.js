@@ -63,6 +63,7 @@ onmessage = function(event) {
 			break;
 
 		case "sync":
+			//TODO: Reuse sync urls
 			reqGET(me.syncURL+'getMapDownload.php?token={0}&filename={1}'.format(msg.token, msg.filename), (res, code) => {
 				if (code == 200) {
 					var np = parser.restoreNotepad(msg.notepad);
