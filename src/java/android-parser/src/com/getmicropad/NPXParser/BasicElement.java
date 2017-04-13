@@ -1,12 +1,10 @@
 package com.getmicropad.NPXParser;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Text;
+import org.simpleframework.xml.*;
 
 import java.util.ArrayList;
 
+@Order(attributes={"height", "id", "width", "x", "y"})
 public class BasicElement implements NoteElement {
 	@Text
 	private String content;

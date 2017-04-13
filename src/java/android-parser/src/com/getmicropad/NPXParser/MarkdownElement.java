@@ -1,8 +1,10 @@
 package com.getmicropad.NPXParser;
 
 import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Order;
 import org.simpleframework.xml.Text;
 
+@Order(attributes={"fontSize", "height", "id", "width", "x", "y"})
 public class MarkdownElement implements NoteElement {
 	@Text(data = true)
 	private String content;

@@ -7,7 +7,7 @@ import org.simpleframework.xml.stream.Format;
 import java.io.*;
 
 public class Parser {
-	private static Serializer serializer = new Persister(new NPXMatcher(), new Format("<?xml version=\"1.0\" encoding= \"UTF-8\" ?>"));
+	private static Serializer serializer = new Persister(new NPXMatcher(), new Format(0, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"));
 
 	public static Notepad parseNpx(File in) throws Exception {
 		return serializer.read(Notepad.class, in);

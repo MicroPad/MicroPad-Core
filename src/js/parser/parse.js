@@ -37,10 +37,10 @@ Notepad.prototype.toXMLObject = function() {
 	var parseableNotepad = {
 		notepad: {
 			$: {
-				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
 				'xsi:noNamespaceSchemaLocation': 'https://getmicropad.com/schema.xsd',
 				title: this.title,
-				lastModified: this.lastModified
+				lastModified: this.lastModified,
+				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
 			},
 			section: []
 		}
@@ -55,15 +55,13 @@ Notepad.prototype.toXMLObject = function() {
 Notepad.prototype.toXML = function() {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
-		headless: false,
-		xmldec: {
-			version: '1.0',
-			encoding: 'UTF-8',
-			'standalone': false
+		headless: true,
+		renderOpts: {
+			'pretty': false
 		},
 		cdata: true
 	});
-	return builder.buildObject(this.toXMLObject());
+	return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'+builder.buildObject(this.toXMLObject()).replace(/&#xD;/g, '');
 }
 Notepad.prototype.toMarkdown = function() {
 	var notes = [];
@@ -170,6 +168,9 @@ Section.prototype.toXML = function() {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
 		headless: true,
+		renderOpts: {
+			'pretty': false
+		},
 		cdata: true
 	});
 	return builder.buildObject(this.toXMLObject());

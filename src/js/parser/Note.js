@@ -97,6 +97,9 @@ exports.Note.prototype.toXML = function() {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
 		headless: true,
+		renderOpts: {
+			'pretty': false
+		},
 		cdata: true
 	});
 	return builder.buildObject(this.toXMLObject());

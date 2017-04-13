@@ -12,6 +12,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 @Root(name="notepad")
+@Order(attributes={"noNamespaceSchemaLocation", "title", "lastModified"})
 public class Notepad implements Parent {
 	@ElementList(inline=true, type=Section.class, entry="section", required=false)
 	public List<Section> sections;
