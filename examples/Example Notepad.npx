@@ -15,7 +15,7 @@
       </bibliography>
       <markdown id="markdown1" x="10px" y="10px" height="auto" width="500px" fontSize="16px"><![CDATA[This is some text! I can format this text using (a slightly modified version of) *GitHub markdown!*
 
-#Random Heading
+# Random Heading
 
 > I like using [GitHub](https://github.com).
 
