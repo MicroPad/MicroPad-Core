@@ -4,7 +4,7 @@ import org.simpleframework.xml.*;
 
 import java.util.ArrayList;
 
-@Order(attributes={"height", "id", "width", "x", "y"})
+@Order(attributes={"id", "x", "y", "height", "width"})
 public class BasicElement implements NoteElement {
 	@Text
 	private String content;

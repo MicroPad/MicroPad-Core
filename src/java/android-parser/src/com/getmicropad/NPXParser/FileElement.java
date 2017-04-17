@@ -3,7 +3,7 @@ package com.getmicropad.NPXParser;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Order;
 
-@Order(attributes={"height", "id", "width", "x", "y", "filename"})
+@Order(attributes={"id", "x", "y", "height", "width", "filename"})
 public class FileElement extends BasicElement {
 	@Attribute
 	private String filename;

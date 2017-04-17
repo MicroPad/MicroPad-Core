@@ -3,6 +3,7 @@ package com.getmicropad.NPXParser;
 import org.simpleframework.xml.*;
 
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Root(name="note")
+@Order(attributes={"title", "time"})
 public class Note {
 	@Path("addons")
 	@ElementList(inline=true, type=String.class, entry="import", name="addons", required = false)

@@ -186,7 +186,7 @@ window.onload = function() {
 
 		var currentTarget = $('#' + event.currentTarget.id);
 		for (k in note.elements) {
-			notepad.lastModified = moment().format();
+			notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 			var element = note.elements[k];
 			if (element.args.id == event.currentTarget.id) {
 				lastEditedElement = element;
@@ -279,7 +279,7 @@ window.onload = function() {
 											var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
 											$("#"+element.args.id+" > img").attr('src', trimmed);
 
-											notepad.lastModified = moment().format();
+											notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 											saveToBrowser();
 										}
 									}
@@ -753,15 +753,7 @@ window.initNotepad = function() {
 
 		if (res !== null) {
 			var filename = '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, ''));
-			$.post(window.syncURL+'getSyncStatus.php', {token: res, filename: filename}, data => {
-				if (data.initialSyncDone) {
-					syncWorker.postMessage({
-						req: 'setOldXML',
-						notepad: notepad
-					});
-				}
-			}).fail(() => { return; });
-
+			
 			syncWorker.postMessage({
 				syncURL: window.syncURL,
 				req: "hasAddedNotepad",
@@ -813,7 +805,7 @@ function updateOpenList() {
 function downloadNotepad(filename) {
 	$('#open-microsync').modal('close');
 	notepad = parser.createNotepad(filename.split('.npx')[0]);
-	notepad.lastModified = moment().subtract(100, 'years').format();
+	notepad.lastModified = moment().subtract(100, 'years').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 	window.initNotepad();
 }
 
@@ -886,7 +878,7 @@ function newSection() {
 	var title = $('#new-section-title').val();
 	var index = parents[parents.length - 1].sections.push(parser.createSection(title)) - 1;
 	loadSection(index);
-	notepad.lastModified = moment().format();
+	notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 	saveToBrowser();
 
 	$('#new-section-title').val('');
@@ -899,7 +891,7 @@ function newNote() {
 	var index = notesInParent.push(newNote) - 1;
 	$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(index, newNote.title));
 	loadNote(index);
-	notepad.lastModified = moment().format();
+	notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 	saveToBrowser();
 
 	$('#new-note-title').val('');
@@ -935,14 +927,14 @@ function deleteOpen() {
 			else if (parents.length > 1 && !note) {
 				//Delete Section
 				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) { return s !== parents[parents.length - 1] });
-				notepad.lastModified = moment().format();
+				notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 				saveToBrowser();
 				loadParent(parents.length - 2);
 			}
 			else if (note) {
 				//Delete Note
 				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) { return n !== note });
-				notepad.lastModified = moment().format();
+				notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 				saveToBrowser();
 				loadParent(parents.length - 1);
 			}
@@ -959,7 +951,7 @@ function deleteElement() {
 			$('#'+lastEditedElement.args.id).remove();
 			if ($('#source_'+lastEditedElement.args.id).length) $('#source_'+lastEditedElement.args.id).remove();
 
-			notepad.lastModified = moment().format();
+			notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 			saveToBrowser();
 		}
 	});
@@ -1065,14 +1057,14 @@ function updateTitle() {
 		//Rename Section
 		parents[parents.length - 1].title = $('#title-input').val();
 		$('#parents > span:nth-last-child(2)').html(parents[parents.length - 1].title);
-		notepad.lastModified = moment().format();
+		notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 		saveToBrowser();
 	}
 	else if (note) {
 		//Rename Note
 		note.title = $('#title-input').val();
 		$('#open-note').html(note.title);
-		notepad.lastModified = moment().format();
+		notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 		saveToBrowser();
 	}
 }
@@ -1270,7 +1262,7 @@ function updateNote(id, init) {
 		}
 
 		resizePage($('#' + element.args.id));
-		if (!init) notepad.lastModified = moment().format();
+		if (!init) notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 		saveToBrowser();
 	}
 }
@@ -1353,7 +1345,7 @@ try {
 			if (id === element.args.id) {
 				blobToDataURL(blob, function(dataURI) {
 					element.content = dataURI;
-					notepad.lastModified = moment().format();
+					notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 					saveToBrowser();
 				});
 				break;
@@ -1802,7 +1794,7 @@ syncWorker.onmessage = function(event) {
 					});
 				}
 				else {
-					notepad.lastModified = moment().format();
+					notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 				}
 			});
 			break;
@@ -1878,7 +1870,7 @@ function msAddNotepad() {
 			req: 'addNotepad',
 			token: res,
 			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
-			lastModified: moment().subtract(100, 'years').format()
+			lastModified: moment().subtract(100, 'years').format('YYYY-MM-DDTHH:mm:ss.SSSZ')
 		});
 	});
 }

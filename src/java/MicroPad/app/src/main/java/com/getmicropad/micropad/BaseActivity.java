@@ -978,6 +978,9 @@ public class BaseActivity extends AppCompatActivity {
 		progressDialog.setIndeterminate(false);
 		progressDialog.setCanceledOnTouchOutside(false);
 
+		ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress);
+		progressBar.setIndeterminate(false);
+
 		this.syncer.service.getMapDownload(token, Helpers.getFilename(this.getNotepad().getTitle())).enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -1035,53 +1038,81 @@ public class BaseActivity extends AppCompatActivity {
 															}
 														}
 
-														try {
-															Response<String> chunkURLs = syncer.service.getChunkUpload(token, Helpers.getFilename(getNotepad().getTitle()), "0", uploadIndexes, "md5").execute();
-															if (chunkURLs.isSuccessful()) {
-																JSONObject chunkURLList = new JSONObject(chunkURLs.body());
-																JSONArray lineNumbers = chunkURLList.names();
-																isSyncing = true;
-																for (int i = 0; i < lineNumbers.length(); i++) {
-																	AndroidNetworking.put(chunkURLList.getString(lineNumbers.getString(i)))
-																			.setPriority(Priority.IMMEDIATE)
-																			.setContentType("text/plain")
-																			.addStringBody(new String(syncObject.getChunks()[i], "UTF-8"))
-																			.build()
-																			.executeForString();
-																}
-															}
-														} catch (IOException e) {
-															e.printStackTrace();
-														}
-
-														try {
-															Response<String> mapUploadUrl = syncer.service.getMapUpload(token, Helpers.getFilename(getNotepad().getTitle())).execute();
-															if (mapUploadUrl.isSuccessful()) {
-																AndroidNetworking.put(mapUploadUrl.body())
-																		.setPriority(Priority.IMMEDIATE)
-																		.setContentType("text/plain")
-																		.addJSONObjectBody(syncObject.getMap())
-																		.build()
-																		.executeForString();
-															}
-															else {
+														if (uploadIndexes.length() > 0) {
+															final String fnUploadIndexes = uploadIndexes;
+															Snackbar.make(findViewById(android.R.id.content), "Your notepad has changed", Snackbar.LENGTH_INDEFINITE).setAction("UPLOAD CHANGES", v -> new Thread(() -> {
 																runOnUiThread(() -> {
-																	syncBtn.clearAnimation();
-																	isSyncing = false;
+																	progressBar.setProgress(0);
+																	progressBar.setVisibility(View.VISIBLE);
 																});
-															}
-														} catch (IOException e) {
-															e.printStackTrace();
+
+																try {
+																	Response<String> chunkURLs = syncer.service.getChunkUpload(token, Helpers.getFilename(getNotepad().getTitle()), "0", fnUploadIndexes, "md5").execute();
+																	if (chunkURLs.isSuccessful()) {
+																		JSONObject chunkURLList = new JSONObject(chunkURLs.body());
+																		JSONArray lineNumbers = chunkURLList.names();
+																		isSyncing = true;
+																		for (int i = 0; i < lineNumbers.length(); i++) {
+																			int currentLine = Integer.parseInt(lineNumbers.getString(i).substring(1));
+																			AndroidNetworking.put(chunkURLList.getString(lineNumbers.getString(i)))
+																					.setPriority(Priority.IMMEDIATE)
+																					.setContentType("text/plain")
+																					.addStringBody(new String(syncObject.getChunks()[i], "UTF-8"))
+																					.build()
+																					.executeForString();
+
+																			runOnUiThread(() -> progressBar.setProgress((int)(((double)(currentLine+1)/(syncObject.getMap().names().length()-1))*100)));
+																		}
+																	}
+																} catch (IOException | JSONException e) {
+																	e.printStackTrace();
+																	runOnUiThread(() -> {
+																		syncBtn.clearAnimation();
+																		isSyncing = false;
+																		progressBar.setVisibility(View.GONE);
+																	});
+																}
+
+																try {
+																	Response<String> mapUploadUrl = syncer.service.getMapUpload(token, Helpers.getFilename(getNotepad().getTitle())).execute();
+																	if (mapUploadUrl.isSuccessful()) {
+																		AndroidNetworking.put(mapUploadUrl.body())
+																				.setPriority(Priority.IMMEDIATE)
+																				.setContentType("text/plain")
+																				.addJSONObjectBody(syncObject.getMap())
+																				.build()
+																				.executeForString();
+
+																		runOnUiThread(() -> {
+																			syncBtn.clearAnimation();
+																			isSyncing = false;
+																			progressBar.setVisibility(View.GONE);
+																		});
+																	}
+																	else {
+																		runOnUiThread(() -> {
+																			syncBtn.clearAnimation();
+																			isSyncing = false;
+																			progressBar.setVisibility(View.GONE);
+																		});
+																	}
+																} catch (IOException e) {
+																	e.printStackTrace();
+																	runOnUiThread(() -> {
+																		syncBtn.clearAnimation();
+																		isSyncing = false;
+																		progressBar.setVisibility(View.GONE);
+																	});
+																}
+															}).start()).show();
+														}
+														else {
 															runOnUiThread(() -> {
 																syncBtn.clearAnimation();
 																isSyncing = false;
+																progressBar.setVisibility(View.GONE);
 															});
 														}
-
-														runOnUiThread(() -> {
-															syncBtn.clearAnimation();
-															isSyncing = false;
-														});
 													}
 													else if (localMapTime.isBefore(remoteMapTime)) {
 														//Download

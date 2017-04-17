@@ -39,7 +39,7 @@ exports.Note.prototype.toXMLObject = function() {
 		note: {
 			$: {
 				title: this.title,
-				time: moment(this.time).format()
+				time: moment(this.time).format('YYYY-MM-DDTHH:mm:ss.SSSZ')
 			},
 			addons: [],
 			bibliography: []

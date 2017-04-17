@@ -5,7 +5,6 @@ importScripts('libs/md5.js');
 importScripts('parser.js');
 
 var me = {};
-var oldXML = "{}";
 
 var lastSyncLocalMap = "";
 var lastSyncRemoteMap = "";
@@ -189,15 +188,11 @@ onmessage = function(event) {
 				}
 			});
 			break;
-
-		case "setOldXML":
-			oldXML = parser.restoreNotepad(msg.notepad).toXML();
-			break;
 	}
 }
 
 function upload(token, localMap, remoteMap, chunks, filename) {
-	if (!remoteMap.lastModified) remoteMap.lastModified = moment(localMap.lastModified).subtract(100, 'years').format();
+	if (!remoteMap.lastModified) remoteMap.lastModified = moment(localMap.lastModified).subtract(100, 'years').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 	if (moment(localMap.lastModified).isBefore(moment(remoteMap.lastModified))) {
 		postMessage({
 			req: 'upload',

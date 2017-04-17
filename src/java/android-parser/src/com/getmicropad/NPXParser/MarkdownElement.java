@@ -4,7 +4,7 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Order;
 import org.simpleframework.xml.Text;
 
-@Order(attributes={"fontSize", "height", "id", "width", "x", "y"})
+@Order(attributes={"id", "x", "y", "height", "width", "fontSize"})
 public class MarkdownElement implements NoteElement {
 	@Text(data = true)
 	private String content;

@@ -25,6 +25,22 @@ public class Parser {
 		return serializer.read(Notepad.class, in);
 	}
 
+	public static Note parseNpxn(File in) throws Exception {
+		return serializer.read(Note.class, in);
+	}
+
+	public static Note parseNpxn(InputStream in) throws Exception {
+		return serializer.read(Note.class, in);
+	}
+
+	public static Note parseNpxn(Reader in) throws Exception {
+		return serializer.read(Note.class, in);
+	}
+
+	public static Note parseNpxn(String in) throws Exception {
+		return serializer.read(Note.class, in);
+	}
+
 	public static void toXml(Notepad notepad, File out) throws Exception {
 		serializer.write(notepad, out);
 	}
@@ -36,6 +52,13 @@ public class Parser {
 	public static String toXml(Notepad notepad) throws Exception {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		serializer.write(notepad, byteArrayOutputStream);
+		byteArrayOutputStream.close();
+		return byteArrayOutputStream.toString();
+	}
+
+	public static String toNpxn(Note note) throws Exception {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		serializer.write(note, byteArrayOutputStream);
 		byteArrayOutputStream.close();
 		return byteArrayOutputStream.toString();
 	}

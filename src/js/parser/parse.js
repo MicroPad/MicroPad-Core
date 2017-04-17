@@ -3,7 +3,6 @@ var parseString = require('xml2js').parseString;
 var moment = require('moment');
 var toMarkdown = require('to-markdown');
 var pd = require('pretty-data').pd;
-var JsDiff = require('diff');
 
 var Note = require('./Note.js').Note;
 
@@ -17,7 +16,7 @@ var Notepad = function(title, lastModified) {
 		this.lastModified = lastModified;
 	}
 	else {
-		this.lastModified = moment().format();
+		this.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 	}
 }
 Notepad.prototype.addSection = function(section) {
@@ -69,48 +68,6 @@ Notepad.prototype.toMarkdown = function() {
 		notes.push.apply(notes, this.sections[i].toMarkdown());
 	}
 	return notes;
-}
-Notepad.prototype.makeDiff = function(oldXML) {
-	var diff = JsDiff.parsePatch(JsDiff.createPatch('d.npx', oldXML, this.toXML(), undefined, undefined, {context: 0}))[0].hunks;
-
-	var processedDiff = [];
-	for (var i = 0; i < diff.length; i++) {
-		var toPush = {opts: {replace: false}};
-		toPush[diff[i].oldStart] = [];
-		var toDelete = [];
-
-		for (var j = 0; j < diff[i].lines.length; j++) {
-			var line = diff[i].lines[j];
-			switch (line.substring(0, 1)) {
-				case "-":
-					toPush.opts.replace = true;
-					toPush[diff[i].oldStart] = [""];
-					toDelete.push(parseInt(diff[i].oldStart)+j);
-					break;
-				case "+":
-					if (toPush[diff[i].oldStart][0] === "") toPush[diff[i].oldStart] = [];
-					toPush[diff[i].oldStart].push(line.substring(1, line.length));
-					break;
-			}
-		}
-
-		processedDiff.push(toPush);
-		if (toDelete.length > 1) {
-			for (var j = 1; j < toDelete.length; j++) {
-				var lineNumber = toDelete[j];
-				toPush = {opts: {replace: true}};
-				toPush[lineNumber] = [""];
-				processedDiff.push(toPush);
-			}
-		}
-	}
-
-	var diffStr = "";
-	for (var i = 0; i < processedDiff.length; i++) {
-		var hunk = processedDiff[i];
-		diffStr += JSON.stringify(hunk)+'\n';
-	}
-	return diffStr;
 }
 
 var Section = function(title) {
@@ -214,7 +171,7 @@ exports.parseFromEvernote = function parseFromEvernote(xml, addons) {
 		var notes = res['en-export'].note;
 		for (var i = 0; i < notes.length; i++) {
 			var noteXML = notes[i];
-			var note = new Note(noteXML.title[0], moment(noteXML.created[0]).format(), supportedAddons);
+			var note = new Note(noteXML.title[0], moment(noteXML.created[0]).format('YYYY-MM-DDTHH:mm:ss.SSSZ'), supportedAddons);
 
 			//Add the general note content
 			note.addElement('markdown', {
@@ -274,7 +231,7 @@ exports.createSection = function createSection(title) {
 }
 
 exports.createNote = function createNote(title, addons) {
-	return new Note(title, moment().format(), addons);
+	return new Note(title, moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ'), addons);
 }
 
 exports.restoreNotepad = function restoreNotepad(obj) {
@@ -301,7 +258,7 @@ exports.restoreSection = function restoreSection(obj) {
 	return restoredSection;
 }
 exports.restoreNote = function restoreNote(obj) {
-	var restoredNote = new Note(obj.title, moment(obj.time).format(), obj.addons);
+	var restoredNote = new Note(obj.title, moment(obj.time).format('YYYY-MM-DDTHH:mm:ss.SSSZ'), obj.addons);
 	for (k in obj.bibliography) {
 		var source = obj.bibliography[k];
 		restoredNote.addSource(source.id, source.item, source.content);
