@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import okhttp3.HttpUrl;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -17,19 +20,29 @@ public class MicroSyncManager {
 	private HttpUrl syncUri;
 	private JSONObject oldMap;
 	private Gson gson;
-	private Retrofit retrofit;
 	public MicroSyncService service;
+	private Map<String, S3Url> s3UrlMap = new HashMap<>();
+
 
 	public MicroSyncManager(String syncUri) {
 		this.syncUri = HttpUrl.parse(syncUri);
 		this.oldMap = new JSONObject();
 		this.gson = new Gson();
-		this.retrofit = new Retrofit.Builder()
+		Retrofit retrofit = new Retrofit.Builder()
 				.baseUrl(this.syncUri)
 //				.addConverterFactory(GsonConverterFactory.create())
 				.addConverterFactory(new StringConverterFactory())
 				.build();
-		this.service = this.retrofit.create(MicroSyncService.class);
+		this.service = retrofit.create(MicroSyncService.class);
+
+		s3UrlMap.put("getChunkUpload", new S3Url("getChunkUpload", service));
+		s3UrlMap.put("getChunkDownload", new S3Url("getChunkDownload", service));
+		s3UrlMap.put("getMapUpload", new S3Url("getMapUpload", service));
+		s3UrlMap.put("getMapDownload", new S3Url("getMapDownload", service));
+	}
+
+	public Map<String, S3Url> getS3UrlMap() {
+		return this.s3UrlMap;
 	}
 
 	public JSONObject getOldMap() {
@@ -56,10 +69,6 @@ public class MicroSyncManager {
 		@FormUrlEncoded
 		@POST("addNotepad.php")
 		Call<String> addNotepad(@Field("token") String token, @Field("filename") String filename, @Field("lastModified") String lastModified);
-
-		@FormUrlEncoded
-		@POST("sync.php")
-		Call<String> sync(@Field("token") String token, @Field("filename") String filename, @Field("lastModified") String lastModified, @Field("method") String method);
 
 		@FormUrlEncoded
 		@POST("getChunkUpload.php")

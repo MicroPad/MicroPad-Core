@@ -981,277 +981,269 @@ public class BaseActivity extends AppCompatActivity {
 		ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress);
 		progressBar.setIndeterminate(false);
 
-//		MicroSyncManager.S3Url mapDownloadUrl = new MicroSyncManager.S3Url("getMapDownload", )
-
-		this.syncer.service.getMapDownload(token, Helpers.getFilename(this.getNotepad().getTitle())).enqueue(new Callback<String>() {
+		syncer.getS3UrlMap().get("getMapDownload").getUrl(token, Helpers.getFilename(this.getNotepad().getTitle()), new S3Url.S3Return() {
 			@Override
-			public void onResponse(Call<String> call, Response<String> response) {
-				if (response.isSuccessful()) {
-					if (response.body().length() == 0) {
-						syncBtn.clearAnimation();
-						isSyncing = false;
-						return;
-					}
+			public void onResponse(String url) {
+				if (url.length() == 0) {
+					syncBtn.clearAnimation();
+					isSyncing = false;
+					return;
+				}
 
-					new Thread(() -> {
-						try {
-							byte[] npxBytes = Parser.toXml(getNotepad()).getBytes(StandardCharsets.UTF_8);
-							if (npxBytes.length > 1000000000) {
-								syncBtn.clearAnimation();
-								isSyncing = false;
+				new Thread(() -> {
+					try {
+						byte[] npxBytes = Parser.toXml(getNotepad()).getBytes(StandardCharsets.UTF_8);
+						if (npxBytes.length > 1000000000) {
+							syncBtn.clearAnimation();
+							isSyncing = false;
 
-								new AlertDialog.Builder(BaseActivity.this)
-										.setTitle("Error")
-										.setMessage("Wowza! Your notepad is so big we can't store it. It might be a good idea to split up your notepad.")
-										.setPositiveButton("Close", (dialog, which) -> {})
-										.show();
-								return;
-							}
-							SyncObject syncObject = new SyncObject(npxBytes, getNotepad().getLastModified().toXMLFormat());
-							AndroidNetworking.get(response.body())
-									.setPriority(Priority.IMMEDIATE)
-									.build()
-									.getAsJSONObject(new JSONObjectRequestListener() {
-										@Override
-										public void onResponse(JSONObject remoteMap) {
-											new Thread(() -> {
-												try {
-													ZonedDateTime localMapTime = ZonedDateTime.parse(syncObject.getMap().getString("lastModified"));
-													ZonedDateTime remoteMapTime = ZonedDateTime.parse(remoteMap.getString("lastModified"));
-													if (localMapTime.isAfter(remoteMapTime)) {
-														//Upload
-														String uploadIndexes = "";
-														for (int i = 0; i < syncObject.getMap().names().length(); i++) {
-															try {
-																String lineNumber = syncObject.getMap().names().getString(i);
-																if (lineNumber.equals("lastModified")) continue;
-																if (remoteMap.isNull(lineNumber) || !((JSONObject)syncObject.getMap().get(lineNumber)).get("md5").equals(((JSONObject)remoteMap.get(lineNumber)).get("md5"))) {
-																	//Upload Chunk
-																	if (uploadIndexes.length() > 0) uploadIndexes += ",";
-																	uploadIndexes += lineNumber;
-																}
-															} catch (JSONException e) {
-																runOnUiThread(() -> {
-																	syncBtn.clearAnimation();
-																	isSyncing = false;
-																});
-																e.printStackTrace();
-																return;
+							new AlertDialog.Builder(BaseActivity.this)
+									.setTitle("Error")
+									.setMessage("Wowza! Your notepad is so big we can't store it. It might be a good idea to split up your notepad.")
+									.setPositiveButton("Close", (dialog, which) -> {})
+									.show();
+							return;
+						}
+						SyncObject syncObject = new SyncObject(npxBytes, getNotepad().getLastModified().toXMLFormat());
+						AndroidNetworking.get(url)
+								.setPriority(Priority.IMMEDIATE)
+								.build()
+								.getAsJSONObject(new JSONObjectRequestListener() {
+									@Override
+									public void onResponse(JSONObject remoteMap) {
+										new Thread(() -> {
+											try {
+												ZonedDateTime localMapTime = ZonedDateTime.parse(syncObject.getMap().getString("lastModified"));
+												ZonedDateTime remoteMapTime = ZonedDateTime.parse(remoteMap.getString("lastModified"));
+												if (localMapTime.isAfter(remoteMapTime)) {
+													//Upload
+													String uploadIndexes = "";
+													for (int i = 0; i < syncObject.getMap().names().length(); i++) {
+														try {
+															String lineNumber = syncObject.getMap().names().getString(i);
+															if (lineNumber.equals("lastModified")) continue;
+															if (remoteMap.isNull(lineNumber) || !((JSONObject)syncObject.getMap().get(lineNumber)).get("md5").equals(((JSONObject)remoteMap.get(lineNumber)).get("md5"))) {
+																//Upload Chunk
+																if (uploadIndexes.length() > 0) uploadIndexes += ",";
+																uploadIndexes += lineNumber;
 															}
-														}
-
-														runOnUiThread(() -> {
-															syncBtn.clearAnimation();
-															isSyncing = false;
-														});
-
-														if (uploadIndexes.length() > 0) {
-															final String fnUploadIndexes = uploadIndexes;
-															Snackbar.make(findViewById(R.id.root_layout), "Your notepad has changed", Snackbar.LENGTH_INDEFINITE).setAction("UPLOAD CHANGES", v -> new Thread(() -> {
-																runOnUiThread(() -> {
-																	progressBar.setProgress(0);
-																	progressBar.setVisibility(View.VISIBLE);
-																});
-
-																try {
-																	Response<String> chunkURLs = syncer.service.getChunkUpload(token, Helpers.getFilename(getNotepad().getTitle()), "0", fnUploadIndexes, "md5").execute();
-																	if (chunkURLs.isSuccessful()) {
-																		JSONObject chunkURLList = new JSONObject(chunkURLs.body());
-																		JSONArray lineNumbers = chunkURLList.names();
-																		isSyncing = true;
-																		for (int i = 0; i < lineNumbers.length(); i++) {
-																			int currentLine = Integer.parseInt(lineNumbers.getString(i).substring(1));
-																			AndroidNetworking.put(chunkURLList.getString(lineNumbers.getString(i)))
-																					.setPriority(Priority.IMMEDIATE)
-																					.setContentType("text/plain")
-																					.addStringBody(new String(syncObject.getChunks()[i], "UTF-8"))
-																					.build()
-																					.executeForString();
-
-																			runOnUiThread(() -> progressBar.setProgress((int)(((double)(currentLine+1)/(syncObject.getMap().names().length()-1))*100)));
-																		}
-																	}
-																} catch (IOException | JSONException e) {
-																	e.printStackTrace();
-																	runOnUiThread(() -> {
-																		syncBtn.clearAnimation();
-																		isSyncing = false;
-																		progressBar.setVisibility(View.GONE);
-																	});
-																}
-
-																try {
-																	Response<String> mapUploadUrl = syncer.service.getMapUpload(token, Helpers.getFilename(getNotepad().getTitle())).execute();
-																	if (mapUploadUrl.isSuccessful()) {
-																		AndroidNetworking.put(mapUploadUrl.body())
-																				.setPriority(Priority.IMMEDIATE)
-																				.setContentType("text/plain")
-																				.addJSONObjectBody(syncObject.getMap())
-																				.build()
-																				.executeForString();
-
-																		runOnUiThread(() -> {
-																			syncBtn.clearAnimation();
-																			isSyncing = false;
-																			progressBar.setVisibility(View.GONE);
-																		});
-																	}
-																	else {
-																		runOnUiThread(() -> {
-																			syncBtn.clearAnimation();
-																			isSyncing = false;
-																			progressBar.setVisibility(View.GONE);
-																		});
-																	}
-																} catch (IOException e) {
-																	e.printStackTrace();
-																	runOnUiThread(() -> {
-																		syncBtn.clearAnimation();
-																		isSyncing = false;
-																		progressBar.setVisibility(View.GONE);
-																	});
-																}
-															}).start()).show();
-														}
-														else {
+														} catch (JSONException e) {
 															runOnUiThread(() -> {
 																syncBtn.clearAnimation();
 																isSyncing = false;
-																progressBar.setVisibility(View.GONE);
 															});
+															e.printStackTrace();
+															return;
 														}
 													}
-													else if (localMapTime.isBefore(remoteMapTime)) {
-														//Download
-														runOnUiThread(() -> new AlertDialog.Builder(BaseActivity.this)
-																.setTitle("Sync")
-																.setMessage("A newer version of this notepad is available. Do you want to get it?")
-																.setIcon(new IconicsDrawable(BaseActivity.this).icon(GoogleMaterial.Icon.gmd_cloud_download))
-																.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
-																	new Thread(() -> {
-																		List<byte[]> newNotepadChunks = new ArrayList<>(Arrays.asList(syncObject.getChunks()));
-																		String downloadIndexes = "";
 
-																		for (int i = 0; i < remoteMap.names().length(); i++) {
-																			try {
-																				String lineNumber = remoteMap.names().getString(i);
-																				if (lineNumber.equals("lastModified")) continue;
-																				if (syncObject.getMap().isNull(lineNumber) || !((JSONObject)remoteMap.get(lineNumber)).get("md5").equals(((JSONObject)syncObject.getMap().get(lineNumber)).get("md5"))) {
-																					if (downloadIndexes.length() > 0) downloadIndexes += ",";
-																					downloadIndexes += lineNumber;
+													runOnUiThread(() -> {
+														syncBtn.clearAnimation();
+														isSyncing = false;
+													});
 
-																					runOnUiThread(() -> {
-																						progressDialog.setProgress(0);
-																						progressDialog.show();
-																					});
-																				}
-																			} catch (JSONException e) {
-																				runOnUiThread(() -> {
-																					syncBtn.clearAnimation();
-																					isSyncing = false;
-																				});
-																				e.printStackTrace();
-																				return;
-																			}
-																		}
+													if (uploadIndexes.length() > 0) {
+														final String fnUploadIndexes = uploadIndexes;
+														Snackbar.make(findViewById(R.id.root_layout), "Your notepad has changed", Snackbar.LENGTH_INDEFINITE).setAction("UPLOAD CHANGES", v -> new Thread(() -> {
+															runOnUiThread(() -> {
+																progressBar.setProgress(0);
+																progressBar.setVisibility(View.VISIBLE);
+															});
 
-																		//Download Chunk
-																		try {
-																			Response<String> chunkURLs = syncer.service.getChunkDownload(token, Helpers.getFilename(getNotepad().getTitle()), "0", downloadIndexes, "md5").execute();
-																			if (chunkURLs.isSuccessful()) {
-																				JSONObject chunkURLList = new JSONObject(chunkURLs.body());
-																				JSONArray lineNumbers = chunkURLList.names();
-																				isSyncing = true;
-																				for (int i = 0; i < lineNumbers.length(); i++) {
-																					int currentLine = Integer.parseInt(lineNumbers.getString(i).substring(1));
-																					ANRequest chunkReq = AndroidNetworking.get(chunkURLList.getString(lineNumbers.getString(i)))
-																							.setPriority(Priority.IMMEDIATE)
-																							.build();
-																					if (newNotepadChunks.size() > currentLine) {
-																						newNotepadChunks.set(currentLine, ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
-																					}
-																					else {
-																						newNotepadChunks.add(currentLine, ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
-																					}
+															try {
+																String chunkURLs = syncer.getS3UrlMap().get("getChunkUpload").getUrl(token, Helpers.getFilename(getNotepad().getTitle()), fnUploadIndexes);
+																if (chunkURLs.length() > 0) {
+																	JSONObject chunkURLList = new JSONObject(chunkURLs);
+																	JSONArray lineNumbers = chunkURLList.names();
+																	isSyncing = true;
+																	for (int i = 0; i < lineNumbers.length(); i++) {
+																		int currentLine = Integer.parseInt(lineNumbers.getString(i).substring(1));
+																		AndroidNetworking.put(chunkURLList.getString(lineNumbers.getString(i)))
+																				.setPriority(Priority.IMMEDIATE)
+																				.setContentType("text/plain")
+																				.addStringBody(new String(syncObject.getChunks()[i], "UTF-8"))
+																				.build()
+																				.executeForString();
 
-																					runOnUiThread(() -> progressDialog.setProgress((int)(((double)(currentLine+1)/(remoteMap.names().length()-1))*100)));
-																				}
-																			}
-																		} catch (IOException | JSONException e) {
-																			e.printStackTrace();
-																		}
-
-																		try {
-																			String newNotepadXml = "";
-																			for (byte[] chunk : newNotepadChunks) {
-																				newNotepadXml += new String(chunk, "UTF-8");
-																			}
-
-																			Notepad newNotepad = Parser.parseNpx(newNotepadXml);
-																			syncer.setOldMap(remoteMap);
-																			runOnUiThread(() -> {
-																				setNotepad(newNotepad);
-																				saveNotepad(true);
-																			});
-																		} catch (Exception e) {
-																			e.printStackTrace();
-																		}
-
-																		runOnUiThread(() -> {
-																			progressDialog.dismiss();
-																			syncBtn.clearAnimation();
-																			isSyncing = false;
-																		});
-																	}).start();
-																})
-																.setNegativeButton(android.R.string.no, (d, w) -> {
-																	saveNotepad(false);
+																		runOnUiThread(() -> progressBar.setProgress((int)(((double)(currentLine+1)/(syncObject.getMap().names().length()-1))*100)));
+																	}
+																}
+															} catch (IOException | JSONException e) {
+																e.printStackTrace();
+																runOnUiThread(() -> {
 																	syncBtn.clearAnimation();
 																	isSyncing = false;
-																}).show());
+																	progressBar.setVisibility(View.GONE);
+																});
+															}
+
+															try {
+																String mapUploadUrl = syncer.getS3UrlMap().get("getMapUpload").getUrl(token, Helpers.getFilename(getNotepad().getTitle()));
+
+																if (mapUploadUrl.length() > 0) {
+																	AndroidNetworking.put(mapUploadUrl)
+																			.setPriority(Priority.IMMEDIATE)
+																			.setContentType("text/plain")
+																			.addJSONObjectBody(syncObject.getMap())
+																			.build()
+																			.executeForString();
+
+																	runOnUiThread(() -> {
+																		syncBtn.clearAnimation();
+																		isSyncing = false;
+																		progressBar.setVisibility(View.GONE);
+																	});
+																}
+																else {
+																	runOnUiThread(() -> {
+																		syncBtn.clearAnimation();
+																		isSyncing = false;
+																		progressBar.setVisibility(View.GONE);
+																	});
+																}
+															} catch (IOException e) {
+																e.printStackTrace();
+																runOnUiThread(() -> {
+																	syncBtn.clearAnimation();
+																	isSyncing = false;
+																	progressBar.setVisibility(View.GONE);
+																});
+															}
+														}).start()).show();
 													}
 													else {
 														runOnUiThread(() -> {
 															syncBtn.clearAnimation();
 															isSyncing = false;
+															progressBar.setVisibility(View.GONE);
 														});
 													}
-												} catch (JSONException e) {
+												}
+												else if (localMapTime.isBefore(remoteMapTime)) {
+													//Download
+													runOnUiThread(() -> new AlertDialog.Builder(BaseActivity.this)
+															.setTitle("Sync")
+															.setMessage("A newer version of this notepad is available. Do you want to get it?")
+															.setIcon(new IconicsDrawable(BaseActivity.this).icon(GoogleMaterial.Icon.gmd_cloud_download))
+															.setPositiveButton(android.R.string.yes, (dialogInterface, whichButton) -> {
+																new Thread(() -> {
+																	List<byte[]> newNotepadChunks = new ArrayList<>(Arrays.asList(syncObject.getChunks()));
+																	String downloadIndexes = "";
+
+																	for (int i = 0; i < remoteMap.names().length(); i++) {
+																		try {
+																			String lineNumber = remoteMap.names().getString(i);
+																			if (lineNumber.equals("lastModified")) continue;
+																			if (syncObject.getMap().isNull(lineNumber) || !((JSONObject)remoteMap.get(lineNumber)).get("md5").equals(((JSONObject)syncObject.getMap().get(lineNumber)).get("md5"))) {
+																				if (downloadIndexes.length() > 0) downloadIndexes += ",";
+																				downloadIndexes += lineNumber;
+
+																				runOnUiThread(() -> {
+																					progressDialog.setProgress(0);
+																					progressDialog.show();
+																				});
+																			}
+																		} catch (JSONException e) {
+																			runOnUiThread(() -> {
+																				syncBtn.clearAnimation();
+																				isSyncing = false;
+																			});
+																			e.printStackTrace();
+																			return;
+																		}
+																	}
+
+																	//Download Chunk
+																	try {
+																		String chunkURLs = syncer.getS3UrlMap().get("getChunkDownload").getUrl(token, Helpers.getFilename(getNotepad().getTitle()), downloadIndexes);
+																		if (chunkURLs.length() > 0) {
+																			JSONObject chunkURLList = new JSONObject(chunkURLs);
+																			JSONArray lineNumbers = chunkURLList.names();
+																			isSyncing = true;
+																			for (int i = 0; i < lineNumbers.length(); i++) {
+																				int currentLine = Integer.parseInt(lineNumbers.getString(i).substring(1));
+																				ANRequest chunkReq = AndroidNetworking.get(chunkURLList.getString(lineNumbers.getString(i)))
+																						.setPriority(Priority.IMMEDIATE)
+																						.build();
+																				if (newNotepadChunks.size() > currentLine) {
+																					newNotepadChunks.set(currentLine, ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
+																				}
+																				else {
+																					newNotepadChunks.add(currentLine, ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
+																				}
+
+																				runOnUiThread(() -> progressDialog.setProgress((int)(((double)(currentLine+1)/(remoteMap.names().length()-1))*100)));
+																			}
+																		}
+																	} catch (IOException | JSONException e) {
+																		e.printStackTrace();
+																	}
+
+																	try {
+																		String newNotepadXml = "";
+																		for (byte[] chunk : newNotepadChunks) {
+																			newNotepadXml += new String(chunk, "UTF-8");
+																		}
+
+																		Notepad newNotepad = Parser.parseNpx(newNotepadXml);
+																		syncer.setOldMap(remoteMap);
+																		runOnUiThread(() -> {
+																			setNotepad(newNotepad);
+																			saveNotepad(true);
+																		});
+																	} catch (Exception e) {
+																		e.printStackTrace();
+																	}
+
+																	runOnUiThread(() -> {
+																		progressDialog.dismiss();
+																		syncBtn.clearAnimation();
+																		isSyncing = false;
+																	});
+																}).start();
+															})
+															.setNegativeButton(android.R.string.no, (d, w) -> {
+																saveNotepad(false);
+																syncBtn.clearAnimation();
+																isSyncing = false;
+															}).show());
+												}
+												else {
 													runOnUiThread(() -> {
 														syncBtn.clearAnimation();
 														isSyncing = false;
 													});
-													e.printStackTrace();
 												}
-											}).start();
-										}
+											} catch (JSONException e) {
+												runOnUiThread(() -> {
+													syncBtn.clearAnimation();
+													isSyncing = false;
+												});
+												e.printStackTrace();
+											}
+										}).start();
+									}
 
-										@Override
-										public void onError(ANError anError) {
-											runOnUiThread(() -> {
-												syncBtn.clearAnimation();
-												isSyncing = false;
-											});
-										}
-									});
-						} catch (Exception e) {
-							e.printStackTrace();
-							runOnUiThread(() -> {
-								syncBtn.clearAnimation();
-								isSyncing = false;
-							});
-						}
-					}).start();
-				}
-				else {
-					isSyncing = false;
-					syncBtn.clearAnimation();
-					initNotepadSync(false);
-				}
+									@Override
+									public void onError(ANError anError) {
+										runOnUiThread(() -> {
+											syncBtn.clearAnimation();
+											isSyncing = false;
+										});
+									}
+								});
+					} catch (Exception e) {
+						e.printStackTrace();
+						runOnUiThread(() -> {
+							syncBtn.clearAnimation();
+							isSyncing = false;
+						});
+					}
+				}).start();
 			}
 
 			@Override
-			public void onFailure(Call<String> call, Throwable t) {
+			public void onFailure() {
 				isSyncing = false;
 				syncBtn.clearAnimation();
 				new AlertDialog.Builder(BaseActivity.this)
