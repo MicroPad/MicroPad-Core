@@ -10,6 +10,7 @@ import retrofit2.Response;
 
 public class S3Url {
 	private String url = "";
+	private String filename = "";
 	private String request;
 	private Date expireTime = new Date(0);
 	private MicroSyncManager.MicroSyncService service;
@@ -41,7 +42,12 @@ public class S3Url {
 			}
 		};
 
-		if (!this.url.equals("") || new Date().before(this.expireTime)) {
+		boolean notepadChanged = !this.filename.equals(filename);
+		if (notepadChanged) {
+			this.filename = filename;
+		}
+
+		if (!notepadChanged && !this.url.equals("") && new Date().before(this.expireTime)) {
 			callback.onResponse(this.url);
 		}
 		else {
@@ -67,7 +73,12 @@ public class S3Url {
 	}
 
 	public String getUrl(String token, String filename, String diffIndexes) throws IOException {
-		if (!this.url.equals("") || new Date().before(this.expireTime)) {
+		boolean notepadChanged = this.filename.equals(filename);
+		if (notepadChanged) {
+			this.filename = filename;
+		}
+
+		if (!notepadChanged && !this.url.equals("") && new Date().before(this.expireTime)) {
 			return this.url;
 		}
 		else {

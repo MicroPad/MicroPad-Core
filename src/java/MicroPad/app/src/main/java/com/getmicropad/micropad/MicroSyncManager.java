@@ -34,7 +34,11 @@ public class MicroSyncManager {
 				.addConverterFactory(new StringConverterFactory())
 				.build();
 		this.service = retrofit.create(MicroSyncService.class);
+		this.updateS3UrlMap();
+	}
 
+	public void updateS3UrlMap() {
+		s3UrlMap.clear();
 		s3UrlMap.put("getChunkUpload", new S3Url("getChunkUpload", service));
 		s3UrlMap.put("getChunkDownload", new S3Url("getChunkDownload", service));
 		s3UrlMap.put("getMapUpload", new S3Url("getMapUpload", service));
