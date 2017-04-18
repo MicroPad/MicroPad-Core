@@ -804,7 +804,7 @@ public class BaseActivity extends AppCompatActivity {
 				else {
 					parentList.remove((int)this.parentTree.get(i));
 				}
-				this.saveNotepad();
+				this.saveNotepad(false);
 				return;
 			}
 
@@ -822,7 +822,7 @@ public class BaseActivity extends AppCompatActivity {
 				else {
 					parentList.get(this.parentTree.get(i)).notes.remove((int)this.parentTree.get(i+1));
 				}
-				this.saveNotepad();
+				this.saveNotepad(false);
 				return;
 			}
 
@@ -834,7 +834,7 @@ public class BaseActivity extends AppCompatActivity {
 		List<Section> parentList = this.getNotepad().getSections();
 		for (int i = 0; i < this.parentTree.size(); i++) {
 			if (i == this.parentTree.size() - 1) {
-				this.saveNotepad();
+				this.saveNotepad(false);
 				return;
 			}
 
@@ -854,8 +854,8 @@ public class BaseActivity extends AppCompatActivity {
 		return null;
 	}
 
-	protected void saveNotepad() {
-		getNotepad().setLastModified(new Date());
+	protected void saveNotepad(boolean imported) {
+		if (!imported) getNotepad().setLastModified(new Date());
 		new AsyncTask<Object, String, Boolean>() {
 			private CharSequence oldTitle;
 
@@ -981,6 +981,8 @@ public class BaseActivity extends AppCompatActivity {
 		ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress);
 		progressBar.setIndeterminate(false);
 
+//		MicroSyncManager.S3Url mapDownloadUrl = new MicroSyncManager.S3Url("getMapDownload", )
+
 		this.syncer.service.getMapDownload(token, Helpers.getFilename(this.getNotepad().getTitle())).enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -1038,9 +1040,14 @@ public class BaseActivity extends AppCompatActivity {
 															}
 														}
 
+														runOnUiThread(() -> {
+															syncBtn.clearAnimation();
+															isSyncing = false;
+														});
+
 														if (uploadIndexes.length() > 0) {
 															final String fnUploadIndexes = uploadIndexes;
-															Snackbar.make(findViewById(android.R.id.content), "Your notepad has changed", Snackbar.LENGTH_INDEFINITE).setAction("UPLOAD CHANGES", v -> new Thread(() -> {
+															Snackbar.make(findViewById(R.id.root_layout), "Your notepad has changed", Snackbar.LENGTH_INDEFINITE).setAction("UPLOAD CHANGES", v -> new Thread(() -> {
 																runOnUiThread(() -> {
 																	progressBar.setProgress(0);
 																	progressBar.setVisibility(View.VISIBLE);
@@ -1167,7 +1174,7 @@ public class BaseActivity extends AppCompatActivity {
 																						newNotepadChunks.add(currentLine, ((String)chunkReq.executeForString().getResult()).getBytes(StandardCharsets.UTF_8));
 																					}
 
-																					runOnUiThread(() -> progressDialog.setProgress((int)(((double)currentLine/(remoteMap.names().length()-1))*100)));
+																					runOnUiThread(() -> progressDialog.setProgress((int)(((double)(currentLine+1)/(remoteMap.names().length()-1))*100)));
 																				}
 																			}
 																		} catch (IOException | JSONException e) {
@@ -1184,7 +1191,7 @@ public class BaseActivity extends AppCompatActivity {
 																			syncer.setOldMap(remoteMap);
 																			runOnUiThread(() -> {
 																				setNotepad(newNotepad);
-																				saveNotepad();
+																				saveNotepad(true);
 																			});
 																		} catch (Exception e) {
 																			e.printStackTrace();
@@ -1198,7 +1205,7 @@ public class BaseActivity extends AppCompatActivity {
 																	}).start();
 																})
 																.setNegativeButton(android.R.string.no, (d, w) -> {
-																	saveNotepad();
+																	saveNotepad(false);
 																	syncBtn.clearAnimation();
 																	isSyncing = false;
 																}).show());

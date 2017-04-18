@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_select_notepad"
+    android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.getmicropad.micropad.SelectNotepad"
@@ -42,4 +42,4 @@
         app:ico_icon="gmd-add"
         android:id="@+id/add_notepad_btn"
         app:rippleColor="#fff"/>
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>
