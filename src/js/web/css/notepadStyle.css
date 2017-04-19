@@ -154,6 +154,32 @@ nav {
 	transition: box-shadow .2s;
 }
 
+#viewer > div h1 {
+	font-size: 2em;
+	margin: 10px;
+}
+
+#viewer > div h2 {
+	font-size: 1.8em;
+	margin: 10px;
+}
+
+#viewer > div h3 {
+	font-size: 1.5em;
+	margin: 10px;
+}
+
+#viewer > div h4 {
+	font-size: 1.3em;
+	margin: 10px;
+}
+
+#viewer > div h5 {
+	font-size: 1em;
+	font-weight: 700;
+	margin: 10px;
+}
+
 .handle {
 	position: absolute;
 	text-align: center;
@@ -163,7 +189,11 @@ nav {
 	right: 0;
 	margin: auto;
 	cursor: move;
-	font-size: 16;
+	font-size: 16px;
+}
+
+.hidden-todo-msg {
+	font-size: 16px;
 }
 
 #modal {
