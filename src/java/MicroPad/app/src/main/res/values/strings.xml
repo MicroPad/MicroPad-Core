@@ -5,7 +5,7 @@
     <item name="new_section_context" type="id"/>
     <item name="new_note_context" type="id"/>
 
-    <string name="app_name">μPad</string>
+    <string name="app_name">MicroPad</string>
     <string name="import_btn">Import Notepad</string>
     <string name="new_np_btn">NEW NOTEPAD</string>
     <string name="delete">Delete</string>

@@ -11,6 +11,7 @@ import retrofit2.Response;
 public class S3Url {
 	private String url = "";
 	private String filename = "";
+	private String diffIndexes = "";
 	private String request;
 	private Date expireTime = new Date(0);
 	private MicroSyncManager.MicroSyncService service;
@@ -25,9 +26,9 @@ public class S3Url {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
 				if (response.isSuccessful()) {
+					updateDate();
 					url = response.body();
 					callback.onResponse(url);
-
 				}
 				else {
 					url = "";
@@ -42,12 +43,13 @@ public class S3Url {
 			}
 		};
 
-		boolean notepadChanged = !this.filename.equals(filename);
+		boolean notepadChanged = !(this.filename.equals(filename) && (diffIndexes.length() == 0 || this.diffIndexes.equals(diffIndexes)));
 		if (notepadChanged) {
 			this.filename = filename;
+			this.diffIndexes = diffIndexes;
 		}
 
-		if (!notepadChanged && !this.url.equals("") && new Date().before(this.expireTime)) {
+		if (!notepadChanged && this.url.length() > 0 && new Date().before(this.expireTime)) {
 			callback.onResponse(this.url);
 		}
 		else {
@@ -73,12 +75,13 @@ public class S3Url {
 	}
 
 	public String getUrl(String token, String filename, String diffIndexes) throws IOException {
-		boolean notepadChanged = this.filename.equals(filename);
+		boolean notepadChanged = !(this.filename.equals(filename) && (diffIndexes.length() == 0 || this.diffIndexes.equals(diffIndexes)));
 		if (notepadChanged) {
 			this.filename = filename;
+			this.diffIndexes = diffIndexes;
 		}
 
-		if (!notepadChanged && !this.url.equals("") && new Date().before(this.expireTime)) {
+		if (!notepadChanged && this.url.length() > 0 && new Date().before(this.expireTime)) {
 			return this.url;
 		}
 		else {
@@ -99,6 +102,7 @@ public class S3Url {
 			}
 
 			if (res != null && res.isSuccessful()) {
+				this.updateDate();
 				this.url = res.body();
 			}
 			else {
