@@ -3,6 +3,7 @@ importScripts('libs/localforage.min.js');
 importScripts('libs/encoding.js');
 importScripts('libs/md5.js');
 importScripts('parser.js');
+importScripts('S3Url.js')
 
 var me = {};
 
@@ -17,6 +18,16 @@ var appStorage = localforage.createInstance({
 
 onmessage = function(event) {
 	var msg = event.data;
+
+	if (Object.keys(me).length === 0) {
+		me.S3UrlMap = {
+			getChunkUpload: new S3Url("getChunkUpload", "POST", msg.syncURL),
+			getChunkDownload: new S3Url("getChunkDownload", "POST", msg.syncURL),
+			getMapUpload: new S3Url("getMapUpload", "POST", msg.syncURL),
+			getMapDownload: new S3Url("getMapDownload", "GET", msg.syncURL)
+		};
+	}
+
 	me.syncURL = msg.syncURL;
 
 	switch (msg.req) {
@@ -62,8 +73,7 @@ onmessage = function(event) {
 			break;
 
 		case "sync":
-			//TODO: Reuse sync urls
-			reqGET(me.syncURL+'getMapDownload.php?token={0}&filename={1}'.format(msg.token, msg.filename), (res, code) => {
+			me.S3UrlMap.getMapDownload.getUrl(msg.token, msg.filename, (res, code) => {
 				if (code == 200) {
 					var np = parser.restoreNotepad(msg.notepad);
 					var npxUInt8Arr = new TextEncoder().encode(np.toXML());
@@ -142,13 +152,7 @@ onmessage = function(event) {
 				}
 			}
 
-			apiPostSync('getChunkDownload.php', {
-				token: msg.token,
-				filename: msg.filename,
-				index: 0,
-				multidex: diffIndexes,
-				md5: remoteMap[0].md5
-			}, (downloadURLs, code) => {
+			me.S3UrlMap.getChunkDownload.getUrlSync(msg.token, msg.filename, (downloadURLs, code) => {
 				if (code === 200) {
 					var downloadURLs = JSON.parse(downloadURLs);
 					for (lineNumber in downloadURLs) {
@@ -186,7 +190,7 @@ onmessage = function(event) {
 					console.log(downloadURLs);
 					return;
 				}
-			});
+			}, diffIndexes);
 			break;
 	}
 }
@@ -212,13 +216,7 @@ function upload(token, localMap, remoteMap, chunks, filename) {
 		}
 	}
 
-	apiPostSync('getChunkUpload.php', {
-		token: token,
-		filename: filename,
-		index: 0,
-		multidex: diffIndexes,
-		md5: localMap[0].md5
-	}, (uploadURLs, code) => {
+	me.S3UrlMap.getChunkUpload.getUrlSync(token, filename, (uploadURLs, code) => {
 		if (code === 200) {
 			var uploadURLs = JSON.parse(uploadURLs);
 			for (lineNumber in uploadURLs) {
@@ -238,10 +236,7 @@ function upload(token, localMap, remoteMap, chunks, filename) {
 			}
 
 			//Add local map.json to the upload cue
-			apiPost('getMapUpload.php', {
-				token: token,
-				filename: filename
-			}, function(mapURL, code) {
+			me.S3UrlMap.getMapUpload.getUrl(token, filename, (mapURL, code) => {
 				if (code === 200) {
 					postMessage({
 						req: "cuePUT",
@@ -272,7 +267,7 @@ function upload(token, localMap, remoteMap, chunks, filename) {
 			});
 			return;
 		}
-	});
+	}, diffIndexes);
 }
 
 function apiPost(url, params, callback) {
