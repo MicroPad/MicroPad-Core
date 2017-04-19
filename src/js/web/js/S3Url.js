@@ -29,7 +29,7 @@ S3Url.prototype.getUrl = function(token, filename, callback, diffIndexes) {
 
 		switch(this.protocol) {
 			case "GET":
-				this.reqGet(this.syncUrl+this.request+'.php?token={0}&filename={1}'.format(token, filename), (url, code) => {
+				this.reqGet(this.syncUrl+this.request+'.php?token={0}&filename={1}&r={2}'.format(token, filename, new Date().getTime()), (url, code) => {
 					this.updateDate();
 					this.url = url;
 					if (code != 200) this.url = "";
@@ -71,7 +71,7 @@ S3Url.prototype.getUrlSync = function(token, filename, callback, diffIndexes) {
 
 		switch(this.protocol) {
 			case "GET":
-				this.reqGetSync(this.syncUrl+this.request+'.php?token={0}&filename={1}'.format(token, filename), (url, code) => {
+				this.reqGetSync(this.syncUrl+this.request+'.php?token={0}&filename={1}&r={2}'.format(token, filename, new Date().getTime()), (url, code) => {
 					this.updateDate();
 					this.url = url;
 					if (code != 200) this.url = "";
