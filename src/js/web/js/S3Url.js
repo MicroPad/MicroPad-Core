@@ -10,10 +10,6 @@ var S3Url = function(request, protocol, syncUrl) {
 
 S3Url.prototype.getUrl = function(token, filename, callback, diffIndexes) {
 	var notepadChanged = !(this.filename === filename && (this.diffIndexes === undefined || this.diffIndexes === diffIndexes));
-	if (notepadChanged) {
-		this.filename = filename;
-		this.diffIndexes = diffIndexes;
-	}
 
 	if (!notepadChanged && this.url.length > 0 && (this.expireTime > new Date())) {
 		callback(this.url, 200);
@@ -35,6 +31,11 @@ S3Url.prototype.getUrl = function(token, filename, callback, diffIndexes) {
 					if (code != 200) this.url = "";
 
 					callback(this.url, code);
+
+					if (notepadChanged) {
+						this.filename = filename;
+						this.diffIndexes = diffIndexes;
+					}
 				});
 				break;
 			case "POST":
@@ -44,6 +45,11 @@ S3Url.prototype.getUrl = function(token, filename, callback, diffIndexes) {
 					if (code != 200) this.url = "";
 
 					callback(this.url, code);
+
+					if (notepadChanged) {
+						this.filename = filename;
+						this.diffIndexes = diffIndexes;
+					}
 				});
 				break;
 		}
@@ -77,6 +83,11 @@ S3Url.prototype.getUrlSync = function(token, filename, callback, diffIndexes) {
 					if (code != 200) this.url = "";
 
 					callback(this.url, code);
+
+					if (notepadChanged) {
+						this.filename = filename;
+						this.diffIndexes = diffIndexes;
+					}
 				});
 				break;
 			case "POST":
@@ -86,6 +97,11 @@ S3Url.prototype.getUrlSync = function(token, filename, callback, diffIndexes) {
 					if (code != 200) this.url = "";
 
 					callback(this.url, code);
+
+					if (notepadChanged) {
+						this.filename = filename;
+						this.diffIndexes = diffIndexes;
+					}
 				});
 				break;
 		}
