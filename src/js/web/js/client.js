@@ -208,6 +208,15 @@ window.onload = function() {
 						$('#md-textarea').bind('input propertychange', function() {
 							element.content = $('#md-textarea').val();
 							currentTarget.html('<p class="handle">::::</p>'+md.makeHtml(element.content));
+
+							var checkedTodoItems = currentTarget.find('.task-list-item input:checked');
+							if (checkedTodoItems.length > 5) {
+								checkedTodoItems.each(function(i) {
+									$(this).parent().toggle();
+								});
+								currentTarget.append('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Show/Hide {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
+							}
+
 							updateReference(event);
 						});
 
@@ -1183,7 +1192,7 @@ function loadNote(id, delta) {
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
 		if (delta && $('#' + element.args.id).length) continue;
-		$('#viewer').append('<div id="{0}" class="interact resize drag z-depth-2 hoverable" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(element.args.id, element.args.x, element.args.y, element.args.width, element.args.height))
+		$('#viewer').append('<div id="{0}" class="interact resize drag z-depth-2 hoverable element" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(element.args.id, element.args.x, element.args.y, element.args.width, element.args.height))
 		var elementDiv = document.getElementById(element.args.id);
 
 		switch (element.type) {
@@ -1193,6 +1202,14 @@ function loadNote(id, delta) {
 				asciimath.translate(undefined, true);
 				drawPictures();
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
+				var checkedTodoItems = $('#'+element.args.id+' .task-list-item input:checked');
+				if (checkedTodoItems.length > 5) {
+					checkedTodoItems.each(function(i) {
+						$(this).parent().toggle();
+					});
+					elementDiv.innerHTML += '<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Show/Hide {1} Completed Items</a>'.format(element.args.id, checkedTodoItems.length);
+				}
 				break;
 			case "drawing":
 				elementDiv.style.padding = "0px";
@@ -1248,6 +1265,13 @@ function loadNote(id, delta) {
 		updateNote(undefined, true);
 	}, 1000);
 	updateInstructions();
+}
+
+function showTodo(id) {
+	$('#'+id+' .task-list-item input:checked').each(function(i) {
+		$(this).parent().toggle();
+	});
+	// $('#'+id+' > .hidden-todo-msg').hide();
 }
 
 function updateNote(id, init) {
@@ -1516,6 +1540,10 @@ function saveToBrowser(retry) {
 
 	$('#viewer ul').each(function(i) {
 		$(this).addClass('browser-default');
+	});
+
+	$('#viewer > .element').each(function(i) {
+		resizePage($(this), false);
 	});
 
 	notepadStorage.setItem(notepad.title, stringify(notepad), function() {
