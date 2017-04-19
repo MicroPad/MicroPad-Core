@@ -99,7 +99,7 @@ onmessage = function(event) {
 						return;
 					}
 
-					reqGET(res+'&r='+new Date().getTime(), (remoteMapJSON, code) => {
+					reqGET(res, (remoteMapJSON, code) => {
 						if (remoteMapJSON === lastSyncRemoteMap && JSON.stringify(localMap) === lastSyncLocalMap) {
 							postMessage({
 								req: 'upload',
@@ -165,7 +165,7 @@ onmessage = function(event) {
 							type: "Download",
 							percentage: ((parseInt(lineNumber))/(Object.keys(remoteMap).length-1))*100
 						});
-						reqGetSync(downloadURL+'&r='+new Date().getTime(), function(res, code) {
+						reqGetSync(downloadURL, function(res, code) {
 							chunks[lineNumber] = new TextEncoder().encode(res);
 							postMessage({
 								req: "progress",
