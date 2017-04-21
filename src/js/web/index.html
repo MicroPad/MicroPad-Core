@@ -26,7 +26,7 @@
 					<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
 					<!-- <a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a> -->
 					<ul class="left">
-						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v1.27.2-alpha" style="font-weight: 100; font-size: 1rem;">α</em></span>
+						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v1.28.0-alpha" style="font-weight: 100; font-size: 1rem;">α</em></span>
 					</ul>
 
 					<ul id="nav-desktop" class="right hide-on-med-and-down">
@@ -71,6 +71,7 @@
 					<li><input id="title-input" type="text" placeholder="Title" /></li>
 					<li><a href="javascript:updateTitle();" class="btn green waves-effect waves-light">Update Title</a></li>
 					<li><a href="javascript:deleteOpen();" class="btn red waves-effect waves-light"><i class="material-icons left" style="color: #fff;">delete_forever</i> Delete <span id="open-type"></span></a></li>
+					<li><a href="javascript:exportToPdf();" style="padding: 0 10px;" class="display-with-note btn blue waves-effect waves-light">Export/Print Note (PDF)</a></li>
 					<li><div class="divider"></div></li>
 					<li><a href="javascript:exportOpen();" class="btn blue waves-effect waves-light"><i class="material-icons left" style="color: #fff;">file_download</i> Export Notepad</a></li>
 				</div>
@@ -447,13 +448,15 @@
 		<script src="js/libs/mousetrap.min.js"></script>
 		<script src="js/libs/mammoth.browser.min.js"></script>
 		<script src="js/libs/recorderjs/recorder.min.js"></script>
-
 		<script src="js/libs/interact.min.js"></script>
 		<script src="js/libs/showdown.min.js"></script>
+		<script src="js/libs/html2canvas.js"></script>
+
 		<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
 		<script type="text/javascript" async src="js/libs/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
 		<script src="js/libs/ASCIIMathML.js"></script>
 		<script src="js/libs/ASCIIsvg.js"></script>
+
 		
 		<script src="js/parser.js"></script>
 		<script src="js/client.js"></script>

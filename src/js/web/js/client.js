@@ -14,6 +14,7 @@ var stillLoading = false;
 var syncWorker = new Worker('js/syncWorker.js');
 var syncMethod = "block";
 var hasAddedNotepad = "unknown";
+var todoShowToggle = {};
 
 var uploadWorker = new Worker('js/uploadWorker.js');
 var putRequests = [];
@@ -969,6 +970,71 @@ function exportOpen() {
 	saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
 }
 
+function exportToPdf() {
+	var printContents = "";
+	$(md.makeHtml(note.toMarkdown().md)).printThis({
+		importCSS: false,
+		header: "<em>{0}</em><hr />".format(note.title)
+	});
+
+	// convertToPdfMarkdown(mdNote => {
+	// });
+}
+
+function convertToPdfMarkdown(callback) {
+	var mdNote = "";
+	var elementsLeft = note.elements.length;
+
+	var mathsRe = /===([^]+?)===/gi;
+	var graphRe = /=-=([^]+?)=-=/gi;
+
+	for (var i = 0; i < note.elements.length; i++) {
+		var element = note.elements[i];
+		var citation = "";
+		for (var j = 0; j < note.bibliography.length; j++) {
+			var source = note.bibliography[j];
+
+			if (source.item === element.args.id) {
+				citation = "[[{0}]]({1})".format(source.id, source.content);
+			}
+		}
+
+		switch (element.type) {
+			case "markdown":
+				if (element.content.match(mathsRe) || element.content.match(graphRe)) {
+					if (!todoShowToggle[element.args.id]) showTodo(element.args.id);
+					html2canvas(document.getElementById(element.args.id), {
+						onrendered: canvas => {
+							mdNote += "![]({0}){1}\n\n".format(canvas.toDataURL("image/png"), citation);
+							elementsLeft--;
+							if (elementsLeft === 0) callback(mdNote);
+						}
+					});
+				}
+				else {
+					mdNote += element.content+citation+"\n\n";
+					elementsLeft--;
+					if (elementsLeft === 0) callback(mdNote);
+				}
+				break;
+
+			case "drawing":
+			case "image":
+				mdNote += "![]({0}){1}\n\n".format(element.content, citation);
+				elementsLeft--;
+				if (elementsLeft === 0) callback(mdNote);
+				break;
+
+			case "file":
+			case "recording":
+				mdNote += "[{0}]({1}){2}\n\n".format(element.args.filename, element.content, citation);
+				elementsLeft--;
+				if (elementsLeft === 0) callback(mdNote);
+				break;
+		}
+	}
+}
+
 function exportNotepads(type) {
 	var zip = new JSZip();
 	var ext = "npxz";
@@ -1263,7 +1329,6 @@ function loadNote(id, delta) {
 	updateInstructions();
 }
 
-var todoShowToggle = {};
 function showTodo(id) {
 	todoShowToggle[id] = !todoShowToggle[id];
 	if (todoShowToggle[id]) {
