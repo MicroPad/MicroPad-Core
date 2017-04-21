@@ -1272,6 +1272,8 @@ function showTodo(id) {
 	else {
 		$('#'+id+' .task-list-item input:checked').parentsUntil('ul').hide();
 	}
+
+	resizePage($('#'+id), false);
 }
 
 function updateNote(id, init) {
