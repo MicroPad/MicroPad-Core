@@ -211,9 +211,7 @@ window.onload = function() {
 
 							var checkedTodoItems = currentTarget.find('.task-list-item input:checked');
 							if (checkedTodoItems.length > 5) {
-								checkedTodoItems.each(function(i) {
-									$(this).parent().toggle();
-								});
+								checkedTodoItems.parentsUntil('ul').hide();
 								currentTarget.append('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Show/Hide {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
 							}
 
@@ -1205,9 +1203,7 @@ function loadNote(id, delta) {
 
 				var checkedTodoItems = $('#'+element.args.id+' .task-list-item input:checked');
 				if (checkedTodoItems.length > 5) {
-					checkedTodoItems.each(function(i) {
-						$(this).parent().toggle();
-					});
+					checkedTodoItems.parentsUntil('ul').hide();
 					elementDiv.innerHTML += '<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Show/Hide {1} Completed Items</a>'.format(element.args.id, checkedTodoItems.length);
 				}
 				break;
@@ -1267,11 +1263,15 @@ function loadNote(id, delta) {
 	updateInstructions();
 }
 
+var todoShowToggle = {};
 function showTodo(id) {
-	$('#'+id+' .task-list-item input:checked').each(function(i) {
-		$(this).parent().toggle();
-	});
-	// $('#'+id+' > .hidden-todo-msg').hide();
+	todoShowToggle[id] = !todoShowToggle[id];
+	if (todoShowToggle[id]) {
+		$('#'+id+' .task-list-item input:checked').parentsUntil('#'+id).show();
+	}
+	else {
+		$('#'+id+' .task-list-item input:checked').parentsUntil('ul').hide();
+	}
 }
 
 function updateNote(id, init) {
