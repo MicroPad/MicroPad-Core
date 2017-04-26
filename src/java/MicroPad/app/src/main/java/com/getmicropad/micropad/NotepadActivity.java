@@ -50,7 +50,7 @@ public class NotepadActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_select_notepad);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
 		/* Request permissions */
 		if (savedInstanceState != null) {
