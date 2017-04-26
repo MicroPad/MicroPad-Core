@@ -972,67 +972,11 @@ function exportOpen() {
 
 function exportToPdf() {
 	var printContents = "";
-	$(md.makeHtml(note.toMarkdown().md)).printThis({
+	$('<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script><script type="text/javascript" src="js/libs/MathJax/MathJax.js?config=MML_HTMLorMML"></script><script src="js/libs/ASCIIMathML.js"></script><script src="js/libs/ASCIIsvg.js"></script><script>window.onload = function() {asciimath.translate(undefined, true); MathJax.Hub.Queue(["Typeset", MathJax.Hub]);}</script>'+md.makeHtml(note.toMarkdown().md)).printThis({
 		importCSS: false,
-		header: "<em>{0}</em><hr />".format(note.title)
+		header: "<em>{0}</em><hr />".format(note.title),
+		removeScripts: false
 	});
-
-	// convertToPdfMarkdown(mdNote => {
-	// });
-}
-
-function convertToPdfMarkdown(callback) {
-	var mdNote = "";
-	var elementsLeft = note.elements.length;
-
-	var mathsRe = /===([^]+?)===/gi;
-	var graphRe = /=-=([^]+?)=-=/gi;
-
-	for (var i = 0; i < note.elements.length; i++) {
-		var element = note.elements[i];
-		var citation = "";
-		for (var j = 0; j < note.bibliography.length; j++) {
-			var source = note.bibliography[j];
-
-			if (source.item === element.args.id) {
-				citation = "[[{0}]]({1})".format(source.id, source.content);
-			}
-		}
-
-		switch (element.type) {
-			case "markdown":
-				if (element.content.match(mathsRe) || element.content.match(graphRe)) {
-					if (!todoShowToggle[element.args.id]) showTodo(element.args.id);
-					html2canvas(document.getElementById(element.args.id), {
-						onrendered: canvas => {
-							mdNote += "![]({0}){1}\n\n".format(canvas.toDataURL("image/png"), citation);
-							elementsLeft--;
-							if (elementsLeft === 0) callback(mdNote);
-						}
-					});
-				}
-				else {
-					mdNote += element.content+citation+"\n\n";
-					elementsLeft--;
-					if (elementsLeft === 0) callback(mdNote);
-				}
-				break;
-
-			case "drawing":
-			case "image":
-				mdNote += "![]({0}){1}\n\n".format(element.content, citation);
-				elementsLeft--;
-				if (elementsLeft === 0) callback(mdNote);
-				break;
-
-			case "file":
-			case "recording":
-				mdNote += "[{0}]({1}){2}\n\n".format(element.args.filename, element.content, citation);
-				elementsLeft--;
-				if (elementsLeft === 0) callback(mdNote);
-				break;
-		}
-	}
 }
 
 function exportNotepads(type) {
