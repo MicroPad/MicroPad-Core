@@ -187,6 +187,8 @@
 			extensions: ['maths', 'graphs']
 		});
 
+		var todoShowToggle = {};
+
 		//Thanks to http://stackoverflow.com/a/12300351/998467
 		function dataURItoBlob(dataURI) {
 			// convert base64 to raw binary data held in a string
@@ -255,6 +257,12 @@
 					asciimath.translate(undefined, true);
 					drawPictures();
 					MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
+					var checkedTodoItems = $('#'+id+' .task-list-item input:checked');
+					if (checkedTodoItems.length > 5) {
+						checkedTodoItems.parentsUntil('ul').hide();
+						elementDiv.innerHTML += '<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Show/Hide {1} Completed Items</a>'.format(id, checkedTodoItems.length);
+					}
 					break;
 
 				case "drawing":
@@ -318,6 +326,18 @@
 			if (path[1] && path[1].tagName.toLowerCase() === 'a') return;
 			Native.openEditor(event.currentTarget.id);
 		});
+
+		function showTodo(id) {
+			todoShowToggle[id] = !todoShowToggle[id];
+			if (todoShowToggle[id]) {
+				$('#'+id+' .task-list-item input:checked').parentsUntil('#'+id).show();
+			}
+			else {
+				$('#'+id+' .task-list-item input:checked').parentsUntil('ul').hide();
+			}
+
+			resizePage($('#'+id), false);
+		}
 	</script>
 </body>
 </html>
