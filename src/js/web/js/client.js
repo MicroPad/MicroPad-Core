@@ -646,6 +646,12 @@ window.onload = function() {
 			$('#'+lastEditedElement.args.id).click();
 		}
 	});
+	Mousetrap.bind('mod+p', e => {
+		if (note) {
+			e.preventDefault();
+			exportToPdf();
+		}
+	});
 	Mousetrap.bind('mod+1', e => {
 		if (parents.length > 0) {
 			e.preventDefault();
@@ -971,11 +977,30 @@ function exportOpen() {
 }
 
 function exportToPdf() {
-	var printContents = "";
-	$('<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script><script type="text/javascript" src="js/libs/MathJax/MathJax.js?config=MML_HTMLorMML"></script><script src="js/libs/ASCIIMathML.js"></script><script src="js/libs/ASCIIsvg.js"></script><script>window.onload = function() {asciimath.translate(undefined, true); MathJax.Hub.Queue(["Typeset", MathJax.Hub]);}</script>'+md.makeHtml(note.toMarkdown().md)).printThis({
-		importCSS: false,
-		header: "<em>{0}</em><hr />".format(note.title),
-		removeScripts: false
+	var printContents = $('<style>body {background-color: #fff;} .element {margin: 10px; padding: 5px; border: 1px solid grey;}</style><div></div>');
+
+	$('#viewer > .element').each(function(i) {
+		if (this.id.startsWith('markdown')) {
+			showTodo(this.id);
+		}
+		var cleanedElement = $(this.outerHTML.split('<p class="handle">::::</p>').join(''));
+		if (this.id.startsWith('file') || this.id.startsWith('recording')) return;
+
+		cleanedElement.removeClass();
+		cleanedElement.addClass('element');
+		cleanedElement.css('top', 'initial');
+		cleanedElement.css('left', 'initial');
+
+		cleanedElement.find('.MathJax > .MJX_Assistive_MathML').each(function(j) {
+			$(this).remove();
+		});
+
+		printContents.append(cleanedElement);
+	});
+	console.log(printContents);
+
+	printContents.printThis({
+		header: "<em>{0}</em><hr />".format(note.title)
 	});
 }
 
