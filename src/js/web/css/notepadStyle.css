@@ -143,15 +143,20 @@ nav {
 	background-color: #607d8b;
 	z-index: 1000;
 	padding: 10px;
-	overflow-x: auto;
+	overflow: auto;
 	color: #fff;
 	border-left: 2px solid #ffb300;
 }
 
 #notepad-explorer > ul {
 	width: auto;
+	overflow: auto;
 	white-space: nowrap;
-	bottom: 1280px;
+	padding-bottom: 128px;
+}
+
+#notepad-explorer ul {
+	overflow: visible !important;
 }
 
 #notepad-explorer li {
