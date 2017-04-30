@@ -893,7 +893,7 @@ function newNotepad() {
 function newSection() {
 	if (parents.length < 1) {
 		$('#new-note-title').val('');
-		alert("You have to create a section before adding a note");
+		alert("You have to create a notepad before adding a section");
 		return;
 	}
 
