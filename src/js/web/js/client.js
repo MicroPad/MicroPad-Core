@@ -898,7 +898,9 @@ function newSection() {
 	}
 
 	var title = $('#new-section-title').val();
-	var index = parents[parents.length - 1].sections.push(parser.createSection(title)) - 1;
+	var newSection = parser.createSection(title);
+	newSection.parent = parents[parents.length - 1];
+	var index = parents[parents.length - 1].sections.push(newSection) - 1;
 	loadSection(index);
 	notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 	saveToBrowser();
@@ -916,6 +918,7 @@ function newNote() {
 
 	var title = $('#new-note-title').val();
 	var newNote = parser.createNote(title, ['asciimath']);
+	newNote.parent = parents[parents.length - 1];
 	var notesInParent = parents[parents.length - 1].notes;
 	var index = notesInParent.push(newNote) - 1;
 	$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(index, newNote.title));
@@ -966,6 +969,7 @@ function deleteOpen() {
 				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) { return n !== note });
 				notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 				saveToBrowser();
+				updateNotepadExplorer();
 				loadParent(parents.length - 1);
 			}
 		}
