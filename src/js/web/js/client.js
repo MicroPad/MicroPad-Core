@@ -891,6 +891,12 @@ function newNotepad() {
 }
 
 function newSection() {
+	if (parents.length < 1) {
+		$('#new-note-title').val('');
+		alert("You have to create a section before adding a note");
+		return;
+	}
+
 	var title = $('#new-section-title').val();
 	var index = parents[parents.length - 1].sections.push(parser.createSection(title)) - 1;
 	loadSection(index);
@@ -901,6 +907,12 @@ function newSection() {
 }
 
 function newNote() {
+	if (parents.length < 2) {
+		$('#new-note-title').val('');
+		alert("You have to create a section before adding a note");
+		return;
+	}
+
 	var title = $('#new-note-title').val();
 	var newNote = parser.createNote(title, ['asciimath']);
 	var notesInParent = parents[parents.length - 1].notes;
