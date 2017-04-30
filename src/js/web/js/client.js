@@ -911,6 +911,7 @@ function newNote() {
 	saveToBrowser();
 
 	$('#new-note-title').val('');
+	updateNotepadExplorer();
 }
 
 function deleteOpen() {
@@ -1176,6 +1177,7 @@ function updateSelector() {
 
 var expUid = 0;
 function updateNotepadExplorer() {
+	expUid = 0;
 	$('#notepad-explorer').html('<strong>{0}</strong><ul id="exp-{1}-s"></ul>'.format(notepad.title, expUid));
 	expUid++;
 
@@ -1256,6 +1258,7 @@ function loadSection(id, providedSection) {
 		var note = section.notes[k];
 		$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(k, note.title));
 	}
+	updateNotepadExplorer();
 }
 
 function loadNote(id, delta) {
