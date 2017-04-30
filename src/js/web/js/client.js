@@ -904,6 +904,7 @@ function newSection() {
 	saveToBrowser();
 
 	$('#new-section-title').val('');
+	updateNotepadExplorer();
 }
 
 function newNote() {
@@ -1203,7 +1204,7 @@ function updateNotepadExplorer() {
 function addSectionToExplorer(parent, parentSelector, sec, currentPath) {
 	var uid = expUid;
 	expUid++;
-	parentSelector.append('<li id="exp-{1}" onclick="toggleExplorer(event, {1});"><i class="material-icons">book</i> {0}<ul id="exp-{1}-s" class="expandable"></ul></li>'.format(sec.title, uid));
+	parentSelector.append('<li id="exp-{1}" onclick="toggleExplorer(event, {1});"><i class="material-icons">book</i> {0} <span onclick="event.stopPropagation();loadSectionFromExplorer(\'{2}\')">(Open)</span><ul id="exp-{1}-s" class="expandable"></ul></li>'.format(sec.title, uid, currentPath.join()));
 
 	for (var i = 0; i < sec.sections.length; i++) {
 		addSectionToExplorer(sec, $('#exp-'+uid+'-s'), sec.sections[i], currentPath.concat([i]));
@@ -1244,6 +1245,22 @@ function loadNoteFromExplorer(currentPath) {
 	loadNote(currentPath[currentPath.length-1]);
 }
 
+function loadSectionFromExplorer(currentPath) {
+	var currentPath = currentPath.split(',');
+	var baseObj = {};
+	for (var i = 0; i < currentPath.length; i++) {
+		if (i === 0) {
+			baseObj = notepad.sections[currentPath[i]];
+		}
+		else {
+			baseObj = baseObj.sections[currentPath[i]];
+		}
+	}
+	parents = [];
+	recalculateParents(baseObj); //baseObj now equals the section that we're loading
+	loadSection(currentPath[currentPath.length-1]);
+}
+
 function loadSection(id, providedSection) {
 	var section = parents[parents.length - 1].sections[id];
 	if (providedSection) section = providedSection;
@@ -1270,7 +1287,6 @@ function loadSection(id, providedSection) {
 		var note = section.notes[k];
 		$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(k, note.title));
 	}
-	updateNotepadExplorer();
 }
 
 function loadNote(id, delta) {
