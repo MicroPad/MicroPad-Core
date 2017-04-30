@@ -74,12 +74,12 @@ nav {
 	margin-left: 10px;
 }
 
-#s-dd {
+#mob-s-dd {
 	color: #AAAFB4;
 	pointer-events: none;
 }
 
-#n-dd {
+#mob-n-dd {
 	color: #AAAFB4;
 	pointer-events: none;
 }
@@ -115,10 +115,9 @@ nav {
 	top: 128px;
 	background-image: url('../img/white-lines.png');
 	background-color:rgba(0, 0, 0, 0.5);
-	width: 100%;
+	width: 85%;
 	height: 100%;
 	pointer-events: none;
-	z-index: 1001;
 }
 #instructions {
 	position: absolute;
@@ -129,6 +128,9 @@ nav {
 	font-weight: 200;
 	font-size: 10vmin;
 	width: 80%;
+}
+#empty-viewer.mobile {
+	width: 100%;
 }
 
 #notepad-explorer {
@@ -153,6 +155,7 @@ nav {
 
 #notepad-explorer li {
 	cursor: pointer;
+	user-select: none;
 }
 
 #notepad-explorer li > ul {
@@ -160,7 +163,7 @@ nav {
 }
 
 #notepad-explorer .exp-note {
-	padding-left: 20px;
+	/*padding-left: 20px;*/
 }
 
 #viewer {
@@ -172,7 +175,7 @@ nav {
 	transform: scale(1);
 }
 
-#viewer .mobile {
+#viewer.mobile {
 	width: 100%;
 }
 

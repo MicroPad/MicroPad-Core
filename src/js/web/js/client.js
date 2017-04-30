@@ -753,10 +753,10 @@ window.initNotepad = function() {
 	$('#viewer').html('');
 	$('#parents > span:not(#open-note)').remove();
 	$('#open-note').hide();
-	$('#n-dd').css('color', '#AAAFB4');
-	$('#n-dd').css('pointer-events', 'none');
-	$('#s-dd').css('color', '#fff');
-	$('#s-dd').css('pointer-events', 'auto');
+	$('#mob-n-dd').css('color', '#AAAFB4');
+	$('#mob-n-dd').css('pointer-events', 'none');
+	$('#mob-s-dd').css('color', '#000');
+	$('#mob-s-dd').css('pointer-events', 'auto');
 	$('#search-link').css('color', '#fff');
 	$('#search-link').css('pointer-events', 'auto');
 	$('#notepadTitle').html(notepad.title);
@@ -1176,29 +1176,58 @@ function updateSelector() {
 
 var expUid = 0;
 function updateNotepadExplorer() {
-	$('#notepad-explorer').html('<strong>{0}</strong><ul></ul>'.format(notepad.title));
+	$('#notepad-explorer').html('<strong>{0}</strong><ul id="exp-{1}-s"></ul>'.format(notepad.title, expUid));
+	expUid++;
 
 	for (var i = 0; i < notepad.sections.length; i++) {
-		addSectionToExplorer(notepad, $('#notepad-explorer > ul'), notepad.sections[i]);
+		addSectionToExplorer(notepad, $('#notepad-explorer > ul'), notepad.sections[i], [i]);
 	}
+
+	toggleExplorer();
 }
 
-function addSectionToExplorer(parent, parentSelector, sec) {
+function addSectionToExplorer(parent, parentSelector, sec, currentPath) {
 	var uid = expUid;
 	expUid++;
-	parentSelector.append('<li id="exp-{1}"><i class="material-icons">book</i> {0}<ul id="exp-{1}-s"></ul></li>'.format(sec.title, uid));
+	parentSelector.append('<li id="exp-{1}" onclick="toggleExplorer(event, {1});"><i class="material-icons">book</i> {0}<ul id="exp-{1}-s" class="expandable"></ul></li>'.format(sec.title, uid));
 
 	for (var i = 0; i < sec.sections.length; i++) {
-		addSectionToExplorer(sec, $('#exp-'+uid+'-s'), sec.sections[i]);
+		addSectionToExplorer(sec, $('#exp-'+uid+'-s'), sec.sections[i], currentPath.concat([i]));
 	}
 
 	for (var i = 0; i < sec.notes.length; i++) {
-		parentSelector.append('<li class="exp-note"><i class="material-icons">note</i> {0}</li>'.format(sec.notes[i].title));
+		$('#exp-'+uid+'-s').append('<li class="exp-note" onclick="event.stopPropagation();loadNoteFromExplorer(\'{1}\');"><i class="material-icons">note</i> {0}</li>'.format(sec.notes[i].title, currentPath.concat([i]).join()));
 	}
 }
 
-function expandExplorer(uid) {
+function toggleExplorer(event, uid) {
+	if (event) event.stopPropagation();
 
+	if (uid == undefined) {
+		$('#notepad-explorer .expandable').toggle(1);
+	}
+	else {
+		$("#exp-"+uid+"-s").toggle(300);
+	}
+}
+
+function loadNoteFromExplorer(currentPath) {
+	var currentPath = currentPath.split(',');
+	var baseObj = {};
+	for (var i = 0; i < currentPath.length; i++) {
+		if (i === 0) {
+			baseObj = notepad.sections[currentPath[i]];
+		}
+		else if (i === currentPath.length-1) {
+			baseObj = baseObj.notes[currentPath[i]];
+		}
+		else {
+			baseObj = baseObj.sections[currentPath[i]];
+		}
+	}
+	parents = [];
+	recalculateParents(baseObj); //baseObj now equals the note that we're loading
+	loadNote(currentPath[currentPath.length-1]);
 }
 
 function loadSection(id, providedSection) {
@@ -1214,8 +1243,8 @@ function loadSection(id, providedSection) {
 	updateInstructions();
 	$('#open-type').html('Section');
 	$('#title-input').val(section.title);
-	$('#n-dd').css('color', '#fff');
-	$('#n-dd').css('pointer-events', 'auto');
+	$('#mob-n-dd').css('color', '#000');
+	$('#mob-n-dd').css('pointer-events', 'auto');
 
 	$('#selectorTitle').html(section.title);
 	for (k in section.sections) {
@@ -1699,7 +1728,7 @@ function resizeCanvas() {
 
 function mobileNav() {
 	if (isMobile()) {
-		$('#viewer').addClass('mobile');
+		$('#viewer, #empty-viewer').addClass('mobile');
 		$('#mob-np-dd').attr('data-activates', 'notepad-dropdown');
 		$('#mob-np-dd').dropdown();
 		$('#mob-s-dd').attr('data-activates', 'section-dropdown');
@@ -1709,13 +1738,9 @@ function mobileNav() {
 		$('#mob-n-dd').dropdown();
 	}
 	else {
-		$('#viewer').removeClass('mobile');
+		$('#viewer, #empty-viewer').removeClass('mobile');
 		$('#np-dd').attr('data-activates', 'notepad-dropdown');
-		$('#s-dd').attr('data-activates', 'section-dropdown');
-		$('#n-dd').attr('data-activates', 'notes-dropdown');
 		$('#np-dd').dropdown();
-		$('#s-dd').dropdown();
-		$('#n-dd').dropdown();
 	}
 }
 
