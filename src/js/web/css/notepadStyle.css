@@ -151,6 +151,7 @@ nav {
 #notepad-explorer > ul {
 	width: auto;
 	white-space: nowrap;
+	bottom: 1280px;
 }
 
 #notepad-explorer li {
