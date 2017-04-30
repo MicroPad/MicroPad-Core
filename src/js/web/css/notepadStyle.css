@@ -118,6 +118,7 @@ nav {
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
+	z-index: 1001;
 }
 #instructions {
 	position: absolute;
@@ -130,13 +131,49 @@ nav {
 	width: 80%;
 }
 
+#notepad-explorer {
+	position: fixed;
+	float: right;
+	top: 128px;
+	width: 15%;
+	left: 85%;
+	height: calc(100% - 128px);
+	background-color: #607d8b;
+	z-index: 1000;
+	padding: 10px;
+	overflow-x: auto;
+	color: #fff;
+	border-left: 2px solid #ffb300;
+}
+
+#notepad-explorer > ul {
+	width: auto;
+	white-space: nowrap;
+}
+
+#notepad-explorer li {
+	cursor: pointer;
+}
+
+#notepad-explorer li > ul {
+	padding-left: 10px; !important
+}
+
+#notepad-explorer .exp-note {
+	padding-left: 20px;
+}
+
 #viewer {
 	position: relative;
-	width: 100%;
+	width: 85%;
 	height: calc(100% - 128px);
 	top: 128px;
 	transform-origin: 0 0;
 	transform: scale(1);
+}
+
+#viewer .mobile {
+	width: 100%;
 }
 
 .interact {

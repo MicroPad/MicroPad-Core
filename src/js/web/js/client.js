@@ -760,6 +760,8 @@ window.initNotepad = function() {
 	$('#search-link').css('color', '#fff');
 	$('#search-link').css('pointer-events', 'auto');
 	$('#notepadTitle').html(notepad.title);
+
+	updateNotepadExplorer();
 	updateInstructions();
 
 	appStorage.getItem('syncToken', function(err, res) {
@@ -1170,6 +1172,33 @@ function updateSelector() {
 
 	if (parents.length > 0) $('#add-section-link').css('display', 'block');
 	if (parents.length > 1) $('#add-note-link').css('display', 'block');
+}
+
+var expUid = 0;
+function updateNotepadExplorer() {
+	$('#notepad-explorer').html('<strong>{0}</strong><ul></ul>'.format(notepad.title));
+
+	for (var i = 0; i < notepad.sections.length; i++) {
+		addSectionToExplorer(notepad, $('#notepad-explorer > ul'), notepad.sections[i]);
+	}
+}
+
+function addSectionToExplorer(parent, parentSelector, sec) {
+	var uid = expUid;
+	expUid++;
+	parentSelector.append('<li id="exp-{1}"><i class="material-icons">book</i> {0}<ul id="exp-{1}-s"></ul></li>'.format(sec.title, uid));
+
+	for (var i = 0; i < sec.sections.length; i++) {
+		addSectionToExplorer(sec, $('#exp-'+uid+'-s'), sec.sections[i]);
+	}
+
+	for (var i = 0; i < sec.notes.length; i++) {
+		parentSelector.append('<li class="exp-note"><i class="material-icons">note</i> {0}</li>'.format(sec.notes[i].title));
+	}
+}
+
+function expandExplorer(uid) {
+
 }
 
 function loadSection(id, providedSection) {
@@ -1670,6 +1699,7 @@ function resizeCanvas() {
 
 function mobileNav() {
 	if (isMobile()) {
+		$('#viewer').addClass('mobile');
 		$('#mob-np-dd').attr('data-activates', 'notepad-dropdown');
 		$('#mob-np-dd').dropdown();
 		$('#mob-s-dd').attr('data-activates', 'section-dropdown');
@@ -1679,6 +1709,7 @@ function mobileNav() {
 		$('#mob-n-dd').dropdown();
 	}
 	else {
+		$('#viewer').removeClass('mobile');
 		$('#np-dd').attr('data-activates', 'notepad-dropdown');
 		$('#s-dd').attr('data-activates', 'section-dropdown');
 		$('#n-dd').attr('data-activates', 'notes-dropdown');
