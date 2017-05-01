@@ -164,6 +164,10 @@ nav {
 	user-select: none;
 }
 
+#notepad-explorer.touch li {
+	margin: 20px 0 20px 0;
+}
+
 #notepad-explorer li > ul {
 	padding-left: 10px; !important
 }

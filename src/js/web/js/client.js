@@ -119,6 +119,10 @@ window.onload = function() {
 	$('#menu-button').sideNav();
 	wasMobile = isMobile();
 
+	if (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) {
+		$('#notepad-explorer').addClass('touch');
+	}
+
 	if (window.platform === 'web') {
 		/** Restore to previous notepad */
 		appStorage.getItem('lastNotepadTitle', function(e, title) {
