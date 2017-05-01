@@ -913,12 +913,12 @@ function newSection() {
 	var newSection = parser.createSection(title);
 	newSection.parent = parents[parents.length - 1];
 	var index = parents[parents.length - 1].sections.push(newSection) - 1;
+	updateNotepadExplorer();
 	loadSection(index);
 	notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 	saveToBrowser();
 
 	$('#new-section-title').val('');
-	updateNotepadExplorer();
 }
 
 function newNote() {
