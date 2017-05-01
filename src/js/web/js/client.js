@@ -1744,46 +1744,6 @@ function resizeCanvas() {
 	canvasOffset = canvas.offset();
 }
 
-function mobileNav() {
-	if (isMobile()) {
-		$('#viewer, #empty-viewer').addClass('mobile');
-		$('#mob-np-dd').attr('data-activates', 'notepad-dropdown');
-		$('#mob-np-dd').dropdown();
-		$('#mob-s-dd').attr('data-activates', 'section-dropdown');
-		$('#mob-n-dd').attr('data-activates', 'notes-dropdown');
-		$('#mob-np-dd').dropdown();
-		$('#mob-s-dd').dropdown();
-		$('#mob-n-dd').dropdown();
-	}
-	else {
-		$('#viewer, #empty-viewer').removeClass('mobile');
-		$('#np-dd').attr('data-activates', 'notepad-dropdown');
-		$('#np-dd').dropdown();
-	}
-}
-
-function updateInstructions() {
-	if (!notepad) {
-		$('#empty-viewer').show();
-		$('#instructions').html("You don't have a notepad open. Open or create one to <s>procrastinate</s> study.");
-	}
-	else if (parents.length === 1) {
-		$('#empty-viewer').show();
-		$('#instructions').html("We don't put our notes in notepads directly. Use the sections menu to open or create a section.");
-	}
-	else if (!note) {
-		$('#empty-viewer').show();
-		$('#instructions').html("You're in a section! You can either open/create a note or open/create a sub-section.");
-	}
-	else if (note.elements.length === 0) {
-		$('#empty-viewer').show();
-		$('#instructions').html("Welcome to your note! Press anywhere on here to insert an element.");
-	}
-	else {
-		$('#empty-viewer').hide();
-	}
-}
-
 function zoom(zoomIn) {
 	if (!note) return;
 
