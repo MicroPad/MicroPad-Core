@@ -974,16 +974,16 @@ function deleteOpen() {
 				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) { return s !== parents[parents.length - 1] });
 				notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 				saveToBrowser();
-				updateNotepadExplorer();
 				loadParent(parents.length - 2);
+				updateNotepadExplorer();
 			}
 			else if (note) {
 				//Delete Note
 				parents[parents.length - 1].notes = parents[parents.length - 1].notes.filter(function(n) { return n !== note });
 				notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 				saveToBrowser();
-				updateNotepadExplorer();
 				loadParent(parents.length - 1);
+				updateNotepadExplorer();
 			}
 		}
 	});
