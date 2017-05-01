@@ -1275,7 +1275,6 @@ function loadNote(id, delta) {
 	if (!delta) {
 		window.scrollTo(0, 0);
 		noteID = id;
-		oldNote = note;
 		note = parents[parents.length - 1].notes[id];
 		document.title = note.title + " - µPad";
 		linkBreadcrumbs();
