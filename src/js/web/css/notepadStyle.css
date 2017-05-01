@@ -115,7 +115,7 @@ nav {
 	top: 128px;
 	background-image: url('../img/white-lines.png');
 	background-color:rgba(0, 0, 0, 0.5);
-	width: 85%;
+	width: 80%;
 	height: 100%;
 	pointer-events: none;
 }
@@ -137,8 +137,8 @@ nav {
 	position: fixed;
 	float: right;
 	top: 128px;
-	width: 15%;
-	left: 85%;
+	width: 20%;
+	left: 80%;
 	height: calc(100% - 128px);
 	background-color: #607d8b;
 	z-index: 1000;
@@ -174,7 +174,7 @@ nav {
 
 #viewer {
 	position: relative;
-	width: 85%;
+	width: 80%;
 	height: calc(100% - 128px);
 	top: 128px;
 	transform-origin: 0 0;
