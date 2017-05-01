@@ -1121,6 +1121,7 @@ function updateTitle() {
 		$('#parents > span:nth-last-child(2)').html(parents[parents.length - 1].title);
 		notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 		saveToBrowser();
+		updateNotepadExplorer();
 	}
 	else if (note) {
 		//Rename Note
@@ -1128,6 +1129,7 @@ function updateTitle() {
 		$('#open-note').html(note.title);
 		notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 		saveToBrowser();
+		updateNotepadExplorer();
 	}
 }
 
