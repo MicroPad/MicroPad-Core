@@ -881,6 +881,14 @@ function recalculateParents(baseObj) {
 	linkBreadcrumbs();
 }
 
+function getCurrentPath() {
+	var currentPath = [];
+	for (var i = parents.length - 1; i >= 1; i--) {
+		currentPath.unshift(parents[i-1].sections.indexOf(parents[i]));
+	}
+	return currentPath;
+}
+
 function scrollBreadcrumbs() {
 	$('#parents').scrollLeft($('#breadcrumb-holder').width());
 }
@@ -966,6 +974,7 @@ function deleteOpen() {
 				parents[parents.length - 2].sections = parents[parents.length - 2].sections.filter(function(s) { return s !== parents[parents.length - 1] });
 				notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 				saveToBrowser();
+				updateNotepadExplorer();
 				loadParent(parents.length - 2);
 			}
 			else if (note) {
@@ -1198,44 +1207,6 @@ function updateSelector() {
 	if (parents.length > 1) $('#add-note-link').css('display', 'block');
 }
 
-var expUid = 0;
-function updateNotepadExplorer() {
-	expUid = 0;
-	$('#notepad-explorer').html('<strong>{0}</strong><ul id="exp-{1}-s"></ul>'.format(notepad.title, expUid));
-	expUid++;
-
-	for (var i = 0; i < notepad.sections.length; i++) {
-		addSectionToExplorer(notepad, $('#notepad-explorer > ul'), notepad.sections[i], [i]);
-	}
-
-	toggleExplorer();
-}
-
-function addSectionToExplorer(parent, parentSelector, sec, currentPath) {
-	var uid = expUid;
-	expUid++;
-	parentSelector.append('<li id="exp-{1}" onclick="toggleExplorer(event, {1});"><i class="material-icons">book</i> {0} <span onclick="event.stopPropagation();loadSectionFromExplorer(\'{2}\')">(Open)</span><ul id="exp-{1}-s" class="expandable"></ul></li>'.format(sec.title, uid, currentPath.join()));
-
-	for (var i = 0; i < sec.sections.length; i++) {
-		addSectionToExplorer(sec, $('#exp-'+uid+'-s'), sec.sections[i], currentPath.concat([i]));
-	}
-
-	for (var i = 0; i < sec.notes.length; i++) {
-		$('#exp-'+uid+'-s').append('<li class="exp-note" onclick="event.stopPropagation();loadNoteFromExplorer(\'{1}\');"><i class="material-icons">note</i> {0}</li>'.format(sec.notes[i].title, currentPath.concat([i]).join()));
-	}
-}
-
-function toggleExplorer(event, uid) {
-	if (event) event.stopPropagation();
-
-	if (uid == undefined) {
-		$('#notepad-explorer .expandable').toggle(1);
-	}
-	else {
-		$("#exp-"+uid+"-s").toggle(300);
-	}
-}
-
 function loadNoteFromExplorer(currentPath) {
 	var currentPath = currentPath.split(',');
 	var baseObj = {};
@@ -1297,6 +1268,7 @@ function loadSection(id, providedSection) {
 		var note = section.notes[k];
 		$('#noteList').append('<li><a href="javascript:loadNote({0});">{1}</a></li>'.format(k, note.title));
 	}
+	autoExpandExplorer();
 }
 
 function loadNote(id, delta) {
@@ -1385,7 +1357,6 @@ function loadNote(id, delta) {
 
 			updateNote(event.target.id);
 			justMoved = true;
-
 		}
 	});
 
@@ -1395,6 +1366,7 @@ function loadNote(id, delta) {
 		updateNote(undefined, true);
 	}, 1000);
 	updateInstructions();
+	autoExpandExplorer();
 }
 
 function showTodo(id, allOn) {
