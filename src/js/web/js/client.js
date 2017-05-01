@@ -1000,7 +1000,7 @@ function exportToPdf() {
 	var printContents = $('<style>body {background-color: #fff;} .element {margin: 10px; padding: 5px; border: 1px solid grey;} table, th, td {border: 1px solid black;border-collapse: collapse;background-color: #fff;}</style><div></div>');
 	$('#viewer > .element').each(function(i) {
 		if (this.id.startsWith('markdown')) {
-			showTodo(this.id);
+			showTodo(this.id, true);
 		}
 		var cleanedElement = $(this.outerHTML.split('<p class="handle">::::</p>').join(''));
 		if (this.id.startsWith('file') || this.id.startsWith('recording')) return;
@@ -1393,13 +1393,19 @@ function loadNote(id, delta) {
 	updateInstructions();
 }
 
-function showTodo(id) {
-	todoShowToggle[id] = !todoShowToggle[id];
-	if (todoShowToggle[id]) {
+function showTodo(id, allOn) {
+	if (allOn) {
+		todoShowToggle[id] = true;
 		$('#'+id+' .task-list-item input:checked').parentsUntil('#'+id).show();
 	}
 	else {
-		$('#'+id+' .task-list-item input:checked').parentsUntil('ul').hide();
+		todoShowToggle[id] = !todoShowToggle[id];
+		if (todoShowToggle[id]) {
+			$('#'+id+' .task-list-item input:checked').parentsUntil('#'+id).show();
+		}
+		else {
+			$('#'+id+' .task-list-item input:checked').parentsUntil('ul').hide();
+		}
 	}
 
 	resizePage($('#'+id), false);
