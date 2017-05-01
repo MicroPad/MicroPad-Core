@@ -997,14 +997,14 @@ function exportOpen() {
 }
 
 function exportToPdf() {
-	var printContents = $('<style>body {background-color: #fff;} .element {margin: 10px; padding: 5px; border: 1px solid grey;}</style><div></div>');
-
+	var printContents = $('<style>body {background-color: #fff;} .element {margin: 10px; padding: 5px; border: 1px solid grey;} table, th, td {border: 1px solid black;border-collapse: collapse;background-color: #fff;}</style><div></div>');
 	$('#viewer > .element').each(function(i) {
 		if (this.id.startsWith('markdown')) {
 			showTodo(this.id);
 		}
 		var cleanedElement = $(this.outerHTML.split('<p class="handle">::::</p>').join(''));
 		if (this.id.startsWith('file') || this.id.startsWith('recording')) return;
+		if (this.id.startsWith('markdown')) cleanedElement.css('width', '100%');
 
 		cleanedElement.removeClass();
 		cleanedElement.addClass('element');
