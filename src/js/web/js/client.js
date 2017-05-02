@@ -2009,6 +2009,17 @@ function formatMd(type) {
 	}
 }
 
+function getHelp() {
+	Materialize.toast("Downloading help notepad...", 1000);
+	$.get("https://getmicropad.com/Help.npx?rng="+new Date().getTime(), data => {
+		parser.parse(data, ["asciimath"]);
+		while (!parser.notepad) if (parser.notepad) break;
+		notepad = parser.notepad;
+
+		window.initNotepad();
+	});
+}
+
 /** Utility functions */
 function toBase64(str) {
 	return window.btoa(unescape(encodeURIComponent(str)));
