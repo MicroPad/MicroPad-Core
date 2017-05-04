@@ -110,7 +110,7 @@ S3Url.prototype.getUrlSync = function(token, filename, callback, diffIndexes) {
 
 S3Url.prototype.updateDate = function() {
 	this.expireTime = new Date();
-	this.expireTime.setMinutes(this.expireTime.getMinutes()+20);
+	this.expireTime.setMinutes(this.expireTime.getMinutes()+15);
 }
 
 S3Url.prototype.apiPost = function(url, params, callback) {
