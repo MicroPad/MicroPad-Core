@@ -615,7 +615,7 @@ window.onload = function() {
 	$(document).keypress(function(e) {
 		var charcode = e.charCode;
 		var char = String.fromCharCode(charcode);
-		if (char && note && note.elements.length === 0) {
+		if (e.target.tagName.toLowerCase() !== "input" && char && note && note.elements.length === 0) {
 			lastClick = {
 				x: 10,
 				y: 10
