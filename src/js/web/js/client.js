@@ -811,6 +811,13 @@ function scrollBreadcrumbs() {
 function newNotepad() {
 	var title = $('#new-notepad-title').val();
 	notepad = parser.createNotepad(title);
+	
+	var demoNote = parser.createNote("Example Note", ['asciimath']);
+	var demoSection = parser.createSection("Example Section");
+	demoSection.addNote(demoNote);
+	notepad.addSection(demoSection);
+	console.log(notepad);
+
 	window.initNotepad();
 	saveToBrowser();
 
