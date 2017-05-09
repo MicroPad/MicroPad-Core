@@ -816,12 +816,13 @@ function newNotepad() {
 	var demoSection = parser.createSection("Example Section");
 	demoSection.addNote(demoNote);
 	notepad.addSection(demoSection);
-	console.log(notepad);
 
 	window.initNotepad();
 	saveToBrowser();
 
 	$('#new-notepad-title').val('');
+	loadSection(0);
+	loadNote(0);
 }
 
 function newSection() {
