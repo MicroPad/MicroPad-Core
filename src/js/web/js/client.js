@@ -1214,6 +1214,7 @@ function loadNote(id, delta) {
 	}
 	$('#open-type').html('Note');
 	$('#title-input').val(note.title);
+	$('#path-input').val(getCurrentPath(true).join('/'));
 
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
