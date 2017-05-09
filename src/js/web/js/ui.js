@@ -120,7 +120,7 @@ function updateInstructions() {
 			$('#instructions').html("You can't put notes in notepads directly. Open the menu and use the sections menu to create a section.");
 		}
 		else {
-			$('#instructions').html("You can't put notes in notepads directly. Use the + button or the 'S' key to create a section. Or the Notepad Explorer to open a section.");
+			$('#instructions').html("You can't put notes in notepads directly. Use the + button or the 'S' key to create a section or the <em>Notepad Explorer</em> to open a section.");
 		}
 	}
 	else if (!note) {
