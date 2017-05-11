@@ -815,6 +815,7 @@ function getCurrentPath(useTitles) {
 function updatePath() {
 	var newPathTitles = $('#path-input').val().split('//');
 	var objectToTransfer = {};
+	var newPath = [];
 
 	if (note) {
 		objectToTransfer = note;
@@ -833,6 +834,7 @@ function updatePath() {
 		if (baseObject.sections) {
 			for (var j = 0; j < baseObject.sections.length; j++) {
 				if (baseObject.sections[j].title == title) {
+					baseObject.sections[j].parent = baseObject;
 					baseObject = baseObject.sections[j];
 					parents.push(baseObject);
 					break;
@@ -840,11 +842,10 @@ function updatePath() {
 			}
 		}
 
-		if (j === newPathTitles.length-1 && baseObject.notes) {
-			for (var j = 0; i < baseObject.notes.length; j++) {
+		if (i === newPathTitles.length-1 && baseObject.notes) {
+			for (var j = 0; j < baseObject.notes.length; j++) {
 				if (baseObject.notes[j].title == title) {
-					baseObject = baseObject.notes[j];
-					parents.push(baseObject);
+					baseObject.notes[j].parent = baseObject;
 					break;
 				}
 			}
@@ -858,9 +859,19 @@ function updatePath() {
 		parents[parents.length-1].sections.push(objectToTransfer);
 	}
 
+	var tmpParents = [parents];
+
 	notepad = parser.restoreNotepad(notepad);
 	saveToBrowser(() => {
 		window.initNotepad();
+
+		parents = tmpParents[0];
+		if (objectToTransfer.elements) {
+			loadNoteFromExplorer(getCurrentPath().join()+','+parents[parents.length-1].notes.indexOf(objectToTransfer));
+		}
+		else {
+			loadSectionFromExplorer(getCurrentPath().join());
+		}
 	});
 }
 
@@ -1239,7 +1250,7 @@ function loadSection(id, providedSection) {
 	$('#open-type').html('Section');
 	$('#title-input').val(section.title);
 	$('.path-changing').show();
-	$('#path-input').val(getCurrentPath(true).join('//'));
+	$('#path-input').val(getCurrentPath(true).slice(0, -1).join('//'));
 	$('#mob-n-dd').css('color', '#000');
 	$('#mob-n-dd').css('pointer-events', 'auto');
 	showExplorer();
