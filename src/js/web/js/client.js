@@ -15,6 +15,7 @@ var syncWorker = new Worker('js/syncWorker.js');
 var syncMethod = "block";
 var hasAddedNotepad = "unknown";
 var todoShowToggle = {};
+var isFullscreen = false;
 
 var uploadWorker = new Worker('js/uploadWorker.js');
 var putRequests = [];

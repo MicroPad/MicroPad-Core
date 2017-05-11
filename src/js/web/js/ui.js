@@ -26,6 +26,7 @@ function showExplorer() {
 	$('#viewer').removeClass('mobile');
 	$('#notepad-explorer').show();
 	$('#show-explorer').hide();
+	isFullscreen = false;
 }
 
 var expUid = 0;
