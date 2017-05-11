@@ -14,14 +14,14 @@ function enableKeyboardShortcuts() {
 	var isFullscreen = false;
 	Mousetrap.bind('f', e => {
 		if (note) {
-			if (isFullscreen) {
+			if (!isFullscreen) {
 				$('#viewer').addClass('mobile');
 				$('#notepad-explorer').hide();
 				Materialize.toast("Notepad Explorer hidden. Press \'F\' to show it again.", 1000);
+				$('#show-explorer').show();
 			}
 			else {
-				$('#viewer').removeClass('mobile');
-				$('#notepad-explorer').show();
+				showExplorer();
 			}
 			isFullscreen = !isFullscreen;
 		}

@@ -22,6 +22,12 @@ $('#new-note-title').keydown(e => {
 	}
 });
 
+function showExplorer() {
+	$('#viewer').removeClass('mobile');
+	$('#notepad-explorer').show();
+	$('#show-explorer').hide();
+}
+
 var expUid = 0;
 function updateNotepadExplorer() {
 	expUid = 0;

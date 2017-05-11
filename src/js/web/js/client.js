@@ -116,6 +116,7 @@ window.onload = function() {
 	$('.display-with-note').hide();
 	$('#not-syncing-pitch').hide();
 	$('#sync-options').hide();
+	$('#show-explorer').hide();
 	$('#menu-button').sideNav();
 	wasMobile = isMobile();
 
@@ -682,6 +683,7 @@ window.initNotepad = function() {
 
 	updateNotepadExplorer();
 	updateInstructions();
+	showExplorer();
 
 	appStorage.getItem('syncToken', function(err, res) {
 		if (err) return;
@@ -1180,6 +1182,7 @@ function loadSection(id, providedSection) {
 	$('#title-input').val(section.title);
 	$('#mob-n-dd').css('color', '#000');
 	$('#mob-n-dd').css('pointer-events', 'auto');
+	showExplorer();
 
 	$('#selectorTitle').html(section.title);
 	for (k in section.sections) {
@@ -1211,6 +1214,7 @@ function loadNote(id, delta) {
 		setTimeout(function() {
 			$('#sidenav-overlay').trigger('click');
 		}, 800);
+		showExplorer();
 	}
 	$('#open-type').html('Note');
 	$('#title-input').val(note.title);
