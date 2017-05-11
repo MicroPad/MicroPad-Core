@@ -681,6 +681,7 @@ window.initNotepad = function() {
 	$('#search-link').css('color', '#fff');
 	$('#search-link').css('pointer-events', 'auto');
 	$('#notepadTitle').html(notepad.title);
+	$('.path-changing').hide();
 
 	updateNotepadExplorer();
 	updateInstructions();
@@ -753,6 +754,7 @@ function loadSearchResult(resID) {
 	parents = [];
 	var result = latestResults[resID];
 	recalculateParents(result);
+	$('.path-changing').show();
 
 	$('#sectionList').html('');
 	for (k in parents[parents.length - 1].sections) {
@@ -799,12 +801,67 @@ function recalculateParents(baseObj) {
 	linkBreadcrumbs();
 }
 
-function getCurrentPath() {
+function getCurrentPath(useTitles) {
 	var currentPath = [];
 	for (var i = parents.length - 1; i >= 1; i--) {
-		currentPath.unshift(parents[i-1].sections.indexOf(parents[i]));
+		var index = parents[i-1].sections.indexOf(parents[i]);
+		if (useTitles) index = parents[i-1].sections[index].title;
+
+		currentPath.unshift(index);
 	}
 	return currentPath;
+}
+
+function updatePath() {
+	var newPathTitles = $('#path-input').val().split('//');
+	var objectToTransfer = {};
+
+	if (note) {
+		objectToTransfer = note;
+		parents[parents.length-1].notes.splice(parents[parents.length-1].notes.indexOf(note), 1);
+	}
+	else {
+		objectToTransfer = parents.pop();
+		parents[parents.length-1].sections.splice(parents[parents.length-1].sections.indexOf(objectToTransfer), 1);
+	}
+
+	parents = [notepad];
+
+	var baseObject = notepad;
+	for (var i = 0; i < newPathTitles.length; i++) {
+		var title = newPathTitles[i];
+		if (baseObject.sections) {
+			for (var j = 0; j < baseObject.sections.length; j++) {
+				if (baseObject.sections[j].title == title) {
+					baseObject = baseObject.sections[j];
+					parents.push(baseObject);
+					break;
+				}
+			}
+		}
+
+		if (j === newPathTitles.length-1 && baseObject.notes) {
+			for (var j = 0; i < baseObject.notes.length; j++) {
+				if (baseObject.notes[j].title == title) {
+					baseObject = baseObject.notes[j];
+					parents.push(baseObject);
+					break;
+				}
+			}
+		}
+	}
+
+	if (objectToTransfer.elements) {
+		parents[parents.length-1].notes.push(objectToTransfer);
+	}
+	else {
+		parents[parents.length-1].sections.push(objectToTransfer);
+	}
+
+	notepad = parser.restoreNotepad(notepad);
+	saveToBrowser(() => {
+		window.initNotepad();
+	});
 }
 
 function scrollBreadcrumbs() {
@@ -1181,6 +1238,8 @@ function loadSection(id, providedSection) {
 	updateInstructions();
 	$('#open-type').html('Section');
 	$('#title-input').val(section.title);
+	$('.path-changing').show();
+	$('#path-input').val(getCurrentPath(true).join('//'));
 	$('#mob-n-dd').css('color', '#000');
 	$('#mob-n-dd').css('pointer-events', 'auto');
 	showExplorer();
@@ -1219,7 +1278,8 @@ function loadNote(id, delta) {
 	}
 	$('#open-type').html('Note');
 	$('#title-input').val(note.title);
-	$('#path-input').val(getCurrentPath(true).join('/'));
+	$('.path-changing').show();
+	$('#path-input').val(getCurrentPath(true).join('//'));
 
 	for (var i = 0; i < note.elements.length; i++) {
 		var element = note.elements[i];
@@ -1571,7 +1631,7 @@ function resizePage(selElement, isImage) {
 	}
 }
 
-function saveToBrowser(retry) {
+function saveToBrowser(callback) {
 	/*
 		I want to use the Filesystem and FileWriter API for this (https://www.html5rocks.com/en/tutorials/file/filesystem/)
 		but only Chrome and Opera support it. For now I'll use IndexedDB with a sneaky async library.
@@ -1590,6 +1650,9 @@ function saveToBrowser(retry) {
 	notepadStorage.setItem(notepad.title, stringify(notepad), function() {
 		updateNotepadList();
 		$('.save-status').html('All changes saved');
+		if (callback) {
+			callback();
+		}
 	});
 
 	appStorage.setItem('lastNotepadTitle', notepad.title);
