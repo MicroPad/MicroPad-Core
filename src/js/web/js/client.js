@@ -813,6 +813,10 @@ function getCurrentPath(useTitles) {
 }
 
 function updatePath() {
+	function invalidPath() {
+		Materialize.toast("The path you entered was invalid", 2000);
+	}
+
 	var newPathTitles = $('#path-input').val().split('//');
 	var objectToTransfer = {};
 	var newPath = [];
@@ -870,7 +874,9 @@ function updatePath() {
 			loadNoteFromExplorer(getCurrentPath().join()+','+parents[parents.length-1].notes.indexOf(objectToTransfer));
 		}
 		else {
-			loadSectionFromExplorer(getCurrentPath().join());
+			var pathToAdd = getCurrentPath().join()+','+parents[parents.length-1].sections.indexOf(objectToTransfer);
+			if (getCurrentPath().length < 1) pathToAdd = parents[parents.length-1].sections.indexOf(objectToTransfer);
+			loadSectionFromExplorer(pathToAdd);
 		}
 	});
 }
