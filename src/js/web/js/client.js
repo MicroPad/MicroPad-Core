@@ -862,6 +862,7 @@ function updatePath() {
 	var tmpParents = [parents];
 
 	notepad = parser.restoreNotepad(notepad);
+	notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 	saveToBrowser(() => {
 		window.initNotepad();
 
