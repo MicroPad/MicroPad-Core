@@ -1227,7 +1227,7 @@ function loadNoteFromExplorer(currentPath) {
 }
 
 function loadSectionFromExplorer(currentPath) {
-	var currentPath = currentPath.split(',');
+	var currentPath = currentPath.toString().split(',');
 	var baseObj = {};
 	for (var i = 0; i < currentPath.length; i++) {
 		if (i === 0) {
