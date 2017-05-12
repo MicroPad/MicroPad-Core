@@ -26,7 +26,7 @@
 					<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
 					<!-- <a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a> -->
 					<ul class="left">
-						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v1.31.1-alpha" style="font-weight: 100; font-size: 1rem;">α</em></span>
+						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v1.32.0-alpha" style="font-weight: 100; font-size: 1rem;">α</em></span>
 					</ul>
 
 					<ul id="nav-desktop" class="right hide-on-med-and-down">
@@ -36,6 +36,7 @@
 						<li><a id="np-dd" class="dropdown-button" href="#!"><i class="material-icons left">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
 						<li id="search-button"><a id="search-link" href="#!" class="modal-trigger" data-target="search"><i class="material-icons left">search</i>Search</a></li>
 						<li><a href="javascript:getHelp();"><i class="material-icons left">help_outline</i>Help</a></li>
+						<li><a id="show-explorer" href="javascript:showExplorer();"><i class="material-icons left">explore</i>Show Explorer</a></li>
 					</ul>
 				</div>
 			</nav>
@@ -69,6 +70,8 @@
 				<div id="sidenav-options">
 					<li><input id="title-input" type="text" placeholder="Title" /></li>
 					<li><a href="javascript:updateTitle();" class="btn green waves-effect waves-light">Update Title</a></li>
+					<li><input id="path-input" type="text" placeholder="Note Path" class="path-changing" /></li>
+					<li><a href="javascript:updatePath();" class="btn green waves-effect waves-light path-changing">Change Path</a></li>
 					<li><a href="javascript:deleteOpen();" class="btn red waves-effect waves-light"><i class="material-icons left" style="color: #fff;">delete_forever</i> Delete <span id="open-type"></span></a></li>
 					<li><a href="javascript:exportToPdf();" style="padding: 0 10px;" class="display-with-note btn blue waves-effect waves-light">Export/Print Note (PDF)</a></li>
 					<li><div class="divider"></div></li>
