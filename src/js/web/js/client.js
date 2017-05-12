@@ -813,10 +813,6 @@ function getCurrentPath(useTitles) {
 }
 
 function updatePath() {
-	function invalidPath() {
-		Materialize.toast("The path you entered was invalid", 2000);
-	}
-
 	var newPathTitles = $('#path-input').val().split('//');
 	var objectToTransfer = {};
 	var newPath = [];
