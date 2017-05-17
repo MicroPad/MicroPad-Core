@@ -1014,7 +1014,7 @@ function exportToPdf() {
 		}
 		var cleanedElement = $(this.outerHTML.split('<p class="handle">::::</p>').join(''));
 		if (this.id.startsWith('file') || this.id.startsWith('recording')) return;
-		if (this.id.startsWith('markdown')) cleanedElement.css('width', '100%');
+		if (this.id.startsWith('markdown')) cleanedElement.css('width', '80%');
 
 		cleanedElement.removeClass();
 		cleanedElement.addClass('element');
