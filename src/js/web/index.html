@@ -26,11 +26,12 @@
 					<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
 					<!-- <a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a> -->
 					<ul class="left">
-						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v1.32.2-alpha" style="font-weight: 100; font-size: 1rem;">α</em></span>
+						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v1.33.0-alpha" style="font-weight: 100; font-size: 1rem;">α</em></span>
 					</ul>
 
 					<ul id="nav-desktop" class="right hide-on-med-and-down">
 						<li style="margin-right: 10px;"><span class="save-status"></span></li>
+						<li><a href="javascript:msSync();"><i class="material-icons">sync</i></a></li>
 						<li><div style="top: 10px;" class="file-field input-field"><div class="waves-effect waves-light btn amber darken-1 tooltipped" data-position="left" data-delay="50" data-tooltip="Upload a .npx/.enex file or a .npxz/.zip archive"><span>Upload Notepads</span><input id="upload" type="file"></div><div style="display: none;" class="file-path-wrapper"><input id="upload-name" class="file-path validate" type="text"></div></div></li>
 
 						<li><a id="np-dd" class="dropdown-button" href="#!"><i class="material-icons left">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
@@ -473,6 +474,7 @@
 		<script src="js/parser.js"></script>
 		<script src="js/keyboardShortcuts.js"></script>
 		<script src="js/client.js"></script>
+		<script src="js/MicroSyncUX.js"></script>
 		<script src="js/ui.js"></script>
 	</body>
 </html>

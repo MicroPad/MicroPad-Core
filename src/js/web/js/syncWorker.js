@@ -6,9 +6,7 @@ importScripts('parser.js');
 importScripts('S3Url.js')
 
 var me = {};
-
-var lastSyncLocalMap = "";
-var lastSyncRemoteMap = "";
+var lastSyncAsk = new Date(0);
 
 var appStorage = localforage.createInstance({
 	name: 'uPad',
@@ -73,6 +71,16 @@ onmessage = function(event) {
 			break;
 
 		case "sync":
+			if (new Date() - lastSyncAsk < 2000) {
+				postMessage({
+					req: 'upload',
+					code: 200,
+					text: ''
+				});
+				return;
+			}
+			lastSyncAsk = new Date();
+
 			me.S3UrlMap.getMapDownload.getUrl(msg.token, msg.filename, (res, code) => {
 				if (code == 200) {
 					var np = parser.restoreNotepad(msg.notepad);
@@ -100,16 +108,6 @@ onmessage = function(event) {
 					}
 
 					reqGET(res, (remoteMapJSON, code) => {
-						if (remoteMapJSON === lastSyncRemoteMap && JSON.stringify(localMap) === lastSyncLocalMap) {
-							postMessage({
-								req: 'upload',
-								code: 200,
-								text: ''
-							});
-							return;
-						}
-						lastSyncRemoteMap = remoteMapJSON;
-						lastSyncLocalMap = JSON.stringify(localMap);
 
 						var remoteMap = JSON.parse(remoteMapJSON);
 						if (moment(localMap.lastModified).isBefore(remoteMap.lastModified)) {
