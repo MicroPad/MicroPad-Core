@@ -140,9 +140,11 @@ window.onload = function() {
 		/** Handle Notepad Upload */
 		document.getElementById("upload").addEventListener("change", function(event) {
 			handleUpload(event);
+			$(this).val(null);
 		}, false);
 		document.getElementById("mob-upload").addEventListener("change", function(event) {
 			handleUpload(event);
+			$(this).val(null);
 		}, false);
 	}
 
