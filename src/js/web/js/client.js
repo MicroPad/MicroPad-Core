@@ -220,8 +220,8 @@ window.onload = function() {
 
 							var checkedTodoItems = currentTarget.find('.task-list-item input:checked');
 							if (checkedTodoItems.length > 5) {
-								checkedTodoItems.parentsUntil('ul').hide();
-								currentTarget.append('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Show/Hide {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
+								todoShowToggle[currentTarget[0].id] = false;
+								currentTarget.find('.handle').after('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
 							}
 
 							updateReference(event);
@@ -1313,8 +1313,8 @@ function loadNote(id, delta) {
 
 				var checkedTodoItems = $('#'+element.args.id+' .task-list-item input:checked');
 				if (checkedTodoItems.length > 5) {
-					checkedTodoItems.parentsUntil('ul').hide();
-					elementDiv.innerHTML += '<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Show/Hide {1} Completed Items</a>'.format(element.args.id, checkedTodoItems.length);
+					todoShowToggle[element.args.id] = false;
+					$(elementDiv).find('.handle').after($('<a class="hidden-todo-msg todo-toggle" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(element.args.id, checkedTodoItems.length)));
 				}
 				break;
 			case "drawing":
@@ -1375,12 +1375,12 @@ function loadNote(id, delta) {
 
 function showTodo(id, allOn) {
 	if (allOn) {
-		todoShowToggle[id] = true;
+		todoShowToggle[id] = false;
 		$('#'+id+' .task-list-item input:checked').parentsUntil('#'+id).show();
 	}
 	else {
 		todoShowToggle[id] = !todoShowToggle[id];
-		if (todoShowToggle[id]) {
+		if (!todoShowToggle[id]) {
 			$('#'+id+' .task-list-item input:checked').parentsUntil('#'+id).show();
 		}
 		else {
