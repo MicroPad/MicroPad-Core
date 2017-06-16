@@ -1004,8 +1004,10 @@ function deleteElement() {
 }
 
 function exportOpen() {
-	var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
-	saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+	notepad.toXML(xml => {
+		var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
+		saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+	});
 }
 
 function exportToPdf() {
@@ -1042,8 +1044,10 @@ function exportNotepads(type) {
 	notepadStorage.iterate(function(value, key, i) {
 		switch (type) {
 			case "npx":
-				var blob = new Blob([parser.restoreNotepad(JSON.parse(value)).toXML()], { type: "text/xml;charset=utf-8" });
-				zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+				parser.restoreNotepad(JSON.parse(value)).toXML(xml => {
+					var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
+					zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+				});
 				break;
 			case "md":
 				for (var i = 0; i < parser.restoreNotepad(JSON.parse(value)).toMarkdown().length; i++) {
@@ -1763,31 +1767,6 @@ function zoom(zoomIn) {
 		curScale -= 0.1;
 	}
 	$('#viewer').css('transform', 'scale('+curScale+')');
-}
-
-uploadWorker.onmessage = function(event) {
-	var msg = event.data;
-
-	switch (msg.req) {
-		case "done":
-			putRequests.shift();
-			cueUpload();
-			break;
-
-		case "progress":
-			msg.percentage = msg.percentage.toFixed(1);
-			if (msg.percentage < 100) {
-				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">{0}ing: {1}%</a>)'.format(msg.type, msg.percentage));
-			}
-			else {
-				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
-			}
-			break;
-	}
-}
-
-function cueUpload() {
-	if (putRequests.length > 0) uploadWorker.postMessage(putRequests[0]);
 }
 
 function formatMd(type) {

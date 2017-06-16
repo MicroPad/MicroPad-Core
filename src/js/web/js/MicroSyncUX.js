@@ -1,5 +1,30 @@
 var downloadData;
 
+uploadWorker.onmessage = function(event) {
+	var msg = event.data;
+
+	switch (msg.req) {
+		case "done":
+			putRequests.shift();
+			cueUpload();
+			break;
+
+		case "progress":
+			msg.percentage = msg.percentage.toFixed(1);
+			if (msg.percentage < 100) {
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">{0}ing: {1}%</a>)'.format(msg.type, msg.percentage));
+			}
+			else {
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+			}
+			break;
+	}
+}
+
+function cueUpload() {
+	if (putRequests.length > 0) uploadWorker.postMessage(putRequests[0]);
+}
+
 syncWorker.onmessage = function(event) {
 	var msg = event.data;
 

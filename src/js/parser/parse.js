@@ -1,16 +1,21 @@
-var xml2js = require('xml2js');
-var parseString = require('xml2js').parseString;
-var moment = require('moment');
-var toMarkdown = require('to-markdown');
-var pd = require('pretty-data').pd;
+const xml2js = require('xml2js');
+const parseString = require('xml2js').parseString;
+const moment = require('moment');
+const toMarkdown = require('to-markdown');
+const pd = require('pretty-data').pd;
 
-var Note = require('./Note.js').Note;
+const Note = require('./Note.js').Note;
+const Assets = require('./Assets.js');
 
 var searchResults = [];
+
+exports.assets = Assets.Assets;
+exports.Asset = Assets.Asset;
 
 var Notepad = function(title, lastModified) {
 	this.title = title;
 	this.sections = [];
+	this.assets = new Assets.Assets();
 
 	if (lastModified) {
 		this.lastModified = lastModified;
@@ -32,26 +37,31 @@ Notepad.prototype.search = function(query) {
 
 	return searchResults;
 }
-Notepad.prototype.toXMLObject = function() {
-	var parseableNotepad = {
-		notepad: {
-			$: {
-				'xsi:noNamespaceSchemaLocation': 'https://getmicropad.com/schema.xsd',
-				title: this.title,
-				lastModified: this.lastModified,
-				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
-			},
-			section: []
+Notepad.prototype.toXMLObject = function(callback) {
+	this.assets.addAsset(new Assets.Asset(new Blob(["test"], {type:"text/xml;charset=utf-8"})));
+
+	this.assets.getXMLObject(assetsObj => {
+		var parseableNotepad = {
+			notepad: {
+				$: {
+					'xsi:noNamespaceSchemaLocation': 'https://getmicropad.com/schema.xsd',
+					title: this.title,
+					lastModified: this.lastModified,
+					'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
+				},
+				section: [],
+				assets: assetsObj
+			}
 		}
-	}
 
-	for (k in this.sections) {
-		parseableNotepad.notepad.section.push(this.sections[k].toXMLObject().section);
-	}
+		for (k in this.sections) {
+			parseableNotepad.notepad.section.push(this.sections[k].toXMLObject().section);
+		}
 
-	return parseableNotepad;
+		callback(parseableNotepad);
+	});
 }
-Notepad.prototype.toXML = function() {
+Notepad.prototype.toXML = function(callback) {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
 		headless: true,
@@ -60,7 +70,10 @@ Notepad.prototype.toXML = function() {
 		},
 		cdata: true
 	});
-	return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'+builder.buildObject(this.toXMLObject()).replace(/&#xD;/g, '');
+
+	this.toXMLObject(obj => {
+		callback('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'+builder.buildObject(obj).replace(/&#xD;/g, ''));
+	})
 }
 Notepad.prototype.toMarkdown = function() {
 	var notes = [];
