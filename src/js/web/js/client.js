@@ -1038,7 +1038,7 @@ function exportToPdf() {
 
 function exportNotepads(type) {
 	var zip = new JSZip();
-	var ext = "npxz";
+	var ext = "zip";
 	notepadStorage.iterate(function(value, key, i) {
 		switch (type) {
 			case "npx":
@@ -1046,7 +1046,6 @@ function exportNotepads(type) {
 				zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
 				break;
 			case "md":
-				ext = 'zip';
 				for (var i = 0; i < parser.restoreNotepad(JSON.parse(value)).toMarkdown().length; i++) {
 					var note = parser.restoreNotepad(JSON.parse(value)).toMarkdown()[i];
 
