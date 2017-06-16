@@ -283,19 +283,21 @@ window.onload = function() {
 						$('#drawingEditor').modal({
 							ready: function() {
 								resizeCanvas();
-								if (element.content) {
+								if (element.args.ext) {
 									var img = new Image();
 									img.onload = function() {
 										canvasCtx.drawImage(img, 0, 0);
 									}
-									img.src = element.content;
+									assetStorage.getItem(element.args.ext).then(blob => {
+										img.src = URL.createObjectURL(blob);
+									});
 								}
 							},
 							complete: function() {
 								confirmAsync("Do you want to save this drawing?").then(function(answer) {
 									if (answer) {
 										if (!isCanvasBlank($('#drawing-viewer')[0])) {
-											element.content = $('#drawing-viewer')[0].toDataURL();
+											assetStorage.setItem(element.args.ext, dataURItoBlob($('#drawing-viewer')[0].toDataURL()));
 
 											var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
 											$("#"+element.args.id+" > img").attr('src', trimmed);
@@ -333,8 +335,9 @@ window.onload = function() {
 							reader.readAsDataURL(file);
 
 							reader.onload = function() {
-								element.content = reader.result;
-								$("#"+element.args.id+" > img").attr('src', URL.createObjectURL(dataURItoBlob(element.content)));
+								var blob = dataURItoBlob(reader.result);
+								assetStorage.setItem(element.args.ext, blob);
+								$("#"+element.args.id+" > img").attr('src', URL.createObjectURL(blob));
 								updateReference(event);
 								setTimeout(() => {
 									resizePage($("#"+element.args.id), true);
@@ -401,7 +404,9 @@ window.onload = function() {
 							reader.readAsDataURL(file);
 
 							reader.onload = function() {
-								element.content = reader.result;
+								var blob = dataURItoBlob(reader.result);
+								assetStorage.setItem(element.args.ext, blob);
+
 								$('#' + element.args.id + '> .fileHolder > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
 								$('#' + element.args.id + '> .fileHolder > a').html(element.args.filename);
 							}
@@ -1311,14 +1316,20 @@ function loadNote(id, delta) {
 		let element = note.elements[i];
 
 		if (element.content !== "AS" && element.type !== "markdown") {
-			let asset = new parser.Asset(dataURItoBlob(element.content));
-			notepad.assets.addAsset(asset);
-			element.args.ext = asset.uuid;
-			element.content = "AS";
+			try {
+				let asset = new parser.Asset(dataURItoBlob(element.content));
+				notepad.assets.addAsset(asset);
+				element.args.ext = asset.uuid;
+				element.content = "AS";
 
-			assetStorage.setItem(asset.uuid, asset.data).then(() => {
-				displayElement(delta, element, (i === note.elements.length-1));
-			});
+				assetStorage.setItem(asset.uuid, asset.data).then(() => {
+					displayElement(delta, element, (i === note.elements.length-1));
+				});
+			}
+			catch(e) {
+				note.elements.splice(note.elements.indexOf(element), 1);
+				continue;
+			}
 		}
 		else {
 			displayElement(delta, element, (i === note.elements.length-1));
@@ -1392,9 +1403,12 @@ function loadNote(id, delta) {
 			case "recording":
 				$(elementDiv).addClass('recording');
 
+				elementDiv.innerHTML += '<p class="recording-text"><em>{0}</em></p><audio controls="true" style="padding-top: 20px;"></audio>'.format(element.args.filename);
 				assetStorage.getItem(element.args.ext).then(blob => {
-					elementDiv.innerHTML += '<p class="recording-text"><em>{1}</em></p><audio controls="true" style="padding-top: 20px;" src="{0}"></audio>'.format(URL.createObjectURL(blob), element.args.filename);
-					if (!delta) edgeFix(dataURItoBlob(element.content), element.args.id);
+					if (!delta) {
+						$(elementDiv).find('audio')[0].src = URL.createObjectURL(blob);
+						edgeFix(blob, element.args.id);
+					}
 				});
 				break;
 		}
@@ -1446,7 +1460,7 @@ function updateNote(id, init) {
 	}
 }
 
-function insert(type, newElement) {
+function insert(type, newElement, callback) {
 	$('#insert').modal('close');
 	if (!newElement) {
 		var newElement = {
@@ -1477,29 +1491,39 @@ function insert(type, newElement) {
 	newElement.args.height = 'auto';
 
 	//Handle element specific args
-	switch (type) {
-		case "markdown":
-			newElement.args.fontSize = '16px';
-			break;
-		case "drawing":
-			newElement.content = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAQAAADa613fAAAAaElEQVR42u3PQREAAAwCoNm/9CL496ABuREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREWkezG8AZQ6nfncAAAAASUVORK5CYII=";
-			break;
-		case "file":
-			newElement.args.filename = "File";
-			break;
-		case "recording":
-			newElement.args.filename = note.title.replace(/[^a-z0-9 ]/gi, '') + ' ' + new Date().toISOString() + ".ogg";
-			break;
+	if (type === "markdown") {
+		newElement.args.fontSize = '16px';
+		elementAdded();
+	}
+	else {
+		var asset = new parser.Asset(dataURItoBlob("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAQAAADa613fAAAAaElEQVR42u3PQREAAAwCoNm/9CL496ABuREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREWkezG8AZQ6nfncAAAAASUVORK5CYII="));
+		newElement.content = "AS";
+		newElement.args.ext = asset.uuid;
+
+		assetStorage.setItem(asset.uuid, asset.data).then(() => {
+			switch (type) {
+				case "file":
+					newElement.args.filename = "File";
+					break;
+				case "recording":
+					newElement.args.filename = note.title.replace(/[^a-z0-9 ]/gi, '') + ' ' + new Date().toISOString() + ".ogg";
+					break;
+			}
+
+			elementAdded();
+		});
 	}
 
-	note.elements.push(newElement);
 
-	loadNote(noteID, true);
-	asciimath.translate(undefined, true);
-	drawPictures();
-	MathJax.Hub.Typeset();
-	$('#' + newElement.args.id).trigger('click');
-	return newElement.args.id;
+	function elementAdded() {
+		note.elements.push(newElement);
+		loadNote(noteID, true);
+		asciimath.translate(undefined, true);
+		drawPictures();
+		MathJax.Hub.Typeset();
+		$('#' + newElement.args.id).trigger('click');
+		if (callback) callback(newElement.args.id);
+	}
 }
 
 /** Recording Stuff */
@@ -1518,21 +1542,19 @@ try {
 		var blob = new Blob([e.detail], { type: 'audio/ogg' });
 		var url = URL.createObjectURL(blob);
 
-		var id = insert('recording');
-		for (var i = 0; i < note.elements.length; i++) {
-			var element = note.elements[i];
-			if (id === element.args.id) {
-				blobToDataURL(blob, function(dataURI) {
-					element.content = dataURI;
+		insert('recording', undefined, id => {
+			for (var i = 0; i < note.elements.length; i++) {
+				var element = note.elements[i];
+				if (id === element.args.id) {
+					assetStorage.setItem(element.args.ext, blob);
 					notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-					saveToBrowser();
-				});
-				break;
+					break;
+				}
 			}
-		}
 
-		$('#' + id + ' > audio').attr('src', url);
-		edgeFix(blob, id);
+			$('#' + id + ' > audio').attr('src', url);
+			edgeFix(blob, id);
+		});
 	});
 }
 catch (err) {}
