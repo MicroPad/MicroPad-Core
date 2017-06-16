@@ -9,8 +9,9 @@ const Assets = require('./Assets.js');
 
 var searchResults = [];
 
-exports.assets = Assets.Assets;
+exports.Assets = Assets.Assets;
 exports.Asset = Assets.Asset;
+exports.parseAssets = Assets.parse;
 
 var Notepad = function(title, lastModified) {
 	this.title = title;
@@ -59,7 +60,7 @@ Notepad.prototype.toXMLObject = function(callback) {
 		callback(parseableNotepad);
 	});
 }
-Notepad.prototype.toXML = function(callback) {
+Notepad.prototype.toXML = function(callback, assets) {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
 		headless: true,
@@ -69,9 +70,10 @@ Notepad.prototype.toXML = function(callback) {
 		cdata: true
 	});
 
+	this.assets = assets;
 	this.toXMLObject(obj => {
 		callback('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'+builder.buildObject(obj).replace(/&#xD;/g, ''));
-	})
+	});
 }
 Notepad.prototype.toMarkdown = function() {
 	var notes = [];

@@ -1,4 +1,5 @@
 var notepad;
+var notepadAssets = new Set();
 var parents = [];
 var note;
 var noteID;
@@ -289,6 +290,7 @@ window.onload = function() {
 										canvasCtx.drawImage(img, 0, 0);
 									}
 									assetStorage.getItem(element.args.ext).then(blob => {
+										if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 										img.src = URL.createObjectURL(blob);
 									});
 								}
@@ -298,6 +300,7 @@ window.onload = function() {
 									if (answer) {
 										if (!isCanvasBlank($('#drawing-viewer')[0])) {
 											assetStorage.setItem(element.args.ext, dataURItoBlob($('#drawing-viewer')[0].toDataURL()));
+											if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 
 											var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
 											$("#"+element.args.id+" > img").attr('src', trimmed);
@@ -337,6 +340,7 @@ window.onload = function() {
 							reader.onload = function() {
 								var blob = dataURItoBlob(reader.result);
 								assetStorage.setItem(element.args.ext, blob);
+								if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 								$("#"+element.args.id+" > img").attr('src', URL.createObjectURL(blob));
 								updateReference(event);
 								setTimeout(() => {
@@ -406,6 +410,7 @@ window.onload = function() {
 							reader.onload = function() {
 								var blob = dataURItoBlob(reader.result);
 								assetStorage.setItem(element.args.ext, blob);
+								if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 
 								$('#' + element.args.id + '> .fileHolder > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
 								$('#' + element.args.id + '> .fileHolder > a').html(element.args.filename);
@@ -1013,10 +1018,26 @@ function deleteElement() {
 	});
 }
 
+function getAssets(callback) {
+	var assets = new parser.Assets();
+
+	var count = 0;
+	for (let uuid of notepadAssets) {
+		assetStorage.getItem(uuid).then(blob => {
+			var asset = new parser.Asset(blob);
+			asset.uuid = uuid;
+			assets.addAsset(asset);
+			if (++count === notepadAssets.size) callback(assets);
+		});
+	}
+}
+
 function exportOpen() {
-	notepad.toXML(xml => {
-		var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
-		saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+	getAssets(assets => {
+		notepad.toXML(xml => {
+			var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
+			saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+		}, assets);
 	});
 }
 
@@ -1054,9 +1075,11 @@ function exportNotepads(type) {
 	notepadStorage.iterate(function(value, key, i) {
 		switch (type) {
 			case "npx":
-				parser.restoreNotepad(JSON.parse(value)).toXML(xml => {
-					var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
-					zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+				getAssets(assets => {
+					parser.restoreNotepad(JSON.parse(value)).toXML(xml => {
+						var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
+						zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+					}, assets);
 				});
 				break;
 			case "md":
@@ -1089,6 +1112,7 @@ function downloadFile(elementID) {
 	assetStorage.getItem(selElement.args.ext).then(blob => {
 		saveAs(blob, filename);
 	});
+	if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 
 	$('#fileEditor').modal('close');
 }
@@ -1323,6 +1347,7 @@ function loadNote(id, delta) {
 				element.content = "AS";
 
 				assetStorage.setItem(asset.uuid, asset.data).then(() => {
+					if (!notepadAssets.has(asset)) notepadAssets.add(asset.uuid);
 					displayElement(delta, element, (i === note.elements.length-1));
 				});
 			}
@@ -1384,6 +1409,7 @@ function loadNote(id, delta) {
 				elementDiv.style.padding = "0px";
 
 				assetStorage.getItem(element.args.ext).then(blob => {
+					if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 					elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" src="{0}" />'.format(URL.createObjectURL(blob));
 				});
 				break;
@@ -1394,6 +1420,7 @@ function loadNote(id, delta) {
 				elementDiv.style.padding = "0px";
 
 				assetStorage.getItem(element.args.ext).then(blob => {
+					if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 					elementDiv.innerHTML += '<img id="img_{1}" class="resize" style="width: 100%; height: auto;" src="{0}" />'.format(URL.createObjectURL(blob), element.args.id);
 				});
 				break;
@@ -1405,6 +1432,7 @@ function loadNote(id, delta) {
 
 				elementDiv.innerHTML += '<p class="recording-text"><em>{0}</em></p><audio controls="true" style="padding-top: 20px;"></audio>'.format(element.args.filename);
 				assetStorage.getItem(element.args.ext).then(blob => {
+					if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 					if (!delta) {
 						$(elementDiv).find('audio')[0].src = URL.createObjectURL(blob);
 						edgeFix(blob, element.args.id);
@@ -1501,6 +1529,7 @@ function insert(type, newElement, callback) {
 		newElement.args.ext = asset.uuid;
 
 		assetStorage.setItem(asset.uuid, asset.data).then(() => {
+			if (notepadAssets.assets.indexOf(asset) === -1) notepadAssets.addAsset(asset);
 			switch (type) {
 				case "file":
 					newElement.args.filename = "File";
@@ -1759,6 +1788,13 @@ function handleUpload(event) {
 		case "npx":
 			readFileInputEventAsText(event, function(text) {
 				parser.parse(text, ["asciimath"]);
+				parser.parseAssets(text, a => {
+					if (!a.assets) return;
+					for (var i = 0; i < a.assets.length; i++) {
+						if (!notepadAssets.has(a.assets[i])) notepadAssets.add(a.assets[i].uuid);
+						assetStorage.setItem(a.assets[i].uuid, a.assets[i].data);
+					}
+				});
 				while (!parser.notepad) if (parser.notepad) break;
 				notepad = parser.notepad;
 
@@ -1787,6 +1823,9 @@ function handleUpload(event) {
 						if (k.split('.').pop().toLowerCase() === 'npx') {
 							zip.file(k).async('string').then(function success(text) {
 								parser.parse(text, ["asciimath"]);
+								parser.parseAssets(text, a => {
+									notepadAssets = a;
+								});
 								while (!parser.notepad) if (parser.notepad) break;
 								notepad = parser.notepad;
 

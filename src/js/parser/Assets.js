@@ -1,4 +1,5 @@
 const xml2js = require('xml2js');
+const parseString = require('xml2js').parseString;
 
 exports.Assets = function() {
 	this.assets = [];
@@ -49,11 +50,18 @@ exports.Asset.prototype.getXMLObject = function(callback) {
 exports.parse = function(xml, callback) {
 	parseString(xml, {trim: true}, (e, res) => {
 		var assets = new exports.Assets();
-		if (e) callback(exports.assets);
+		if (e) {
+			callback(assets);
+			return;
+		}
 
-		var assetsXML = res.assets;
-		for (var i = 0; i < assetsXML.length; i++) {
-			if (!assetsXML.asset) callback(exports.assets);
+		var assetsXML = res.notepad.assets[0];
+		if (!assetsXML || !assetsXML.asset) {
+			callback(assets);
+			return;
+		}
+
+		for (var i = 0; i < assetsXML.asset.length; i++) {
 			var assetXML = assetsXML.asset[i];
 
 			var asset = new exports.Asset(dataURItoBlob(assetXML._));
@@ -82,7 +90,7 @@ function dataURItoBlob(dataURI) {
 	var byteString = atob(dataURI.split(',')[1]);
 
 	// separate out the mime component
-	var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+	var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
 	// write the bytes of the string to an ArrayBuffer
 	var ab = new ArrayBuffer(byteString.length);
