@@ -38,8 +38,6 @@ Notepad.prototype.search = function(query) {
 	return searchResults;
 }
 Notepad.prototype.toXMLObject = function(callback) {
-	this.assets.addAsset(new Assets.Asset(new Blob(["test"], {type:"text/xml;charset=utf-8"})));
-
 	this.assets.getXMLObject(assetsObj => {
 		var parseableNotepad = {
 			notepad: {

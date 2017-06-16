@@ -19,8 +19,14 @@ exports.Assets.prototype.getXMLObject = function(callback) {
 	}
 }
 
-exports.Asset = function(dataAsBlob) {
-	this.uuid = generateGuid();
+exports.Asset = function(dataAsBlob, uuid) {
+	if (uuid) {
+		this.uuid = uuid;
+	}
+	else {
+		this.uuid = generateGuid();
+	}
+
 	this.data = dataAsBlob;
 }
 
@@ -38,6 +44,24 @@ exports.Asset.prototype.getXMLObject = function(callback) {
 				uuid: this.uuid
 			}
 		});
+	});
+}
+
+exports.parse = function(xml, callback) {
+	parseString(xml, {trim: true}, (e, res) => {
+		var assets = new exports.Assets();
+		if (e) callback(exports.assets);
+
+		var assetsXML = res.assets;
+		for (var i = 0; i < assetsXML.length; i++) {
+			if (!assetsXML.asset) callback(exports.assets);
+			var assetXML = assetsXML.asset[i];
+
+			var asset = new exports.Asset(dataURItoBlob(assetXML._));
+			asset.uuid = assetXML.$.uuid;
+			assets.addAsset(asset);
+		}
+		callback(assets);
 	});
 }
 
@@ -13717,8 +13741,6 @@ Notepad.prototype.search = function(query) {
 	return searchResults;
 }
 Notepad.prototype.toXMLObject = function(callback) {
-	this.assets.addAsset(new Assets.Asset(new Blob(["test"], {type:"text/xml;charset=utf-8"})));
-
 	this.assets.getXMLObject(assetsObj => {
 		var parseableNotepad = {
 			notepad: {
