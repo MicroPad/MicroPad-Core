@@ -21,15 +21,20 @@ var uploadWorker = new Worker('js/uploadWorker.js');
 var putRequests = [];
 
 /** Setup localforage */
-var notepadStorage = localforage.createInstance({
+const notepadStorage = localforage.createInstance({
 	name: 'MicroPad',
 	storeName: 'notepads'
 });
 
-var appStorage = localforage.createInstance({
+const appStorage = localforage.createInstance({
 	name: 'MicroPad',
 	version: 1.0,
 	storeName: 'app'
+});
+
+const assetStorage = localforage.createInstance({
+	name: 'MicroPad',
+	storeName: 'assets'
 });
 
 /** Setup md parser */
