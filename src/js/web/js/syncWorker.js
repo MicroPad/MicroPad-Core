@@ -84,52 +84,54 @@ onmessage = function(event) {
 			me.S3UrlMap.getMapDownload.getUrl(msg.token, msg.filename, (res, code) => {
 				if (code == 200) {
 					var np = parser.restoreNotepad(msg.notepad);
-					var npxUInt8Arr = new TextEncoder().encode(np.toXML());
-					var chunks = [];
-					var localMap = {lastModified: np.lastModified};
+					np.toXML(xml => {
+						var npxUInt8Arr = new TextEncoder().encode(xml);
+						var chunks = [];
+						var localMap = {lastModified: np.lastModified};
 
-					//Split the octet array (npxUInt8Arr) chunks of 1000000B (where 1B = 8b)
-					var pos = 0;
-					var count = 0;
-					while (!chunks[chunks.length-1] || chunks[chunks.length-1].length === 1000000) {
-						var chunk = npxUInt8Arr.slice(pos, pos+1000000);
-						chunks.push(chunk);
-						pos += chunk.length;
+						//Split the octet array (npxUInt8Arr) chunks of 1000000B (where 1B = 8b)
+						var pos = 0;
+						var count = 0;
+						while (!chunks[chunks.length-1] || chunks[chunks.length-1].length === 1000000) {
+							var chunk = npxUInt8Arr.slice(pos, pos+1000000);
+							chunks.push(chunk);
+							pos += chunk.length;
 
-						localMap[count++] = {md5: md5(new TextDecoder("utf-8").decode(chunk))};
-					}
-
-					if (chunks.length > 1000) {
-						postMessage({
-							req: 'error',
-							text: "Wowza! Your notepad is so big we can't store it.<br><br>It might be a good idea to split up your notepad."
-						});
-						return;
-					}
-
-					reqGET(res, (remoteMapJSON, code) => {
-
-						var remoteMap = JSON.parse(remoteMapJSON);
-						if (moment(localMap.lastModified).isBefore(remoteMap.lastModified)) {
-							postMessage({
-								req: "askDownload",
-								localMap: localMap,
-								remoteMap: remoteMap,
-								chunks: chunks,
-								filename: msg.filename
-							});
+							localMap[count++] = {md5: md5(new TextDecoder("utf-8").decode(chunk))};
 						}
-						else if (moment(localMap.lastModified).isAfter(remoteMap.lastModified)) {
-							upload(msg.token, localMap, remoteMap, chunks, msg.filename);
-						}
-						else {
+
+						if (chunks.length > 1000) {
 							postMessage({
-								req: 'upload',
-								code: 200,
-								text: ''
+								req: 'error',
+								text: "Wowza! Your notepad is so big we can't store it.<br><br>It might be a good idea to split up your notepad."
 							});
 							return;
 						}
+
+						reqGET(res, (remoteMapJSON, code) => {
+
+							var remoteMap = JSON.parse(remoteMapJSON);
+							if (moment(localMap.lastModified).isBefore(remoteMap.lastModified)) {
+								postMessage({
+									req: "askDownload",
+									localMap: localMap,
+									remoteMap: remoteMap,
+									chunks: chunks,
+									filename: msg.filename
+								});
+							}
+							else if (moment(localMap.lastModified).isAfter(remoteMap.lastModified)) {
+								upload(msg.token, localMap, remoteMap, chunks, msg.filename);
+							}
+							else {
+								postMessage({
+									req: 'upload',
+									code: 200,
+									text: ''
+								});
+								return;
+							}
+						});
 					});
 				}
 			});
