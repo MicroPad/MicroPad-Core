@@ -1079,10 +1079,12 @@ function downloadFile(elementID) {
 			break;
 		}
 	}
-	var dataURI = selElement.content;
+
 	var filename = selElement.args.filename;
-	var blob = dataURItoBlob(dataURI);
-	saveAs(blob, filename);
+	assetStorage.getItem(selElement.args.ext).then(blob => {
+		saveAs(blob, filename);
+	});
+
 	$('#fileEditor').modal('close');
 }
 
@@ -1305,45 +1307,21 @@ function loadNote(id, delta) {
 	$('.path-changing').show();
 	$('#path-input').val(getCurrentPath(true).join('//'));
 
-	for (var i = 0; i < note.elements.length; i++) {
-		var element = note.elements[i];
-		if (delta && $('#' + element.args.id).length) continue;
-		$('#viewer').append('<div id="{0}" class="interact resize drag z-depth-2 hoverable element" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(element.args.id, element.args.x, element.args.y, element.args.width, element.args.height))
-		var elementDiv = document.getElementById(element.args.id);
+	for (let i = 0; i < note.elements.length; i++) {
+		let element = note.elements[i];
 
-		switch (element.type) {
-			case "markdown":
-				elementDiv.style.fontSize = element.args.fontSize;
-				elementDiv.innerHTML += md.makeHtml(element.content);
-				asciimath.translate(undefined, true);
-				drawPictures();
-				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+		if (element.content !== "AS" && element.type !== "markdown") {
+			let asset = new parser.Asset(dataURItoBlob(element.content));
+			notepad.assets.addAsset(asset);
+			element.args.ext = asset.uuid;
+			element.content = "AS";
 
-				var checkedTodoItems = $('#'+element.args.id+' .task-list-item input:checked');
-				if (checkedTodoItems.length > 5) {
-					todoShowToggle[element.args.id] = false;
-					$(elementDiv).find('.handle').after($('<a class="hidden-todo-msg todo-toggle" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(element.args.id, checkedTodoItems.length)));
-				}
-				break;
-			case "drawing":
-				elementDiv.style.padding = "0px";
-				elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" src="{0}" />'.format(element.content);
-				break;
-			case "image":
-				src = element.content;
-				if (!delta) src = URL.createObjectURL(dataURItoBlob(element.content));
-
-				elementDiv.style.padding = "0px";
-				elementDiv.innerHTML += '<img id="img_{1}" class="resize" style="width: 100%; height: auto;" src="{0}" />'.format(src, element.args.id);
-				break;
-			case "file":
-				elementDiv.innerHTML += '<div class="fileHolder" id="{4}" style="padding: 20px; height: {0}; width: {1};"><a href="javascript:downloadFile(\'{3}\');">{2}</a></div>'.format(element.args.height, element.args.width, element.args.filename, element.args.id);
-				break;
-			case "recording":
-				$(elementDiv).addClass('recording');
-				elementDiv.innerHTML += '<p class="recording-text"><em>{1}</em></p><audio controls="true" style="padding-top: 20px;" src="{0}"></audio>'.format(element.content, element.args.filename);
-				if (!delta) edgeFix(dataURItoBlob(element.content), element.args.id);
-				break;
+			assetStorage.setItem(asset.uuid, asset.data).then(() => {
+				displayElement(delta, element, (i === note.elements.length-1));
+			});
+		}
+		else {
+			displayElement(delta, element, (i === note.elements.length-1));
 		}
 	}
 
@@ -1372,13 +1350,65 @@ function loadNote(id, delta) {
 		}
 	});
 
-	updateBib();
-	setTimeout(function() {
-		initDrawings();
-		updateNote(undefined, true);
-	}, 1000);
-	updateInstructions();
-	autoExpandExplorer();
+	function displayElement(delta, element, lastElement) {
+		if (delta && $('#' + element.args.id).length) return;
+		$('#viewer').append('<div id="{0}" class="interact resize drag z-depth-2 hoverable element" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(element.args.id, element.args.x, element.args.y, element.args.width, element.args.height))
+		var elementDiv = document.getElementById(element.args.id);
+
+		switch (element.type) {
+			case "markdown":
+				elementDiv.style.fontSize = element.args.fontSize;
+				elementDiv.innerHTML += md.makeHtml(element.content);
+				asciimath.translate(undefined, true);
+				drawPictures();
+				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
+				var checkedTodoItems = $('#'+element.args.id+' .task-list-item input:checked');
+				if (checkedTodoItems.length > 5) {
+					todoShowToggle[element.args.id] = false;
+					$(elementDiv).find('.handle').after($('<a class="hidden-todo-msg todo-toggle" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(element.args.id, checkedTodoItems.length)));
+				}
+				break;
+			case "drawing":
+				elementDiv.style.padding = "0px";
+
+				assetStorage.getItem(element.args.ext).then(blob => {
+					elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" src="{0}" />'.format(URL.createObjectURL(blob));
+				});
+				break;
+			case "image":
+				// src = element.content;
+				// if (!delta) src = URL.createObjectURL(dataURItoBlob(element.content));
+
+				elementDiv.style.padding = "0px";
+
+				assetStorage.getItem(element.args.ext).then(blob => {
+					elementDiv.innerHTML += '<img id="img_{1}" class="resize" style="width: 100%; height: auto;" src="{0}" />'.format(URL.createObjectURL(blob), element.args.id);
+				});
+				break;
+			case "file":
+				elementDiv.innerHTML += '<div class="fileHolder" id="{4}" style="padding: 20px; height: {0}; width: {1};"><a href="javascript:downloadFile(\'{3}\');">{2}</a></div>'.format(element.args.height, element.args.width, element.args.filename, element.args.id);
+				break;
+			case "recording":
+				$(elementDiv).addClass('recording');
+
+				assetStorage.getItem(element.args.ext).then(blob => {
+					elementDiv.innerHTML += '<p class="recording-text"><em>{1}</em></p><audio controls="true" style="padding-top: 20px;" src="{0}"></audio>'.format(URL.createObjectURL(blob), element.args.filename);
+					if (!delta) edgeFix(dataURItoBlob(element.content), element.args.id);
+				});
+				break;
+		}
+
+		if (lastElement) {
+			updateBib();
+			setTimeout(function() {
+				initDrawings();
+				updateNote(undefined, true);
+			}, 1000);
+			updateInstructions();
+			autoExpandExplorer();
+		}
+	}
 }
 
 function showTodo(id, allOn) {
