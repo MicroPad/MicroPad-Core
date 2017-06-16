@@ -1529,7 +1529,7 @@ function insert(type, newElement, callback) {
 		newElement.args.ext = asset.uuid;
 
 		assetStorage.setItem(asset.uuid, asset.data).then(() => {
-			if (notepadAssets.assets.indexOf(asset) === -1) notepadAssets.addAsset(asset);
+			if (!notepadAssets.has(asset)) notepadAssets.add(asset.uuid);
 			switch (type) {
 				case "file":
 					newElement.args.filename = "File";
