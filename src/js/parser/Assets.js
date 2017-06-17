@@ -11,6 +11,11 @@ exports.Assets.prototype.addAsset = function(asset) {
 
 exports.Assets.prototype.getXMLObject = function(callback) {
 	var parsedAssets = {asset: []};
+	if (this.assets.length === 0) {
+		callback(parsedAssets);
+		return;
+	}
+
 	for (let i = 0; i < this.assets.length; i++) {
 		this.assets[i].getXMLObject(obj => {
 			parsedAssets.asset.push(obj);
@@ -50,7 +55,7 @@ exports.Asset.prototype.getXMLObject = function(callback) {
 exports.parse = function(xml, callback) {
 	parseString(xml, {trim: true}, (e, res) => {
 		var assets = new exports.Assets();
-		if (e) {
+		if (e || !res.notepad.assets) {
 			callback(assets);
 			return;
 		}

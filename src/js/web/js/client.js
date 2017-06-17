@@ -765,13 +765,6 @@ function updateOpenList() {
 	});
 }
 
-function downloadNotepad(filename) {
-	$('#open-microsync').modal('close');
-	notepad = parser.createNotepad(filename.split('.npx')[0]);
-	notepad.lastModified = moment().subtract(100, 'years').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-	window.initNotepad();
-}
-
 var latestResults = [];
 function loadSearchResult(resID) {
 	$('#search').modal('close');
@@ -1027,6 +1020,10 @@ function deleteElement() {
 
 function getAssets(callback) {
 	var assets = new parser.Assets();
+	if (notepadAssets.size === 0) {
+		callback(assets);
+		return;
+	}
 
 	var count = 0;
 	for (let uuid of notepadAssets) {
@@ -1779,14 +1776,6 @@ function loadFromBrowser(title) {
 		notepad = parser.restoreNotepad(res);
 		notepad.notepadAssets = res.notepadAssets;
 		window.initNotepad();
-
-		getXmlObject(function(xmlObj) {
-			syncWorker.postMessage({
-				req: "setOld",
-				xmlObj: xmlObj
-			});
-			msHasNotepad();
-		});
 	});
 }
 
@@ -1800,6 +1789,7 @@ function handleUpload(event) {
 				parser.parse(text, ["asciimath"]);
 				parser.parseAssets(text, a => {
 					if (!a.assets) return;
+					notepadAssets = new Set();
 					for (var i = 0; i < a.assets.length; i++) {
 						if (!notepadAssets.has(a.assets[i].uuid)) notepadAssets.add(a.assets[i].uuid);
 						assetStorage.setItem(a.assets[i].uuid, a.assets[i].data);

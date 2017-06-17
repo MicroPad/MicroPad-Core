@@ -84,6 +84,9 @@ onmessage = function(event) {
 			me.S3UrlMap.getMapDownload.getUrl(msg.token, msg.filename, (res, code) => {
 				if (code == 200) {
 					var np = parser.restoreNotepad(msg.notepad);
+					msg.assets.__proto__ = parser.Assets.prototype;
+					for (var i = 0; i < msg.assets.assets.length; i++) msg.assets.assets[i].__proto__ = parser.Asset.prototype;
+
 					np.toXML(xml => {
 						var npxUInt8Arr = new TextEncoder().encode(xml);
 						var chunks = [];
@@ -132,7 +135,7 @@ onmessage = function(event) {
 								return;
 							}
 						});
-					});
+					}, msg.assets);
 				}
 			});
 			break;
