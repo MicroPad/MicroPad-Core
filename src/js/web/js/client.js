@@ -683,6 +683,13 @@ window.initNotepad = function() {
 	$('#open-type').html('Notepad')
 	$('#title-input').val(notepad.title);
 
+	if (notepad.notepadAssets) {
+		notepadAssets = new Set(notepad.notepadAssets);
+	}
+	else {
+		notepadAssets = new Set();
+	}
+
 	parents.push(notepad);
 
 	//Clear old lists
@@ -1036,6 +1043,7 @@ function exportOpen() {
 	getAssets(assets => {
 		notepad.toXML(xml => {
 			var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
+			notepad.assets = new parser.Assets();
 			saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
 		}, assets);
 	});
@@ -1342,7 +1350,6 @@ function loadNote(id, delta) {
 		if (element.content !== "AS" && element.type !== "markdown") {
 			try {
 				let asset = new parser.Asset(dataURItoBlob(element.content));
-				notepad.assets.addAsset(asset);
 				element.args.ext = asset.uuid;
 				element.content = "AS";
 
@@ -1752,6 +1759,7 @@ function saveToBrowser(callback) {
 		resizePage($(this), false);
 	});
 
+	notepad.notepadAssets = Array.from(notepadAssets);
 	notepadStorage.setItem(notepad.title, stringify(notepad), function() {
 		updateNotepadList();
 		$('.save-status').html('All changes saved');
@@ -1767,7 +1775,9 @@ function loadFromBrowser(title) {
 	notepadStorage.getItem(title, function(err, res) {
 		if (err || res === null) return;
 
-		notepad = parser.restoreNotepad(JSON.parse(res));
+		res = JSON.parse(res);
+		notepad = parser.restoreNotepad(res);
+		notepad.notepadAssets = res.notepadAssets;
 		window.initNotepad();
 
 		getXmlObject(function(xmlObj) {
@@ -1791,12 +1801,13 @@ function handleUpload(event) {
 				parser.parseAssets(text, a => {
 					if (!a.assets) return;
 					for (var i = 0; i < a.assets.length; i++) {
-						if (!notepadAssets.has(a.assets[i])) notepadAssets.add(a.assets[i].uuid);
+						if (!notepadAssets.has(a.assets[i].uuid)) notepadAssets.add(a.assets[i].uuid);
 						assetStorage.setItem(a.assets[i].uuid, a.assets[i].data);
 					}
 				});
 				while (!parser.notepad) if (parser.notepad) break;
 				notepad = parser.notepad;
+				notepad.notepadAssets = notepadAssets;
 
 				window.initNotepad();
 				saveToBrowser();
