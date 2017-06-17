@@ -34,11 +34,13 @@ syncWorker.onmessage = function(event) {
 			hasAddedNotepad = isTrue;
 
 			if (isTrue) {
+				$('#sync-button').show();
 				$('#not-syncing-pitch').hide();
 				$('#sync-options').show();
 				msSync();
 			}
 			else {
+				$('#sync-button').hide();
 				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Enable µSync</a>)');
 				$('#not-syncing-pitch').show();
 				$('#sync-options').hide();

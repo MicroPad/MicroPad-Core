@@ -122,6 +122,7 @@ window.onload = function() {
 	$('#stop-recording-btn').hide();
 	$('.display-with-note').hide();
 	$('#not-syncing-pitch').hide();
+	$('#sync-button').hide();
 	$('#sync-options').hide();
 	$('#show-explorer').hide();
 	$('#menu-button').sideNav();
