@@ -135,12 +135,7 @@ window.onload = function() {
 		/** Restore to previous notepad */
 		appStorage.getItem('lastNotepadTitle', function(e, title) {
 			if (title == null || e) return;
-			notepadStorage.iterate(function(value, key, i) {
-				if (title === key) {
-					notepad = parser.restoreNotepad(JSON.parse(value));
-					initNotepad();
-				}
-			});
+			loadFromBrowser(title);
 		});
 
 		/** Handle Notepad Upload */
@@ -1018,20 +1013,22 @@ function deleteElement() {
 	});
 }
 
-function getAssets(callback) {
+function getAssets(callback, npAssets) {
 	var assets = new parser.Assets();
-	if (notepadAssets.size === 0) {
+	if (!npAssets) npAssets = notepadAssets;
+
+	if (npAssets.size === 0) {
 		callback(assets);
 		return;
 	}
 
 	var count = 0;
-	for (let uuid of notepadAssets) {
+	for (let uuid of npAssets) {
 		assetStorage.getItem(uuid).then(blob => {
 			var asset = new parser.Asset(blob);
 			asset.uuid = uuid;
 			assets.addAsset(asset);
-			if (++count === notepadAssets.size) callback(assets);
+			if (++count === npAssets.size) callback(assets);
 		});
 	}
 }
@@ -1077,30 +1074,57 @@ function exportToPdf() {
 function exportNotepads(type) {
 	var zip = new JSZip();
 	var ext = "zip";
-	notepadStorage.iterate(function(value, key, i) {
-		switch (type) {
-			case "npx":
-				getAssets(assets => {
-					parser.restoreNotepad(JSON.parse(value)).toXML(xml => {
-						var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
-						zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
-					}, assets);
-				});
-				break;
-			case "md":
-				for (var i = 0; i < parser.restoreNotepad(JSON.parse(value)).toMarkdown().length; i++) {
-					var note = parser.restoreNotepad(JSON.parse(value)).toMarkdown()[i];
+	var notepadsCounted = 0;
 
-					var blob = new Blob([note.md], { type: "text/markdown;charset=utf-8" });
-					zip.file('{0}/{1}.md'.format(key.replace(/[^a-z0-9 ]/gi, ''), note.title.replace(/[^a-z0-9 ]/gi, '')), blob);
-				}
-				break;
-		}
-	}, function() {
-		zip.generateAsync({ type: "blob" }).then(function(blob) {
-			saveAs(blob, "notepads."+ext);
+	notepadStorage.length((err, numOfNotepads) => {
+		notepadStorage.iterate(function(value, key, i) {
+			switch (type) {
+				case "npx":
+					let res = JSON.parse(value);
+					getAssets(assets => {
+						let np = parser.restoreNotepad(res);
+
+						np.toXML(xml => {
+							var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
+							zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+							if (++notepadsCounted === numOfNotepads) {
+								np.assets = new parser.Assets();
+								downloadZip(zip);
+							}
+						}, assets);
+					}, new Set(res.notepadAssets));
+					break;
+				case "md":
+					res = JSON.parse(value);
+					getAssets(assets => {
+						let np = parser.restoreNotepad(res);
+
+						np.toMarkdown(mdNotes => {
+							for (let j = 0; j < mdNotes.length; j++) {
+								let mdNote = mdNotes[j];
+
+								let blob = new Blob([mdNote.md], { type: "text/markdown;charset=utf-8" });
+								zip.file('{0}/{1}.md'.format(key.replace(/[^a-z0-9 ]/gi, ''), mdNote.title.replace(/[^a-z0-9 ]/gi, '')), blob);
+							}
+							if (++notepadsCounted === numOfNotepads) {
+								np.assets = new parser.Assets();
+								downloadZip(zip);
+							}
+						}, assets);
+					}, new Set(res.notepadAssets));
+					break;
+			}
 		});
 	});
+
+	function downloadZip(zip) {
+		zip.generateAsync({
+			type: "blob",
+			compression: "DEFLATE"
+		}).then(function(blob) {
+			saveAs(blob, "notepads."+ext);
+		});
+	}
 }
 
 function downloadFile(elementID) {
@@ -1341,6 +1365,7 @@ function loadNote(id, delta) {
 	$('.path-changing').show();
 	$('#path-input').val(getCurrentPath(true).join('//'));
 
+	var elementCount = 0;
 	for (let i = 0; i < note.elements.length; i++) {
 		let element = note.elements[i];
 
@@ -1349,10 +1374,11 @@ function loadNote(id, delta) {
 				let asset = new parser.Asset(dataURItoBlob(element.content));
 				element.args.ext = asset.uuid;
 				element.content = "AS";
+				notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 
 				assetStorage.setItem(asset.uuid, asset.data).then(() => {
 					if (!notepadAssets.has(asset)) notepadAssets.add(asset.uuid);
-					displayElement(delta, element, (i === note.elements.length-1));
+					displayElement(delta, element, (++elementCount === note.elements.length));
 				});
 			}
 			catch(e) {
@@ -1361,7 +1387,7 @@ function loadNote(id, delta) {
 			}
 		}
 		else {
-			displayElement(delta, element, (i === note.elements.length-1));
+			displayElement(delta, element, (++elementCount === note.elements.length));
 		}
 	}
 
@@ -1414,7 +1440,17 @@ function loadNote(id, delta) {
 
 				assetStorage.getItem(element.args.ext).then(blob => {
 					if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
-					elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" src="{0}" />'.format(URL.createObjectURL(blob));
+					elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" />';
+
+					var trimmed = false;
+					$(elementDiv).find('img')[0].onload = function() {
+						if (!trimmed) {
+							trimmed = true;
+							initDrawing($(elementDiv).find('img')[0]);
+						}
+					};
+
+					$(elementDiv).find('img')[0].src = URL.createObjectURL(blob);
 				});
 				break;
 			case "image":
@@ -1448,7 +1484,6 @@ function loadNote(id, delta) {
 		if (lastElement) {
 			updateBib();
 			setTimeout(function() {
-				initDrawings();
 				updateNote(undefined, true);
 			}, 1000);
 			updateInstructions();
@@ -1682,17 +1717,14 @@ function updateBib() {
 	saveToBrowser();
 }
 
-function initDrawings() {
-	$('.drawing').each(function(i) {
-		var img = $(this)[0];
-		var tmpCanvas = $('<canvas width="{0}" height="{1}"></canvas>'.format(img.naturalWidth, img.naturalHeight))[0];
-		var tmpCtx = tmpCanvas.getContext('2d');
-		tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
-		tmpCtx.drawImage(img, 0, 0);
+function initDrawing(img) {
+	var tmpCanvas = $('<canvas width="{0}" height="{1}"></canvas>'.format(img.naturalWidth, img.naturalHeight))[0];
+	var tmpCtx = tmpCanvas.getContext('2d');
+	tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+	tmpCtx.drawImage(img, 0, 0);
 
-		var trimmed = URL.createObjectURL(dataURItoBlob(trim(tmpCanvas).toDataURL()));
-		$(this).attr('src', trimmed);
-	});
+	var trimmed = URL.createObjectURL(dataURItoBlob(trim(tmpCanvas).toDataURL()));
+	img.src = trimmed;
 }
 
 function readFileInputEventAsText(event, callback) {

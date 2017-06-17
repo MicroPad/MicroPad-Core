@@ -105,7 +105,7 @@ exports.Note.prototype.toXML = function() {
 	return builder.buildObject(this.toXMLObject());
 }
 
-exports.Note.prototype.toMarkdown = function() {
+exports.Note.prototype.toMarkdown = function(assets) {
 	var mdNote = "";
 	for (var i = 0; i < this.elements.length; i++) {
 		var element = this.elements[i];
@@ -125,12 +125,28 @@ exports.Note.prototype.toMarkdown = function() {
 
 			case "drawing":
 			case "image":
-				mdNote += "![]({0}){1}\n\n".format(element.content, citation);
+				var content = "";
+				if (element.args.ext) {
+					content = assets[element.args.ext];
+				}
+				else {
+					content = element.content;
+				}
+
+				mdNote += "![]({0}){1}\n\n".format(content, citation);
 				break;
 
 			case "file":
 			case "recording":
-				mdNote += "[{0}]({1}){2}\n\n".format(element.args.filename, element.content, citation);
+				var content = "";
+				if (element.args.ext) {
+					content = assets[element.args.ext];
+				}
+				else {
+					content = element.content;
+				}
+
+				mdNote += "[{0}]({1}){2}\n\n".format(element.args.filename, content, citation);
 				break;
 		}
 	}

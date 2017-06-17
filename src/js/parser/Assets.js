@@ -24,6 +24,21 @@ exports.Assets.prototype.getXMLObject = function(callback) {
 	}
 }
 
+exports.Assets.prototype.getBase64Assets = function(callback) {
+	var parsedAssets = {};
+	if (this.assets.length === 0) {
+		callback(parsedAssets);
+		return;
+	}
+
+	for (let i = 0; i < this.assets.length; i++) {
+		blobToDataURL(this.assets[i].data, b64 => {
+			parsedAssets[this.assets[i].uuid] = b64;
+			if (i === this.assets.length - 1) callback(parsedAssets);
+		});
+	}
+}
+
 exports.Asset = function(dataAsBlob, uuid) {
 	if (uuid) {
 		this.uuid = uuid;

@@ -75,12 +75,20 @@ Notepad.prototype.toXML = function(callback, assets) {
 		callback('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'+builder.buildObject(obj).replace(/&#xD;/g, ''));
 	});
 }
-Notepad.prototype.toMarkdown = function() {
+Notepad.prototype.toMarkdown = function(callback, assets) {
 	var notes = [];
-	for (var i = 0; i < this.sections.length; i++) {
-		notes.push.apply(notes, this.sections[i].toMarkdown());
+	if (this.sections.length === 0) {
+		callback(notes);
+		return;
 	}
-	return notes;
+
+	this.assets = assets;
+	this.assets.getBase64Assets(b64Assets => {
+		for (var i = 0; i < this.sections.length; i++) {
+			notes.push.apply(notes, this.sections[i].toMarkdown(b64Assets));
+			if (i === this.sections.length - 1) callback(notes);
+		}
+	});
 }
 
 var Section = function(title) {
@@ -145,16 +153,16 @@ Section.prototype.toXML = function() {
 	});
 	return builder.buildObject(this.toXMLObject());
 }
-Section.prototype.toMarkdown = function() {
+Section.prototype.toMarkdown = function(b64Assets) {
 	var mdNoteList = [];
 
 	for (var i = 0; i < this.sections.length; i++) {
 		var section = this.sections[i];
-		mdNoteList.push.apply(mdNoteList, section.toMarkdown());
+		mdNoteList.push.apply(mdNoteList, section.toMarkdown(b64Assets));
 	}
 
 	for (var i = 0; i < this.notes.length; i++) {
-		mdNoteList.push(this.notes[i].toMarkdown());
+		mdNoteList.push(this.notes[i].toMarkdown(b64Assets));
 	}
 
 	return mdNoteList;

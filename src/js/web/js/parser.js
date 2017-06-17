@@ -5234,12 +5234,20 @@ Notepad.prototype.toXML = function(callback, assets) {
 		callback('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'+builder.buildObject(obj).replace(/&#xD;/g, ''));
 	});
 }
-Notepad.prototype.toMarkdown = function() {
+Notepad.prototype.toMarkdown = function(callback, assets) {
 	var notes = [];
-	for (var i = 0; i < this.sections.length; i++) {
-		notes.push.apply(notes, this.sections[i].toMarkdown());
+	if (this.sections.length === 0) {
+		callback(notes);
+		return;
 	}
-	return notes;
+
+	this.assets = assets;
+	this.assets.getBase64Assets(b64Assets => {
+		for (var i = 0; i < this.sections.length; i++) {
+			notes.push.apply(notes, this.sections[i].toMarkdown(b64Assets));
+			if (i === this.sections.length - 1) callback(notes);
+		}
+	});
 }
 
 var Section = function(title) {
@@ -5304,16 +5312,16 @@ Section.prototype.toXML = function() {
 	});
 	return builder.buildObject(this.toXMLObject());
 }
-Section.prototype.toMarkdown = function() {
+Section.prototype.toMarkdown = function(b64Assets) {
 	var mdNoteList = [];
 
 	for (var i = 0; i < this.sections.length; i++) {
 		var section = this.sections[i];
-		mdNoteList.push.apply(mdNoteList, section.toMarkdown());
+		mdNoteList.push.apply(mdNoteList, section.toMarkdown(b64Assets));
 	}
 
 	for (var i = 0; i < this.notes.length; i++) {
-		mdNoteList.push(this.notes[i].toMarkdown());
+		mdNoteList.push(this.notes[i].toMarkdown(b64Assets));
 	}
 
 	return mdNoteList;
@@ -5624,6 +5632,21 @@ exports.Assets.prototype.getXMLObject = function(callback) {
 	}
 }
 
+exports.Assets.prototype.getBase64Assets = function(callback) {
+	var parsedAssets = {};
+	if (this.assets.length === 0) {
+		callback(parsedAssets);
+		return;
+	}
+
+	for (let i = 0; i < this.assets.length; i++) {
+		blobToDataURL(this.assets[i].data, b64 => {
+			parsedAssets[this.assets[i].uuid] = b64;
+			if (i === this.assets.length - 1) callback(parsedAssets);
+		});
+	}
+}
+
 exports.Asset = function(dataAsBlob, uuid) {
 	if (uuid) {
 		this.uuid = uuid;
@@ -5823,7 +5846,7 @@ exports.Note.prototype.toXML = function() {
 	return builder.buildObject(this.toXMLObject());
 }
 
-exports.Note.prototype.toMarkdown = function() {
+exports.Note.prototype.toMarkdown = function(assets) {
 	var mdNote = "";
 	for (var i = 0; i < this.elements.length; i++) {
 		var element = this.elements[i];
@@ -5843,12 +5866,28 @@ exports.Note.prototype.toMarkdown = function() {
 
 			case "drawing":
 			case "image":
-				mdNote += "![]({0}){1}\n\n".format(element.content, citation);
+				var content = "";
+				if (element.args.ext) {
+					content = assets[element.args.ext];
+				}
+				else {
+					content = element.content;
+				}
+
+				mdNote += "![]({0}){1}\n\n".format(content, citation);
 				break;
 
 			case "file":
 			case "recording":
-				mdNote += "[{0}]({1}){2}\n\n".format(element.args.filename, element.content, citation);
+				var content = "";
+				if (element.args.ext) {
+					content = assets[element.args.ext];
+				}
+				else {
+					content = element.content;
+				}
+
+				mdNote += "[{0}]({1}){2}\n\n".format(element.args.filename, content, citation);
 				break;
 		}
 	}
