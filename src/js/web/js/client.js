@@ -1,4 +1,5 @@
 var notepad;
+var notepadAssets = new Set();
 var parents = [];
 var note;
 var noteID;
@@ -21,15 +22,20 @@ var uploadWorker = new Worker('js/uploadWorker.js');
 var putRequests = [];
 
 /** Setup localforage */
-var notepadStorage = localforage.createInstance({
+const notepadStorage = localforage.createInstance({
 	name: 'MicroPad',
 	storeName: 'notepads'
 });
 
-var appStorage = localforage.createInstance({
+const appStorage = localforage.createInstance({
 	name: 'MicroPad',
 	version: 1.0,
 	storeName: 'app'
+});
+
+const assetStorage = localforage.createInstance({
+	name: 'MicroPad',
+	storeName: 'assets'
 });
 
 /** Setup md parser */
@@ -129,12 +135,7 @@ window.onload = function() {
 		/** Restore to previous notepad */
 		appStorage.getItem('lastNotepadTitle', function(e, title) {
 			if (title == null || e) return;
-			notepadStorage.iterate(function(value, key, i) {
-				if (title === key) {
-					notepad = parser.restoreNotepad(JSON.parse(value));
-					initNotepad();
-				}
-			});
+			loadFromBrowser(title);
 		});
 
 		/** Handle Notepad Upload */
@@ -278,19 +279,23 @@ window.onload = function() {
 						$('#drawingEditor').modal({
 							ready: function() {
 								resizeCanvas();
-								if (element.content) {
+								if (element.args.ext) {
 									var img = new Image();
 									img.onload = function() {
 										canvasCtx.drawImage(img, 0, 0);
 									}
-									img.src = element.content;
+									assetStorage.getItem(element.args.ext).then(blob => {
+										if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
+										img.src = URL.createObjectURL(blob);
+									});
 								}
 							},
 							complete: function() {
 								confirmAsync("Do you want to save this drawing?").then(function(answer) {
 									if (answer) {
 										if (!isCanvasBlank($('#drawing-viewer')[0])) {
-											element.content = $('#drawing-viewer')[0].toDataURL();
+											assetStorage.setItem(element.args.ext, dataURItoBlob($('#drawing-viewer')[0].toDataURL()));
+											if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 
 											var trimmed = URL.createObjectURL(dataURItoBlob(trim($('#drawing-viewer')[0]).toDataURL()));
 											$("#"+element.args.id+" > img").attr('src', trimmed);
@@ -328,8 +333,10 @@ window.onload = function() {
 							reader.readAsDataURL(file);
 
 							reader.onload = function() {
-								element.content = reader.result;
-								$("#"+element.args.id+" > img").attr('src', URL.createObjectURL(dataURItoBlob(element.content)));
+								var blob = dataURItoBlob(reader.result);
+								assetStorage.setItem(element.args.ext, blob);
+								if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
+								$("#"+element.args.id+" > img").attr('src', URL.createObjectURL(blob));
 								updateReference(event);
 								setTimeout(() => {
 									resizePage($("#"+element.args.id), true);
@@ -396,7 +403,10 @@ window.onload = function() {
 							reader.readAsDataURL(file);
 
 							reader.onload = function() {
-								element.content = reader.result;
+								var blob = dataURItoBlob(reader.result);
+								assetStorage.setItem(element.args.ext, blob);
+								if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
+
 								$('#' + element.args.id + '> .fileHolder > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
 								$('#' + element.args.id + '> .fileHolder > a').html(element.args.filename);
 							}
@@ -668,6 +678,13 @@ window.initNotepad = function() {
 	$('#open-type').html('Notepad')
 	$('#title-input').val(notepad.title);
 
+	if (notepad.notepadAssets) {
+		notepadAssets = new Set(notepad.notepadAssets);
+	}
+	else {
+		notepadAssets = new Set();
+	}
+
 	parents.push(notepad);
 
 	//Clear old lists
@@ -741,13 +758,6 @@ function updateOpenList() {
 			$('#open-from-sync-button').hide();
 		}
 	});
-}
-
-function downloadNotepad(filename) {
-	$('#open-microsync').modal('close');
-	notepad = parser.createNotepad(filename.split('.npx')[0]);
-	notepad.lastModified = moment().subtract(100, 'years').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-	window.initNotepad();
 }
 
 var latestResults = [];
@@ -1003,9 +1013,34 @@ function deleteElement() {
 	});
 }
 
+function getAssets(callback, npAssets) {
+	var assets = new parser.Assets();
+	if (!npAssets) npAssets = notepadAssets;
+
+	if (npAssets.size === 0) {
+		callback(assets);
+		return;
+	}
+
+	var count = 0;
+	for (let uuid of npAssets) {
+		assetStorage.getItem(uuid).then(blob => {
+			var asset = new parser.Asset(blob);
+			asset.uuid = uuid;
+			assets.addAsset(asset);
+			if (++count === npAssets.size) callback(assets);
+		});
+	}
+}
+
 function exportOpen() {
-	var blob = new Blob([notepad.toXML()], { type: "text/xml;charset=utf-8" });
-	saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+	getAssets(assets => {
+		notepad.toXML(xml => {
+			var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
+			notepad.assets = new parser.Assets();
+			saveAs(blob, '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')));
+		}, assets);
+	});
 }
 
 function exportToPdf() {
@@ -1038,28 +1073,58 @@ function exportToPdf() {
 
 function exportNotepads(type) {
 	var zip = new JSZip();
-	var ext = "npxz";
-	notepadStorage.iterate(function(value, key, i) {
-		switch (type) {
-			case "npx":
-				var blob = new Blob([parser.restoreNotepad(JSON.parse(value)).toXML()], { type: "text/xml;charset=utf-8" });
-				zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
-				break;
-			case "md":
-				ext = 'zip';
-				for (var i = 0; i < parser.restoreNotepad(JSON.parse(value)).toMarkdown().length; i++) {
-					var note = parser.restoreNotepad(JSON.parse(value)).toMarkdown()[i];
+	var ext = "zip";
+	var notepadsCounted = 0;
 
-					var blob = new Blob([note.md], { type: "text/markdown;charset=utf-8" });
-					zip.file('{0}/{1}.md'.format(key.replace(/[^a-z0-9 ]/gi, ''), note.title.replace(/[^a-z0-9 ]/gi, '')), blob);
-				}
-				break;
-		}
-	}, function() {
-		zip.generateAsync({ type: "blob" }).then(function(blob) {
-			saveAs(blob, "notepads."+ext);
+	notepadStorage.length((err, numOfNotepads) => {
+		notepadStorage.iterate(function(value, key, i) {
+			switch (type) {
+				case "npx":
+					let res = JSON.parse(value);
+					getAssets(assets => {
+						let np = parser.restoreNotepad(res);
+
+						np.toXML(xml => {
+							var blob = new Blob([xml], { type: "text/xml;charset=utf-8" });
+							zip.file(key.replace(/[^a-z0-9 ]/gi, '') + '.npx', blob);
+							if (++notepadsCounted === numOfNotepads) {
+								np.assets = new parser.Assets();
+								downloadZip(zip);
+							}
+						}, assets);
+					}, new Set(res.notepadAssets));
+					break;
+				case "md":
+					res = JSON.parse(value);
+					getAssets(assets => {
+						let np = parser.restoreNotepad(res);
+
+						np.toMarkdown(mdNotes => {
+							for (let j = 0; j < mdNotes.length; j++) {
+								let mdNote = mdNotes[j];
+
+								let blob = new Blob([mdNote.md], { type: "text/markdown;charset=utf-8" });
+								zip.file('{0}/{1}.md'.format(key.replace(/[^a-z0-9 ]/gi, ''), mdNote.title.replace(/[^a-z0-9 ]/gi, '')), blob);
+							}
+							if (++notepadsCounted === numOfNotepads) {
+								np.assets = new parser.Assets();
+								downloadZip(zip);
+							}
+						}, assets);
+					}, new Set(res.notepadAssets));
+					break;
+			}
 		});
 	});
+
+	function downloadZip(zip) {
+		zip.generateAsync({
+			type: "blob",
+			compression: "DEFLATE"
+		}).then(function(blob) {
+			saveAs(blob, "notepads."+ext);
+		});
+	}
 }
 
 function downloadFile(elementID) {
@@ -1071,10 +1136,13 @@ function downloadFile(elementID) {
 			break;
 		}
 	}
-	var dataURI = selElement.content;
+
 	var filename = selElement.args.filename;
-	var blob = dataURItoBlob(dataURI);
-	saveAs(blob, filename);
+	assetStorage.getItem(selElement.args.ext).then(blob => {
+		saveAs(blob, filename);
+	});
+	if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
+
 	$('#fileEditor').modal('close');
 }
 
@@ -1297,45 +1365,29 @@ function loadNote(id, delta) {
 	$('.path-changing').show();
 	$('#path-input').val(getCurrentPath(true).join('//'));
 
-	for (var i = 0; i < note.elements.length; i++) {
-		var element = note.elements[i];
-		if (delta && $('#' + element.args.id).length) continue;
-		$('#viewer').append('<div id="{0}" class="interact resize drag z-depth-2 hoverable element" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(element.args.id, element.args.x, element.args.y, element.args.width, element.args.height))
-		var elementDiv = document.getElementById(element.args.id);
+	var elementCount = 0;
+	for (let i = 0; i < note.elements.length; i++) {
+		let element = note.elements[i];
 
-		switch (element.type) {
-			case "markdown":
-				elementDiv.style.fontSize = element.args.fontSize;
-				elementDiv.innerHTML += md.makeHtml(element.content);
-				asciimath.translate(undefined, true);
-				drawPictures();
-				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+		if (element.content !== "AS" && element.type !== "markdown") {
+			try {
+				let asset = new parser.Asset(dataURItoBlob(element.content));
+				element.args.ext = asset.uuid;
+				element.content = "AS";
+				notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 
-				var checkedTodoItems = $('#'+element.args.id+' .task-list-item input:checked');
-				if (checkedTodoItems.length > 5) {
-					todoShowToggle[element.args.id] = false;
-					$(elementDiv).find('.handle').after($('<a class="hidden-todo-msg todo-toggle" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(element.args.id, checkedTodoItems.length)));
-				}
-				break;
-			case "drawing":
-				elementDiv.style.padding = "0px";
-				elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" src="{0}" />'.format(element.content);
-				break;
-			case "image":
-				src = element.content;
-				if (!delta) src = URL.createObjectURL(dataURItoBlob(element.content));
-
-				elementDiv.style.padding = "0px";
-				elementDiv.innerHTML += '<img id="img_{1}" class="resize" style="width: 100%; height: auto;" src="{0}" />'.format(src, element.args.id);
-				break;
-			case "file":
-				elementDiv.innerHTML += '<div class="fileHolder" id="{4}" style="padding: 20px; height: {0}; width: {1};"><a href="javascript:downloadFile(\'{3}\');">{2}</a></div>'.format(element.args.height, element.args.width, element.args.filename, element.args.id);
-				break;
-			case "recording":
-				$(elementDiv).addClass('recording');
-				elementDiv.innerHTML += '<p class="recording-text"><em>{1}</em></p><audio controls="true" style="padding-top: 20px;" src="{0}"></audio>'.format(element.content, element.args.filename);
-				if (!delta) edgeFix(dataURItoBlob(element.content), element.args.id);
-				break;
+				assetStorage.setItem(asset.uuid, asset.data).then(() => {
+					if (!notepadAssets.has(asset)) notepadAssets.add(asset.uuid);
+					displayElement(delta, element, (++elementCount === note.elements.length));
+				});
+			}
+			catch(e) {
+				note.elements.splice(note.elements.indexOf(element), 1);
+				continue;
+			}
+		}
+		else {
+			displayElement(delta, element, (++elementCount === note.elements.length));
 		}
 	}
 
@@ -1364,13 +1416,80 @@ function loadNote(id, delta) {
 		}
 	});
 
-	updateBib();
-	setTimeout(function() {
-		initDrawings();
-		updateNote(undefined, true);
-	}, 1000);
-	updateInstructions();
-	autoExpandExplorer();
+	function displayElement(delta, element, lastElement) {
+		if (delta && $('#' + element.args.id).length) return;
+		$('#viewer').append('<div id="{0}" class="interact resize drag z-depth-2 hoverable element" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(element.args.id, element.args.x, element.args.y, element.args.width, element.args.height))
+		var elementDiv = document.getElementById(element.args.id);
+
+		switch (element.type) {
+			case "markdown":
+				elementDiv.style.fontSize = element.args.fontSize;
+				elementDiv.innerHTML += md.makeHtml(element.content);
+				asciimath.translate(undefined, true);
+				drawPictures();
+				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
+				var checkedTodoItems = $('#'+element.args.id+' .task-list-item input:checked');
+				if (checkedTodoItems.length > 5) {
+					todoShowToggle[element.args.id] = false;
+					$(elementDiv).find('.handle').after($('<a class="hidden-todo-msg todo-toggle" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(element.args.id, checkedTodoItems.length)));
+				}
+				break;
+			case "drawing":
+				elementDiv.style.padding = "0px";
+
+				assetStorage.getItem(element.args.ext).then(blob => {
+					if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
+					elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" />';
+
+					var trimmed = false;
+					$(elementDiv).find('img')[0].onload = function() {
+						if (!trimmed) {
+							trimmed = true;
+							initDrawing($(elementDiv).find('img')[0]);
+						}
+					};
+
+					$(elementDiv).find('img')[0].src = URL.createObjectURL(blob);
+				});
+				break;
+			case "image":
+				// src = element.content;
+				// if (!delta) src = URL.createObjectURL(dataURItoBlob(element.content));
+
+				elementDiv.style.padding = "0px";
+
+				assetStorage.getItem(element.args.ext).then(blob => {
+					if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
+					elementDiv.innerHTML += '<img id="img_{1}" class="resize" style="width: 100%; height: auto;" src="{0}" />'.format(URL.createObjectURL(blob), element.args.id);
+				});
+				break;
+			case "file":
+				elementDiv.innerHTML += '<div class="fileHolder" id="{4}" style="padding: 20px; height: {0}; width: {1};"><a href="javascript:downloadFile(\'{3}\');">{2}</a></div>'.format(element.args.height, element.args.width, element.args.filename, element.args.id);
+				break;
+			case "recording":
+				$(elementDiv).addClass('recording');
+
+				elementDiv.innerHTML += '<p class="recording-text"><em>{0}</em></p><audio controls="true" style="padding-top: 20px;"></audio>'.format(element.args.filename);
+				assetStorage.getItem(element.args.ext).then(blob => {
+					if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
+					if (!delta) {
+						$(elementDiv).find('audio')[0].src = URL.createObjectURL(blob);
+						edgeFix(blob, element.args.id);
+					}
+				});
+				break;
+		}
+
+		if (lastElement) {
+			updateBib();
+			setTimeout(function() {
+				updateNote(undefined, true);
+			}, 1000);
+			updateInstructions();
+			autoExpandExplorer();
+		}
+	}
 }
 
 function showTodo(id, allOn) {
@@ -1408,7 +1527,7 @@ function updateNote(id, init) {
 	}
 }
 
-function insert(type, newElement) {
+function insert(type, newElement, callback) {
 	$('#insert').modal('close');
 	if (!newElement) {
 		var newElement = {
@@ -1439,29 +1558,40 @@ function insert(type, newElement) {
 	newElement.args.height = 'auto';
 
 	//Handle element specific args
-	switch (type) {
-		case "markdown":
-			newElement.args.fontSize = '16px';
-			break;
-		case "drawing":
-			newElement.content = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAQAAADa613fAAAAaElEQVR42u3PQREAAAwCoNm/9CL496ABuREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREWkezG8AZQ6nfncAAAAASUVORK5CYII=";
-			break;
-		case "file":
-			newElement.args.filename = "File";
-			break;
-		case "recording":
-			newElement.args.filename = note.title.replace(/[^a-z0-9 ]/gi, '') + ' ' + new Date().toISOString() + ".ogg";
-			break;
+	if (type === "markdown") {
+		newElement.args.fontSize = '16px';
+		elementAdded();
+	}
+	else {
+		var asset = new parser.Asset(dataURItoBlob("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAQAAADa613fAAAAaElEQVR42u3PQREAAAwCoNm/9CL496ABuREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREWkezG8AZQ6nfncAAAAASUVORK5CYII="));
+		newElement.content = "AS";
+		newElement.args.ext = asset.uuid;
+
+		assetStorage.setItem(asset.uuid, asset.data).then(() => {
+			if (!notepadAssets.has(asset)) notepadAssets.add(asset.uuid);
+			switch (type) {
+				case "file":
+					newElement.args.filename = "File";
+					break;
+				case "recording":
+					newElement.args.filename = note.title.replace(/[^a-z0-9 ]/gi, '') + ' ' + new Date().toISOString() + ".ogg";
+					break;
+			}
+
+			elementAdded();
+		});
 	}
 
-	note.elements.push(newElement);
 
-	loadNote(noteID, true);
-	asciimath.translate(undefined, true);
-	drawPictures();
-	MathJax.Hub.Typeset();
-	$('#' + newElement.args.id).trigger('click');
-	return newElement.args.id;
+	function elementAdded() {
+		note.elements.push(newElement);
+		loadNote(noteID, true);
+		asciimath.translate(undefined, true);
+		drawPictures();
+		MathJax.Hub.Typeset();
+		$('#' + newElement.args.id).trigger('click');
+		if (callback) callback(newElement.args.id);
+	}
 }
 
 /** Recording Stuff */
@@ -1480,21 +1610,19 @@ try {
 		var blob = new Blob([e.detail], { type: 'audio/ogg' });
 		var url = URL.createObjectURL(blob);
 
-		var id = insert('recording');
-		for (var i = 0; i < note.elements.length; i++) {
-			var element = note.elements[i];
-			if (id === element.args.id) {
-				blobToDataURL(blob, function(dataURI) {
-					element.content = dataURI;
+		insert('recording', undefined, id => {
+			for (var i = 0; i < note.elements.length; i++) {
+				var element = note.elements[i];
+				if (id === element.args.id) {
+					assetStorage.setItem(element.args.ext, blob);
 					notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-					saveToBrowser();
-				});
-				break;
+					break;
+				}
 			}
-		}
 
-		$('#' + id + ' > audio').attr('src', url);
-		edgeFix(blob, id);
+			$('#' + id + ' > audio').attr('src', url);
+			edgeFix(blob, id);
+		});
 	});
 }
 catch (err) {}
@@ -1589,17 +1717,14 @@ function updateBib() {
 	saveToBrowser();
 }
 
-function initDrawings() {
-	$('.drawing').each(function(i) {
-		var img = $(this)[0];
-		var tmpCanvas = $('<canvas width="{0}" height="{1}"></canvas>'.format(img.naturalWidth, img.naturalHeight))[0];
-		var tmpCtx = tmpCanvas.getContext('2d');
-		tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
-		tmpCtx.drawImage(img, 0, 0);
+function initDrawing(img) {
+	var tmpCanvas = $('<canvas width="{0}" height="{1}"></canvas>'.format(img.naturalWidth, img.naturalHeight))[0];
+	var tmpCtx = tmpCanvas.getContext('2d');
+	tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+	tmpCtx.drawImage(img, 0, 0);
 
-		var trimmed = URL.createObjectURL(dataURItoBlob(trim(tmpCanvas).toDataURL()));
-		$(this).attr('src', trimmed);
-	});
+	var trimmed = URL.createObjectURL(dataURItoBlob(trim(tmpCanvas).toDataURL()));
+	img.src = trimmed;
 }
 
 function readFileInputEventAsText(event, callback) {
@@ -1663,6 +1788,7 @@ function saveToBrowser(callback) {
 		resizePage($(this), false);
 	});
 
+	notepad.notepadAssets = Array.from(notepadAssets);
 	notepadStorage.setItem(notepad.title, stringify(notepad), function() {
 		updateNotepadList();
 		$('.save-status').html('All changes saved');
@@ -1678,16 +1804,10 @@ function loadFromBrowser(title) {
 	notepadStorage.getItem(title, function(err, res) {
 		if (err || res === null) return;
 
-		notepad = parser.restoreNotepad(JSON.parse(res));
+		res = JSON.parse(res);
+		notepad = parser.restoreNotepad(res);
+		notepad.notepadAssets = res.notepadAssets;
 		window.initNotepad();
-
-		getXmlObject(function(xmlObj) {
-			syncWorker.postMessage({
-				req: "setOld",
-				xmlObj: xmlObj
-			});
-			msHasNotepad();
-		});
 	});
 }
 
@@ -1699,8 +1819,17 @@ function handleUpload(event) {
 		case "npx":
 			readFileInputEventAsText(event, function(text) {
 				parser.parse(text, ["asciimath"]);
+				parser.parseAssets(text, a => {
+					if (!a.assets) return;
+					notepadAssets = new Set();
+					for (var i = 0; i < a.assets.length; i++) {
+						if (!notepadAssets.has(a.assets[i].uuid)) notepadAssets.add(a.assets[i].uuid);
+						assetStorage.setItem(a.assets[i].uuid, a.assets[i].data);
+					}
+				});
 				while (!parser.notepad) if (parser.notepad) break;
 				notepad = parser.notepad;
+				notepad.notepadAssets = notepadAssets;
 
 				window.initNotepad();
 				saveToBrowser();
@@ -1727,6 +1856,9 @@ function handleUpload(event) {
 						if (k.split('.').pop().toLowerCase() === 'npx') {
 							zip.file(k).async('string').then(function success(text) {
 								parser.parse(text, ["asciimath"]);
+								parser.parseAssets(text, a => {
+									notepadAssets = a;
+								});
 								while (!parser.notepad) if (parser.notepad) break;
 								notepad = parser.notepad;
 
@@ -1764,31 +1896,6 @@ function zoom(zoomIn) {
 		curScale -= 0.1;
 	}
 	$('#viewer').css('transform', 'scale('+curScale+')');
-}
-
-uploadWorker.onmessage = function(event) {
-	var msg = event.data;
-
-	switch (msg.req) {
-		case "done":
-			putRequests.shift();
-			cueUpload();
-			break;
-
-		case "progress":
-			msg.percentage = msg.percentage.toFixed(1);
-			if (msg.percentage < 100) {
-				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">{0}ing: {1}%</a>)'.format(msg.type, msg.percentage));
-			}
-			else {
-				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
-			}
-			break;
-	}
-}
-
-function cueUpload() {
-	if (putRequests.length > 0) uploadWorker.postMessage(putRequests[0]);
 }
 
 function formatMd(type) {

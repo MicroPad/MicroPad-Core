@@ -1,5 +1,30 @@
 var downloadData;
 
+uploadWorker.onmessage = function(event) {
+	var msg = event.data;
+
+	switch (msg.req) {
+		case "done":
+			putRequests.shift();
+			cueUpload();
+			break;
+
+		case "progress":
+			msg.percentage = msg.percentage.toFixed(1);
+			if (msg.percentage < 100) {
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">{0}ing: {1}%</a>)'.format(msg.type, msg.percentage));
+			}
+			else {
+				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+			}
+			break;
+	}
+}
+
+function cueUpload() {
+	if (putRequests.length > 0) uploadWorker.postMessage(putRequests[0]);
+}
+
 syncWorker.onmessage = function(event) {
 	var msg = event.data;
 
@@ -60,7 +85,6 @@ syncWorker.onmessage = function(event) {
 
 		case "login":
 			if (msg.code === 200) {
-				console.log(JSON.stringify(msg));
 				appStorage.setItem('syncToken', msg.text, function() {
 					window.location.reload();
 				});
@@ -107,8 +131,17 @@ syncWorker.onmessage = function(event) {
 			if (msg.code === 200) {
 				if (msg.text.length === 0) return;
 				parser.parse(msg.text, ["asciimath"]);
+				parser.parseAssets(msg.text, a => {
+					if (!a.assets) return;
+					notepadAssets = new Set();
+					for (var i = 0; i < a.assets.length; i++) {
+						if (!notepadAssets.has(a.assets[i].uuid)) notepadAssets.add(a.assets[i].uuid);
+						assetStorage.setItem(a.assets[i].uuid, a.assets[i].data);
+					}
+				});
 				while (!parser.notepad) if (parser.notepad) break;
 				notepad = parser.notepad;
+				notepad.notepadAssets = notepadAssets;
 
 				window.initNotepad();
 				$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
@@ -178,13 +211,16 @@ function msSync() {
 		if (err || res === null) return;
 
 		$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Syncing&hellip;</a>)');
-		syncWorker.postMessage({
-			syncURL: window.syncURL,
-			req: 'sync',
-			token: res,
-			filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
-			notepad: notepad,
-			method: syncMethod
+		getAssets(assets => {
+			syncWorker.postMessage({
+				syncURL: window.syncURL,
+				req: 'sync',
+				token: res,
+				filename: '{0}.npx'.format(notepad.title.replace(/[^a-z0-9 ]/gi, '')),
+				notepad: notepad,
+				assets: assets,
+				method: syncMethod
+			});
 		});
 	});
 }
@@ -260,8 +296,9 @@ function syncOptions(option) {
 	}
 }
 
-function getXmlObject(callback) {
-	setTimeout(function() {
-		callback(notepad.toXMLObject());
-	}, 0);
+function downloadNotepad(filename) {
+	$('#open-microsync').modal('close');
+	notepad = parser.createNotepad(filename.split('.npx')[0]);
+	notepad.lastModified = moment().subtract(100, 'years').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+	window.initNotepad();
 }
