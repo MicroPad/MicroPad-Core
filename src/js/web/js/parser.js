@@ -5207,8 +5207,8 @@ Notepad.prototype.toXMLObject = function(callback) {
 					lastModified: this.lastModified,
 					'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
 				},
-				section: [],
-				assets: assetsObj
+				assets: assetsObj,
+				section: []
 			}
 		}
 
