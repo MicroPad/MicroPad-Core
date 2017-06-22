@@ -5,7 +5,7 @@ import org.simpleframework.xml.*;
 import java.util.ArrayList;
 
 @Order(attributes={"id", "x", "y", "height", "width"})
-public class BasicElement implements NoteElement {
+public class BinaryElement implements NoteElement {
 	@Text
 	private String content;
 
@@ -24,11 +24,14 @@ public class BasicElement implements NoteElement {
 	@Attribute
 	private String height;
 
-	public BasicElement() {
+	@Attribute(required=false)
+	private String ext;
 
-	};
+	public BinaryElement() {
 
-	public BasicElement(String content, String id, String x, String y, String width, String height) {
+	}
+
+	public BinaryElement(String content, String id, String x, String y, String width, String height) {
 		this.content = content;
 		this.id = id;
 		this.x = x;
@@ -83,5 +86,13 @@ public class BasicElement implements NoteElement {
 
 	public void setHeight(String height) {
 		this.height = height;
+	}
+
+	public String getExt() {
+		return this.ext;
+	}
+
+	public void setExt(String ext) {
+		this.ext = ext;
 	}
 }

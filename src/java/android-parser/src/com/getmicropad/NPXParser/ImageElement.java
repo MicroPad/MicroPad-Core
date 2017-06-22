@@ -1,6 +1,6 @@
 package com.getmicropad.NPXParser;
 
-public class ImageElement extends BasicElement {
+public class ImageElement extends BinaryElement {
 	public ImageElement() {
 
 	}

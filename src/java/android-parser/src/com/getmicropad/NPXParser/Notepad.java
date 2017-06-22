@@ -6,14 +6,14 @@ import org.simpleframework.xml.*;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 @Root(name="notepad")
 @Order(attributes={"noNamespaceSchemaLocation", "title", "lastModified"})
 public class Notepad implements Parent {
+	@ElementList(type=Asset.class, entry="asset", name="assets", required=false)
+	private ArrayList<Asset> assets;
+
 	@ElementList(inline=true, type=Section.class, entry="section", required=false)
 	public List<Section> sections;
 
@@ -27,11 +27,14 @@ public class Notepad implements Parent {
 	@Attribute(required = false)
 	private XMLGregorianCalendar lastModified;
 
+	public HashSet<String> notepadAssets = new HashSet<>();
+
 	public Notepad() {}
 
 	public Notepad(String title) {
 		this.title = title;
 		this.sections = new ArrayList<>();
+		this.assets = new ArrayList<>();
 
 		setLastModified(new Date());
 	}
@@ -39,6 +42,7 @@ public class Notepad implements Parent {
 	public Notepad(String title, Date lastModified) {
 		this.title = title;
 		this.sections = new ArrayList<>();
+		this.assets = new ArrayList<>();
 
 		setLastModified(lastModified);
 	}
@@ -83,5 +87,13 @@ public class Notepad implements Parent {
 
 	public void setSections(List<Section> sections) {
 		this.sections = sections;
+	}
+
+	public List<Asset> getAssets() {
+		return this.assets;
+	}
+
+	public void setAssets(ArrayList<Asset> assets) {
+		this.assets = assets;
 	}
 }

@@ -4,11 +4,11 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Order;
 
 @Order(attributes={"id", "x", "y", "height", "width", "filename"})
-public class FileElement extends BasicElement {
+public class FileElement extends BinaryElement {
 	@Attribute
 	private String filename;
 
-	public FileElement() {};
+	public FileElement() {}
 
 	public FileElement(String content, String id, String x, String y, String width, String height, String filename) {
 		super(content, id, x, y, width, height);

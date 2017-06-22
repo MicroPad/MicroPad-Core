@@ -59,6 +59,7 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.annimon.stream.Stream;
+import com.getmicropad.NPXParser.BinaryElement;
 import com.getmicropad.NPXParser.DrawingElement;
 import com.getmicropad.NPXParser.FileElement;
 import com.getmicropad.NPXParser.ImageElement;
@@ -247,6 +248,11 @@ public class BaseActivity extends AppCompatActivity {
 	protected void displayElement(NoteElement element) {
 		String extraArgs = "{}";
 		String content = element.getContent();
+
+		if (element instanceof BinaryElement && !element.getContent().equals("AS")) {
+			//TODO: Convert to asset-store
+		}
+
 		if (element instanceof MarkdownElement) {
 			extraArgs = String.format("{fontSize: \"%s\"}", ((MarkdownElement) element).getFontSize());
 			try {
