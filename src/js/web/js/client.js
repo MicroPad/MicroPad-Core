@@ -48,14 +48,42 @@ showdown.extension('maths', function() {
 			replace: function(s, match) {
 				matches.push('===' + match + '===');
 				var n = matches.length - 1;
-				return '%PLACEHOLDER1' + n + 'ENDPLACEHOLDER1%';
+				return '%ASCIIMATHPLACEHOLDER1' + n + 'ENDASCIIMATHPLACEHOLDER1%';
 			}
 		},
 		{
 			type: 'output',
 			filter: function(text) {
 				for (var i = 0; i < matches.length; ++i) {
-					var pat = '%PLACEHOLDER1' + i + 'ENDPLACEHOLDER1%';
+					var pat = '%ASCIIMATHPLACEHOLDER1' + i + 'ENDASCIIMATHPLACEHOLDER1%';
+					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+				}
+				//reset array
+				matches = [];
+				return text;
+			}
+		}
+	]
+});
+
+showdown.extension('tex-maths', function() {
+	var matches = [];
+	return [
+		{
+			type: 'lang',
+			regex: /=\[=([^]+?)=\[=/gi,
+			replace: function(s, match) {
+				matches.push('=[=' + match + '=[=');
+				var n = matches.length - 1;
+				return '%TEXPLACEHOLDER1' + n + 'ENDTEXPLACEHOLDER1%';
+			}
+		},
+		{
+			type: 'output',
+			filter: function(text) {
+				console.log(matches);
+				for (var i = 0; i < matches.length; ++i) {
+					var pat = '%TEXPLACEHOLDER1' + i + 'ENDTEXPLACEHOLDER1%';
 					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 				}
 				//reset array
@@ -101,7 +129,7 @@ var md = new showdown.Converter({
 	tasklists: true,
 	prefixHeaderId: 'mdheader_',
 	smoothLivePreview: true,
-	extensions: ['maths', 'graphs']
+	extensions: ['maths', 'tex-maths', 'graphs']
 });
 
 $(document).ready(function() {
@@ -109,6 +137,12 @@ $(document).ready(function() {
 });
 
 window.onload = function() {
+	MathJax.Hub.Config({
+		tex2jax: {
+			inlineMath: [['=[=', '=[=']]
+		}
+	});
+
 	/** Get the open notepads */
 	updateNotepadList();
 
