@@ -1967,50 +1967,6 @@ function zoom(zoomIn) {
 	$('#viewer').css('transform', 'scale('+curScale+')');
 }
 
-function formatMd(type) {
-	switch (type) {
-		case "bold":
-			$('#md-textarea').surroundSelectedText("**", "**");
-			break;
-
-		case "italic":
-			$('#md-textarea').surroundSelectedText("*", "*");
-			break;
-
-		case "b-list":
-			$('#md-textarea').surroundSelectedText("- ", "");
-			break;
-
-		case "n-list":
-			$('#md-textarea').surroundSelectedText("1. ", "");
-			break;
-
-		case "t-list":
-			$('#md-textarea').surroundSelectedText("- [ ] ", "");
-			break;
-
-		case "indent":
-			$('#md-textarea').surroundSelectedText("\t", "");
-			break;
-
-		case "equation":
-			$('#md-textarea').surroundSelectedText(" ===", "=== ");
-			break;
-
-		case "strikethrough":
-			$('#md-textarea').surroundSelectedText("~~", "~~");
-			break;
-
-		case "link":
-			$('#md-textarea').replaceSelectedText("[{0}]({1})".format($('#md-textarea').getSelection().text, "https://example.com"));
-			break;
-
-		case "table":
-			$('#md-textarea').replaceSelectedText("| Header 1 | Header 2 |\n|---|---|\n| Column 1 | Column 2 |\n| Row 2 |  |");
-			break;
-	}
-}
-
 function getHelp() {
 	Materialize.toast("Downloading help notepad...", 1000);
 	$.get("https://getmicropad.com/Help.npx?rng="+new Date().getTime(), data => {
