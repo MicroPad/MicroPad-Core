@@ -71,9 +71,9 @@ showdown.extension('tex-maths', function() {
 	return [
 		{
 			type: 'lang',
-			regex: /=\[=([^]+?)=\[=/gi,
+			regex: /;;([^]+?);;/gi,
 			replace: function(s, match) {
-				matches.push('=[=' + match + '=[=');
+				matches.push(';;' + match + ';;');
 				var n = matches.length - 1;
 				return '%TEXPLACEHOLDER1' + n + 'ENDTEXPLACEHOLDER1%';
 			}
@@ -139,7 +139,7 @@ $(document).ready(function() {
 window.onload = function() {
 	MathJax.Hub.Config({
 		tex2jax: {
-			inlineMath: [['=[=', '=[=']]
+			inlineMath: [[';;', ';;']]
 		}
 	});
 
