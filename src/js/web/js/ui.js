@@ -142,3 +142,25 @@ function updateInstructions() {
 		$('#empty-viewer').hide();
 	}
 }
+
+function insertMarkdown(editor, type, openTag, closeTag) {
+	if (/editor-preview-active/.test(editor.codemirror.getWrapperElement().lastChild.className)) return;
+
+	closeTag = (typeof closeTag === 'undefined') ? openTag : closeTag;
+	var cm = editor.codemirror;
+	var text;
+	var start = openTag;
+	var end = closeTag;
+
+	var startPoint = cm.getCursor('start');
+	var endPoint = cm.getCursor('end');
+
+	text = cm.getSelection();
+	cm.replaceSelection(start + text + end);
+
+	startPoint.ch += openTag.length;
+	endPoint.ch = startPoint.ch + text.length;
+
+	cm.setSelection(startPoint, endPoint);
+	cm.focus();
+}

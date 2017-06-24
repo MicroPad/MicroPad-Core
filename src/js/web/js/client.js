@@ -20,6 +20,8 @@ var isFullscreen = false;
 
 var uploadWorker = new Worker('js/uploadWorker.js');
 var putRequests = [];
+var currentTarget;
+var simplemde;
 
 /** Setup localforage */
 const notepadStorage = localforage.createInstance({
@@ -81,7 +83,6 @@ showdown.extension('tex-maths', function() {
 		{
 			type: 'output',
 			filter: function(text) {
-				console.log(matches);
 				for (var i = 0; i < matches.length; ++i) {
 					var pat = '%TEXPLACEHOLDER1' + i + 'ENDTEXPLACEHOLDER1%';
 					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
@@ -140,6 +141,44 @@ window.onload = function() {
 	MathJax.Hub.Config({
 		tex2jax: {
 			inlineMath: [[';;', ';;']]
+		}
+	});
+
+	simplemde = new SimpleMDE({
+		element: document.getElementById("md-textarea"),
+		toolbar: ["bold", "italic", "|", "heading-1", "heading-2", "heading-3", "|", "unordered-list", {
+			name: "todo",
+			title: "Todo List",
+			action: editor => { insertMarkdown(editor, 'todo', '- [ ]', ''); },
+			className: "fa fa-check-square-o"
+		}, "ordered-list", "|", {
+			name: "ASCIIMath",
+			title: "ASCIIMath",
+			action: editor => { insertMarkdown(editor, 'ASCIIMath', '===', '==='); },
+			className: "fa fa-calculator"
+		}, {
+			name: "ASCIISvg",
+			title: "Graphing Tool (ASCIISvg)",
+			action: editor => { insertMarkdown(editor, 'ASCIISvg', '=-=\ninitPicture(-5, 5, -5, 5)\naxes(1, 1, "line", 1)\nplot("x")\n', '=-='); },
+			className: "fa fa-area-chart"
+		}, {
+			name: "LaTeX",
+			title: "LaTeX",
+			action: editor => { insertMarkdown(editor, 'LaTeX', ';;', ';;'); },
+			className: "fa fa-times"
+		}, "|", "link", "image", "quote", "code", "table", "|", "fullscreen", "guide"]
+	});
+
+	simplemde.codemirror.on('change', function() {
+		if (!currentTarget) return;
+		
+		lastEditedElement.content = simplemde.value();
+		currentTarget.html('<p class="handle">::::</p>'+md.makeHtml(lastEditedElement.content));
+
+		var checkedTodoItems = currentTarget.find('.task-list-item input:checked');
+		if (checkedTodoItems.length > 5) {
+			todoShowToggle[currentTarget[0].id] = false;
+			currentTarget.find('.handle').after('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
 		}
 	});
 
@@ -229,7 +268,7 @@ window.onload = function() {
 		var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
 		if (path[0].tagName.toLowerCase() === 'a') return;
 
-		var currentTarget = $('#' + event.currentTarget.id);
+		currentTarget = $('#' + event.currentTarget.id);
 		for (k in note.elements) {
 			notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 			var element = note.elements[k];
@@ -247,21 +286,6 @@ window.onload = function() {
 								break;
 							}
 						}
-
-						$('#md-textarea').val(element.content);
-						$('#md-textarea').unbind();
-						$('#md-textarea').bind('input propertychange', function() {
-							element.content = $('#md-textarea').val();
-							currentTarget.html('<p class="handle">::::</p>'+md.makeHtml(element.content));
-
-							var checkedTodoItems = currentTarget.find('.task-list-item input:checked');
-							if (checkedTodoItems.length > 5) {
-								todoShowToggle[currentTarget[0].id] = false;
-								currentTarget.find('.handle').after('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
-							}
-
-							updateReference(event);
-						});
 
 						$('#mdfs').val(element.args.fontSize);
 						$('#mdfs').val(element.args.fontSize);
@@ -290,7 +314,16 @@ window.onload = function() {
 
 						$('#mdEditor').modal({
 							inDuration: 100,
+							ready: function() {
+								simplemde.value(element.content);
+							},
 							complete: function() {
+								updateReference({
+									target: {
+										id: element.args.id
+									}
+								});
+								simplemde.codemirror.off('change');
 								asciimath.translate(undefined, true);
 								drawPictures();
 								MathJax.Hub.Typeset();
@@ -302,6 +335,7 @@ window.onload = function() {
 									note.addSource(note.bibliography.length + 1, element.args.id, $('#mdsw').val());
 								}
 								updateBib();
+								currentTarget = undefined;
 							}
 						});
 						$('#mdEditor').modal('open');

@@ -13,7 +13,8 @@
 		<meta name="application-name" content="&mu;Pad">
 
 		<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
-		<link rel="stylesheet" type="text/css" href="css/notepadStyle.css">
+		<link type="text/css" rel="stylesheet" href="css/simplemde.min.css">
+		<link type="text/css" rel="stylesheet" href="css/notepadStyle.css">
 		<script>
 			window.platform = "web";
 			window.syncURL = "https://getmicropad.com/sync/api/";
@@ -26,7 +27,7 @@
 					<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
 					<!-- <a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a> -->
 					<ul class="left">
-						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v2.1.1-alpha" style="font-weight: 100; font-size: 1rem;">α</em></span>
+						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v2.2.0-alpha" style="font-weight: 100; font-size: 1rem;">α</em></span>
 					</ul>
 
 					<ul id="nav-desktop" class="right hide-on-med-and-down">
@@ -305,20 +306,9 @@
 				<div class="modal-content">
 					<div class="row">
 						<div class="col m8 s12">
-							<div>
-								<i class="material-icons format-btn" onclick="formatMd('bold');" title="Bold">format_bold</i>
-								<i class="material-icons format-btn" onclick="formatMd('italic');" title="Italic">format_italic</i>
-								<i class="material-icons format-btn" onclick="formatMd('b-list');" title="Bullet List">format_list_bulleted</i>
-								<i class="material-icons format-btn" onclick="formatMd('n-list');" title="Numbered List">format_list_numbered</i> <i class="material-icons format-btn" onclick="formatMd('t-list');" title="Todo List">playlist_add_check</i>
-								<i class="material-icons format-btn" onclick="formatMd('indent');" title="Indent">format_indent_increase</i>
-								<i class="material-icons format-btn" onclick="formatMd('equation');" title="Equation">functions</i>
-								<i class="material-icons format-btn" onclick="formatMd('strikethrough');" title="Strikethrough">strikethrough_s</i>
-								<i class="material-icons format-btn" onclick="formatMd('link');" title="Insert Link">insert_link</i>
-								<i class="material-icons format-btn" onclick="formatMd('table');" title="Insert Table">border_all</i>
-							</div>
 							<div class="input-field">
-								<label for="md-textarea">Content (in Markdown)</label>
-								<textarea id="md-textarea" style="height: calc(90% - 10px); width: 100%; margin-top: 10px;" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" autofocus></textarea>
+								<!-- <label for="md-textarea">Content (in Markdown)</label> -->
+								<textarea id="md-textarea" style="height: calc(90% - 10px); width: 100%; margin-top: 10px;" autofocus></textarea>
 							</div>
 						</div>
 
@@ -464,7 +454,8 @@
 		<script src="js/libs/recorderjs/recorder.min.js"></script>
 		<script src="js/libs/interact.min.js"></script>
 		<script src="js/libs/showdown.min.js"></script>
-
+		<script src="js/libs/simplemde.min.js"></script>
+		
 		<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
 		<script type="text/javascript" async src="js/libs/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 		<script src="js/libs/ASCIIMathML.js"></script>
