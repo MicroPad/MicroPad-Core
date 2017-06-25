@@ -311,5 +311,8 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	z-index: 100000;
 	background: #fff;
 	border: 1px solid grey;
-	padding: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
+	height: 100px;
+	overflow-y: auto;
 }

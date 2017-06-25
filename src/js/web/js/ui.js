@@ -165,7 +165,18 @@ function insertMarkdown(editor, type, openTag, closeTag) {
 	cm.focus();
 }
 
+var lastSpellchecked;
 $(document).on('contextmenu', '.cm-spell-error', event => {
+	lastSpellchecked = event.target;
+	var suggestions = dictionary.suggest(lastSpellchecked.innerHTML);
+	if (suggestions.length > 0) {
+		$('#spellcheck-menu > ul').html('');
+		for (var i = 0; i < suggestions.length; i++) $('#spellcheck-menu > ul').append('<li><a href="javascript:replaceSpelling(\'{0}\');">{0}</a></li>'.format(suggestions[i]));
+	}
+	else {
+		$('#spellcheck-menu > ul').html('No suggestions');
+	}
+
 	$('#spellcheck-menu').removeClass('hidden');
 	$('#spellcheck-menu').attr('style', 'left: {0}; top: {1};'.format(event.pageX, event.pageY));
 
@@ -173,3 +184,8 @@ $(document).on('contextmenu', '.cm-spell-error', event => {
 	return false;
 });
 $(document).on('click', event => { $('#spellcheck-menu').addClass('hidden'); });
+
+function replaceSpelling(replacement) {
+	var word = simplemde.codemirror.findWordAt(simplemde.codemirror.getCursor());
+	simplemde.codemirror.replaceRange(replacement, word.anchor, word.head);
+}
