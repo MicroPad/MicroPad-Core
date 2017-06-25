@@ -167,13 +167,27 @@ window.onload = function() {
 		}, {
 			name: "ASCIISvg",
 			title: "Graphing Tool (ASCIISvg)",
-			action: editor => { insertMarkdown(editor, 'ASCIISvg', '=-=\ninitPicture(-5, 5, -5, 5)\naxes(1, 1, "line", 1)\nplot("x")\n', '=-='); },
+			action: editor => { insertMarkdown(editor, 'ASCIISvg', '=-=\ninitPicture(-5, 5, -5, 5)\naxes(1, 1, "line", 1)\nplot("', '")\n=-='); },
 			className: "fa fa-area-chart"
 		}, {
 			name: "LaTeX",
 			title: "LaTeX",
 			action: editor => { insertMarkdown(editor, 'LaTeX', ';;', ';;'); },
 			className: "fa fa-times"
+		}, "|", {
+			name: "blob-image",
+			title: "Upload Image",
+			action: editor => {
+				$('#inline-image-upload').trigger('click');
+			},
+			className: "fa fa-file-image-o"
+		}, {
+			name: "drawing",
+			title: "Insert Drawing",
+			action: editor => {
+
+			},
+			className: "fa fa-pencil-square-o"
 		}, "|", "link", "image", "quote", "code", "table", "|", "fullscreen", "guide"]
 	});
 
@@ -188,7 +202,38 @@ window.onload = function() {
 			todoShowToggle[currentTarget[0].id] = false;
 			currentTarget.find('.handle').after('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
 		}
+
+		var inlineImages = [];
+		lastEditedElement.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => {
+			inlineImages.push(p1);
+		});
+
+		if (inlineImages) {
+			for (var i = 0; i < inlineImages.length; i++) {
+				var uuid = inlineImages[i];
+
+				assetStorage.getItem(uuid, (err, blob) => {
+					currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}"" />'.format(URL.createObjectURL(blob)));
+				});
+			}
+		}
 	});
+
+	document.getElementById("inline-image-upload").addEventListener("change", function(event) {
+		var reader = new FileReader();
+		var file = event.target.files[0];
+		if (!file) return;
+		reader.readAsDataURL(file);
+
+		reader.onload = function() {
+			var imgAsset = new parser.Asset(dataURItoBlob(reader.result));
+			assetStorage.setItem(imgAsset.uuid, imgAsset.data);
+			if (!notepadAssets.has(imgAsset.uuid)) notepadAssets.add(imgAsset.uuid);
+			simplemde.codemirror.replaceRange("!!({0})".format(imgAsset.uuid), simplemde.codemirror.getCursor());
+		}
+
+		$(this).val(null);
+	}, false);
 
 	/** Get the open notepads */
 	updateNotepadList();
@@ -1512,6 +1557,22 @@ function loadNote(id, delta) {
 				if (checkedTodoItems.length > 5) {
 					todoShowToggle[element.args.id] = false;
 					$(elementDiv).find('.handle').after($('<a class="hidden-todo-msg todo-toggle" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(element.args.id, checkedTodoItems.length)));
+				}
+
+				
+				var inlineImages = [];
+				element.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => {
+					inlineImages.push(p1);
+				});
+
+				if (inlineImages) {
+					for (var i = 0; i < inlineImages.length; i++) {
+						var uuid = inlineImages[i];
+
+						assetStorage.getItem(uuid, (err, blob) => {
+							elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}"" />'.format(URL.createObjectURL(blob)));
+						});
+					}
 				}
 				break;
 			case "drawing":
