@@ -301,3 +301,15 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	font-weight: 100;
 	font-size: 1rem;
 }
+
+.hidden {
+	display: none;
+}
+
+#spellcheck-menu {
+	position: absolute;
+	z-index: 100000;
+	background: #fff;
+	border: 1px solid grey;
+	padding: 5px;
+}

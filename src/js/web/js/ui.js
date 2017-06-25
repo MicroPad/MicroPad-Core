@@ -164,3 +164,12 @@ function insertMarkdown(editor, type, openTag, closeTag) {
 	cm.setSelection(startPoint, endPoint);
 	cm.focus();
 }
+
+$(document).on('contextmenu', '.cm-spell-error', event => {
+	$('#spellcheck-menu').removeClass('hidden');
+	$('#spellcheck-menu').attr('style', 'left: {0}; top: {1};'.format(event.pageX, event.pageY));
+
+	event.preventDefault();
+	return false;
+});
+$(document).on('click', event => { $('#spellcheck-menu').addClass('hidden'); });

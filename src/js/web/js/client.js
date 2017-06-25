@@ -21,6 +21,7 @@ var isFullscreen = false;
 var uploadWorker = new Worker('js/uploadWorker.js');
 var putRequests = [];
 var currentTarget;
+var dictionary;
 var simplemde;
 
 /** Setup localforage */
@@ -143,7 +144,11 @@ window.onload = function() {
 			inlineMath: [[';;', ';;']]
 		}
 	});
-
+	
+	dictionary = new Typo("en_US", false, false, {
+		dictionaryPath: "dict",
+		asyncLoad: true
+	});
 	simplemde = new SimpleMDE({
 		element: document.getElementById("md-textarea"),
 		toolbar: ["bold", "italic", "|", "heading-1", "heading-2", "heading-3", "|", "unordered-list", {
