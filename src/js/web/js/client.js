@@ -185,7 +185,22 @@ window.onload = function() {
 			name: "drawing",
 			title: "Insert Drawing",
 			action: editor => {
+				$('#drawingEditor').modal({
+					ready: function() {
+						resizeCanvas();
+					},
+					complete: function() {
+						var drawingAsset = new parser.Asset(dataURItoBlob($('#drawing-viewer')[0].toDataURL()));
+						assetStorage.setItem(drawingAsset.uuid, drawingAsset.data);
+						if (!notepadAssets.has(drawingAsset)) notepadAssets.add(drawingAsset);
+						simplemde.codemirror.replaceRange("!![{0}]".format(drawingAsset.uuid), simplemde.codemirror.getCursor());
+					}
+				});
 
+				$('#drawingEditor').modal('open');
+				setTimeout(function() {
+					$('#drawingEditor').modal('open');
+				}, 500);
 			},
 			className: "fa fa-pencil-square-o"
 		}, "|", "link", "image", "quote", "code", "table", "|", "fullscreen", "guide"]
@@ -204,16 +219,32 @@ window.onload = function() {
 		}
 
 		var inlineImages = [];
-		lastEditedElement.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => {
-			inlineImages.push(p1);
-		});
+		lastEditedElement.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => { inlineImages.push(p1); });
+		lastEditedElement.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
 
 		if (inlineImages) {
-			for (var i = 0; i < inlineImages.length; i++) {
-				var uuid = inlineImages[i];
+			for (let i = 0; i < inlineImages.length; i++) {
+				let uuid = inlineImages[i];
 
 				assetStorage.getItem(uuid, (err, blob) => {
-					currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}"" />'.format(URL.createObjectURL(blob)));
+					if (!blob) {
+						setTimeout(() => {
+							arguments.callee(err, blob);
+						}, 500);
+						return;
+					}
+					currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(URL.createObjectURL(blob)));
+					var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
+					currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(blob), drawingName));
+					if ($('#'+drawingName).length > 0) {
+						var trimmed = false;
+						$('#'+drawingName)[0].onload = function() {
+							if (!trimmed) {
+								trimmed = true;
+								initDrawing($('#'+drawingName)[0]);
+							}
+						}
+					}
 				});
 			}
 		}
@@ -1561,17 +1592,35 @@ function loadNote(id, delta) {
 
 				
 				var inlineImages = [];
-				element.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => {
-					inlineImages.push(p1);
-				});
+				element.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => { inlineImages.push(p1); });
+				element.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
 
 				if (inlineImages) {
-					for (var i = 0; i < inlineImages.length; i++) {
-						var uuid = inlineImages[i];
+					if (inlineImages) {
+						for (let i = 0; i < inlineImages.length; i++) {
+							let uuid = inlineImages[i];
 
-						assetStorage.getItem(uuid, (err, blob) => {
-							elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}"" />'.format(URL.createObjectURL(blob)));
-						});
+							assetStorage.getItem(uuid, (err, blob) => {
+								if (!blob) {
+									setTimeout(() => {
+										arguments.callee(err, blob);
+									}, 500);
+									return;
+								}
+								elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(URL.createObjectURL(blob)));
+								var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
+								elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(blob), drawingName));
+								if ($('#'+drawingName).length > 0) {
+									var trimmed = false;
+									$('#'+drawingName)[0].onload = function() {
+										if (!trimmed) {
+											trimmed = true;
+											initDrawing($('#'+drawingName)[0]);
+										}
+									}
+								}
+							});
+						}
 					}
 				}
 				break;
