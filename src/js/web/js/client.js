@@ -151,6 +151,9 @@ window.onload = function() {
 	});
 	simplemde = new SimpleMDE({
 		element: document.getElementById("md-textarea"),
+		autofocus: true,
+		tabSize: 4,
+		placeholder: "Write your content here (supports Markdown)",
 		toolbar: ["bold", "italic", "|", "heading-1", "heading-2", "heading-3", "|", "unordered-list", {
 			name: "todo",
 			title: "Todo List",

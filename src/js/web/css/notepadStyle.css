@@ -316,3 +316,9 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	height: 100px;
 	overflow-y: auto;
 }
+
+.CodeMirror {
+	height: calc(90% - 15px);
+	width: 100%;
+	/*margin-top: 10px;*/
+}
