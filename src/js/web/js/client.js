@@ -324,6 +324,8 @@ window.onload = function() {
 							inDuration: 100,
 							ready: function() {
 								simplemde.value(element.content);
+								let info = simplemde.codemirror.getScrollInfo();
+								simplemde.codemirror.scrollTo(info.width, info.height);
 							},
 							complete: function() {
 								updateReference({
