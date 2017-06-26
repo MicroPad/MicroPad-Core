@@ -81,7 +81,7 @@ public class SelectNotepad extends AppCompatActivity {
 			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQ_FILESYSTEM);
 		}
 		else {
-			this.filesystemManager = new FilesystemManager();
+			this.filesystemManager = new FilesystemManager(getApplicationContext());
 			this.getNotepads();
 		}
 
@@ -459,7 +459,7 @@ public class SelectNotepad extends AppCompatActivity {
 		switch (requestCode) {
 			case PERMISSION_REQ_FILESYSTEM:
 				if (grantResults.length > 1 && (grantResults[0] | grantResults[1]) == PackageManager.PERMISSION_GRANTED) {
-					this.filesystemManager = new FilesystemManager();
+					this.filesystemManager = new FilesystemManager(getApplicationContext());
 					this.getNotepads();
 				}
 				else {

@@ -29,7 +29,9 @@ public class Notepad implements Parent {
 
 	public HashSet<String> notepadAssets = new HashSet<>();
 
-	public Notepad() {}
+	public Notepad() {
+		this.assets = new ArrayList<>();
+	}
 
 	public Notepad(String title) {
 		this.title = title;

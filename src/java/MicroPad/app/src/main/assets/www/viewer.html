@@ -245,7 +245,6 @@
 			contentDiv.innerHTML += '<div id="{0}" class="drag z-depth-2" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(id, x, y, width, height);
 			var elementDiv = document.getElementById(id);
 
-
 			switch (id.split(/[0-9]/)[0]) {
 				case "markdown":
 					content = decodeURIComponent(content);
@@ -266,8 +265,12 @@
 					break;
 
 				case "drawing":
-				case "image":
 					elementDiv.innerHTML += '<img style="padding: 5px; width: {1}; height: {2};" src="{0}" />'.format(URL.createObjectURL(dataURItoBlob(content)), width, height);
+					elementDiv.style.padding = "0px";
+					break;
+
+				case "image":
+					elementDiv.innerHTML += '<img style="padding: 5px; width: {1}; height: {2};" src="{0}" />'.format(content, width, height);
 					elementDiv.style.padding = "0px";
 					break;
 

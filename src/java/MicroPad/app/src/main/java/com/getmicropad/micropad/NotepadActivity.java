@@ -421,7 +421,7 @@ public class NotepadActivity extends BaseActivity {
 		switch (requestCode) {
 			case PERMISSION_REQ_FILESYSTEM:
 				if (grantResults.length > 1 && (grantResults[0] | grantResults[1]) == PackageManager.PERMISSION_GRANTED) {
-					this.filesystemManager = new FilesystemManager();
+					this.filesystemManager = new FilesystemManager(getApplicationContext());
 					this.parseNotepad();
 				}
 				else {

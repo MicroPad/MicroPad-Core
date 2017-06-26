@@ -59,6 +59,7 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.annimon.stream.Stream;
+import com.getmicropad.NPXParser.Asset;
 import com.getmicropad.NPXParser.BinaryElement;
 import com.getmicropad.NPXParser.DrawingElement;
 import com.getmicropad.NPXParser.FileElement;
@@ -123,7 +124,7 @@ public class BaseActivity extends AppCompatActivity {
 	Notepad notepad;
 	Note note;
 	List<Integer> parentTree = new ArrayList<>();
-	FilesystemManager filesystemManager = new FilesystemManager();
+	FilesystemManager filesystemManager;
 	List<String> types;
 	ListAdapter insertAdapter;
 	NotepadSearcher notepadSearcher;
@@ -150,7 +151,7 @@ public class BaseActivity extends AppCompatActivity {
 			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQ_FILESYSTEM);
 		}
 		else {
-			this.filesystemManager = new FilesystemManager();
+			this.filesystemManager = new FilesystemManager(getApplicationContext());
 		}
 	}
 
@@ -187,6 +188,8 @@ public class BaseActivity extends AppCompatActivity {
 		noteContainer = (WebView)findViewById(R.id.note_webview);
 		noteContainer.getSettings().setJavaScriptEnabled(true);
 		noteContainer.addJavascriptInterface(this, "Native");
+		noteContainer.getSettings().setAllowFileAccess(true);
+		noteContainer.getSettings().setAllowUniversalAccessFromFileURLs(true);
 		noteContainer.getSettings().setSupportZoom(true);
 		noteContainer.getSettings().setBuiltInZoomControls(true);
 		noteContainer.getSettings().setDisplayZoomControls(false);
@@ -249,8 +252,19 @@ public class BaseActivity extends AppCompatActivity {
 		String extraArgs = "{}";
 		String content = element.getContent();
 
-		if (element instanceof BinaryElement && !element.getContent().equals("AS")) {
-			//TODO: Convert to asset-store
+		if (element instanceof BinaryElement) {
+			if (!element.getContent().equals("AS")) {
+				Asset asset = new Asset();
+				asset.setData(element.getContent());
+				this.setAsset(asset);
+
+				element.setContent("AS");
+				((BinaryElement) element).setExt(asset.getUuid());
+				updateNotepad(this.getNote());
+			}
+
+			content = FileProvider.getUriForFile(getApplicationContext(), this.getApplicationContext().getPackageName()+".fileprovider", new File(this.filesystemManager.assetDirectory+"/"+((BinaryElement) element).getExt())).toString();
+			extraArgs = String.format("{ext: \"%s\"}", ((BinaryElement) element).getExt());
 		}
 
 		if (element instanceof MarkdownElement) {
@@ -264,7 +278,7 @@ public class BaseActivity extends AppCompatActivity {
 		}
 		else if (element instanceof DrawingElement) {
 			try {
-				byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
+				byte[] decoded = this.filesystemManager.getAssetData(((DrawingElement) element).getExt());
 				Bitmap decodedBmp = Helpers.TrimBitmap(BitmapFactory.decodeByteArray(decoded, 0, decoded.length));
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 				decodedBmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
@@ -898,9 +912,17 @@ public class BaseActivity extends AppCompatActivity {
 		}.execute(this.getNotepad());
 	}
 
+	protected void setAsset(Asset asset) {
+		this.notepad.notepadAssets.add(asset.getUuid());
+		this.filesystemManager.setAsset(asset);
+	}
+
 	protected void setNotepad(Notepad notepad) {
 		notepadSearcher = new NotepadSearcher(notepad);
 		this.notepad = notepad;
+		notepad.getAssets().forEach(this::setAsset);
+		this.notepad.setAssets(new ArrayList<>());
+
 		runOnUiThread(() -> this.initNotepadSync(false));
 	}
 
