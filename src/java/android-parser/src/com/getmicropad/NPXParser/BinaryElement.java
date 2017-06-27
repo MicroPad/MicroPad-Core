@@ -89,6 +89,11 @@ public class BinaryElement implements NoteElement {
 	}
 
 	public String getExt() {
+		if (this.ext == null) {
+			Asset asset = new Asset();
+			this.ext = asset.getUuid();
+		}
+
 		return this.ext;
 	}
 

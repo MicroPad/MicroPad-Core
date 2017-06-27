@@ -109,6 +109,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -308,7 +309,8 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	protected NoteElement updateElement(NoteElement element, String content, String width, String height, String source) {
-		this.getNote().elements.remove(element);
+		this.getNote().elements = new ArrayList<>();
+		this.getNote().elements.stream().filter(e -> !e.getId().equals(element.getId())).forEach(e -> this.getNote().elements.add(e));
 		element.setContent(content);
 		element.setWidth(width);
 		element.setHeight(height);
@@ -356,7 +358,7 @@ public class BaseActivity extends AppCompatActivity {
 		return element;
 	}
 
-	String currentContent;
+	byte[] currentContent;
 	View dialogView;
 	String newFilename;
 	@JavascriptInterface
@@ -434,7 +436,7 @@ public class BaseActivity extends AppCompatActivity {
 						sourceInput.setText(source.getUrl());
 					});
 
-					currentContent = element.getContent();
+					currentContent = this.filesystemManager.getAssetData(((BinaryElement) element).getExt());
 
 					//Handle 'browse' button
 					dialogView.findViewById(R.id.browse_button).setOnClickListener(v -> {
@@ -445,7 +447,10 @@ public class BaseActivity extends AppCompatActivity {
 					});
 
 					builder.setPositiveButton("Save", (dialog, which) -> {
-						displayElement(updateElement(element, currentContent, widthInput.getText().toString(), heightInput.getText().toString(), sourceInput.getText().toString()));
+						Asset asset = new Asset(((BinaryElement) element).getExt(), "");
+						filesystemManager.setAsset(asset, currentContent);
+
+						displayElement(updateElement(element, "AS", widthInput.getText().toString(), heightInput.getText().toString(), sourceInput.getText().toString()));
 						currentContent = null;
 						refreshBilbiography();
 					});
@@ -464,7 +469,7 @@ public class BaseActivity extends AppCompatActivity {
 						sourceInput.setText(source.getUrl());
 					});
 
-					currentContent = element.getContent();
+					currentContent = this.filesystemManager.getAssetData(((BinaryElement) element).getExt());
 					newFilename = ((FileElement) element).getFilename();
 
 					//Handle 'record' button
@@ -501,7 +506,7 @@ public class BaseActivity extends AppCompatActivity {
 							}
 							byteArrayOutputStream.flush();
 
-							currentContent = "data:audio/ogg;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+							currentContent = byteArrayOutputStream.toByteArray();
 							byteArrayOutputStream.close();
 							inputStream.close();
 						} catch (IOException e) {
@@ -516,7 +521,11 @@ public class BaseActivity extends AppCompatActivity {
 
 					builder.setPositiveButton("Save", (dialog, which) -> {
 						((RecordingElement) element).setFilename(newFilename);
-						displayElement(updateElement(element, currentContent, "auto", "auto", sourceInput.getText().toString()));
+						Asset asset = new Asset(((BinaryElement) element).getExt(), "");
+						filesystemManager.setAsset(asset, currentContent);
+
+						displayElement(updateElement(element, "AS", "auto", "auto", sourceInput.getText().toString()));
+
 						currentContent = null;
 						newFilename = null;
 						opusRecorder.release();
@@ -537,7 +546,7 @@ public class BaseActivity extends AppCompatActivity {
 						sourceInput.setText(source.getUrl());
 					});
 
-					currentContent = element.getContent();
+					currentContent = this.filesystemManager.getAssetData(((BinaryElement) element).getExt());
 					newFilename = ((FileElement) element).getFilename();
 
 					//Handle 'browse' button
@@ -549,7 +558,10 @@ public class BaseActivity extends AppCompatActivity {
 
 					builder.setPositiveButton("Save", (dialog, which) -> {
 						((FileElement) element).setFilename(newFilename);
-						displayElement(updateElement(element, currentContent, "auto", "auto", sourceInput.getText().toString()));
+						Asset asset = new Asset(((BinaryElement) element).getExt(), "");
+						filesystemManager.setAsset(asset, currentContent);
+						displayElement(updateElement(element, "AS", "auto", "auto", sourceInput.getText().toString()));
+
 						currentContent = null;
 						newFilename = null;
 						refreshBilbiography();
@@ -593,7 +605,7 @@ public class BaseActivity extends AppCompatActivity {
 							Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selFile);
 							ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 							bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-							currentContent = "data:image/png;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+							currentContent = byteArrayOutputStream.toByteArray();
 							runOnUiThread(() -> {
 								((TextView)dialogView.findViewById(R.id.filename_text)).setText(getFilenameFromUri(selFile));
 								dialog.dismiss();
@@ -623,7 +635,7 @@ public class BaseActivity extends AppCompatActivity {
 							String mime = URLConnection.guessContentTypeFromName(newFilename);
 							if (mime == null) mime = URLConnection.guessContentTypeFromStream(inputStream);
 							if (mime == null) mime = "*/*";
-							currentContent = "data:"+mime+";base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+							currentContent = byteArrayOutputStream.toByteArray();
 							byteArrayOutputStream.close();
 							inputStream.close();
 							runOnUiThread(() -> {
