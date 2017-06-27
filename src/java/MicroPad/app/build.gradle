@@ -34,7 +34,11 @@ android {
             variant.buildConfigField "String", "IAB_KEY", "\""+getIabKey()+"\""
         }
     }
+    packagingOptions {
+        pickFirst  'META-INF/LICENSE'
+    }
 }
+
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')

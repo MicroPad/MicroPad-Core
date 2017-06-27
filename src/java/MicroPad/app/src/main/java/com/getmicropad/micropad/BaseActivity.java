@@ -39,6 +39,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
+import android.webkit.MimeTypeMap;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -79,6 +80,11 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 import com.nononsenseapps.filepicker.FilePickerActivity;
+
+import net.sf.jmimemagic.Magic;
+import net.sf.jmimemagic.MagicException;
+import net.sf.jmimemagic.MagicMatchNotFoundException;
+import net.sf.jmimemagic.MagicParseException;
 
 import org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl;
 import org.json.JSONArray;
@@ -660,27 +666,23 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	@JavascriptInterface
-	public void downloadElement(String id) {
-		Stream.of(getNote().elements).filter(element -> element.getId().equals(id)).forEach(element -> {
-			for (File f : getCacheDir().listFiles()) f.delete();
-			String path = getCacheDir().getAbsolutePath()+"/"+((FileElement)element).getFilename();
-			String mime = element.getContent().split("base64")[0];
-			mime = mime.substring(5, mime.length()-1);
+	public void downloadElement(String uuid, String filename) {
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_VIEW);
+		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-			byte[] decoded = Base64.decode(element.getContent().split(",")[1], Base64.DEFAULT);
-			try (OutputStream stream = new FileOutputStream(path)) {
-				stream.write(decoded);
+		String mime = null;
+		try {
+			mime = Magic.getMagicMatch(this.filesystemManager.getAssetData(uuid)).getMimeType();
+		} catch (MagicParseException | MagicMatchNotFoundException | MagicException e) {
+			e.printStackTrace();
+			String ext = MimeTypeMap.getFileExtensionFromUrl(filename);
+			if (ext != null)  mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+			if (mime == null) mime = "application/octet-stream";
+		}
 
-				Intent intent = new Intent();
-				intent.setAction(Intent.ACTION_VIEW);
-				intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-				intent.setDataAndType(FileProvider.getUriForFile(this, this.getApplicationContext().getPackageName()+".fileprovider", new File(path)), mime);
-				startActivity(intent);
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
+		intent.setDataAndType(FileProvider.getUriForFile(this, this.getApplicationContext().getPackageName()+".fileprovider", new File(this.filesystemManager.assetDirectory+"/"+uuid)), mime);
+		startActivity(intent);
 	}
 
 	boolean insertMenuOpen = false;

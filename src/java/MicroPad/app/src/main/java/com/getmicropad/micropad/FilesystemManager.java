@@ -9,6 +9,12 @@ import com.getmicropad.NPXParser.Asset;
 import com.getmicropad.NPXParser.Notepad;
 import com.getmicropad.NPXParser.Parser;
 
+import net.sf.jmimemagic.Magic;
+import net.sf.jmimemagic.MagicException;
+import net.sf.jmimemagic.MagicMatch;
+import net.sf.jmimemagic.MagicMatchNotFoundException;
+import net.sf.jmimemagic.MagicParseException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -116,38 +122,21 @@ public class FilesystemManager {
 	}
 
 	public Asset getAsset(String uuid) {
-		File assetFile = new File(this.assetDirectory+"/"+uuid);
-		if (assetFile.exists()) {
-			FileInputStream inputStream = null;
-			try {
-				inputStream = new FileInputStream(assetFile);
-				byte[] tempStorage = new byte[1024];
-				int bLength;
-				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-				while ((bLength = inputStream.read(tempStorage)) != -1) {
-					byteArrayOutputStream.write(tempStorage, 0, bLength);
-				}
-				byteArrayOutputStream.flush();
+		byte[] data = getAssetData(uuid);
+		if (data == null) return null;
 
-				//Get MIME type
-				String mime = URLConnection.guessContentTypeFromStream(inputStream);
-
-				//Store as Base64
-				String data = "data:"+mime+";base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
-				byteArrayOutputStream.close();
-				inputStream.close();
-				return new Asset(uuid, data);
-			} catch (IOException e) {
-				e.printStackTrace();
-				if (inputStream != null) {
-					try {
-						inputStream.close();
-					} catch (IOException e1) {}
-				}
-			}
+		//Get MIME type
+		String mime;
+		try {
+			mime = Magic.getMagicMatch(data).getMimeType();
+		} catch (MagicParseException | MagicMatchNotFoundException | MagicException e) {
+			e.printStackTrace();
+			mime = "application/octet-stream";
 		}
 
-		return null;
+		//Store as Base64
+		String b64 = "data:"+mime+";base64," + Base64.encodeToString(data, Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+		return new Asset(uuid, b64);
 	}
 
 	public boolean setAsset(Asset asset, byte[] data) {
