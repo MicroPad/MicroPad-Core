@@ -676,7 +676,12 @@ public class BaseActivity extends AppCompatActivity {
 			mime = Magic.getMagicMatch(this.filesystemManager.getAssetData(uuid)).getMimeType();
 		} catch (MagicParseException | MagicMatchNotFoundException | MagicException e) {
 			e.printStackTrace();
-			String ext = MimeTypeMap.getFileExtensionFromUrl(filename);
+			String ext = null;
+			try {
+				ext = MimeTypeMap.getFileExtensionFromUrl(URLEncoder.encode(filename, "utf-8").replace("+", "%20"));
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			}
 			if (ext != null)  mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
 			if (mime == null) mime = "application/octet-stream";
 		}

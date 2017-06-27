@@ -66,5 +66,7 @@ dependencies {
 
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.5'
 
+    compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
+
     testCompile 'junit:junit:4.12'
 }
