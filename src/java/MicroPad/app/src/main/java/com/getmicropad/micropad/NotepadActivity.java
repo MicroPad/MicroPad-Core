@@ -96,7 +96,6 @@ public class NotepadActivity extends BaseActivity {
 						//Phone
 						Intent intent = new Intent(this, ViewerActivity.class);
 
-						intent.putExtra("NOTEPAD_FILE", this.notepadFile);
 						try {
 							intent.putExtra("PATH", this.getParentTree().toArray(new Integer[this.getParentTree().size()]));
 							startActivity(intent);
@@ -525,7 +524,6 @@ public class NotepadActivity extends BaseActivity {
 									//Phone
 									Intent intent = new Intent(NotepadActivity.this, ViewerActivity.class);
 
-									intent.putExtra("NOTEPAD_FILE", notepadFile);
 									try {
 										setParentTree(notepadSearcher.getTree(adapterView.getItemAtPosition(pos)));
 										intent.putExtra("PATH", getParentTree().toArray(new Integer[getParentTree().size()]));

@@ -18,10 +18,10 @@ public class ViewerActivity extends BaseActivity {
 
 		NoteLoader noteLoader = new NoteLoader();
 		try {
-			noteLoader.execute(getIntent().getExtras().get("NOTEPAD_FILE"), new ArrayList<>(Arrays.asList((Integer[])getIntent().getExtras().get("PATH"))));
+			noteLoader.execute(new ArrayList<>(Arrays.asList((Integer[])getIntent().getExtras().get("PATH"))));
 		}
 		catch (ClassCastException e) {
-			noteLoader.execute(getIntent().getExtras().get("NOTEPAD_FILE"), new ArrayList<>(Arrays.asList(Arrays.copyOf(((Object[])getIntent().getExtras().get("PATH")), ((Object[])getIntent().getExtras().get("PATH")).length, Integer[].class))));
+			noteLoader.execute(new ArrayList<>(Arrays.asList(Arrays.copyOf(((Object[])getIntent().getExtras().get("PATH")), ((Object[])getIntent().getExtras().get("PATH")).length, Integer[].class))));
 		}
 	}
 

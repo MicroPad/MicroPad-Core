@@ -128,7 +128,6 @@ public class BaseActivity extends AppCompatActivity {
 	boolean isSaving = false;
 	boolean isSyncing = false;
 	boolean isNotepadSyncing = false;
-	Notepad notepad;
 	Note note;
 	List<Integer> parentTree = new ArrayList<>();
 	FilesystemManager filesystemManager;
@@ -299,6 +298,7 @@ public class BaseActivity extends AppCompatActivity {
 			content = ((FileElement) element).getFilename();
 		}
 
+		noteContainer.clearCache(true);
 		noteContainer.evaluateJavascript(String.format("displayElement(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %s)", element.getId(), content, element.getX(), element.getY(), element.getWidth(), element.getHeight(), extraArgs), (s) -> {});
 	}
 
@@ -932,21 +932,22 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	protected void setAsset(Asset asset) {
-		this.notepad.notepadAssets.add(asset.getUuid());
+		this.getNotepad().notepadAssets.add(asset.getUuid());
 		this.filesystemManager.setAsset(asset);
 	}
 
 	protected void setNotepad(Notepad notepad) {
-		notepadSearcher = new NotepadSearcher(notepad);
-		this.notepad = notepad;
+		this.notepadSearcher = new NotepadSearcher(notepad);
+
+		InteropSingleton.getInstance().setNotepad(notepad);
 		notepad.getAssets().forEach(this::setAsset);
-		this.notepad.setAssets(new ArrayList<>());
+		InteropSingleton.getInstance().getNotepad().setAssets(new ArrayList<>());
 
 		runOnUiThread(() -> this.initNotepadSync(false));
 	}
 
 	protected Notepad getNotepad(){
-		return this.notepad;
+		return InteropSingleton.getInstance().getNotepad();
 	}
 
 	protected void setNote(Note note) {
@@ -966,8 +967,7 @@ public class BaseActivity extends AppCompatActivity {
 		this.parentTree = tree;
 	}
 
-	protected class NoteLoader extends AsyncTask<Object, String, Notepad> {
-		private Notepad res;
+	protected class NoteLoader extends AsyncTask<Object, String, Void> {
 		private Note note;
 		private ProgressBar progressBar;
 
@@ -980,34 +980,18 @@ public class BaseActivity extends AppCompatActivity {
 		}
 
 		@Override
-		protected Notepad doInBackground(Object... params) {
-			try {
-				this.res = Parser.parseNpx((File)params[0]);
-				setNotepad(this.res);
+		protected Void doInBackground(Object... params) {
+			setNotepad(getNotepad());
 
-			} catch (Exception e) {
-				return null;
-			}
-			setParentTree((ArrayList<Integer>)params[1]);
+			setParentTree((ArrayList<Integer>)params[0]);
 			this.note = getNoteFromPath();
 //				this.note = Parser.parseNpx((String)params[1]).getSections().get(0).notes.get(0);
-
-			return this.res;
+			return null;
 		}
 
 		@Override
-		protected void onPostExecute(Notepad notepad) {
-			if (notepad == null) {
-				new AlertDialog.Builder(BaseActivity.this)
-						.setTitle("Error")
-						.setMessage("Error parsing notepad")
-						.setCancelable(true)
-						.setPositiveButton("Close", (dialog, which) -> {})
-						.show();
-			}
-			else {
-				loadNote(this.note);
-			}
+		protected void onPostExecute(Void v) {
+			loadNote(this.note);
 		}
 	}
 
