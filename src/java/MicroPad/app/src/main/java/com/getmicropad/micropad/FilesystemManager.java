@@ -41,7 +41,10 @@ public class FilesystemManager {
 
 		if (!this.workingDirectory.exists()) this.workingDirectory.mkdirs();
 
-		this.assetDirectory = new File(context.getFilesDir()+"/assets");
+		//Clean cache if <500MB left on the device
+		if (context.getCacheDir().getFreeSpace() < 500000000) for (File f : context.getCacheDir().listFiles()) f.delete();
+
+		this.assetDirectory = new File(context.getCacheDir()+"/assets");
 		if (!this.assetDirectory.exists()) this.assetDirectory.mkdirs();
 	}
 
