@@ -192,7 +192,7 @@ window.onload = function() {
 					complete: function() {
 						var drawingAsset = new parser.Asset(dataURItoBlob($('#drawing-viewer')[0].toDataURL()));
 						assetStorage.setItem(drawingAsset.uuid, drawingAsset.data);
-						if (!notepadAssets.has(drawingAsset)) notepadAssets.add(drawingAsset);
+						if (!notepadAssets.has(drawingAsset)) notepadAssets.add(drawingAsset.uuid);
 						simplemde.codemirror.replaceRange("!![{0}]".format(drawingAsset.uuid), simplemde.codemirror.getCursor());
 					}
 				});
