@@ -310,7 +310,7 @@ public class BaseActivity extends AppCompatActivity {
 
 	protected NoteElement updateElement(NoteElement element, String content, String width, String height, String source) {
 		List<NoteElement> filteredElements = new ArrayList<>();
-		this.getNote().elements.stream().filter(e -> !e.getId().equals(element.getId())).forEach(e -> filteredElements.add(e));
+		Stream.of(this.getNote().elements).filter(e -> !e.getId().equals(element.getId())).forEach(filteredElements::add);
 		this.getNote().elements = filteredElements;
 
 		element.setContent(content);
@@ -942,7 +942,7 @@ public class BaseActivity extends AppCompatActivity {
 		this.notepadSearcher = new NotepadSearcher(notepad);
 
 		InteropSingleton.getInstance().setNotepad(notepad);
-		notepad.getAssets().forEach(this::setAsset);
+		Stream.of(notepad.getAssets()).forEach(this::setAsset);
 		InteropSingleton.getInstance().getNotepad().setAssets(new ArrayList<>());
 
 		runOnUiThread(() -> this.initNotepadSync(false));
@@ -1027,7 +1027,7 @@ public class BaseActivity extends AppCompatActivity {
 					try {
 						//Restore Assets
 						ArrayList<Asset> assets = new ArrayList<>();
-						getNotepad().notepadAssets.forEach(uuid -> assets.add(filesystemManager.getAsset(uuid)));
+						for (String uuid : getNotepad().notepadAssets) assets.add(filesystemManager.getAsset(uuid));
 						getNotepad().setAssets(assets);
 						byte[] npxBytes = Parser.toXml(getNotepad()).getBytes(StandardCharsets.UTF_8);
 						getNotepad().setAssets(new ArrayList<>());

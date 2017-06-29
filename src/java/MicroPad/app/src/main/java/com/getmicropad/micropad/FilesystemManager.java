@@ -78,7 +78,7 @@ public class FilesystemManager {
 
 			//Restore Assets
 			ArrayList<Asset> assets = new ArrayList<>();
-			notepad.notepadAssets.forEach(uuid -> assets.add(getAsset(uuid)));
+			for (String uuid : notepad.notepadAssets) assets.add(getAsset(uuid));
 			notepad.setAssets(assets);
 
 			Parser.toXml(notepad, notepadFile);

@@ -106,7 +106,7 @@ public class NotepadActivity extends BaseActivity {
 					else {
 						//Tablet
 						NoteLoader noteLoader = new NoteLoader();
-						noteLoader.execute(this.notepadFile, this.getParentTree());
+						noteLoader.execute(this.getParentTree());
 					}
 			}
 		});

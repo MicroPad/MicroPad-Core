@@ -326,7 +326,7 @@
 					$(event.currentTarget).addClass('z-depth-4');
 
 					navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
-					navigator.vibrate(100);
+					if (navigator.vibrate) navigator.vibrate(100);
 				},
 				drag: function(event) {
 					resizePage(event.target);
@@ -342,6 +342,10 @@
 					Native.updateElementPosition(event.target.id, event.target.style.left, event.target.style.top, event.target.style.width, event.target.style.height);
 				}
 			});
+
+			setTimeout(function() {
+				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+			}, 1500);
 		}
 
 		function displaySource(id, item, link) {
