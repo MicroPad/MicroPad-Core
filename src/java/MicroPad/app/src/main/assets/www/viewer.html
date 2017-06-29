@@ -114,7 +114,7 @@
 	<script src="js/materialize.min.js"></script>
 	<script src="js/interact.min.js"></script>
 	<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
-	<script type="text/javascript" async src="js/MathJax/MathJax.js?config=MML_HTMLorMML"></script>
+	<script type="text/javascript" src="js/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 	<script src="js/showdown.min.js"></script>
 	<script src="js/ASCIIMathML.js"></script>
 	<script src="js/ASCIIsvg.js"></script>
@@ -147,6 +147,33 @@
 					}
 				}
 			];
+		});
+
+		showdown.extension('tex-maths', function() {
+			var matches = [];
+			return [
+				{
+					type: 'lang',
+					regex: /;;([^]+?);;/gi,
+					replace: function(s, match) {
+						matches.push(';;' + match + ';;');
+						var n = matches.length - 1;
+						return '%TEXPLACEHOLDER1' + n + 'ENDTEXPLACEHOLDER1%';
+					}
+				},
+				{
+					type: 'output',
+					filter: function(text) {
+						for (var i = 0; i < matches.length; ++i) {
+							var pat = '%TEXPLACEHOLDER1' + i + 'ENDTEXPLACEHOLDER1%';
+							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+						}
+						//reset array
+						matches = [];
+						return text;
+					}
+				}
+			]
 		});
 
 		showdown.extension('graphs', function() {
@@ -184,7 +211,13 @@
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			smoothLivePreview: true,
-			extensions: ['maths', 'graphs']
+			extensions: ['maths', 'tex-maths', 'graphs']
+		});
+
+		MathJax.Hub.Config({
+			tex2jax: {
+				inlineMath: [[';;', ';;']]
+			}
 		});
 
 		var todoShowToggle = {};
