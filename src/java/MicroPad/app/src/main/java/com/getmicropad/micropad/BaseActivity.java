@@ -659,6 +659,25 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	@JavascriptInterface
+	public String getAssetUrl(String uuid) {
+		return FileProvider.getUriForFile(getApplicationContext(), this.getApplicationContext().getPackageName()+".fileprovider", new File(this.filesystemManager.assetDirectory+"/"+uuid)).toString();
+	}
+
+	@JavascriptInterface
+	public String getTrimmedAssetUrl(String uuid) {
+		byte[] decoded = this.filesystemManager.getAssetData(uuid);
+		try {
+			Bitmap decodedBmp = Helpers.TrimBitmap(BitmapFactory.decodeByteArray(decoded, 0, decoded.length));
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			decodedBmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+			return "data:image/png;base64," + Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+		}
+		catch (Exception e) {
+			return "data:image/png;base64," + Base64.encodeToString(decoded, Base64.NO_WRAP).replaceAll("(?:\\r\\n|\\n\\r|\\n|\\r)", "");
+		}
+	}
+
+	@JavascriptInterface
 	public void updateElementPosition(String id, String x, String y, String width, String height) {
 		new AsyncTask<Object, Void, Void>() {
 			@Override

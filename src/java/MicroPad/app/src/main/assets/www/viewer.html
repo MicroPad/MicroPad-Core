@@ -290,10 +290,27 @@
 					drawPictures();
 					MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 
+					//Todo Lists
 					var checkedTodoItems = $('#'+id+' .task-list-item input:checked');
 					if (checkedTodoItems.length > 5) {
 						todoShowToggle[id] = false;
 						$(elementDiv).find('.handle').after($('<a class="hidden-todo-msg todo-toggle" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(id, checkedTodoItems.length)));
+					}
+
+					//Inline Images
+					var inlineImages = [];
+					content.replace(/!!\(([^]+?)\)/gi, function(match, p1) { inlineImages.push(p1); });
+					content.replace(/!!\[([^]+?)\]/gi, function(match, p1) { inlineImages.push(p1); });
+
+					if (inlineImages) {
+						for (var i = 0; i < inlineImages.length; i++) {
+							var uuid = inlineImages[i];
+
+							var url = Native.getAssetUrl(uuid);
+							elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(url));
+							var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
+							elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(dataURItoBlob(Native.getTrimmedAssetUrl(uuid))), drawingName));
+						}
 					}
 					break;
 
