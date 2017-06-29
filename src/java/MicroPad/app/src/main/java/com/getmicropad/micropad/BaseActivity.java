@@ -309,8 +309,10 @@ public class BaseActivity extends AppCompatActivity {
 	}
 
 	protected NoteElement updateElement(NoteElement element, String content, String width, String height, String source) {
-		this.getNote().elements = new ArrayList<>();
-		this.getNote().elements.stream().filter(e -> !e.getId().equals(element.getId())).forEach(e -> this.getNote().elements.add(e));
+		List<NoteElement> filteredElements = new ArrayList<>();
+		this.getNote().elements.stream().filter(e -> !e.getId().equals(element.getId())).forEach(e -> filteredElements.add(e));
+		this.getNote().elements = filteredElements;
+
 		element.setContent(content);
 		element.setWidth(width);
 		element.setHeight(height);
@@ -1023,7 +1025,13 @@ public class BaseActivity extends AppCompatActivity {
 
 				new Thread(() -> {
 					try {
+						//Restore Assets
+						ArrayList<Asset> assets = new ArrayList<>();
+						getNotepad().notepadAssets.forEach(uuid -> assets.add(filesystemManager.getAsset(uuid)));
+						getNotepad().setAssets(assets);
 						byte[] npxBytes = Parser.toXml(getNotepad()).getBytes(StandardCharsets.UTF_8);
+						getNotepad().setAssets(new ArrayList<>());
+
 						if (npxBytes.length > 1000000000) {
 							syncBtn.clearAnimation();
 							isSyncing = false;
@@ -1394,6 +1402,8 @@ public class BaseActivity extends AppCompatActivity {
 		rotate.setRepeatCount(Animation.INFINITE);
 		this.syncBtn = (ImageView)menu.findItem(R.id.app_bar_sync).getActionView();
 		syncBtn.setImageResource(android.R.drawable.stat_notify_sync);
+		if (this.getNotepad() != null) this.initNotepadSync(false);
+
 		syncBtn.setOnClickListener(v -> {
 			String token = prefs.getString("token", null);
 			if (token != null) {
