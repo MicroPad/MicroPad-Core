@@ -38,7 +38,7 @@
 			position: absolute;
 			text-align: center;
 			user-select: none;
-			width: 100%;
+			width: 3ch;
 			left: 0;
 			right: 0;
 			margin: auto;
@@ -259,8 +259,8 @@
 
 					var checkedTodoItems = $('#'+id+' .task-list-item input:checked');
 					if (checkedTodoItems.length > 5) {
-						checkedTodoItems.parentsUntil('ul').hide();
-						elementDiv.innerHTML += '<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Show/Hide {1} Completed Items</a>'.format(id, checkedTodoItems.length);
+						todoShowToggle[id] = false;
+						$(elementDiv).find('.handle').after($('<a class="hidden-todo-msg todo-toggle" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(id, checkedTodoItems.length)));
 					}
 					break;
 
@@ -330,13 +330,19 @@
 			Native.openEditor(event.currentTarget.id);
 		});
 
-		function showTodo(id) {
-			todoShowToggle[id] = !todoShowToggle[id];
-			if (todoShowToggle[id]) {
+		function showTodo(id, allOn) {
+			if (allOn) {
+				todoShowToggle[id] = false;
 				$('#'+id+' .task-list-item input:checked').parentsUntil('#'+id).show();
 			}
 			else {
-				$('#'+id+' .task-list-item input:checked').parentsUntil('ul').hide();
+				todoShowToggle[id] = !todoShowToggle[id];
+				if (!todoShowToggle[id]) {
+					$('#'+id+' .task-list-item input:checked').parentsUntil('#'+id).show();
+				}
+				else {
+					$('#'+id+' .task-list-item input:checked').parentsUntil('ul').hide();
+				}
 			}
 
 			resizePage($('#'+id), false);

@@ -65,6 +65,7 @@ public class SelectNotepad extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_select_notepad);
+		this.setTitle(getResources().getString(R.string.title_activity_viewer));
 
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		this.syncer = new MicroSyncManager("https://getmicropad.com/sync/api/");
