@@ -288,7 +288,7 @@
 					});
 					asciimath.translate(undefined, true);
 					drawPictures();
-					MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+					MathJax.Hub.Queue(["Typeset", MathJax.Hub, id]);
 
 					//Todo Lists
 					var checkedTodoItems = $('#'+id+' .task-list-item input:checked');
@@ -360,9 +360,9 @@
 				}
 			});
 
-			setTimeout(function() {
-				MathJax.Hub.Typeset();
-			}, 2000);
+			// setTimeout(function() {
+			// 	MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+			// }, 2000);
 		}
 
 		function displaySource(id, item, link) {
