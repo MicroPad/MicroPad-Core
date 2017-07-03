@@ -1,21 +1,35 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+var notepadStorage;
+var appStorage;
+var assetStorage;
+
+localforage.defineDriver(window.cordovaSQLiteDriver).then(() => {
+		return localforage.setDriver([
+			// Try setting cordovaSQLiteDriver if available,
+			window.cordovaSQLiteDriver._driver,
+			// otherwise use one of the default localforage drivers as a fallback.
+			// This should allow you to transparently do your tests in a browser
+			localforage.INDEXEDDB,
+			localforage.WEBSQL,
+			localforage.LOCALSTORAGE
+		]);
+}).then(() => {
+	notepadStorage = localforage.createInstance({
+		name: 'MicroPad',
+		storeName: 'notepads'
+	});
+
+	appStorage = localforage.createInstance({
+		name: 'MicroPad',
+		version: 1.0,
+		storeName: 'app'
+	});
+
+	assetStorage = localforage.createInstance({
+		name: 'MicroPad',
+		storeName: 'assets'
+	});
+});
+
 var app = {
 	// Application Constructor
 	initialize: function() {
@@ -32,7 +46,11 @@ var app = {
 
 	// Update DOM on a Received Event
 	receivedEvent: function(id) {
-		console.log('Received Event: ' + id);
+		switch (id) {
+			case "deviceready":
+				myApp.init();
+				break;
+		}
 	}
 };
 
@@ -53,11 +71,14 @@ var mainView = myApp.addView('.view-main', {
 });
 
 // Callbacks to run specific code for specific pages, for example for About page:
-myApp.onPageInit('index', function(page) {
-	
+myApp.onPageInit('index', page => {
+	notepadStorage.keys().then(keys => {
+		$('#notepadList').html('');
+		notepadStorage.iterate((value, key, i) => {
+			
+		});
+	});
 });
-
-myApp.init();
 
 // Generate dynamic page
 var dynamicPageIndex = 0;
