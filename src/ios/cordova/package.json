@@ -8,5 +8,17 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Apache Cordova Team",
-    "license": "Apache-2.0"
+    "license": "Apache-2.0",
+    "dependencies": {
+        "cordova-browser": "^4.1.0",
+        "cordova-plugin-whitelist": "^1.3.2"
+    },
+    "cordova": {
+        "plugins": {
+            "cordova-plugin-whitelist": {}
+        },
+        "platforms": [
+            "browser"
+        ]
+    }
 }
