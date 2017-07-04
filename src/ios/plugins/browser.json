@@ -15,6 +15,9 @@
         },
         "cordova-plugin-file": {
             "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "cordova-plugin-dialogs": {
+            "PACKAGE_NAME": "com.getmicropad.MicroPad"
         }
     },
     "dependent_plugins": {
