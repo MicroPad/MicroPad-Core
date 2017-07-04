@@ -9,6 +9,10 @@
                 "parents": {
                     "/*": [
                         {
+                            "xml": "<feature name=\"Notification\"><param name=\"ios-package\" value=\"CDVNotification\" /></feature>",
+                            "count": 1
+                        },
+                        {
                             "xml": "<feature name=\"File\"><param name=\"ios-package\" value=\"CDVFile\" /><param name=\"onload\" value=\"true\" /></feature>",
                             "count": 1
                         },
@@ -23,20 +27,31 @@
     },
     "installed_plugins": {
         "cordova-plugin-compat": {
-            "PACKAGE_NAME": "io.cordova.hellocordova"
+            "PACKAGE_NAME": "com.getmicropad.MicroPad"
+        },
+        "cordova-plugin-dialogs": {
+            "PACKAGE_NAME": "com.getmicropad.MicroPad"
         },
         "cordova-plugin-file": {
-            "PACKAGE_NAME": "io.cordova.hellocordova"
+            "PACKAGE_NAME": "com.getmicropad.MicroPad"
         },
         "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "io.cordova.hellocordova"
+            "PACKAGE_NAME": "com.getmicropad.MicroPad"
         },
         "cordova-sqlite-storage": {
-            "PACKAGE_NAME": "io.cordova.hellocordova"
+            "PACKAGE_NAME": "com.getmicropad.MicroPad"
         }
     },
     "dependent_plugins": {},
     "modules": [
+        {
+            "id": "cordova-plugin-dialogs.notification",
+            "file": "plugins/cordova-plugin-dialogs/www/notification.js",
+            "pluginId": "cordova-plugin-dialogs",
+            "merges": [
+                "navigator.notification"
+            ]
+        },
         {
             "id": "cordova-plugin-file.DirectoryEntry",
             "file": "plugins/cordova-plugin-file/www/DirectoryEntry.js",
@@ -221,6 +236,7 @@
     ],
     "plugin_metadata": {
         "cordova-plugin-compat": "1.1.0",
+        "cordova-plugin-dialogs": "1.3.3",
         "cordova-plugin-file": "4.3.3",
         "cordova-plugin-whitelist": "1.3.2",
         "cordova-sqlite-storage": "2.0.4"

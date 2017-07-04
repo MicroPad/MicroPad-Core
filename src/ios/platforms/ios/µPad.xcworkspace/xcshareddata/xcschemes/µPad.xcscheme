@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-               BuildableName = "HelloCordova.app"
-               BlueprintName = "HelloCordova"
-               ReferencedContainer = "container:HelloCordova.xcodeproj">
+               BuildableName = "µPad.app"
+               BlueprintName = "µPad"
+               ReferencedContainer = "container:µPad.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "HelloCordova.app"
-            BlueprintName = "HelloCordova"
-            ReferencedContainer = "container:HelloCordova.xcodeproj">
+            BuildableName = "µPad.app"
+            BlueprintName = "µPad"
+            ReferencedContainer = "container:µPad.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -56,9 +56,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "HelloCordova.app"
-            BlueprintName = "HelloCordova"
-            ReferencedContainer = "container:HelloCordova.xcodeproj">
+            BuildableName = "µPad.app"
+            BlueprintName = "µPad"
+            ReferencedContainer = "container:µPad.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -75,9 +75,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "HelloCordova.app"
-            BlueprintName = "HelloCordova"
-            ReferencedContainer = "container:HelloCordova.xcodeproj">
+            BuildableName = "µPad.app"
+            BlueprintName = "µPad"
+            ReferencedContainer = "container:µPad.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

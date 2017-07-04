@@ -743,5 +743,14 @@ playground.xcworkspace
 
 # End of https://www.gitignore.io/api/macos,xcode,swift,objective-c
 
+### ApacheCordova ###
+# Apache Cordova generated files and directories
+bin/*
+!/plugins
+!/plugins/android.json
+!/plugins/fetch.json
+plugins/*
+platforms/*
+
 secrets.xml
 secrets.properties

@@ -1,4 +1,5 @@
 var appStorage;
+var notepad;
 
 localforage.defineDriver(window.cordovaSQLiteDriver).then(() => {
 		return localforage.setDriver([
@@ -36,7 +37,7 @@ var app = {
 	receivedEvent: function(id) {
 		switch (id) {
 			case "deviceready":
-				myApp.init();
+				appUi.init();
 				break;
 		}
 	}
@@ -45,7 +46,7 @@ var app = {
 app.initialize();
 
 // Initialize your app
-var myApp = new Framework7({
+var appUi = new Framework7({
 	init: false
 });
 
@@ -53,13 +54,13 @@ var myApp = new Framework7({
 var $$ = Dom7;
 
 // Add view
-var mainView = myApp.addView('.view-main', {
+var mainView = appUi.addView('.view-main', {
 	// Because we use fixed-through navbar we can enable dynamic navbar
 	dynamicNavbar: true
 });
 
 // Callbacks to run specific code for specific pages, for example for About page:
-myApp.onPageInit('index', page => {
+appUi.onPageInit('index', page => {
 	
 });
 

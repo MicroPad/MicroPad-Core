@@ -18,22 +18,23 @@
  */
 
 //
-//  AppDelegate.m
-//  HelloCordova
+//  MainViewController.h
+//  µPad
 //
 //  Created by ___FULLUSERNAME___ on ___DATE___.
 //  Copyright ___ORGANIZATIONNAME___ ___YEAR___. All rights reserved.
 //
 
-#import "AppDelegate.h"
-#import "MainViewController.h"
+#import <Cordova/CDVViewController.h>
+#import <Cordova/CDVCommandDelegateImpl.h>
+#import <Cordova/CDVCommandQueue.h>
 
-@implementation AppDelegate
+@interface MainViewController : CDVViewController
 
-- (BOOL)application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions
-{
-    self.viewController = [[MainViewController alloc] init];
-    return [super application:application didFinishLaunchingWithOptions:launchOptions];
-}
+@end
 
+@interface MainCommandDelegate : CDVCommandDelegateImpl
+@end
+
+@interface MainCommandQueue : CDVCommandQueue
 @end

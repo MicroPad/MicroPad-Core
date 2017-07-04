@@ -1,8 +1,4 @@
 var FilesystemHandler = function() {
-	window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, fs => {
-		
-	});
-
 	window.resolveLocalFileSystemURL(cordova.file.documentsDirectory, dir => {
 		dir.getDirectory('MicroPad Notepads', {create: true}, (dir) => {
 			this.notepadDir = dir;

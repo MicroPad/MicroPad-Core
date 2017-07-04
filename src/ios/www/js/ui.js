@@ -1,5 +1,7 @@
 function newNotepad() {
 	navigator.notification.prompt("Notepad Title:", (results) => {
+		if (results.buttonIndex !== 1) return;
+
 		var title = results.input1;
 		notepad = parser.createNotepad(title);
 
@@ -9,5 +11,5 @@ function newNotepad() {
 		notepad.addSection(demoSection);
 
 		//TODO: Load notepad and save
-	}, "New Notepad", ["Add", "Cancel"]);
+	}, "New Notepad", ["Create", "Cancel"]);
 }
