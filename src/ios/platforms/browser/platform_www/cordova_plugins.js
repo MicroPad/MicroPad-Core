@@ -211,7 +211,8 @@ module.exports.metadata =
     "cordova-sqlite-storage": "2.0.4",
     "cordova-plugin-compat": "1.1.0",
     "cordova-plugin-file": "4.3.3",
-    "cordova-plugin-dialogs": "1.3.3"
+    "cordova-plugin-dialogs": "1.3.3",
+    "cordova-plugin-console": "1.0.7"
 }
 // BOTTOM OF METADATA
 });

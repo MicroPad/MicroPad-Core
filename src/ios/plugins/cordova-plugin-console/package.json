@@ -1,0 +1,79 @@
+{
+  "_from": "cordova-plugin-console",
+  "_id": "cordova-plugin-console@1.0.7",
+  "_inBundle": false,
+  "_integrity": "sha1-ibepLtHDNYiN/ADZAtxBcgHPOws=",
+  "_location": "/cordova-plugin-console",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cordova-plugin-console",
+    "name": "cordova-plugin-console",
+    "escapedName": "cordova-plugin-console",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-console/-/cordova-plugin-console-1.0.7.tgz",
+  "_shasum": "89b7a92ed1c335888dfc00d902dc417201cf3b0b",
+  "_spec": "cordova-plugin-console",
+  "_where": "/Users/nick/Programming/micropad/src/ios/node_modules",
+  "author": {
+    "name": "Apache Software Foundation"
+  },
+  "bugs": {
+    "url": "https://github.com/apache/cordova-plugin-console/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova-plugin-console",
+    "platforms": [
+      "ios",
+      "ubuntu",
+      "wp7",
+      "wp8",
+      "windows8",
+      "windows"
+    ]
+  },
+  "deprecated": false,
+  "description": "Cordova Console Plugin",
+  "devDependencies": {
+    "jshint": "^2.6.0"
+  },
+  "engines": {
+    "cordovaDependencies": {
+      "2.0.0": {
+        "cordova": ">100"
+      }
+    }
+  },
+  "homepage": "https://github.com/apache/cordova-plugin-console#readme",
+  "keywords": [
+    "cordova",
+    "console",
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova-ubuntu",
+    "cordova-wp7",
+    "cordova-wp8",
+    "cordova-windows8",
+    "cordova-windows"
+  ],
+  "license": "Apache-2.0",
+  "name": "cordova-plugin-console",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apache/cordova-plugin-console.git"
+  },
+  "scripts": {
+    "jshint": "node node_modules/jshint/bin/jshint www && node node_modules/jshint/bin/jshint src && node node_modules/jshint/bin/jshint tests",
+    "test": "npm run jshint"
+  },
+  "version": "1.0.7"
+}

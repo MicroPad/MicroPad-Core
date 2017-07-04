@@ -1,13 +1,18 @@
 var FilesystemHandler = function() {
-	window.resolveLocalFileSystemURL(cordova.file.documentsDirectory, dir => {
-		dir.getDirectory('MicroPad Notepads', {create: true}, (dir) => {
-			this.notepadDir = dir;
-		});
-	});
+	this.notepadDir = null;
+	this.assetsDir = null;
 
-	window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, dir => {
-		dir.getDirectory('MicroPad Notepads', {create: true}, (dir) => {
-			this.assetsDir = assetsDir;
+	window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, fs => {
+		window.resolveLocalFileSystemURL(cordova.file.documentsDirectory, dir => {
+			dir.getDirectory('MicroPad Notepads', {create: true}, (dir) => {
+				this.notepadDir = dir;
+			});
+		});
+
+		window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, dir => {
+			dir.getDirectory('MicroPad Notepads', {create: true}, (dir) => {
+				this.assetsDir = assetsDir;
+			});
 		});
 	});
 }
