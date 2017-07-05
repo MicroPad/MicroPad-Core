@@ -1,6 +1,7 @@
 // Initialize your app
 var appUi = new Framework7({
-	init: false
+	init: false,
+	tapHold: true
 });
 
 // Export selectors engine
@@ -21,7 +22,7 @@ function updateNotepadList() {
 		$$('#notepadList').html('');
 		for (var i = 0; i < keys.length; i++) {
 			var key = keys[i];
-			$$('#notepadList').append('<li><a href="javascript:loadNotepad(\'{0}\');" class="item-link item-content"><div class="item-inner"><div class="item-title">{0}</div></div></a></li>'.format(key));
+			$$('#notepadList').append('<li><a href="javascript:loadNotepad(\'{0}\');" class="item-link item-content notepad-item"><div class="item-inner"><div class="item-title">{0}</div></div></a></li>'.format(key));
 		}
 	});
 }
