@@ -81,6 +81,17 @@ function initNotepad() {
 	createContentPage();
 }
 
+function loadNotepad(title) {
+	notepadStorage.getItem(title, function(err, res) {
+		if (err || res === null) return;
+
+		res = JSON.parse(res);
+		notepad = parser.restoreNotepad(res);
+		notepad.notepadAssets = res.notepadAssets;
+		initNotepad();
+	});
+}
+
 function saveNotepad(callback) {
 	notepadStorage.setItem(notepad.title, stringify(notepad), function() {
 		if (callback) callback();
