@@ -77,7 +77,23 @@ $$('#notepadList').on('taphold', '#notepadList > li > a', e => {
 			{
 				text: "Rename",
 				onClick: () => {
+					navigator.notification.prompt("Notepad Title:", (results) => {
+						if (results.buttonIndex !== 1 || results.input1.length < 1) return;
 
+						var title = results.input1;
+						notepadStorage.getItem(notepadTitle, function(err, res) {
+							if (err || res === null) return;
+
+							res = JSON.parse(res);
+							notepad = parser.restoreNotepad(res);
+							notepad.notepadAssets = res.notepadAssets;
+							notepad.title = title;
+
+							notepadStorage.removeItem(notepadTitle, () => {
+								saveNotepad(updateNotepadList);
+							});
+						});
+					}, "Rename Notepad", ["Rename", "Cancel"]);
 				}
 			}
 		]

@@ -750,7 +750,7 @@ bin/*
 !/plugins/android.json
 !/plugins/fetch.json
 plugins/*
-platforms/*
+platforms/
 
 secrets.xml
 secrets.properties

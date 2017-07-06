@@ -1,4 +1,0 @@
-*:not(input):not(textarea) {
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-}
