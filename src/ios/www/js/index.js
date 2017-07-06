@@ -78,7 +78,7 @@ function initNotepad() {
 	lastClick = { x: 0, y: 0 };
 	todoShowToggle = {};
 
-	createContentPage();
+	mainView.router.loadPage("notepad.html");
 }
 
 function loadNotepad(title) {

@@ -12,9 +12,101 @@ var mainView = appUi.addView('.view-main', {
 	dynamicNavbar: true
 });
 
-appUi.onPageInit('index', page => {
+var npObjIndex;
+var notepadObjects;
 
+appUi.onPageBeforeInit('notepad', page => {
+	$$('#notepad-title').html(notepad.title);
+	displayNotepad();
 });
+
+function displayNotepad() {
+	npObjIndex = 0;
+	notepadObjects = [];
+
+	//Add sections/notes to the accordion
+	$$('#accordion-holder').html('');
+	insertAccordions($$('#accordion-holder')[0], notepad);
+
+	$$('.accordion-item').off('taphold');
+	$$('.accordion-item').on('taphold', e => {
+		e.stopPropagation();
+		var obj = notepadObjects[e.target.id.split("npobj-")[1]];
+		var buttons = [
+			[
+				{
+					text: "Delete",
+					color: "red",
+					onClick: () => {
+						navigator.notification.confirm("Are you sure you want to delete this?", buttonIndex => {
+							if (buttonIndex === 1) {
+								if (obj.sections) {
+									//Delete a section
+									obj.parent.sections[i].filter(s => { return s !== obj; });
+									$$(e.target).remove();
+									saveNotepad();
+								}
+								else {
+									//Delete a note
+									obj.parent.notes[i].filter(n => { return n !== obj; });
+									$$(e.target).remove();
+									saveNotepad();
+								}
+							}
+						}, "Delete", ["Yes", "No"]);
+					}
+				},
+				{
+					text: "Rename",
+					onClick: () => {
+						navigator.notification.prompt("Notepad Title:", (results) => {
+							if (results.buttonIndex !== 1 || results.input1.length < 1) return;
+
+							var title = results.input1;
+							obj.title = title;
+							$(e.target).find('.item-title').text(title);
+						}, "Rename", ["Rename", "Cancel"]);
+					}
+				}
+			]
+		];
+
+		if (obj.sections) {
+			let moreButtons = [
+				{
+					text: "New Note"
+				},
+				{
+					text: "New Section"
+				}
+			];
+			buttons.push(moreButtons);
+		}
+
+		appUi.actions(e.target, buttons);
+	});
+}
+
+function insertAccordions(parentElement, parent) {
+	$$(parentElement).html('<div class="content-block-title">Sections</div><div class="list-block"><ul class="section-holder" /></div><div class="content-block-title">Notes</div><div class="list-block"><ul class="note-holder" /></div>');
+
+	for (var i = 0; i < parent.sections.length; i++) {
+		var section = parent.sections[i];
+		notepadObjects.push(section);
+		var sectionAccordion = $$('<li id="npobj-{1}" class="accordion-item"><a href="#!" class="item-link item-content section-item"><div class="item-inner"><div class="item-title">{0}</div></div></a><div class="accordion-item-content" /></li>'.format(section.title, npObjIndex++));
+		$$(parentElement).find('ul.section-holder').append(sectionAccordion);
+		insertAccordions(sectionAccordion.find(".accordion-item-content"), section);
+	}
+
+	if (!parent.notes) return;
+	for (var i = 0; i < parent.notes.length; i++) {
+		var n = parent.notes[i];
+		notepadObjects.push(n);
+		var noteList = $$('<li id="npobj-{1}"><a href="javascript:loadNote(\'{1}\');" class="item-link item-content note-item"><div class="item-inner"><div class="item-title">{0}</div></div></a></li>'.format(n.title, npObjIndex++));
+		$$(parentElement).find('ul.note-holder').append(noteList);
+	}
+}
+
 appUi.onPageReinit('index', updateNotepadList);
 
 function updateNotepadList() {
@@ -66,9 +158,7 @@ $$('#notepadList').on('taphold', '#notepadList > li > a', e => {
 						if (buttonIndex === 1) {
 							notepadStorage.removeItem(notepadTitle, () => {
 								notepad = undefined;
-								setTimeout(() => {
-									updateNotepadList();
-								}, 500);
+								updateNotepadList();
 							});
 						}
 					}, "Delete Notepad", ["Yes", "No"]);
@@ -97,39 +187,6 @@ $$('#notepadList').on('taphold', '#notepadList > li > a', e => {
 				}
 			}
 		]
-		// [
-		// 	{
-		// 		text: "Cancel"
-		// 	}
-		// ]
 	];
 	appUi.actions(e.target, buttons);
 });
-
-// Generate dynamic page
-var dynamicPageIndex = 0;
-function createContentPage() {
-	mainView.router.loadContent(
-		'<div class="navbar">' +
-		'  <div class="navbar-inner">' +
-		'    <div class="left"><a href="#" class="back link"><i class="icon icon-back"></i><span>Back</span></a></div>' +
-		'    <div class="center sliding">Dynamic Page ' + (++dynamicPageIndex) + '</div>' +
-		'  </div>' +
-		'</div>' +
-		'<div class="pages">' +
-		'  <!-- Page, data-page contains page name-->' +
-		'  <div data-page="dynamic-pages" class="page">' +
-		'    <!-- Scrollable page content-->' +
-		'    <div class="page-content">' +
-		'      <div class="content-block">' +
-		'        <div class="content-block-inner">' +
-		'          <p>Here is a dynamic page created on ' + new Date() + ' !</p>' +
-		'          <p>Go <a href="#" class="back">back</a> or go to <a href="services.html">Services</a>.</p>' +
-		'        </div>' +
-		'      </div>' +
-		'    </div>' +
-		'  </div>' +
-		'</div>'
-	);
-	return;
-}
