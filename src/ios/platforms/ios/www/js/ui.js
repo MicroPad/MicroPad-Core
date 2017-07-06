@@ -1,6 +1,7 @@
 // Initialize your app
 var appUi = new Framework7({
-	init: false
+	init: false,
+	tapHold: true
 });
 
 // Export selectors engine
@@ -21,7 +22,7 @@ function updateNotepadList() {
 		$$('#notepadList').html('');
 		for (var i = 0; i < keys.length; i++) {
 			var key = keys[i];
-			$$('#notepadList').append('<li><a href="javascript:loadNotepad(\'{0}\');" class="item-link item-content"><div class="item-inner"><div class="item-title">{0}</div></div></a></li>'.format(key));
+			$$('#notepadList').append('<li><a href="javascript:loadNotepad(\'{1}\');" class="item-link item-content notepad-item"><div class="item-inner"><div class="item-title">{0}</div></div></a></li>'.format(key, key.replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0')));
 		}
 	});
 }
@@ -45,6 +46,49 @@ function newNotepad() {
 
 	}, "New Notepad", ["Create", "Cancel"]);
 }
+
+$$('#notepadList').on('taphold', '#notepadList > li > a', e => {
+	var notepadTitle;
+	if ($$(e.target).hasClass("item-inner")) {
+		notepadTitle = $$(e.target).find('.item-title').html();
+	}
+	else {
+		notepadTitle = e.target.innerHTML;
+	}
+
+	var buttons = [
+		[
+			{
+				text: "Delete",
+				color: "red",
+				onClick: () => {
+					navigator.notification.confirm("Are you sure you want to delete this notepad?", buttonIndex => {
+						if (buttonIndex === 1) {
+							notepadStorage.removeItem(notepadTitle, () => {
+								notepad = undefined;
+								setTimeout(() => {
+									updateNotepadList();
+								}, 500);
+							});
+						}
+					}, "Delete Notepad", ["Yes", "No"]);
+				}
+			},
+			{
+				text: "Rename",
+				onClick: () => {
+
+				}
+			}
+		]
+		// [
+		// 	{
+		// 		text: "Cancel"
+		// 	}
+		// ]
+	];
+	appUi.actions(e.target, buttons);
+});
 
 // Generate dynamic page
 var dynamicPageIndex = 0;
