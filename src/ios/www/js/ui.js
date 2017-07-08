@@ -116,6 +116,53 @@ function updateNotepadList() {
 			var key = keys[i];
 			$$('#notepadList').append('<li><a href="javascript:loadNotepad(\'{1}\');" class="item-link item-content notepad-item"><div class="item-inner"><div class="item-title">{0}</div></div></a></li>'.format(key, key.replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0')));
 		}
+
+		$$('#notepadList > li > a').off('taphold');
+		$$('#notepadList > li > a').on('taphold', e => {
+			var notepadTitle = $$(e.currentTarget).find('.item-title').text();
+
+			var buttons = [
+				[
+					{
+						text: "Delete",
+						color: "red",
+						onClick: () => {
+							navigator.notification.confirm("Are you sure you want to delete this notepad?", buttonIndex => {
+								if (buttonIndex === 1) {
+									notepadStorage.removeItem(notepadTitle, () => {
+										notepad = undefined;
+										updateNotepadList();
+									});
+								}
+							}, "Delete Notepad", ["Yes", "No"]);
+						}
+					},
+					{
+						text: "Rename",
+						onClick: () => {
+							navigator.notification.prompt("Notepad Title:", (results) => {
+								if (results.buttonIndex !== 1 || results.input1.length < 1) return;
+
+								var title = results.input1;
+								notepadStorage.getItem(notepadTitle, function(err, res) {
+									if (err || res === null) return;
+
+									res = JSON.parse(res);
+									notepad = parser.restoreNotepad(res);
+									notepad.notepadAssets = res.notepadAssets;
+									notepad.title = title;
+
+									notepadStorage.removeItem(notepadTitle, () => {
+										saveNotepad(updateNotepadList);
+									});
+								});
+							}, "Rename Notepad", ["Rename", "Cancel"]);
+						}
+					}
+				]
+			];
+			appUi.actions(e.target, buttons);
+		});
 	});
 }
 
@@ -138,55 +185,3 @@ function newNotepad() {
 
 	}, "New Notepad", ["Create", "Cancel"]);
 }
-
-$$('#notepadList').on('taphold', '#notepadList > li > a', e => {
-	var notepadTitle;
-	if ($$(e.target).hasClass("item-inner")) {
-		notepadTitle = $$(e.target).find('.item-title').html();
-	}
-	else {
-		notepadTitle = e.target.innerHTML;
-	}
-
-	var buttons = [
-		[
-			{
-				text: "Delete",
-				color: "red",
-				onClick: () => {
-					navigator.notification.confirm("Are you sure you want to delete this notepad?", buttonIndex => {
-						if (buttonIndex === 1) {
-							notepadStorage.removeItem(notepadTitle, () => {
-								notepad = undefined;
-								updateNotepadList();
-							});
-						}
-					}, "Delete Notepad", ["Yes", "No"]);
-				}
-			},
-			{
-				text: "Rename",
-				onClick: () => {
-					navigator.notification.prompt("Notepad Title:", (results) => {
-						if (results.buttonIndex !== 1 || results.input1.length < 1) return;
-
-						var title = results.input1;
-						notepadStorage.getItem(notepadTitle, function(err, res) {
-							if (err || res === null) return;
-
-							res = JSON.parse(res);
-							notepad = parser.restoreNotepad(res);
-							notepad.notepadAssets = res.notepadAssets;
-							notepad.title = title;
-
-							notepadStorage.removeItem(notepadTitle, () => {
-								saveNotepad(updateNotepadList);
-							});
-						});
-					}, "Rename Notepad", ["Rename", "Cancel"]);
-				}
-			}
-		]
-	];
-	appUi.actions(e.target, buttons);
-});
