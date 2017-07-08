@@ -31,7 +31,7 @@ function displayNotepad() {
 	$$('.accordion-item').off('taphold');
 	$$('.accordion-item').on('taphold', e => {
 		e.stopPropagation();
-		var obj = notepadObjects[e.target.id.split("npobj-")[1]];
+		var obj = notepadObjects[$$(e.target).closest('li')[0].id.split("npobj-")[1]];
 		var buttons = [
 			[
 				{
@@ -42,14 +42,14 @@ function displayNotepad() {
 							if (buttonIndex === 1) {
 								if (obj.sections) {
 									//Delete a section
-									obj.parent.sections[i].filter(s => { return s !== obj; });
-									$$(e.target).remove();
+									obj.parent.sections = obj.parent.sections.filter(s => { return s !== obj; });
+									$$(e.target).closest('li').remove();
 									saveNotepad();
 								}
 								else {
 									//Delete a note
-									obj.parent.notes[i].filter(n => { return n !== obj; });
-									$$(e.target).remove();
+									obj.parent.notes = obj.parent.notes.filter(n => { return n !== obj; });
+									$$(e.target).closest('li').remove();
 									saveNotepad();
 								}
 							}
@@ -64,7 +64,8 @@ function displayNotepad() {
 
 							var title = results.input1;
 							obj.title = title;
-							$(e.target).find('.item-title').text(title);
+							$$(e.target).find('.item-title').add($$(e.target).closest('.item-title')).text(title);
+							saveNotepad();
 						}, "Rename", ["Rename", "Cancel"]);
 					}
 				}
