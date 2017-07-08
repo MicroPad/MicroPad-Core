@@ -87,12 +87,16 @@ function displayNotepad() {
 							notepadObjects.push(n);
 							saveNotepad();
 
-							$$(e.target).closest('li').find('.note-holder').append('<li id="npobj-{1}"><a href="javascript:loadNote(\'{1}\');" class="item-link item-content note-item"><div class="item-inner"><div class="item-title">{0}</div></div></a></li>'.format(n.title, npObjIndex++));
+							var selection = $$(e.target).closest('li').find('.note-holder');
+							$$(selection[selection.length - 1]).append('<li id="npobj-{1}"><a href="javascript:loadNote(\'{1}\');" class="item-link item-content note-item"><div class="item-inner"><div class="item-title">{0}</div></div></a></li>'.format(n.title, npObjIndex++));
 						}, "New Note", ["Create", "Cancel"]);
 					}
 				},
 				{
-					text: "New Section"
+					text: "New Section",
+					onClick: () => {
+						newSection(obj);
+					}
 				}
 			];
 			buttons.push(moreButtons);
@@ -103,13 +107,15 @@ function displayNotepad() {
 }
 
 function insertAccordions(parentElement, parent) {
+
 	$$(parentElement).html('<div class="content-block-title">Sections</div><div class="list-block"><ul class="section-holder" /></div><div class="content-block-title">Notes</div><div class="list-block"><ul class="note-holder" /></div>');
+	if (parent.notes) $$(parentElement).css('border-left', '5px solid {0}'.format(Please.make_color({from_hash: parent.title})));
 
 	for (var i = 0; i < parent.sections.length; i++) {
 		var section = parent.sections[i];
 		notepadObjects.push(section);
 		var sectionAccordion = $$('<li id="npobj-{1}" class="accordion-item"><a href="#!" class="item-link item-content section-item"><div class="item-inner"><div class="item-title">{0}</div></div></a><div class="accordion-item-content" /></li>'.format(section.title, npObjIndex++));
-		$$(parentElement).find('ul.section-holder').append(sectionAccordion);
+		$$($$(parentElement).find('ul.section-holder')[0]).append(sectionAccordion);
 		insertAccordions(sectionAccordion.find(".accordion-item-content"), section);
 	}
 
@@ -199,4 +205,21 @@ function newNotepad() {
 		});
 
 	}, "New Notepad", ["Create", "Cancel"]);
+}
+
+function addSectionBtn() {
+	newSection(notepad);
+}
+
+function newSection(parent) {
+	navigator.notification.prompt("Section Title:", (results) => {
+		if (results.buttonIndex !== 1 || results.input1.length < 1) return;
+
+		var title = results.input1;
+		var s = parser.createSection(title);
+		s.parent = parent;
+		parent.addSection(s);
+		notepadObjects.push(s);
+		saveNotepad(displayNotepad);
+	}, "New Section", ["Create", "Cancel"]);
 }
