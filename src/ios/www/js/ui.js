@@ -75,7 +75,21 @@ function displayNotepad() {
 		if (obj.sections) {
 			let moreButtons = [
 				{
-					text: "New Note"
+					text: "New Note",
+					onClick: () => {
+						navigator.notification.prompt("Note Title:", (results) => {
+							if (results.buttonIndex !== 1 || results.input1.length < 1) return;
+
+							var title = results.input1;
+							var n = parser.createNote(title, ["asciimath"]);
+							n.parent = obj;
+							obj.addNote(n);
+							notepadObjects.push(n);
+							saveNotepad();
+
+							$$(e.target).closest('li').find('.note-holder').append('<li id="npobj-{1}"><a href="javascript:loadNote(\'{1}\');" class="item-link item-content note-item"><div class="item-inner"><div class="item-title">{0}</div></div></a></li>'.format(n.title, npObjIndex++));
+						}, "New Note", ["Create", "Cancel"]);
+					}
 				},
 				{
 					text: "New Section"
