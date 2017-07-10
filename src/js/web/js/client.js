@@ -254,7 +254,9 @@ window.onload = function() {
 				});
 			}
 		}
+	});
 
+	simplemde.codemirror.on('update', function () {
 		applyDictionary();
 	});
 

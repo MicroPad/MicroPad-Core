@@ -193,7 +193,7 @@ function replaceSpelling(replacement) {
 function addToDictionary() {
 	var wordPos = simplemde.codemirror.findWordAt(simplemde.codemirror.getCursor());
 	var word = simplemde.codemirror.getLine(wordPos.anchor.line).substr(wordPos.anchor.ch, wordPos.head.ch-wordPos.anchor.ch);
-	userDictionary.add(word);
+	userDictionary.add(word.toLowerCase());
 	appStorage.setItem("dictionary", Array.from(userDictionary));
 
 	applyDictionary();
@@ -201,6 +201,6 @@ function addToDictionary() {
 
 function applyDictionary() {
 	$('.cm-spell-error').each(function(i) {
-		if (userDictionary.has($(this).text())) $(this).removeClass('cm-spell-error');
+		if (userDictionary.has($(this).text().toLowerCase())) $(this).removeClass('cm-spell-error');
 	});
 }
