@@ -170,7 +170,7 @@ $(document).on('contextmenu', '.cm-spell-error', event => {
 	lastSpellchecked = event.target;
 	var suggestions = dictionary.suggest(lastSpellchecked.innerHTML);
 	if (suggestions.length > 0) {
-		$('#spellcheck-menu > ul').html('');
+		$('#spellcheck-menu > ul').html('<li><em><a href="javascript:addToDictionary();">Add to dictionary</a></em></li>');
 		for (var i = 0; i < suggestions.length; i++) $('#spellcheck-menu > ul').append('<li><a href="javascript:replaceSpelling(\'{0}\');">{0}</a></li>'.format(suggestions[i]));
 	}
 	else {
@@ -188,4 +188,19 @@ $(document).on('click', event => { $('#spellcheck-menu').addClass('hidden'); });
 function replaceSpelling(replacement) {
 	var word = simplemde.codemirror.findWordAt(simplemde.codemirror.getCursor());
 	simplemde.codemirror.replaceRange(replacement, word.anchor, word.head);
+}
+
+function addToDictionary() {
+	var wordPos = simplemde.codemirror.findWordAt(simplemde.codemirror.getCursor());
+	var word = simplemde.codemirror.getLine(wordPos.anchor.line).substr(wordPos.anchor.ch, wordPos.head.ch-wordPos.anchor.ch);
+	userDictionary.add(word);
+	appStorage.setItem("dictionary", Array.from(userDictionary));
+
+	applyDictionary();
+}
+
+function applyDictionary() {
+	$('.cm-spell-error').each(function(i) {
+		if (userDictionary.has($(this).text())) $(this).removeClass('cm-spell-error');
+	});
 }

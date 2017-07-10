@@ -22,6 +22,7 @@ var uploadWorker = new Worker('js/uploadWorker.js');
 var putRequests = [];
 var currentTarget;
 var dictionary;
+var userDictionary = new Set();
 var simplemde;
 
 /** Setup localforage */
@@ -144,6 +145,11 @@ window.onload = function() {
 			inlineMath: [[';;', ';;']]
 		}
 	});
+
+	appStorage.getItem("dictionary", (err, d) => {
+		if (err) return;
+		userDictionary = new Set(d);
+	});
 	
 	dictionary = new Typo("en_US", false, false, {
 		dictionaryPath: "dict",
@@ -248,6 +254,8 @@ window.onload = function() {
 				});
 			}
 		}
+
+		applyDictionary();
 	});
 
 	document.getElementById("inline-image-upload").addEventListener("change", function(event) {
@@ -400,6 +408,7 @@ window.onload = function() {
 							inDuration: 100,
 							ready: function() {
 								simplemde.value(element.content);
+								applyDictionary();
 								let info = simplemde.codemirror.getScrollInfo();
 								simplemde.codemirror.scrollTo(info.width, info.height);
 							},
