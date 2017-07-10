@@ -169,12 +169,12 @@ var lastSpellchecked;
 $(document).on('contextmenu', '.cm-spell-error', event => {
 	lastSpellchecked = event.target;
 	var suggestions = dictionary.suggest(lastSpellchecked.innerHTML);
+	$('#spellcheck-menu > ul').html('<li><em><a href="javascript:addToDictionary();">Add to dictionary</a></em></li>');
 	if (suggestions.length > 0) {
-		$('#spellcheck-menu > ul').html('<li><em><a href="javascript:addToDictionary();">Add to dictionary</a></em></li>');
 		for (var i = 0; i < suggestions.length; i++) $('#spellcheck-menu > ul').append('<li><a href="javascript:replaceSpelling(\'{0}\');">{0}</a></li>'.format(suggestions[i]));
 	}
 	else {
-		$('#spellcheck-menu > ul').html('No suggestions');
+		$('#spellcheck-menu > ul').append('<li>No suggestions</li>');
 	}
 
 	$('#spellcheck-menu').removeClass('hidden');
