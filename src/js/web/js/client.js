@@ -150,6 +150,11 @@ window.onload = function() {
 		if (err) return;
 		userDictionary = new Set(d);
 	});
+
+	appStorage.getItem("useOldEditor", (err, d) => {
+		if (err) return;
+		updateEditor(d, true);
+	});	
 	
 	dictionary = new Typo("en_US", false, false, {
 		dictionaryPath: "dict",
@@ -216,48 +221,18 @@ window.onload = function() {
 		if (!currentTarget) return;
 		
 		lastEditedElement.content = simplemde.value();
-		currentTarget.html('<p class="handle">::::</p>'+md.makeHtml(lastEditedElement.content));
-
-		var checkedTodoItems = currentTarget.find('.task-list-item input:checked');
-		if (checkedTodoItems.length > 5) {
-			todoShowToggle[currentTarget[0].id] = false;
-			currentTarget.find('.handle').after('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
-		}
-
-		var inlineImages = [];
-		lastEditedElement.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => { inlineImages.push(p1); });
-		lastEditedElement.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
-
-		if (inlineImages) {
-			for (let i = 0; i < inlineImages.length; i++) {
-				let uuid = inlineImages[i];
-
-				assetStorage.getItem(uuid, (err, blob) => {
-					if (!blob) {
-						setTimeout(() => {
-							arguments.callee(err, blob);
-						}, 500);
-						return;
-					}
-					currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(URL.createObjectURL(blob)));
-					var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
-					currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(blob), drawingName));
-					if ($('#'+drawingName).length > 0) {
-						var trimmed = false;
-						$('#'+drawingName)[0].onload = function() {
-							if (!trimmed) {
-								trimmed = true;
-								initDrawing($('#'+drawingName)[0]);
-							}
-						}
-					}
-				});
-			}
-		}
+		processEditedMarkdown();
 	});
 
 	simplemde.codemirror.on('update', function () {
 		applyDictionary();
+	});
+
+	$('#md-textarea-old').bind('input propertychange', function() {
+		if (!currentTarget) return;
+		
+		lastEditedElement.content = $('#md-textarea-old').val();
+		processEditedMarkdown();
 	});
 
 	document.getElementById("inline-image-upload").addEventListener("change", function(event) {
@@ -410,9 +385,15 @@ window.onload = function() {
 							inDuration: 100,
 							ready: function() {
 								simplemde.value(element.content);
+								$('#md-textarea-old').val(element.content);
 								applyDictionary();
 								let info = simplemde.codemirror.getScrollInfo();
 								simplemde.codemirror.scrollTo(info.width, info.height);
+
+								appStorage.getItem("useOldEditor", (err, d) => {
+									if (err) return;
+									if (d == 1) $('#md-textarea-old').focus();
+								});
 							},
 							complete: function() {
 								updateReference({
@@ -1925,6 +1906,47 @@ function initDrawing(img) {
 
 	var trimmed = URL.createObjectURL(dataURItoBlob(trim(tmpCanvas).toDataURL()));
 	img.src = trimmed;
+}
+
+function processEditedMarkdown() {
+	currentTarget.html('<p class="handle">::::</p>'+md.makeHtml(lastEditedElement.content));
+
+	var checkedTodoItems = currentTarget.find('.task-list-item input:checked');
+	if (checkedTodoItems.length > 5) {
+		todoShowToggle[currentTarget[0].id] = false;
+		currentTarget.find('.handle').after('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
+	}
+
+	var inlineImages = [];
+	lastEditedElement.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => { inlineImages.push(p1); });
+	lastEditedElement.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
+
+	if (inlineImages) {
+		for (let i = 0; i < inlineImages.length; i++) {
+			let uuid = inlineImages[i];
+
+			assetStorage.getItem(uuid, (err, blob) => {
+				if (!blob) {
+					setTimeout(() => {
+						arguments.callee(err, blob);
+					}, 500);
+					return;
+				}
+				currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(URL.createObjectURL(blob)));
+				var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
+				currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(blob), drawingName));
+				if ($('#'+drawingName).length > 0) {
+					var trimmed = false;
+					$('#'+drawingName)[0].onload = function() {
+						if (!trimmed) {
+							trimmed = true;
+							initDrawing($('#'+drawingName)[0]);
+						}
+					}
+				}
+			});
+		}
+	}
 }
 
 function readFileInputEventAsText(event, callback) {

@@ -167,7 +167,16 @@ function insertMarkdown(editor, type, openTag, closeTag) {
 
 var lastSpellchecked;
 $(document).on('contextmenu', '.cm-spell-error', event => {
+	event.stopPropagation();
 	lastSpellchecked = event.target;
+
+	if (!event.pageX) {
+		let bounds = event.target.getBoundingClientRect();
+		event.pageX = bounds.left;
+		event.pageY = bounds.top;
+	}
+	console.log(event);
+
 	var suggestions = dictionary.suggest(lastSpellchecked.innerHTML);
 	$('#spellcheck-menu > ul').html('<li><em><a href="javascript:addToDictionary();">Add to dictionary</a></em></li>');
 	if (suggestions.length > 0) {
@@ -184,6 +193,36 @@ $(document).on('contextmenu', '.cm-spell-error', event => {
 	return false;
 });
 $(document).on('click', event => { $('#spellcheck-menu').addClass('hidden'); });
+
+$(document).on('contextmenu', '.CodeMirror-line', event => {
+	if (event.originalEvent && event.originalEvent.button === 0) {
+		let pos = simplemde.codemirror.getCursor();
+		pos.line--;
+		console.log(pos);
+
+		var counter = 0;
+		$('.CodeMirror-line').each(function(i) {
+			if (i !== pos.line) return;
+			
+			$(this).find('span > span').each(function(j) {
+				if (counter <= pos.ch) {
+					counter += $(this).text().length;
+				}
+				else {
+					console.log($(this));
+					simplemde.codemirror.setCursor(pos);
+					$(this).trigger('contextmenu');
+					return false;
+				}
+			});
+
+			return false;
+		});
+
+		event.preventDefault();
+		return false;
+	}
+});
 
 function replaceSpelling(replacement) {
 	var word = simplemde.codemirror.findWordAt(simplemde.codemirror.getCursor());
@@ -203,4 +242,37 @@ function applyDictionary() {
 	$('.cm-spell-error').each(function(i) {
 		if (userDictionary.has($(this).text().toLowerCase())) $(this).removeClass('cm-spell-error');
 	});
+}
+
+$('#md-use-old-editor').change(event => {
+	if (event.target.checked) {
+		updateEditor(1);
+	}
+	else {
+		updateEditor(0);
+	}
+});
+
+function updateEditor(useOldEditor, init) {
+	if (!init) appStorage.setItem("useOldEditor", useOldEditor);
+	if (useOldEditor == 1) {
+		$('#md-textarea-old').val(simplemde.value());
+		$('#md-textarea-old').removeClass("hidden");
+
+		$(simplemde.codemirror.getWrapperElement()).addClass("hidden");
+		$('.editor-toolbar').addClass("hidden");
+		$('.editor-statusbar').addClass("hidden");
+
+		$('#md-use-old-editor').prop("checked", true);
+	}
+	else {
+		simplemde.value($('#md-textarea-old').val());
+		$('#md-textarea-old').addClass("hidden");
+
+		$(simplemde.codemirror.getWrapperElement()).removeClass("hidden");
+		$('.editor-toolbar').removeClass("hidden");
+		$('.editor-statusbar').removeClass("hidden");
+
+		$('#md-use-old-editor').prop("checked", false);
+	}
 }
