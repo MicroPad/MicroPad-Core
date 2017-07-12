@@ -600,8 +600,13 @@ window.onload = function() {
 			}
 		}).on('resizemove', function(event) {
 			var resizeObj = event.target;
-			if ($(event.target).prop("tagName") == "IMG") resizeObj = $('#'+event.target.id.split("_")[1])[0];
-			$(resizeObj).css('width', parseInt($(resizeObj).css('width')) + 10 + event.dx);
+			var resizeExtra = 10;
+			if ($(event.target).prop("tagName") == "IMG") {
+				resizeObj = $('#'+event.target.id.split("_")[1])[0];
+				resizeExtra = 0;
+			}
+
+			$(resizeObj).css('width', parseInt($(resizeObj).css('width')) + resizeExtra + event.dx);
 			$(resizeObj).css('height', 'auto');
 			resizePage($(resizeObj));
 			event.target = resizeObj;
@@ -1622,6 +1627,7 @@ function loadNote(id, delta) {
 				assetStorage.getItem(element.args.ext).then(blob => {
 					if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 					elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" />';
+					$(elementDiv).removeClass('resize');
 
 					var trimmed = false;
 					$(elementDiv).find('img')[0].onload = function() {
