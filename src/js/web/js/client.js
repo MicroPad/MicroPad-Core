@@ -1303,7 +1303,7 @@ function updateNotepadList() {
 			isUpdating = true;
 			$('#notepadList').html('');
 			notepadStorage.iterate(function(value, key, i) {
-				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{1}</a></li>'.format(key.replace("'", "\\'"), key));
+				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{1}</a></li>'.format(key.replace('"', '&quot;').replace("'", "\\'"), key));
 			}, function() {
 				isUpdating = false;
 			});
@@ -2178,4 +2178,15 @@ function blobToDataURL(blob, callback) {
 	var a = new FileReader();
 	a.onload = function(e) { callback(e.target.result); }
 	a.readAsDataURL(blob);
+}
+
+function addslashes(string) {
+	return string.replace(/\\/g, '\\\\').
+		replace(/\u0008/g, '\\b').
+		replace(/\t/g, '\\t').
+		replace(/\n/g, '\\n').
+		replace(/\f/g, '\\f').
+		replace(/\r/g, '\\r').
+		replace(/'/g, '\\\'').
+		replace(/"/g, '\\"');
 }
