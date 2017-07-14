@@ -23,10 +23,11 @@ uploadWorker.onmessage = function(event) {
 
 function cueUpload() {
 	if (putRequests.length > 0) uploadWorker.postMessage(putRequests[0]);
-	if (putRequests.length > 1) {
-		$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Uploading: {0} parts remaining...</a>)'.format(putRequests.length));
-	} else {
-		$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+	$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Uploading: {0} parts remaining...</a>)'.format(putRequests.length));
+	if (putRequests.length <= 1) {
+		setTimeout(() => {
+			$('#parents > span:first-child').html(notepad.title+' (<a href="#!" onclick="$(\'#sync-manager\').modal(\'open\')">Synced</a>)');
+		}, 500);
 	}
 }
 
