@@ -1224,7 +1224,9 @@ function downloadFile(elementID) {
 	$('#fileEditor').modal('close');
 }
 
-function updateTitle() {
+function updateTitle(newTitle) {
+	if (!newTitle) newTitle = $('#title-input').val();
+
 	if (parents.length === 1) {
 		//Delete old Notepad
 		appStorage.getItem('syncToken', (err, token) => {
@@ -1233,7 +1235,7 @@ function updateTitle() {
 					switch (window.platform) {
 						case "web":
 							notepadStorage.removeItem(notepad.title, function() {
-								notepad.title = $('#title-input').val();
+								notepad.title = newTitle;
 								$('#parents > span:nth-child(1)').html(notepad.title);
 								saveToBrowser();
 								setTimeout(function() {
@@ -1249,7 +1251,7 @@ function updateTitle() {
 								}).then(function(file) {
 									return file.deleteAsync();
 								}).done(function() {
-									notepad.title = $('#title-input').val();
+									notepad.title = newTitle;
 									saveToBrowser(undefined, true);
 								});
 							break;
@@ -1275,7 +1277,7 @@ function updateTitle() {
 	}
 	else if (parents.length > 1 && !note) {
 		//Rename Section
-		parents[parents.length - 1].title = $('#title-input').val();
+		parents[parents.length - 1].title = newTitle;
 		$('#parents > span:nth-last-child(2)').html(parents[parents.length - 1].title);
 		notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 		saveToBrowser();
@@ -1283,7 +1285,7 @@ function updateTitle() {
 	}
 	else if (note) {
 		//Rename Note
-		note.title = $('#title-input').val();
+		note.title = newTitle;
 		$('#open-note').html(note.title);
 		notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 		saveToBrowser();
@@ -2097,6 +2099,14 @@ function confirmAsync(question) {
 				}
 				return false;
 			});
+			break;
+	}
+}
+
+function ask(title, placeholder) {
+	switch (window.platform) {
+		case "web":
+			return prompt(title, placeholder);
 			break;
 	}
 }

@@ -46,30 +46,46 @@ function updateNotepadExplorer() {
 function addSectionToExplorer(parent, parentSelector, sec, currentPath) {
 	var uid = expUid;
 	expUid++;
-	parentSelector.append('<li id="exp-{1}" explorer-path="{2}" onclick="toggleExplorer(event, {1});" oncontextmenu="event.stopPropagation();showContextMenu(\'{2}\', \'s\');return false;"><i class="material-icons">book</i> {0} <span onclick="event.stopPropagation();loadSectionFromExplorer(\'{2}\')">(Open)</span><ul id="exp-{1}-s" class="expandable"></ul></li>'.format(sec.title, uid, currentPath.join()));
+	parentSelector.append('<li id="exp-{1}" explorer-path="{2}" onclick="toggleExplorer(event, {1});" oncontextmenu="event.stopPropagation();showContextMenu(event, \'{2}\', \'s\');return false;"><i class="material-icons">book</i> {0} <span onclick="event.stopPropagation();loadSectionFromExplorer(\'{2}\')">(Open)</span><ul id="exp-{1}-s" class="expandable"></ul></li>'.format(sec.title, uid, currentPath.join()));
 
 	for (var i = 0; i < sec.sections.length; i++) {
 		addSectionToExplorer(sec, $('#exp-'+uid+'-s'), sec.sections[i], currentPath.concat([i]));
 	}
 
 	for (var i = 0; i < sec.notes.length; i++) {
-		$('#exp-'+uid+'-s').append('<li class="exp-note" onclick="event.stopPropagation();loadNoteFromExplorer(\'{1}\');" oncontextmenu="event.stopPropagation();showContextMenu(\'{1}\', \'n\');return false;"><i class="material-icons">note</i> {0}</li>'.format(sec.notes[i].title, currentPath.concat([i]).join()));
+		$('#exp-'+uid+'-s').append('<li class="exp-note" onclick="event.stopPropagation();loadNoteFromExplorer(\'{1}\');" oncontextmenu="event.stopPropagation();showContextMenu(event, \'{1}\', \'n\');return false;"><i class="material-icons">note</i> {0}</li>'.format(sec.notes[i].title, currentPath.concat([i]).join()));
 	}
 }
 
-function showContextMenu(currentPath, type) {
+function showContextMenu(event, currentPath, type) {
 	switch (type) {
 		case "s":
 			loadSectionFromExplorer(currentPath);
-			$('#menu-button').sideNav('show');
 			break;
 
 		case "n":
 			loadNoteFromExplorer(currentPath);
-			setTimeout(() => {$('#menu-button').sideNav('show');}, 900)
 			break;
 	}
+
+	$('#explorer-menu').removeClass('hidden');
+	$('#explorer-menu').attr('style', 'left: {0}; top: {1};'.format(event.pageX, event.pageY));
 	return false;
+}
+
+function renameContext() {
+	var existingTitle = "";
+	if (note) {
+		existingTitle = note.title;
+	} else {
+		existingTitle = parents[parents.length - 1].title;
+	}
+
+	updateTitle(ask("Rename:", existingTitle));
+}
+
+function deleteContext() {
+	deleteOpen();
 }
 
 function toggleExplorer(event, uid, show) {
@@ -192,7 +208,9 @@ $(document).on('contextmenu', '.cm-spell-error', event => {
 	event.preventDefault();
 	return false;
 });
-$(document).on('click', event => { $('#spellcheck-menu').addClass('hidden'); });
+$(document).on('click', event => {
+	$('.context-menu').addClass('hidden');
+});
 
 $(document).on('contextmenu', '.CodeMirror-line', event => {
 	if (event.originalEvent && event.originalEvent.button === 0) {

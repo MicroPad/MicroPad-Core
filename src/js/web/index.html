@@ -443,8 +443,15 @@
 			<h5 class="preloader-text center-align">While you're waiting, how about a little riddle for you?<br /><img src="fonts/equation.svg" style="max-width: 90%; height: auto;" /></h5>
 		</div>
 
-		<div id="spellcheck-menu" class="hidden">
+		<div id="spellcheck-menu" class="context-menu hidden">
 			<ul></ul>
+		</div>
+
+		<div id="explorer-menu" class="context-menu hidden">
+			<ul>
+				<li><a href="javascript:renameContext();">Rename</a></li>
+				<li><a href="javascript:deleteContext();">Delete</a></li>
+			</ul>
 		</div>
 
 		<input id="inline-image-upload" type="file" style="display: none;" />
