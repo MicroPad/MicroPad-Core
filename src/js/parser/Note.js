@@ -154,6 +154,16 @@ exports.Note.prototype.toMarkdown = function(assets) {
 	return {title: this.title, md: mdNote};
 }
 
+exports.Note.prototype.getUsedAssets = function() {
+	var usedAssets = [];
+	for (var i = 0; i < this.elements.length; i++) {
+		var element = this.elements[i];
+		if (element.content === "AS") usedAssets.push(element.args.ext);
+	}
+
+	return usedAssets;
+}
+
 // Thanks to http://stackoverflow.com/a/4673436/998467
 if (!String.prototype.format) {
 	String.prototype.format = function() {

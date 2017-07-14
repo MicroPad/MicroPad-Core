@@ -1303,7 +1303,7 @@ function updateNotepadList() {
 			isUpdating = true;
 			$('#notepadList').html('');
 			notepadStorage.iterate(function(value, key, i) {
-				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(key));
+				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{1}</a></li>'.format(key.replace("'", "\\'"), key));
 			}, function() {
 				isUpdating = false;
 			});
@@ -1949,6 +1949,11 @@ function saveToBrowser(callback) {
 		resizePage($(this), false);
 	});
 
+	if (Math.floor(Math.random()*50)+1 === 50) {
+		//1 in 50 chance to clean out old assets
+		cleanAssets();
+	}
+
 	notepad.notepadAssets = Array.from(notepadAssets);
 	notepadStorage.setItem(notepad.title, stringify(notepad), function() {
 		updateNotepadList();
@@ -1970,6 +1975,10 @@ function loadFromBrowser(title) {
 		notepad.notepadAssets = res.notepadAssets;
 		window.initNotepad();
 	});
+}
+
+function cleanAssets() {
+	notepadAssets = notepad.getUsedAssets();
 }
 
 function handleUpload(event) {
