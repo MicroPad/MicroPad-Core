@@ -6,12 +6,6 @@ onmessage = function(event) {
 	var hasProcessedYet = (msg.method !== "diff");
 
 	var xhr = new XMLHttpRequest();
-	xhr.upload.addEventListener("progress", function(event) {
-		if (msg.req === "cuePUT") var verb = "Upload";
-		if (msg.req === "cueGET") var verb = "Download";
-
-		progress(event, verb);
-	});
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			if (xhr.status == 200) {
@@ -52,16 +46,6 @@ function hasProcessed(token, filename, callback) {
 		}
 	});
 
-}
-
-function progress(event, type) {
-	if (event.lengthComputable) {
-		postMessage({
-			req: "progress",
-			type: type,
-			percentage: parseInt((event.loaded/event.total)*100)
-		});
-	}
 }
 
 function apiPostSync(url, params, callback) {
