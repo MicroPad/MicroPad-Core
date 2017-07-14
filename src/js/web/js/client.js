@@ -556,6 +556,7 @@ window.onload = function() {
 
 								$('#' + element.args.id + '> .fileHolder > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
 								$('#' + element.args.id + '> .fileHolder > a').html(element.args.filename);
+								$('#file-upload').val(null);
 							}
 						});
 
