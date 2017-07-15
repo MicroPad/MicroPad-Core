@@ -31,6 +31,15 @@ exports.Note.prototype.addElement = function(type, args, content) {
 exports.Note.prototype.search = function(query) {
 	var pattern = new RegExp("\\b"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
 	if (pattern.test(this.title)) return this;
+
+	if (query.length > 1 && query.charAt(0) == '#') {
+		pattern = new RegExp("(^|\\s)"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")+"(\\b)", 'i');
+		for (var i = 0; i < this.elements.length; i++) {
+			var el = this.elements[i];
+			if (el.type !== "markdown") return;
+			if (pattern.test(el.content)) return this;
+		}
+	}
 	return false;
 }
 

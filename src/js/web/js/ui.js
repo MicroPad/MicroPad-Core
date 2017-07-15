@@ -294,3 +294,9 @@ function updateEditor(useOldEditor, init) {
 		$('#md-use-old-editor').prop("checked", false);
 	}
 }
+
+function searchHashtag(hashtag) {
+	$('#search-text').val(hashtag);
+	$('#search').modal('open');
+	$('#search-text').trigger('input');
+}
