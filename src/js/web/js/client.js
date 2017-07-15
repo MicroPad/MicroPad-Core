@@ -131,7 +131,7 @@ showdown.extension('hashtags', function() {
 			type: 'lang',
 			regex: /(^|\s)(#[a-z\d-]+)/gi,
 			replace: function(s, match) {
-				matches.push('<a href="javascript:searchHashtag(\'#{0}\');">#{0}</a>'.format(s.split("#")[1]));
+				matches.push('<a href="javascript:searchHashtag(\'#{1}\');">#{0}</a>'.format(s, s.split("#")[1]));
 				var n = matches.length - 1;
 				return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
 			}
