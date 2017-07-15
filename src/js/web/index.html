@@ -27,7 +27,7 @@
 					<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
 					<!-- <a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a> -->
 					<ul class="left">
-						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v2.4.0-beta" style="font-weight: 100; font-size: 1rem;">β</em></span>
+						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v2.5.0-beta" style="font-weight: 100; font-size: 1rem;">β</em></span>
 					</ul>
 
 					<ul id="nav-desktop" class="right hide-on-med-and-down">
@@ -451,6 +451,17 @@
 			<ul>
 				<li><a href="javascript:renameContext();">Rename</a></li>
 				<li><a href="javascript:deleteContext();">Delete</a></li>
+			</ul>
+		</div>
+
+		<div id="insert-menu" class="context-menu hidden">
+			<ul>
+				<li><a href="javascript:insert('markdown');">Text (Markdown-formatted)</a></li>
+				<li><a href="javascript:uploadDocx();">Upload Microsoft&reg; Word Document</a></li>
+				<li><a href="javascript:insert('drawing');">Drawing</a></li>
+				<li><a href="javascript:insert('image');">Image</a></li>
+				<li><a href="javascript:insert('file');">File</a></li>
+				<li><a href="javascript:insertRecording();">Recording</a></li>
 			</ul>
 		</div>
 

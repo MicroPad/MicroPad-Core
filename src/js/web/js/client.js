@@ -316,6 +316,17 @@ window.onload = function() {
 			$('#insert').modal('open');
 		}
 	});
+
+	$('#viewer').on('contextmenu', e => {
+		if (e.target == $('#viewer')[0] && note && !isDropdownActive()) {
+			event.preventDefault();
+			lastClick.x = e.pageX;
+			lastClick.y = e.pageY - 128;
+			$('#insert-menu').removeClass('hidden');
+			$('#insert-menu').attr('style', 'left: {0}; top: {1};'.format(event.pageX, event.pageY));
+		}
+	});
+
 	function isDropdownActive() {
 		return $('.dropdown-content.active').length > 0;
 	}
