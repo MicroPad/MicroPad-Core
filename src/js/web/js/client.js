@@ -164,6 +164,7 @@ window.onload = function() {
 		element: document.getElementById("md-textarea"),
 		autofocus: true,
 		tabSize: 4,
+		sanitize: true,
 		placeholder: "Write your content here (supports Markdown)",
 		toolbar: ["bold", "italic", "|", "heading-1", "heading-2", "heading-3", "|", "unordered-list", {
 			name: "todo",
@@ -1514,8 +1515,9 @@ function loadNote(id, delta) {
 
 		switch (element.type) {
 			case "markdown":
+				element.content = element.content.replace(/<script.*?>.*?<\/script>/igm, '');
 				elementDiv.style.fontSize = element.args.fontSize;
-				elementDiv.innerHTML += md.makeHtml(element.content);
+				elementDiv.innerHTML += md.makeHtml(element.content).replace(/<script.*?>.*?<\/script>/igm, '');
 				asciimath.translate(undefined, true);
 				drawPictures();
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
@@ -1859,7 +1861,7 @@ function initDrawing(img) {
 }
 
 function processEditedMarkdown() {
-	currentTarget.html('<p class="handle">::::</p>'+md.makeHtml(lastEditedElement.content));
+	currentTarget.html('<p class="handle">::::</p>'+md.makeHtml(lastEditedElement.content).replace(/<script.*?>.*?<\/script>/igm, ''));
 
 	var checkedTodoItems = currentTarget.find('.task-list-item input:checked');
 	if (checkedTodoItems.length > 5) {
