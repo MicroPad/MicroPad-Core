@@ -1561,31 +1561,30 @@ function loadNote(id, delta) {
 				element.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
 
 				if (inlineImages) {
-					if (inlineImages) {
-						for (let i = 0; i < inlineImages.length; i++) {
-							let uuid = inlineImages[i];
+					for (let i = 0; i < inlineImages.length; i++) {
+						let uuid = inlineImages[i];
+						if (!notepadAssets.has(uuid)) notepadAssets.add(uuid);
 
-							assetStorage.getItem(uuid, (err, blob) => {
-								if (!blob) {
-									setTimeout(() => {
-										arguments.callee(err, blob);
-									}, 500);
-									return;
-								}
-								elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(URL.createObjectURL(blob)));
-								var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
-								elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(blob), drawingName));
-								if ($('#'+drawingName).length > 0) {
-									var trimmed = false;
-									$('#'+drawingName)[0].onload = function() {
-										if (!trimmed) {
-											trimmed = true;
-											initDrawing($('#'+drawingName)[0]);
-										}
+						assetStorage.getItem(uuid, (err, blob) => {
+							if (!blob) {
+								setTimeout(() => {
+									arguments.callee(err, blob);
+								}, 500);
+								return;
+							}
+							elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(URL.createObjectURL(blob)));
+							var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
+							elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(blob), drawingName));
+							if ($('#'+drawingName).length > 0) {
+								var trimmed = false;
+								$('#'+drawingName)[0].onload = function() {
+									if (!trimmed) {
+										trimmed = true;
+										initDrawing($('#'+drawingName)[0]);
 									}
 								}
-							});
-						}
+							}
+						});
 					}
 				}
 				break;
@@ -1903,6 +1902,7 @@ function processEditedMarkdown() {
 	if (inlineImages) {
 		for (let i = 0; i < inlineImages.length; i++) {
 			let uuid = inlineImages[i];
+			if (!notepadAssets.has(uuid)) notepadAssets.add(uuid);
 
 			assetStorage.getItem(uuid, (err, blob) => {
 				if (!blob) {

@@ -302,6 +302,17 @@ exports.Note.prototype.getUsedAssets = function() {
 	for (var i = 0; i < this.elements.length; i++) {
 		var element = this.elements[i];
 		if (element.content === "AS") usedAssets.push(element.args.ext);
+
+		if (element.type === "markdown") {
+			var inlineImages = [];
+			element.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => { inlineImages.push(p1); });
+			element.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
+
+			if (inlineImages) {
+				let uuid = inlineImages[i];
+				usedAssets.push(uuid);
+			}
+		}
 	}
 
 	return usedAssets;
