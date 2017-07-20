@@ -310,7 +310,7 @@ exports.Note.prototype.getUsedAssets = function() {
 
 			if (inlineImages) {
 				let uuid = inlineImages[i];
-				usedAssets.push(uuid);
+				if (uuid) usedAssets.push(uuid);
 			}
 		}
 	}
