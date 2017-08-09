@@ -1,6 +1,7 @@
 var appStorage;
 var notepadStorage;
 var assetStorage;
+var hasLoadedStorage = false;
 
 var notepad;
 var note;
@@ -42,6 +43,7 @@ localforage.defineDriver(window.cordovaSQLiteDriver).then(() => {
 		storeName: 'assets'
 	});
 
+	hasLoadedStorage = true;
 	updateNotepadList();
 });
 
@@ -78,6 +80,12 @@ function initNotepad() {
 	lastClick = { x: 0, y: 0 };
 	todoShowToggle = {};
 
+	if (notepad.notepadAssets) {
+		notepadAssets = new Set(notepad.notepadAssets);
+	} else {
+		notepadAssets = new Set();
+	}
+
 	mainView.router.loadPage("notepad.html");
 }
 
@@ -93,6 +101,7 @@ function loadNotepad(title) {
 }
 
 function saveNotepad(callback) {
+	notepad.notepadAssets = Array.from(notepadAssets);
 	notepadStorage.setItem(notepad.title, stringify(notepad), function() {
 		if (callback) callback();
 	});
@@ -109,6 +118,11 @@ function stringify(obj) {
 	});
 }
 
+function loadNote(id) {
+	note = notepadObjects[id];
+	mainView.router.loadPage("note.html");
+}
+
 //Thanks to http://stackoverflow.com/a/4673436/998467
 if (!String.prototype.format) {
 	String.prototype.format = function() {
@@ -120,4 +134,40 @@ if (!String.prototype.format) {
 			;
 		});
 	};
+}
+
+//Thanks to http://stackoverflow.com/a/17386803/998467
+function isCanvasBlank(canvas) {
+	var blank = document.createElement('canvas');
+	blank.width = canvas.width;
+	blank.height = canvas.height;
+
+	return canvas.toDataURL() == blank.toDataURL();
+}
+
+//Thanks to http://stackoverflow.com/a/12300351/998467
+function dataURItoBlob(dataURI) {
+	// convert base64 to raw binary data held in a string
+	// doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+	var byteString = atob(dataURI.split(',')[1]);
+
+	// separate out the mime component
+	var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+	// write the bytes of the string to an ArrayBuffer
+	var ab = new ArrayBuffer(byteString.length);
+	var ia = new Uint8Array(ab);
+	for (var i = 0; i < byteString.length; i++) {
+		ia[i] = byteString.charCodeAt(i);
+	}
+
+	// write the ArrayBuffer to a blob, and you're done
+	var blob = new Blob([ab], { type: mimeString });
+	return blob;
+}
+
+function blobToDataURL(blob, callback) {
+	var a = new FileReader();
+	a.onload = function(e) { callback(e.target.result); }
+	a.readAsDataURL(blob);
 }
