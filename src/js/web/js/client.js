@@ -151,6 +151,33 @@ showdown.extension('hashtags', function() {
 	]
 });
 
+showdown.extension('quick-maths', function() {
+	var matches = [];
+	return [
+		{
+			type: 'lang',
+			regex: /\/\/([^]+?)\/\//gi,
+			replace: function(s, match) {
+				matches.push('==={0}==='.format(match));
+				var n = matches.length - 1;
+				return '%PLACEHOLDER4' + n + 'ENDPLACEHOLDER4%';
+			}
+		},
+		{
+			type: 'output',
+			filter: function(text) {
+				for (var i = 0; i < matches.length; ++i) {
+					var pat = '%PLACEHOLDER4' + i + 'ENDPLACEHOLDER4%';
+					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+				}
+				//reset array
+				matches = [];
+				return text;
+			}
+		}
+	]
+});
+
 var md = new showdown.Converter({
 	parseImgDimensions: true,
 	simplifiedAutoLink: true,
@@ -159,7 +186,7 @@ var md = new showdown.Converter({
 	tasklists: true,
 	prefixHeaderId: 'mdheader_',
 	smoothLivePreview: true,
-	extensions: ['maths', 'tex-maths', 'graphs', 'hashtags']
+	extensions: ['maths', 'tex-maths', 'graphs', 'hashtags', 'quick-maths']
 });
 
 $(document).ready(function() {
