@@ -22,6 +22,7 @@ var uploadWorker = new Worker('js/uploadWorker.js');
 var putRequests = [];
 var currentTarget;
 var dictionary;
+var userDictionary = new Set();
 var simplemde;
 
 /** Setup localforage */
@@ -123,6 +124,60 @@ showdown.extension('graphs', function() {
 	]
 });
 
+showdown.extension('hashtags', function() {
+	var matches = [];
+	return [
+		{
+			type: 'lang',
+			regex: /(^|\s)(#[a-z\d-]+)/gi,
+			replace: function(s, match) {
+				matches.push('<a href="javascript:searchHashtag(\'#{1}\');">{0}</a>'.format(s, s.split("#")[1]));
+				var n = matches.length - 1;
+				return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
+			}
+		},
+		{
+			type: 'output',
+			filter: function(text) {
+				for (var i = 0; i < matches.length; ++i) {
+					var pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
+					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+				}
+				//reset array
+				matches = [];
+				return text;
+			}
+		}
+	]
+});
+
+showdown.extension('quick-maths', function() {
+	var matches = [];
+	return [
+		{
+			type: 'lang',
+			regex: /\/\/([^]+?)\/\//gi,
+			replace: function(s, match) {
+				matches.push('==={0}==='.format(match));
+				var n = matches.length - 1;
+				return '%PLACEHOLDER4' + n + 'ENDPLACEHOLDER4%';
+			}
+		},
+		{
+			type: 'output',
+			filter: function(text) {
+				for (var i = 0; i < matches.length; ++i) {
+					var pat = '%PLACEHOLDER4' + i + 'ENDPLACEHOLDER4%';
+					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+				}
+				//reset array
+				matches = [];
+				return text;
+			}
+		}
+	]
+});
+
 var md = new showdown.Converter({
 	parseImgDimensions: true,
 	simplifiedAutoLink: true,
@@ -131,7 +186,7 @@ var md = new showdown.Converter({
 	tasklists: true,
 	prefixHeaderId: 'mdheader_',
 	smoothLivePreview: true,
-	extensions: ['maths', 'tex-maths', 'graphs']
+	extensions: ['maths', 'tex-maths', 'graphs', 'hashtags', 'quick-maths']
 });
 
 $(document).ready(function() {
@@ -144,6 +199,16 @@ window.onload = function() {
 			inlineMath: [[';;', ';;']]
 		}
 	});
+
+	appStorage.getItem("dictionary", (err, d) => {
+		if (err) return;
+		userDictionary = new Set(d);
+	});
+
+	appStorage.getItem("useOldEditor", (err, d) => {
+		if (err) return;
+		updateEditor(d, true);
+	});	
 	
 	dictionary = new Typo("en_US", false, false, {
 		dictionaryPath: "dict",
@@ -153,6 +218,7 @@ window.onload = function() {
 		element: document.getElementById("md-textarea"),
 		autofocus: true,
 		tabSize: 4,
+		sanitize: true,
 		placeholder: "Write your content here (supports Markdown)",
 		toolbar: ["bold", "italic", "|", "heading-1", "heading-2", "heading-3", "|", "unordered-list", {
 			name: "todo",
@@ -210,44 +276,18 @@ window.onload = function() {
 		if (!currentTarget) return;
 		
 		lastEditedElement.content = simplemde.value();
-		currentTarget.html('<p class="handle">::::</p>'+md.makeHtml(lastEditedElement.content));
+		processEditedMarkdown();
+	});
 
-		var checkedTodoItems = currentTarget.find('.task-list-item input:checked');
-		if (checkedTodoItems.length > 5) {
-			todoShowToggle[currentTarget[0].id] = false;
-			currentTarget.find('.handle').after('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
-		}
+	simplemde.codemirror.on('update', function () {
+		applyDictionary();
+	});
 
-		var inlineImages = [];
-		lastEditedElement.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => { inlineImages.push(p1); });
-		lastEditedElement.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
-
-		if (inlineImages) {
-			for (let i = 0; i < inlineImages.length; i++) {
-				let uuid = inlineImages[i];
-
-				assetStorage.getItem(uuid, (err, blob) => {
-					if (!blob) {
-						setTimeout(() => {
-							arguments.callee(err, blob);
-						}, 500);
-						return;
-					}
-					currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(URL.createObjectURL(blob)));
-					var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
-					currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(blob), drawingName));
-					if ($('#'+drawingName).length > 0) {
-						var trimmed = false;
-						$('#'+drawingName)[0].onload = function() {
-							if (!trimmed) {
-								trimmed = true;
-								initDrawing($('#'+drawingName)[0]);
-							}
-						}
-					}
-				});
-			}
-		}
+	$('#md-textarea-old').bind('input propertychange', function() {
+		if (!currentTarget) return;
+		
+		lastEditedElement.content = $('#md-textarea-old').val();
+		processEditedMarkdown();
 	});
 
 	document.getElementById("inline-image-upload").addEventListener("change", function(event) {
@@ -331,6 +371,17 @@ window.onload = function() {
 			$('#insert').modal('open');
 		}
 	});
+
+	$('#viewer').on('contextmenu', e => {
+		if (e.target == $('#viewer')[0] && note && !isDropdownActive()) {
+			event.preventDefault();
+			lastClick.x = e.pageX;
+			lastClick.y = e.pageY - 128;
+			$('#insert-menu').removeClass('hidden');
+			$('#insert-menu').attr('style', 'left: {0}; top: {1};'.format(event.pageX, event.pageY));
+		}
+	});
+
 	function isDropdownActive() {
 		return $('.dropdown-content.active').length > 0;
 	}
@@ -400,8 +451,15 @@ window.onload = function() {
 							inDuration: 100,
 							ready: function() {
 								simplemde.value(element.content);
+								$('#md-textarea-old').val(element.content);
+								applyDictionary();
 								let info = simplemde.codemirror.getScrollInfo();
 								simplemde.codemirror.scrollTo(info.width, info.height);
+
+								appStorage.getItem("useOldEditor", (err, d) => {
+									if (err) return;
+									if (d == 1) $('#md-textarea-old').focus();
+								});
 							},
 							complete: function() {
 								updateReference({
@@ -564,6 +622,7 @@ window.onload = function() {
 
 								$('#' + element.args.id + '> .fileHolder > a').attr('href', 'javascript:downloadFile(\'{0}\');'.format(element.args.id));
 								$('#' + element.args.id + '> .fileHolder > a').html(element.args.filename);
+								$('#file-upload').val(null);
 							}
 						});
 
@@ -608,8 +667,13 @@ window.onload = function() {
 			}
 		}).on('resizemove', function(event) {
 			var resizeObj = event.target;
-			if ($(event.target).prop("tagName") == "IMG") resizeObj = $('#'+event.target.id.split("_")[1])[0];
-			$(resizeObj).css('width', parseInt($(resizeObj).css('width')) + 10 + event.dx);
+			var resizeExtra = 10;
+			if ($(event.target).prop("tagName") == "IMG") {
+				resizeObj = $('#'+event.target.id.split("_")[1])[0];
+				resizeExtra = 0;
+			}
+
+			$(resizeObj).css('width', parseInt($(resizeObj).css('width')) + resizeExtra + event.dx);
 			$(resizeObj).css('height', 'auto');
 			resizePage($(resizeObj));
 			event.target = resizeObj;
@@ -623,81 +687,6 @@ window.onload = function() {
 			$('#source_' + event.target.id).css('left', parseInt($('#' + event.target.id).css('left')) + parseInt($('#' + event.target.id).css('width')) + 10 + "px");
 			$('#source_' + event.target.id).css('top', $('#' + event.target.id).css('top'));
 		}
-	}
-
-	/** Pen Input Handler */
-	$(window).resize(function() {
-		resizeCanvas();
-		mobileNav();
-	});
-	canvasCtx = $('#drawing-viewer')[0].getContext("2d");
-	resizeCanvas();
-	canvasCtx.strokeStyle = "#000000";
-	var ongoingTouches = new Array();
-	$('#drawing-viewer')[0].onpointerdown = function(event) {
-		if (true) {
-			ongoingTouches.push(copyTouch(event));
-			canvasCtx.beginPath();
-		}
-	}
-	$('#drawing-viewer')[0].onpointermove = function(event) {
-		var pos = realPos(event);
-		if (event.pressure > 0) {
-			if (event.buttons === 32) {
-				canvasCtx.clearRect(pos.x - 10, pos.y - 10, 20, 20);
-			}
-			else {
-				var idx = ongoingTouchIndexById(event.pointerId);
-
-				canvasCtx.beginPath();
-				ongoingPos = realPos(ongoingTouches[idx]);
-				canvasCtx.moveTo(ongoingPos.x, ongoingPos.y);
-				canvasCtx.lineTo(pos.x, pos.y);
-				canvasCtx.lineWidth = event.pressure * 10;
-				canvasCtx.lineCap = "round";
-				canvasCtx.stroke();
-
-				ongoingTouches.splice(idx, 1, copyTouch(event));
-			}
-		}
-	}
-	$('#drawing-viewer')[0].onpointerup = function(event) {
-		var pos = realPos(event);
-		var idx = ongoingTouchIndexById(event.pointerId);
-		if (idx >= 0 && event.buttons !== 32) {
-			canvasCtx.lineWidth = event.pressure * 10;
-			canvasCtx.fillStyle = "#000000";
-			canvasCtx.beginPath();
-			ongoingPos = realPos(ongoingTouches[idx]);
-			canvasCtx.moveTo(ongoingPos.x, ongoingPos.y);
-			canvasCtx.lineTo(pos.x, pos.y);
-
-			ongoingTouches.splice(idx, 1);
-		}
-	}
-	$('#drawing-viewer')[0].onpointercancel = function(event) {
-		var idx = ongoingTouchIndexById(event.pointerId);
-		ongoingTouches.splice(idx, 1);
-	}
-	function copyTouch(touch) {
-		return { identifier: touch.pointerId, pageX: touch.pageX, pageY: touch.pageY };
-	}
-
-	function realPos(touchEvent) {
-		return {
-			x: touchEvent.pageX - canvasOffset.left,
-			y: touchEvent.pageY - canvasOffset.top
-		};
-	}
-	function ongoingTouchIndexById(idToFind) {
-		for (var i = 0; i < ongoingTouches.length; i++) {
-			var id = ongoingTouches[i].identifier;
-
-			if (id == idToFind) {
-				return i;
-			}
-		}
-		return -1;
 	}
 
 	$('#new-notepad').modal({
@@ -1301,7 +1290,9 @@ function downloadFile(elementID) {
 	$('#fileEditor').modal('close');
 }
 
-function updateTitle() {
+function updateTitle(newTitle) {
+	if (!newTitle) newTitle = $('#title-input').val();
+
 	if (parents.length === 1) {
 		//Delete old Notepad
 		appStorage.getItem('syncToken', (err, token) => {
@@ -1310,7 +1301,7 @@ function updateTitle() {
 					switch (window.platform) {
 						case "web":
 							notepadStorage.removeItem(notepad.title, function() {
-								notepad.title = $('#title-input').val();
+								notepad.title = newTitle;
 								$('#parents > span:nth-child(1)').html(notepad.title);
 								saveToBrowser();
 								setTimeout(function() {
@@ -1326,7 +1317,7 @@ function updateTitle() {
 								}).then(function(file) {
 									return file.deleteAsync();
 								}).done(function() {
-									notepad.title = $('#title-input').val();
+									notepad.title = newTitle;
 									saveToBrowser(undefined, true);
 								});
 							break;
@@ -1352,7 +1343,7 @@ function updateTitle() {
 	}
 	else if (parents.length > 1 && !note) {
 		//Rename Section
-		parents[parents.length - 1].title = $('#title-input').val();
+		parents[parents.length - 1].title = newTitle;
 		$('#parents > span:nth-last-child(2)').html(parents[parents.length - 1].title);
 		notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 		saveToBrowser();
@@ -1360,7 +1351,7 @@ function updateTitle() {
 	}
 	else if (note) {
 		//Rename Note
-		note.title = $('#title-input').val();
+		note.title = newTitle;
 		$('#open-note').html(note.title);
 		notepad.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 		saveToBrowser();
@@ -1378,7 +1369,7 @@ function updateNotepadList() {
 			isUpdating = true;
 			$('#notepadList').html('');
 			notepadStorage.iterate(function(value, key, i) {
-				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{0}</a></li>'.format(key));
+				$('#notepadList').append('<li><a href="javascript:loadFromBrowser(\'{0}\');">{1}</a></li>'.format(key.replace('"', '&quot;').replace("'", "\\'"), key));
 			}, function() {
 				isUpdating = false;
 			});
@@ -1578,8 +1569,9 @@ function loadNote(id, delta) {
 
 		switch (element.type) {
 			case "markdown":
+				element.content = element.content.replace(/<script.*?>.*?<\/script>/igm, '');
 				elementDiv.style.fontSize = element.args.fontSize;
-				elementDiv.innerHTML += md.makeHtml(element.content);
+				elementDiv.innerHTML += md.makeHtml(element.content).replace(/<script.*?>.*?<\/script>/igm, '');
 				asciimath.translate(undefined, true);
 				drawPictures();
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
@@ -1596,31 +1588,30 @@ function loadNote(id, delta) {
 				element.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
 
 				if (inlineImages) {
-					if (inlineImages) {
-						for (let i = 0; i < inlineImages.length; i++) {
-							let uuid = inlineImages[i];
+					for (let i = 0; i < inlineImages.length; i++) {
+						let uuid = inlineImages[i];
+						if (!notepadAssets.has(uuid)) notepadAssets.add(uuid);
 
-							assetStorage.getItem(uuid, (err, blob) => {
-								if (!blob) {
-									setTimeout(() => {
-										arguments.callee(err, blob);
-									}, 500);
-									return;
-								}
-								elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(URL.createObjectURL(blob)));
-								var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
-								elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(blob), drawingName));
-								if ($('#'+drawingName).length > 0) {
-									var trimmed = false;
-									$('#'+drawingName)[0].onload = function() {
-										if (!trimmed) {
-											trimmed = true;
-											initDrawing($('#'+drawingName)[0]);
-										}
+						assetStorage.getItem(uuid, (err, blob) => {
+							if (!blob) {
+								setTimeout(() => {
+									arguments.callee(err, blob);
+								}, 500);
+								return;
+							}
+							elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(URL.createObjectURL(blob)));
+							var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
+							elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(blob), drawingName));
+							if ($('#'+drawingName).length > 0) {
+								var trimmed = false;
+								$('#'+drawingName)[0].onload = function() {
+									if (!trimmed) {
+										trimmed = true;
+										initDrawing($('#'+drawingName)[0]);
 									}
 								}
-							});
-						}
+							}
+						});
 					}
 				}
 				break;
@@ -1630,6 +1621,7 @@ function loadNote(id, delta) {
 				assetStorage.getItem(element.args.ext).then(blob => {
 					if (!notepadAssets.has(element.args.ext)) notepadAssets.add(element.args.ext);
 					elementDiv.innerHTML += '<img class="drawing" style="width: auto; height: auto;" />';
+					$(elementDiv).removeClass('resize');
 
 					var trimmed = false;
 					$(elementDiv).find('img')[0].onload = function() {
@@ -1678,6 +1670,11 @@ function loadNote(id, delta) {
 			updateInstructions();
 			autoExpandExplorer();
 		}
+	}
+
+	if (note.elements.length === 0) {
+		updateInstructions();
+		autoExpandExplorer();
 	}
 }
 
@@ -1916,6 +1913,48 @@ function initDrawing(img) {
 	img.src = trimmed;
 }
 
+function processEditedMarkdown() {
+	currentTarget.html('<p class="handle">::::</p>'+md.makeHtml(lastEditedElement.content).replace(/<script.*?>.*?<\/script>/igm, ''));
+
+	var checkedTodoItems = currentTarget.find('.task-list-item input:checked');
+	if (checkedTodoItems.length > 5) {
+		todoShowToggle[currentTarget[0].id] = false;
+		currentTarget.find('.handle').after('<a class="hidden-todo-msg" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(currentTarget[0].id, checkedTodoItems.length));
+	}
+
+	var inlineImages = [];
+	lastEditedElement.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => { inlineImages.push(p1); });
+	lastEditedElement.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
+
+	if (inlineImages) {
+		for (let i = 0; i < inlineImages.length; i++) {
+			let uuid = inlineImages[i];
+			if (!notepadAssets.has(uuid)) notepadAssets.add(uuid);
+
+			assetStorage.getItem(uuid, (err, blob) => {
+				if (!blob) {
+					setTimeout(() => {
+						arguments.callee(err, blob);
+					}, 500);
+					return;
+				}
+				currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(URL.createObjectURL(blob)));
+				var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
+				currentTarget[0].innerHTML = currentTarget[0].innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(blob), drawingName));
+				if ($('#'+drawingName).length > 0) {
+					var trimmed = false;
+					$('#'+drawingName)[0].onload = function() {
+						if (!trimmed) {
+							trimmed = true;
+							initDrawing($('#'+drawingName)[0]);
+						}
+					}
+				}
+			});
+		}
+	}
+}
+
 function readFileInputEventAsText(event, callback) {
 	var file = event.target.files[0];
 
@@ -1977,6 +2016,11 @@ function saveToBrowser(callback) {
 		resizePage($(this), false);
 	});
 
+	if (Math.floor(Math.random()*50)+1 === 50) {
+		//1 in 50 chance to clean out old assets
+		cleanAssets();
+	}
+
 	notepad.notepadAssets = Array.from(notepadAssets);
 	notepadStorage.setItem(notepad.title, stringify(notepad), function() {
 		updateNotepadList();
@@ -1998,6 +2042,10 @@ function loadFromBrowser(title) {
 		notepad.notepadAssets = res.notepadAssets;
 		window.initNotepad();
 	});
+}
+
+function cleanAssets() {
+	notepadAssets = notepad.getUsedAssets();
 }
 
 function handleUpload(event) {
@@ -2131,6 +2179,14 @@ function confirmAsync(question) {
 	}
 }
 
+function ask(title, placeholder) {
+	switch (window.platform) {
+		case "web":
+			return prompt(title, placeholder);
+			break;
+	}
+}
+
 function stringify(obj) {
 	var seen = [];
 	return JSON.stringify(obj, (key, val) => {
@@ -2189,4 +2245,15 @@ function blobToDataURL(blob, callback) {
 	var a = new FileReader();
 	a.onload = function(e) { callback(e.target.result); }
 	a.readAsDataURL(blob);
+}
+
+function addslashes(string) {
+	return string.replace(/\\/g, '\\\\').
+		replace(/\u0008/g, '\\b').
+		replace(/\t/g, '\\t').
+		replace(/\n/g, '\\n').
+		replace(/\f/g, '\\f').
+		replace(/\r/g, '\\r').
+		replace(/'/g, '\\\'').
+		replace(/"/g, '\\"');
 }

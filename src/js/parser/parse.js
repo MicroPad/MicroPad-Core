@@ -90,6 +90,16 @@ Notepad.prototype.toMarkdown = function(callback, assets) {
 		}
 	});
 }
+Notepad.prototype.getUsedAssets = function() {
+	var usedAssets = [];
+
+	for (var i = 0; i < this.sections.length; i++) {
+		var section = this.sections[i];
+		usedAssets.push.apply(usedAssets, section.getUsedAssets());
+	}
+
+	return new Set(usedAssets);
+}
 
 var Section = function(title) {
 	this.parent = undefined;
@@ -166,6 +176,21 @@ Section.prototype.toMarkdown = function(b64Assets) {
 	}
 
 	return mdNoteList;
+}
+Section.prototype.getUsedAssets = function() {
+	var usedAssets = [];
+
+	for (var i = 0; i < this.sections.length; i++) {
+		var section = this.sections[i];
+		usedAssets.push.apply(usedAssets, section.getUsedAssets());
+	}
+
+	for (var i = 0; i < this.notes.length; i++) {
+		var note = this.notes[i];
+		usedAssets.push.apply(usedAssets, note.getUsedAssets());
+	}
+
+	return usedAssets;
 }
 
 var supportedAddons = [];

@@ -169,7 +169,7 @@ nav {
 }
 
 #notepad-explorer li > ul {
-	padding-left: 10px; !important
+	padding-left: 20px; !important
 }
 
 #notepad-explorer .exp-note {
@@ -276,7 +276,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 }
 
 .insert-icon {
-	margin-left: calc(50% - 6rem);
+	margin-left: calc(50% - 3rem);
 	cursor: pointer;
 }
 
@@ -306,7 +306,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	display: none;
 }
 
-#spellcheck-menu {
+.context-menu {
 	position: absolute;
 	z-index: 100000;
 	background: #fff;
@@ -321,4 +321,12 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	height: calc(90% - 15px);
 	width: 100%;
 	/*margin-top: 10px;*/
+}
+
+#insert {
+	max-height: calc(6rem + 140px);
+}
+
+#insert .insert-icon {
+	font-size: 3rem;
 }

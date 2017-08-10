@@ -31,6 +31,15 @@ exports.Note.prototype.addElement = function(type, args, content) {
 exports.Note.prototype.search = function(query) {
 	var pattern = new RegExp("\\b"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
 	if (pattern.test(this.title)) return this;
+
+	if (query.length > 1 && query.charAt(0) == '#') {
+		pattern = new RegExp("(^|\\s)"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")+"(\\b)", 'i');
+		for (var i = 0; i < this.elements.length; i++) {
+			var el = this.elements[i];
+			if (el.type !== "markdown") return;
+			if (pattern.test(el.content)) return this;
+		}
+	}
 	return false;
 }
 
@@ -152,6 +161,27 @@ exports.Note.prototype.toMarkdown = function(assets) {
 	}
 
 	return {title: this.title, md: mdNote};
+}
+
+exports.Note.prototype.getUsedAssets = function() {
+	var usedAssets = [];
+	for (var i = 0; i < this.elements.length; i++) {
+		var element = this.elements[i];
+		if (element.content === "AS") usedAssets.push(element.args.ext);
+
+		if (element.type === "markdown") {
+			var inlineImages = [];
+			element.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => { inlineImages.push(p1); });
+			element.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
+
+			if (inlineImages) {
+				let uuid = inlineImages[i];
+				if (uuid) usedAssets.push(uuid);
+			}
+		}
+	}
+
+	return usedAssets;
 }
 
 // Thanks to http://stackoverflow.com/a/4673436/998467

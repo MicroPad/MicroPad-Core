@@ -46,30 +46,46 @@ function updateNotepadExplorer() {
 function addSectionToExplorer(parent, parentSelector, sec, currentPath) {
 	var uid = expUid;
 	expUid++;
-	parentSelector.append('<li id="exp-{1}" explorer-path="{2}" onclick="toggleExplorer(event, {1});" oncontextmenu="event.stopPropagation();showContextMenu(\'{2}\', \'s\');return false;"><i class="material-icons">book</i> {0} <span onclick="event.stopPropagation();loadSectionFromExplorer(\'{2}\')">(Open)</span><ul id="exp-{1}-s" class="expandable"></ul></li>'.format(sec.title, uid, currentPath.join()));
+	parentSelector.append('<li id="exp-{1}" explorer-path="{2}" onclick="toggleExplorer(event, {1});" oncontextmenu="event.stopPropagation();showContextMenu(event, \'{2}\', \'s\');return false;"><i class="material-icons">book</i> {0} <span onclick="event.stopPropagation();loadSectionFromExplorer(\'{2}\')">(Open)</span><ul id="exp-{1}-s" class="expandable"></ul></li>'.format(sec.title, uid, currentPath.join()));
 
 	for (var i = 0; i < sec.sections.length; i++) {
 		addSectionToExplorer(sec, $('#exp-'+uid+'-s'), sec.sections[i], currentPath.concat([i]));
 	}
 
 	for (var i = 0; i < sec.notes.length; i++) {
-		$('#exp-'+uid+'-s').append('<li class="exp-note" onclick="event.stopPropagation();loadNoteFromExplorer(\'{1}\');" oncontextmenu="event.stopPropagation();showContextMenu(\'{1}\', \'n\');return false;"><i class="material-icons">note</i> {0}</li>'.format(sec.notes[i].title, currentPath.concat([i]).join()));
+		$('#exp-'+uid+'-s').append('<li class="exp-note" onclick="event.stopPropagation();loadNoteFromExplorer(\'{1}\');" oncontextmenu="event.stopPropagation();showContextMenu(event, \'{1}\', \'n\');return false;"><i class="material-icons">note</i> {0}</li>'.format(sec.notes[i].title, currentPath.concat([i]).join()));
 	}
 }
 
-function showContextMenu(currentPath, type) {
+function showContextMenu(event, currentPath, type) {
 	switch (type) {
 		case "s":
 			loadSectionFromExplorer(currentPath);
-			$('#menu-button').sideNav('show');
 			break;
 
 		case "n":
 			loadNoteFromExplorer(currentPath);
-			setTimeout(() => {$('#menu-button').sideNav('show');}, 900)
 			break;
 	}
+
+	$('#explorer-menu').removeClass('hidden');
+	$('#explorer-menu').attr('style', 'left: {0}; top: {1};'.format(event.pageX, event.pageY));
 	return false;
+}
+
+function renameContext() {
+	var existingTitle = "";
+	if (note) {
+		existingTitle = note.title;
+	} else {
+		existingTitle = parents[parents.length - 1].title;
+	}
+
+	updateTitle(ask("Rename:", existingTitle));
+}
+
+function deleteContext() {
+	deleteOpen();
 }
 
 function toggleExplorer(event, uid, show) {
@@ -167,14 +183,23 @@ function insertMarkdown(editor, type, openTag, closeTag) {
 
 var lastSpellchecked;
 $(document).on('contextmenu', '.cm-spell-error', event => {
+	event.stopPropagation();
 	lastSpellchecked = event.target;
+
+	if (!event.pageX) {
+		let bounds = event.target.getBoundingClientRect();
+		event.pageX = bounds.left;
+		event.pageY = bounds.top;
+	}
+	console.log(event);
+
 	var suggestions = dictionary.suggest(lastSpellchecked.innerHTML);
+	$('#spellcheck-menu > ul').html('<li><em><a href="javascript:addToDictionary();">Add to dictionary</a></em></li>');
 	if (suggestions.length > 0) {
-		$('#spellcheck-menu > ul').html('');
 		for (var i = 0; i < suggestions.length; i++) $('#spellcheck-menu > ul').append('<li><a href="javascript:replaceSpelling(\'{0}\');">{0}</a></li>'.format(suggestions[i]));
 	}
 	else {
-		$('#spellcheck-menu > ul').html('No suggestions');
+		$('#spellcheck-menu > ul').append('<li>No suggestions</li>');
 	}
 
 	$('#spellcheck-menu').removeClass('hidden');
@@ -183,9 +208,95 @@ $(document).on('contextmenu', '.cm-spell-error', event => {
 	event.preventDefault();
 	return false;
 });
-$(document).on('click', event => { $('#spellcheck-menu').addClass('hidden'); });
+$(document).on('click', event => {
+	$('.context-menu').addClass('hidden');
+});
+
+$(document).on('contextmenu', '.CodeMirror-line', event => {
+	if (event.originalEvent && event.originalEvent.button === 0) {
+		let pos = simplemde.codemirror.getCursor();
+		pos.line--;
+		console.log(pos);
+
+		var counter = 0;
+		$('.CodeMirror-line').each(function(i) {
+			if (i !== pos.line) return;
+			
+			$(this).find('span > span').each(function(j) {
+				if (counter <= pos.ch) {
+					counter += $(this).text().length;
+				}
+				else {
+					console.log($(this));
+					simplemde.codemirror.setCursor(pos);
+					$(this).trigger('contextmenu');
+					return false;
+				}
+			});
+
+			return false;
+		});
+
+		event.preventDefault();
+		return false;
+	}
+});
 
 function replaceSpelling(replacement) {
 	var word = simplemde.codemirror.findWordAt(simplemde.codemirror.getCursor());
 	simplemde.codemirror.replaceRange(replacement, word.anchor, word.head);
+}
+
+function addToDictionary() {
+	var wordPos = simplemde.codemirror.findWordAt(simplemde.codemirror.getCursor());
+	var word = simplemde.codemirror.getLine(wordPos.anchor.line).substr(wordPos.anchor.ch, wordPos.head.ch-wordPos.anchor.ch);
+	userDictionary.add(word.toLowerCase());
+	appStorage.setItem("dictionary", Array.from(userDictionary));
+
+	applyDictionary();
+}
+
+function applyDictionary() {
+	$('.cm-spell-error').each(function(i) {
+		if (userDictionary.has($(this).text().toLowerCase())) $(this).removeClass('cm-spell-error');
+	});
+}
+
+$('#md-use-old-editor').change(event => {
+	if (event.target.checked) {
+		updateEditor(1);
+	}
+	else {
+		updateEditor(0);
+	}
+});
+
+function updateEditor(useOldEditor, init) {
+	if (!init) appStorage.setItem("useOldEditor", useOldEditor);
+	if (useOldEditor == 1) {
+		$('#md-textarea-old').val(simplemde.value());
+		$('#md-textarea-old').removeClass("hidden");
+
+		$(simplemde.codemirror.getWrapperElement()).addClass("hidden");
+		$('.editor-toolbar').addClass("hidden");
+		$('.editor-statusbar').addClass("hidden");
+
+		$('#md-use-old-editor').prop("checked", true);
+	}
+	else {
+		simplemde.value($('#md-textarea-old').val());
+		$('#md-textarea-old').addClass("hidden");
+
+		$(simplemde.codemirror.getWrapperElement()).removeClass("hidden");
+		$('.editor-toolbar').removeClass("hidden");
+		$('.editor-statusbar').removeClass("hidden");
+
+		$('#md-use-old-editor').prop("checked", false);
+	}
+}
+
+function searchHashtag(hashtag) {
+	$('#search-text').val(hashtag);
+	$('#search').modal('open');
+	$('#search-text').trigger('input');
 }

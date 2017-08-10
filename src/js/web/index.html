@@ -27,7 +27,7 @@
 					<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
 					<!-- <a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a> -->
 					<ul class="left">
-						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v2.3.0-alpha" style="font-weight: 100; font-size: 1rem;">α</em></span>
+						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v2.6.4-beta" style="font-weight: 100; font-size: 1rem;">β</em></span>
 					</ul>
 
 					<ul id="nav-desktop" class="right hide-on-med-and-down">
@@ -273,7 +273,7 @@
 						</div>
 
 						<div class="col m2 s6">
-							<img class="insert-icon tooltipped" style="width: 6rem; height: auto" data-position="bottom" data-delay="50" data-tooltip="Microsoft&reg; Word Document (docx)" onclick="uploadDocx();" src="fonts/MSWord.svg" />
+							<img class="insert-icon tooltipped" style="width: 3rem; height: auto" data-position="bottom" data-delay="50" data-tooltip="Microsoft&reg; Word Document (docx)" onclick="uploadDocx();" src="fonts/MSWord.svg" />
 						</div>
 
 						<div class="col m2 s6">
@@ -309,6 +309,7 @@
 							<div class="input-field">
 								<!-- <label for="md-textarea">Content (in Markdown)</label> -->
 								<textarea id="md-textarea"></textarea>
+								<textarea id="md-textarea-old" style="height: calc(90% - 10px); width: 100%; margin-top: 10px;" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" autofocus></textarea>
 							</div>
 						</div>
 
@@ -317,6 +318,7 @@
 								<input id="mdfs" type="text" value="16px" placeholder="Font Size" />
 								<input id="mdw" type="text" placeholder="Width" />
 								<input id="mdh" type="text" placeholder="Height" />
+								<input id="md-use-old-editor" type="checkbox" /> Use the native editor
 						</div>
 					</div>
 				</div>
@@ -441,8 +443,26 @@
 			<h5 class="preloader-text center-align">While you're waiting, how about a little riddle for you?<br /><img src="fonts/equation.svg" style="max-width: 90%; height: auto;" /></h5>
 		</div>
 
-		<div id="spellcheck-menu" class="hidden">
+		<div id="spellcheck-menu" class="context-menu hidden">
 			<ul></ul>
+		</div>
+
+		<div id="explorer-menu" class="context-menu hidden">
+			<ul>
+				<li><a href="javascript:renameContext();">Rename</a></li>
+				<li><a href="javascript:deleteContext();">Delete</a></li>
+			</ul>
+		</div>
+
+		<div id="insert-menu" class="context-menu hidden">
+			<ul>
+				<li><a href="javascript:insert('markdown');">Text (Markdown-formatted)</a></li>
+				<li><a href="javascript:uploadDocx();">Upload Microsoft&reg; Word Document</a></li>
+				<li><a href="javascript:insert('drawing');">Drawing</a></li>
+				<li><a href="javascript:insert('image');">Image</a></li>
+				<li><a href="javascript:insert('file');">File</a></li>
+				<li><a href="javascript:insertRecording();">Recording</a></li>
+			</ul>
 		</div>
 
 		<input id="inline-image-upload" type="file" style="display: none;" />
@@ -473,5 +493,6 @@
 		<script src="js/client.js"></script>
 		<script src="js/MicroSyncUX.js"></script>
 		<script src="js/ui.js"></script>
+		<script src="js/penInput.js"></script>
 	</body>
 </html>
