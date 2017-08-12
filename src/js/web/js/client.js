@@ -730,6 +730,12 @@ window.onload = function() {
 		if (latestResults.length > 0) Materialize.showStaggeredList('#search-results');
 	});
 
+	$('#search-text').keyup(e => {
+		if (e.keyCode === 13) {
+			$('#search-results > li:first > h4 > a')[0].click();
+		}
+	});
+
 	/** Recording Stuff */
 	$('#stop-recording-btn').on('click', function(event) {
 		rec.stop();
