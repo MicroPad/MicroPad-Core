@@ -156,7 +156,7 @@ showdown.extension('quick-maths', function() {
 	return [
 		{
 			type: 'lang',
-			regex: /\/\/([^]+?)\/\//gi,
+			regex: /''([^]+?)''/gi,
 			replace: function(s, match) {
 				matches.push('==={0}==='.format(match));
 				var n = matches.length - 1;
