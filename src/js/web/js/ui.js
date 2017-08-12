@@ -32,7 +32,7 @@ function showExplorer() {
 var expUid = 0;
 function updateNotepadExplorer() {
 	expUid = 0;
-	$('#notepad-explorer').html('<strong>{0}</strong><ul id="exp-{1}-s"></ul>'.format(notepad.title, expUid));
+	$('#notepad-explorer').html('<a href="javascript:toggleFullscreen();" style="color: white;">&raquo;</a> <strong>{0}</strong><ul id="exp-{1}-s"></ul>'.format(notepad.title, expUid));
 	expUid++;
 
 	for (var i = 0; i < notepad.sections.length; i++) {
@@ -100,6 +100,21 @@ function toggleExplorer(event, uid, show) {
 		}
 		else {
 			$("#exp-"+uid+"-s").toggle(300);
+		}
+	}
+}
+
+function toggleFullscreen() {
+	if (note) {
+		if (!isFullscreen) {
+			$('#viewer').addClass('mobile');
+			$('#notepad-explorer').hide();
+			Materialize.toast("Notepad Explorer hidden. Press \'F\' to show it again.", 1000);
+			$('#show-explorer').show();
+			isFullscreen = true;
+		}
+		else {
+			showExplorer();
 		}
 	}
 }
