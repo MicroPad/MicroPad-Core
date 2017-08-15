@@ -32,7 +32,7 @@ function showExplorer() {
 var expUid = 0;
 function updateNotepadExplorer() {
 	expUid = 0;
-	$('#notepad-explorer').html('<a href="javascript:toggleFullscreen();" style="color: white;">&raquo;</a> <strong>{0}</strong><ul id="exp-{1}-s"></ul>'.format(notepad.title, expUid));
+	$('#notepad-explorer').html('<a href="javascript:toggleFullscreen();" style="color: white;">&raquo;</a> <strong>{0}</strong><ul id="exp-{1}-s"></ul>'.format(removeHTML(notepad.title), expUid));
 	expUid++;
 
 	for (var i = 0; i < notepad.sections.length; i++) {
@@ -46,14 +46,14 @@ function updateNotepadExplorer() {
 function addSectionToExplorer(parent, parentSelector, sec, currentPath) {
 	var uid = expUid;
 	expUid++;
-	parentSelector.append('<li id="exp-{1}" explorer-path="{2}" onclick="toggleExplorer(event, {1});" oncontextmenu="event.stopPropagation();showContextMenu(event, \'{2}\', \'s\');return false;"><i class="material-icons">book</i> {0} <span onclick="event.stopPropagation();loadSectionFromExplorer(\'{2}\')">(Open)</span><ul id="exp-{1}-s" class="expandable"></ul></li>'.format(sec.title, uid, currentPath.join()));
+	parentSelector.append('<li id="exp-{1}" explorer-path="{2}" onclick="toggleExplorer(event, {1});" oncontextmenu="event.stopPropagation();showContextMenu(event, \'{2}\', \'s\');return false;"><i class="material-icons">book</i> {0} <span onclick="event.stopPropagation();loadSectionFromExplorer(\'{2}\')">(Open)</span><ul id="exp-{1}-s" class="expandable"></ul></li>'.format(removeHTML(sec.title), uid, currentPath.join()));
 
 	for (var i = 0; i < sec.sections.length; i++) {
 		addSectionToExplorer(sec, $('#exp-'+uid+'-s'), sec.sections[i], currentPath.concat([i]));
 	}
 
 	for (var i = 0; i < sec.notes.length; i++) {
-		$('#exp-'+uid+'-s').append('<li class="exp-note" onclick="event.stopPropagation();loadNoteFromExplorer(\'{1}\');" oncontextmenu="event.stopPropagation();showContextMenu(event, \'{1}\', \'n\');return false;"><i class="material-icons">note</i> {0}</li>'.format(sec.notes[i].title, currentPath.concat([i]).join()));
+		$('#exp-'+uid+'-s').append('<li class="exp-note" onclick="event.stopPropagation();loadNoteFromExplorer(\'{1}\');" oncontextmenu="event.stopPropagation();showContextMenu(event, \'{1}\', \'n\');return false;"><i class="material-icons">note</i> {0}</li>'.format(removeHTML(sec.notes[i].title), currentPath.concat([i]).join()));
 	}
 }
 
