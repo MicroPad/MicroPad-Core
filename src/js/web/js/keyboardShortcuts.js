@@ -12,18 +12,7 @@ function enableKeyboardShortcuts() {
 		}
 	});
 	Mousetrap.bind('f', e => {
-		if (note) {
-			if (!isFullscreen) {
-				$('#viewer').addClass('mobile');
-				$('#notepad-explorer').hide();
-				Materialize.toast("Notepad Explorer hidden. Press \'F\' to show it again.", 1000);
-				$('#show-explorer').show();
-				isFullscreen = true;
-			}
-			else {
-				showExplorer();
-			}
-		}
+		toggleFullscreen();
 	});
 	Mousetrap.bind('e', e => {
 		if (note && lastEditedElement) {

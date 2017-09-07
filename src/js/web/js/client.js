@@ -156,7 +156,7 @@ showdown.extension('quick-maths', function() {
 	return [
 		{
 			type: 'lang',
-			regex: /\/\/([^]+?)\/\//gi,
+			regex: /''([^]+?)''/gi,
 			replace: function(s, match) {
 				matches.push('==={0}==='.format(match));
 				var n = matches.length - 1;
@@ -725,9 +725,15 @@ window.onload = function() {
 		latestResults = notepad.search(query);
 		for (k in latestResults) {
 			var result = latestResults[k];
-			$('#search-results').append('<li style="opacity: 0;"><h4><a href="javascript:loadSearchResult({1});">{0}</a></h4></li>'.format(result.title, k));
+			$('#search-results').append('<li style="opacity: 0;"><h4><a href="javascript:loadSearchResult({1});">{0}</a></h4></li>'.format(removeHTML(result.title), k));
 		}
 		if (latestResults.length > 0) Materialize.showStaggeredList('#search-results');
+	});
+
+	$('#search-text').keyup(e => {
+		if (e.keyCode === 13) {
+			$('#search-results > li:first > h4 > a')[0].click();
+		}
 	});
 
 	/** Recording Stuff */
@@ -2256,4 +2262,8 @@ function addslashes(string) {
 		replace(/\r/g, '\\r').
 		replace(/'/g, '\\\'').
 		replace(/"/g, '\\"');
+}
+
+function removeHTML(string) {
+	return string.replace(/<[^>]*>/, "");
 }

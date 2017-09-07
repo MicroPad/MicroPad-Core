@@ -14,7 +14,7 @@ exports.Asset = Assets.Asset;
 exports.parseAssets = Assets.parse;
 
 var Notepad = function(title, lastModified) {
-	this.title = title;
+	this.title = removeHTML(title);
 	this.sections = [];
 	this.assets = new Assets.Assets();
 
@@ -103,7 +103,7 @@ Notepad.prototype.getUsedAssets = function() {
 
 var Section = function(title) {
 	this.parent = undefined;
-	this.title = title;
+	this.title = removeHTML(title);
 	this.sections = [];
 	this.notes = [];
 };
@@ -135,7 +135,7 @@ Section.prototype.toXMLObject = function() {
 	var parseableSection = {
 		section: {
 			$: {
-				title: this.title
+				title: removeHTML(this.title)
 			},
 			section: [],
 			note: []
@@ -469,4 +469,8 @@ if (!String.prototype.format) {
 			;
 		});
 	};
+}
+
+function removeHTML(string) {
+	return string.replace(/<[^>]*>/, "");
 }

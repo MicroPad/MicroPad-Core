@@ -3,7 +3,7 @@ var moment = require('moment');
 
 exports.Note = function(title, time, addons) {
 	this.parent = undefined;
-	this.title = title;
+	this.title = removeHTML(title);
 	this.time = Date.parse(time);
 	this.addons = addons;
 	this.bibliography = [];
@@ -47,7 +47,7 @@ exports.Note.prototype.toXMLObject = function() {
 	var parseableNote = {
 		note: {
 			$: {
-				title: this.title,
+				title: removeHTML(this.title),
 				time: moment(this.time).format('YYYY-MM-DDTHH:mm:ss.SSSZ')
 			},
 			addons: [],
@@ -195,4 +195,8 @@ if (!String.prototype.format) {
 			;
 		});
 	};
+}
+
+function removeHTML(string) {
+	return string.replace(/<[^>]*>/, "");
 }
