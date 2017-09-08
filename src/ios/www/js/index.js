@@ -2,6 +2,7 @@ var appStorage;
 var notepadStorage;
 var assetStorage;
 var hasLoadedStorage = false;
+var notepadAssets = new Set();
 
 var notepad;
 var note;

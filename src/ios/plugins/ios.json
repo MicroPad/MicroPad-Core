@@ -7,6 +7,9 @@
         "files": {}
     },
     "installed_plugins": {
+        "cordova-plugin-console": {
+            "PACKAGE_NAME": "com.getmicropad.MicroPad"
+        },
         "cordova-plugin-dialogs": {
             "PACKAGE_NAME": "com.getmicropad.MicroPad"
         },
@@ -17,9 +20,6 @@
             "PACKAGE_NAME": "com.getmicropad.MicroPad"
         },
         "cordova-sqlite-storage": {
-            "PACKAGE_NAME": "com.getmicropad.MicroPad"
-        },
-        "cordova-plugin-console": {
             "PACKAGE_NAME": "com.getmicropad.MicroPad"
         }
     },
