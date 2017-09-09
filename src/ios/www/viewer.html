@@ -1,0 +1,433 @@
+<html>
+<head>
+	<meta name="viewport" content="initial-scale=1.0,maximum-scale=10.0">
+	<link type="text/css" rel="stylesheet" href="lib/materialize.min.css"  media="screen,projection"/>
+	<style>
+		#MathJax_Message {
+			display: none;
+		}
+
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+			background-color: #fff;
+		}
+
+		input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]), input[type=password]:focus:not([readonly]), input[type=email]:focus:not([readonly]), input[type=url]:focus:not([readonly]), input[type=time]:focus:not([readonly]), input[type=date]:focus:not([readonly]), input[type=datetime]:focus:not([readonly]), input[type=datetime-local]:focus:not([readonly]), input[type=tel]:focus:not([readonly]), input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]) {
+			border-color: #ffb300; !important;
+			box-shadow: 0 1px 0 0 #ffb300;
+		}
+
+		[type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+			position: static;
+			left: 0px;
+			opacity: 1;
+		}
+
+		#content {
+			position: relative;
+			width: 100%;
+			height: 100%;
+		}
+
+		#content.empty {
+			background-image: url('img/white-lines.png');
+		}
+
+		.handle {
+			position: absolute;
+			text-align: center;
+			user-select: none;
+			width: 3ch;
+			left: 0;
+			right: 0;
+			margin: auto;
+			cursor: move;
+			font-size: 16px;
+		}
+
+		#content > div {
+			position: absolute;
+			min-width: 170px;
+			min-height: 50px;
+			padding: 5px;
+			word-wrap: break-word;
+			overflow: auto;
+			transition: box-shadow .2s;
+		}
+
+		#content > div {
+			position: absolute;
+			min-width: 170px;
+			min-height: 50px;
+			padding: 5px;
+			word-wrap: break-word;
+			overflow: auto;
+			transition: box-shadow .2s;
+		}
+
+		#content > div h1 {
+			font-size: 2em;
+			margin: 10px;
+		}
+
+		#content > div h2 {
+			font-size: 1.8em;
+			margin: 10px;
+		}
+
+		#content > div h3 {
+			font-size: 1.5em;
+			margin: 10px;
+		}
+
+		#content > div h4 {
+			font-size: 1.3em;
+			margin: 10px;
+		}
+
+		#content > div h5 {
+			font-size: 1em;
+			font-weight: 700;
+			margin: 10px;
+		}
+
+		#instructions {
+			position: absolute;
+			top: calc(50% - 7.5vmin);
+			left: 50%;
+			transform: translate(-50%, -50%);
+			text-align: center;
+			font-weight: 200;
+			font-size: 15vmin;
+			width: 80%;
+		}
+	</style>
+</head>
+<body>
+	<div id="content" class="empty"></div>
+
+	<!-- JS Libs -->
+	<script src="lib/jquery.js"></script>
+	<script src="lib/materialize.min.js"></script>
+	<script src="lib/interact.min.js"></script>
+	<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}};</script>
+	<script type="text/javascript" src="lib/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	<script src="lib/showdown.min.js"></script>
+	<script src="lib/ASCIIMathML.js"></script>
+	<script src="lib/ASCIIsvg.js"></script>
+	<script type="text/javascript">String.prototype.format||(String.prototype.format=function(){var a=arguments;return this.replace(/{(\d+)}/g,function(b,c){return"undefined"!=typeof a[c]?a[c]:b})});</script>
+	
+	<!-- JS Code -->
+	<script type="text/javascript">
+		window.addEventListener("message", event => {
+			let msg = event.data;
+			switch (msg) {
+				case "displayElement":
+					displayElement(msg.id, msg.content, msg.x, msg.y, msg.width, msg.height, msg.extraArgs);
+					break;
+
+				case "displaySource":
+					displaySource(msg.id, msg.item, msg.link);
+					break;
+
+				case "removeElement":
+					removeElement(msg.id);
+					break;
+
+				case "clear":
+					$('#content').html('<h1 id="instructions" class="valign">Tap anywhere on the page to insert an element</h1>');
+					$('#content').addClass('empty');
+			}
+		});
+
+		function sendMessage(options) {
+			window.parent.postMessage(options, "*");
+		}
+
+		showdown.extension('maths', function() {
+			var matches = [];
+			return [
+				{
+					type: 'lang',
+					regex: /===([^]+?)===/gi,
+					replace: function(s, match) {
+						matches.push('===' + match + '===');
+						var n = matches.length - 1;
+						return '%PLACEHOLDER' + n + '%';
+					}
+				},
+				{
+					type: 'output',
+					filter: function(text) {
+						for (var i = 0; i < matches.length; ++i) {
+							var pat = '%PLACEHOLDER' + i + '%';
+							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+						}
+						//reset array
+						matches = [];
+						return text;
+					}
+				}
+			];
+		});
+
+		showdown.extension('tex-maths', function() {
+			var matches = [];
+			return [
+				{
+					type: 'lang',
+					regex: /;;([^]+?);;/gi,
+					replace: function(s, match) {
+						matches.push(';;' + match + ';;');
+						var n = matches.length - 1;
+						return '%TEXPLACEHOLDER1' + n + 'ENDTEXPLACEHOLDER1%';
+					}
+				},
+				{
+					type: 'output',
+					filter: function(text) {
+						for (var i = 0; i < matches.length; ++i) {
+							var pat = '%TEXPLACEHOLDER1' + i + 'ENDTEXPLACEHOLDER1%';
+							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+						}
+						//reset array
+						matches = [];
+						return text;
+					}
+				}
+			]
+		});
+
+		showdown.extension('graphs', function() {
+			var matches = [];
+			return [
+				{
+					type: 'lang',
+					regex: /=-=([^]+?)=-=/gi,
+					replace: function(s, match) {
+						matches.push("<embed width='400' height='400' src='img/d.svg' script='{0}'></embed>".format(match));
+						var n = matches.length - 1;
+						return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
+					}
+				},
+				{
+					type: 'output',
+					filter: function(text) {
+						for (var i = 0; i < matches.length; ++i) {
+							var pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
+							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+						}
+						//reset array
+						matches = [];
+						return text;
+					}
+				}
+			]
+		});
+
+		var md = new showdown.Converter({
+			parseImgDimensions: true,
+			simplifiedAutoLink: true,
+			strikethrough: true,
+			tables: true,
+			tasklists: true,
+			prefixHeaderId: 'mdheader_',
+			smoothLivePreview: true,
+			extensions: ['maths', 'tex-maths', 'graphs']
+		});
+
+		MathJax.Hub.Config({
+			tex2jax: {
+				inlineMath: [[';;', ';;']]
+			}
+		});
+
+		var todoShowToggle = {};
+
+		//Thanks to http://stackoverflow.com/a/12300351/998467
+		function dataURItoBlob(dataURI) {
+			// convert base64 to raw binary data held in a string
+			// doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+			var byteString = atob(dataURI.split(',')[1]);
+
+			// separate out the mime component
+			var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+			// write the bytes of the string to an ArrayBuffer
+			var ab = new ArrayBuffer(byteString.length);
+			var ia = new Uint8Array(ab);
+			for (var i = 0; i < byteString.length; i++) {
+				ia[i] = byteString.charCodeAt(i);
+			}
+
+			// write the ArrayBuffer to a blob, and you're done
+			var blob = new Blob([ab], { type: mimeString });
+			return blob;
+		}
+
+		function blobToDataURL(blob, callback) {
+			var a = new FileReader();
+			a.onload = function(e) { callback(e.target.result); };
+			a.readAsDataURL(blob);
+		}
+
+		function resizePage(element) {
+			if (parseInt($(element).css('left')) + $(element).width() + 1000 > parseInt($('#content').css('width'))) {
+				$('#content').css('width', parseInt($(element).css('left')) + $(element).width() + 1000 + 'px');
+			}
+			if (parseInt($(element).css('top')) + $(element).height() + 1000 > parseInt($('#content').css('height'))) {
+				$('#content').css('height', parseInt($(element).css('top')) + $(element).height() + 1000 + 'px');
+			}
+		}
+
+		function downloadElement(uuid, filename) {
+			sendMessage({
+				req: "downloadElement",
+				uuid: uuid,
+				filename: filename
+			});
+		}
+
+		$('#content').click(function(e) {
+			if (e.target.id == "content" || e.target.id == "instructions") {
+				Native.openInsertMenu(e.pageX, e.pageY);
+			}
+		});
+
+		function displayElement(id, content, x, y, width, height, extraArgs) {
+			var contentDiv = document.getElementById("content");
+			$(contentDiv).removeClass('empty');
+			$('#instructions').remove();
+
+			if ($('#'+id).length) $('#'+id).remove();
+
+			contentDiv.innerHTML += '<div id="{0}" class="drag z-depth-2" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(id, x, y, width, height);
+			var elementDiv = document.getElementById(id);
+
+			switch (id.split(/[0-9]/)[0]) {
+				case "markdown":
+					content = decodeURIComponent(content);
+					elementDiv.style.fontSize = extraArgs.fontSize;
+					elementDiv.innerHTML += md.makeHtml(content);
+					$('#content ul').each(function(i) {
+						$(this).addClass('browser-default');
+					});
+					asciimath.translate(undefined, true);
+					drawPictures();
+					MathJax.Hub.Queue(["Typeset", MathJax.Hub, id]);
+
+					//Todo Lists
+					var checkedTodoItems = $('#'+id+' .task-list-item input:checked');
+					if (checkedTodoItems.length > 5) {
+						todoShowToggle[id] = false;
+						$(elementDiv).find('.handle').after($('<a class="hidden-todo-msg todo-toggle" href="javascript:showTodo(\'{0}\')">Toggle {1} Completed Items</a>'.format(id, checkedTodoItems.length)));
+					}
+
+					//Inline Images
+					var inlineImages = [];
+					content.replace(/!!\(([^]+?)\)/gi, function(match, p1) { inlineImages.push(p1); });
+					content.replace(/!!\[([^]+?)\]/gi, function(match, p1) { inlineImages.push(p1); });
+
+					if (inlineImages) {
+						for (var i = 0; i < inlineImages.length; i++) {
+							var uuid = inlineImages[i];
+
+							var url = Native.getAssetUrl(uuid);
+							elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\("+uuid+"\)", '<img src="{0}" />'.format(url));
+							var drawingName = "inline-drawing-"+Math.random().toString(36).substring(7);
+							elementDiv.innerHTML = elementDiv.innerHTML.replace("!!\["+uuid+"\]", '<img id="{1}" src="{0}" />'.format(URL.createObjectURL(dataURItoBlob(Native.getTrimmedAssetUrl(uuid))), drawingName));
+						}
+					}
+					break;
+
+				case "drawing":
+					elementDiv.innerHTML += '<img style="padding: 5px; width: {1}; height: {2};" src="{0}" />'.format(URL.createObjectURL(dataURItoBlob(content)), width, height);
+					elementDiv.style.padding = "0px";
+					break;
+
+				case "image":
+					elementDiv.innerHTML += '<img style="padding: 5px; width: {1}; height: {2};" src="{0}" />'.format(content, width, height);
+					elementDiv.style.padding = "0px";
+					break;
+
+				case "recording":
+					elementDiv.innerHTML += '<p>{1}</p><a href="javascript:downloadElement(\'{0}\', \'{1}\');" class="btn blue waves-effect waves-light" style="width: 100%;"><span style="padding: 15px; color: #fff">Open Recording</span></a>'.format(extraArgs.ext, content);
+					break;
+
+				case "file":
+					elementDiv.innerHTML += '{1}<br /><a href="javascript:downloadElement(\'{0}\', \'{1}\');" class="btn blue waves-effect waves-light" style="width: 100%;"><span style="padding: 15px; color: #fff">Open File</span></a>'.format(extraArgs.ext, content);
+					break;
+			}
+			resizePage(elementDiv);
+
+			$('.drag').draggable({
+				handle: ".handle",
+				stack: ".drag",
+				scroll: false,
+				start: function(event) {
+					$(event.currentTarget).removeClass('z-depth-2');
+					$(event.currentTarget).addClass('z-depth-4');
+
+					navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+					if (navigator.vibrate) navigator.vibrate(100);
+				},
+				drag: function(event) {
+					resizePage(event.target);
+
+					if ($('#source_'+event.target.id).length) {
+						$('#source_'+event.target.id).attr("style", 'left: {0}; top: {1};'.format(parseInt(event.target.style.left)+$(event.target).width()+10+"px", event.target.style.top));
+					}
+				},
+				stop: function(event) {
+					$(event.target).removeClass('z-depth-4');
+					$(event.target).addClass('z-depth-2');
+
+					Native.updateElementPosition(event.target.id, event.target.style.left, event.target.style.top, event.target.style.width, event.target.style.height);
+				}
+			});
+
+			// setTimeout(function() {
+			// 	MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+			// }, 2000);
+		}
+
+		function displaySource(id, item, link) {
+			if ($('#source_'+item).length) $('#source_'+item).remove();
+
+			var itemEl = document.getElementById(item);
+			$('#content').append('<div id="source_{0}" style="left: {1}; top: {2};"><a href="{4}">[{3}]</a></div>'.format(item, parseInt(itemEl.style.left)+$(itemEl).width()+10+"px", itemEl.style.top, id, link));
+		}
+
+		function removeElement(id) {
+			if ($('#'+id).length) $('#'+id).remove();
+			if ($('#source_'+id).length) $('#source_'+id).remove();
+		}
+
+		$('#content').on('click', 'div', function(event) {
+			var path = event.originalEvent.path || (event.originalEvent.composedPath && event.originalEvent.composedPath()) || [event.originalEvent.target];
+			if (path[0].tagName.toLowerCase() === 'a') return;
+			if (path[1] && path[1].tagName.toLowerCase() === 'a') return;
+			Native.openEditor(event.currentTarget.id);
+		});
+
+		function showTodo(id, allOn) {
+			if (allOn) {
+				todoShowToggle[id] = false;
+				$('#'+id+' .task-list-item input:checked').parentsUntil('#'+id).show();
+			}
+			else {
+				todoShowToggle[id] = !todoShowToggle[id];
+				if (!todoShowToggle[id]) {
+					$('#'+id+' .task-list-item input:checked').parentsUntil('#'+id).show();
+				}
+				else {
+					$('#'+id+' .task-list-item input:checked').parentsUntil('ul').hide();
+				}
+			}
+
+			resizePage($('#'+id), false);
+		}
+	</script>
+</body>
+</html>
