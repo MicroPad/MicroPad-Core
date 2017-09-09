@@ -1380,6 +1380,8 @@ function updateNotepadList() {
 				isUpdating = false;
 			});
 		}
+	}).catch(error => {
+		console.log(error);
 	});
 }
 

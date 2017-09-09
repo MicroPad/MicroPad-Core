@@ -1,7 +1,7 @@
 # Created by https://www.gitignore.io
 
 src/js/uwp/µPad/µPad/µPad_TemporaryKey.pfx
-
+src/ios/platforms
 
 ### SublimeText ###
 # cache files for sublime text
