@@ -256,6 +256,13 @@ function newNotepad() {
 		if (results.buttonIndex !== 1 || results.input1.length < 1) return;
 
 		var title = results.input1;
+
+		if (title === "exnp") {
+			//Create the example notepad for testing reasons
+			exampleNotepadTest();
+			return;
+		}
+
 		notepad = parser.createNotepad(title);
 
 		var demoNote = parser.createNote("Example Note", ['asciimath']);
