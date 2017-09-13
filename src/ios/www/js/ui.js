@@ -34,7 +34,9 @@ appUi.onPageBeforeInit('note', page => {
 });
 
 appUi.onPageInit('note', page => {
-	displayNote();
+	document.getElementById('viewer').onload = function() {
+		displayNote();
+	};
 });
 
 function displayNotepad() {

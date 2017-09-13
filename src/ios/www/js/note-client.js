@@ -2,11 +2,11 @@ function sendToViewer(options) {
 	document.getElementById('viewer').contentWindow.postMessage(options, "*");
 }
 
-function displayNote(delta) {
-	sendToViewer({req: 'clear'});
+var activeElements = new Set();
 
+function displayNote(delta) {
 	appUi.showPreloader("Loading Note...");
-	if (!delta) $('#viewer').html('');
+	if (!delta) sendToViewer({req: 'clear'});
 
 	var elementCount = 0;
 	for (let i = 0; i < note.elements.length; i++) {
@@ -31,6 +31,40 @@ function displayNote(delta) {
 		}
 		else {
 			displayElement(delta, element, (++elementCount === note.elements.length));
+		}
+	}
+
+	function displayElement(delta, element, lastElement) {
+		if (delta && $('#viewer').contents().find('#'+element.args.id).length) return;
+		let elementToSend = {
+			req: "displayElement",
+			id: element.args.id,
+			content: element.content,
+			x: element.args.x,
+			y: element.args.y,
+			width: element.args.width,
+			height: element.args.height,
+			extraArgs: {}
+		};
+
+		switch (element.type) {
+			case "markdown":
+				elementToSend.extraArgs['fontSize'] = element.args.fontSize;
+				sendToViewer(elementToSend);
+				break;
+
+			case "image":
+				assetStorage.getItem(element.args.ext, (err, res) => {
+					if (err || res == null) return;
+
+					elementToSend.content = URL.createObjectURL(res);
+					sendToViewer(elementToSend);
+				});
+				break;
+		}
+
+		if (lastElement) {
+			appUi.hidePreloader();
 		}
 	}
 }

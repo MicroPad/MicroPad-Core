@@ -122,7 +122,7 @@
 	<script type="text/javascript">
 		window.addEventListener("message", event => {
 			let msg = event.data;
-			switch (msg) {
+			switch (msg.req) {
 				case "displayElement":
 					displayElement(msg.id, msg.content, msg.x, msg.y, msg.width, msg.height, msg.extraArgs);
 					break;
@@ -304,6 +304,7 @@
 
 			contentDiv.innerHTML += '<div id="{0}" class="drag z-depth-2" style="left: {1}; top: {2}; width: {3}; height: {4};"><p class="handle">::::</p></div>'.format(id, x, y, width, height);
 			var elementDiv = document.getElementById(id);
+			console.log()
 
 			switch (id.split(/[0-9]/)[0]) {
 				case "markdown":
