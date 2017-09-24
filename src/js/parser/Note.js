@@ -36,7 +36,7 @@ exports.Note.prototype.search = function(query) {
 		pattern = new RegExp("(^|\\s)"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")+"(\\b)", 'i');
 		for (var i = 0; i < this.elements.length; i++) {
 			var el = this.elements[i];
-			if (el.type !== "markdown") return;
+			if (el.type !== "markdown") continue;
 			if (pattern.test(el.content)) return this;
 		}
 	}
