@@ -1228,9 +1228,10 @@ function exportNotepads(type) {
 
 	notepadStorage.length((err, numOfNotepads) => {
 		notepadStorage.iterate(function(value, key, i) {
+			var res = {};
 			switch (type) {
 				case "npx":
-					let res = JSON.parse(value);
+					res = JSON.parse(value);
 					getAssets(assets => {
 						let np = parser.restoreNotepad(res);
 
