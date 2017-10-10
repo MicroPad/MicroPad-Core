@@ -324,6 +324,7 @@ function reqGET(url, callback) {
 		}
 	}
 	xhr.open("GET", url, true);
+	xhr.setRequestHeader("Cache-Control", "max-age=0");
 	xhr.send();
 }
 
