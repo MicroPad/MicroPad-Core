@@ -114,6 +114,8 @@ onmessage = function(event) {
 						reqGET(res, (remoteMapJSON, code) => {
 
 							var remoteMap = JSON.parse(remoteMapJSON);
+							if (!remoteMap.lastModified) upload(msg.token, localMap, remoteMap, chunks, msg.filename);
+
 							if (moment(localMap.lastModified).isBefore(remoteMap.lastModified)) {
 								postMessage({
 									req: "askDownload",
@@ -127,12 +129,7 @@ onmessage = function(event) {
 								upload(msg.token, localMap, remoteMap, chunks, msg.filename);
 							}
 							else {
-								postMessage({
-									req: 'upload',
-									code: 200,
-									text: ''
-								});
-								return;
+								upload(msg.token, localMap, remoteMap, chunks, msg.filename);
 							}
 						});
 					}, msg.assets);
