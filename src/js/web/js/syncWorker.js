@@ -128,9 +128,6 @@ onmessage = function(event) {
 							else if (moment(localMap.lastModified).isAfter(remoteMap.lastModified)) {
 								upload(msg.token, localMap, remoteMap, chunks, msg.filename);
 							}
-							else {
-								upload(msg.token, localMap, remoteMap, chunks, msg.filename);
-							}
 						});
 					}, msg.assets);
 				}
