@@ -73,7 +73,7 @@ S3Url.prototype.getUrlSync = function(token, filename, callback, diffIndexes) {
 			index: "0",
 			md5: "m"
 		};
-		if (diffIndexes) params.multidex = diffIndexes;
+		if (diffIndexes !== undefined && diffIndexes !== null) params.multidex = diffIndexes;
 
 		switch(this.protocol) {
 			case "GET":
