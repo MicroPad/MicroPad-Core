@@ -25,12 +25,11 @@
 			<nav class="blue-grey" style="box-shadow: none; z-index: 110; padding-bottom: 65px;">
 				<div class="nav-wrapper" style="z-index: 110;">
 					<a id="menu-button" class="left side" data-activates="menu" style="padding-left: 10px;"><i class="material-icons">menu</i></a>
-					<!-- <a id="mobile-menu-btn" href="#!"><i class="left material-icons hide-on-med-and-up">menu</i></a> -->
 					<ul class="left">
-						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-large-only">m|</span><em title="v2.6.12-beta" style="font-weight: 100; font-size: 1rem;">β</em></span>
+						<span class="brand-logo">µPad<span id="mobile-canary" class="hide-on-med-and-up">m|</span><em title="v2.6.13-beta" style="font-weight: 100; font-size: 1rem;">β</em></span>
 					</ul>
 
-					<ul id="nav-desktop" class="right hide-on-med-and-down">
+					<ul id="nav-desktop" class="right hide-on-small-only">
 						<li style="margin-right: 10px;"><span class="save-status"></span></li>
 						<li id="sync-button"><a href="javascript:msSync();"><i class="material-icons">sync</i></a></li>
 						<li><div style="top: 10px;" class="file-field input-field"><div class="waves-effect waves-light btn amber darken-1 tooltipped" data-position="left" data-delay="50" data-tooltip="Upload a .npx/.enex file or a .npxz/.zip archive"><span>Upload Notepads</span><input id="upload" type="file"></div><div style="display: none;" class="file-path-wrapper"><input id="upload-name" class="file-path validate" type="text"></div></div></li>
@@ -54,7 +53,7 @@
 
 			<!-- Sidenav -->
 			<ul id="menu" class="side-nav menu-button">
-				<div class="hide-on-large-only">
+				<div class="hide-on-med-and-up">
 					<li class="save-status"></li>
 					<li><input type="file" id="mob-upload" /></li>
 					<li><a id="mob-np-dd" class="dropdown-button" href="#!"><i class="material-icons">collections_bookmark</i>Notepads<i class="material-icons right">arrow_drop_down</i></a></li>
@@ -84,8 +83,8 @@
 
 			<div style="width: 100%; height: 100%; position: relative; z-index: 50;">
 				<!-- Notepad Explorer -->
-				<div id="notepad-explorer" class="hide-on-med-and-down"></div>
-				<div class="fixed-action-btn horizontal hide-on-med-and-down" style="z-index: 1001; user-select: none;">
+				<div id="notepad-explorer" class="hide-on-small-only"></div>
+				<div class="fixed-action-btn horizontal hide-on-small-only" style="z-index: 1001; user-select: none;">
 					<a class="btn-floating btn-large amber darken-1"><i class="material-icons">add</i></a>
 					<ul>
 						<li><a class="btn-floating green modal-trigger tooltipped" data-target="new-section" data-delay="50" data-position="top" data-tooltip="New Section (S)"><i class="material-icons">book</i></a></li>
