@@ -186,7 +186,8 @@ var md = new showdown.Converter({
 	tasklists: true,
 	prefixHeaderId: 'mdheader_',
 	smoothLivePreview: true,
-	extensions: ['maths', 'tex-maths', 'graphs', 'hashtags', 'quick-maths']
+	emoji: true,
+	extensions: ['maths', 'tex-maths', 'graphs', 'hashtags', 'quick-maths', 'xssfilter']
 });
 
 $(document).ready(function() {
@@ -207,6 +208,12 @@ window.onload = function() {
 
 	appStorage.getItem("useOldEditor", (err, d) => {
 		if (err) return;
+
+		if (d === null) {
+			d = 1;
+			appStorage.setItem("useOldEditor", d);
+		}
+
 		updateEditor(d, true);
 	});	
 	
