@@ -187,7 +187,7 @@ var md = new showdown.Converter({
 	prefixHeaderId: 'mdheader_',
 	smoothLivePreview: true,
 	emoji: true,
-	extensions: ['maths', 'tex-maths', 'graphs', 'hashtags', 'quick-maths', 'xssfilter']
+	extensions: ['maths', 'tex-maths', 'graphs', 'hashtags', 'quick-maths']
 });
 
 $(document).ready(function() {
