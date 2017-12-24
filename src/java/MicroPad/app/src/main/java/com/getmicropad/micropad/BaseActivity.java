@@ -787,7 +787,13 @@ public class BaseActivity extends AppCompatActivity {
 				newElement.setY(y+"px");
 				newElement.setWidth("auto");
 				newElement.setHeight("auto");
-				newElement.setContent("");
+
+				if (newElement instanceof BinaryElement) {
+					newElement.setContent("AS");
+				} else {
+					newElement.setContent("");
+				}
+
 				this.getNote().elements.add(newElement);
 				displayElement(newElement);
 				updateNotepad(this.getNote());
