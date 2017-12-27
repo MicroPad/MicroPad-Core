@@ -95,6 +95,19 @@ public class Note {
 		Pattern pattern = Pattern.compile(regexStr, Pattern.CASE_INSENSITIVE);
 		Matcher matcher = pattern.matcher(this.getTitle());
 		if (matcher.find()) return this;
+
+		//Hashtags
+		if (query.length() > 1 && query.charAt(0) == '#') {
+			regexStr = "(^|\\s)"+query;
+			pattern = Pattern.compile(regexStr, Pattern.CASE_INSENSITIVE);
+
+			for (NoteElement element : elements) {
+				if (!(element instanceof MarkdownElement)) continue;
+				matcher = pattern.matcher(element.getContent());
+				if (matcher.find()) return this;
+			}
+		}
+
 		return null;
 	}
 
