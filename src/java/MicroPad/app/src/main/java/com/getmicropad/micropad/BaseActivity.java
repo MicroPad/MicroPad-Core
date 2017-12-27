@@ -27,6 +27,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
@@ -106,6 +107,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -1192,15 +1194,14 @@ public class BaseActivity extends AppCompatActivity {
 													//Download
 													Snackbar.make(findViewById(R.id.root_layout), "A newer version of this notepad has been synced", Snackbar.LENGTH_INDEFINITE).setAction("DOWNLOAD", v -> new Thread(() -> {
 														List<byte[]> newNotepadChunks = new ArrayList<>(Arrays.asList(syncObject.getChunks()));
-														String downloadIndexes = "";
+														List<String> downloadIndexes = new ArrayList<>();
 
 														for (int i = 0; i < remoteMap.names().length(); i++) {
 															try {
 																String lineNumber = remoteMap.names().getString(i);
 																if (lineNumber.equals("lastModified")) continue;
 																if (syncObject.getMap().isNull(lineNumber) || !((JSONObject)remoteMap.get(lineNumber)).get("md5").equals(((JSONObject)syncObject.getMap().get(lineNumber)).get("md5"))) {
-																	if (downloadIndexes.length() > 0) downloadIndexes += ",";
-																	downloadIndexes += lineNumber;
+																	downloadIndexes.add(lineNumber);
 
 																	runOnUiThread(() -> {
 																		progressDialog.setProgress(0);
@@ -1219,14 +1220,16 @@ public class BaseActivity extends AppCompatActivity {
 
 														//Download Chunk
 														try {
-															String chunkURLs = syncer.getS3UrlMap().get("getChunkDownload").getUrl(token, Helpers.getFilename(getNotepad().getTitle()), downloadIndexes);
+															String chunkURLs = syncer.getS3UrlMap().get("getChunkDownload").getUrl(token, Helpers.getFilename(getNotepad().getTitle()), TextUtils.join(",", downloadIndexes));
 															if (chunkURLs.length() > 0) {
 																JSONObject chunkURLList = new JSONObject(chunkURLs);
-																JSONArray lineNumbers = chunkURLList.names();
+																List<Integer> lineNumbers = new ArrayList<>();
+																for (int i = 0; i < chunkURLList.names().length(); i++) lineNumbers.add(Integer.parseInt(chunkURLList.names().getString(i).substring(1)));
+																Collections.sort(lineNumbers);
+
 																isSyncing = true;
-																for (int i = 0; i < lineNumbers.length(); i++) {
-																	int currentLine = Integer.parseInt(lineNumbers.getString(i).substring(1));
-																	ANRequest chunkReq = AndroidNetworking.get(chunkURLList.getString(lineNumbers.getString(i)))
+																for (Integer currentLine : lineNumbers) {
+																	ANRequest chunkReq = AndroidNetworking.get(chunkURLList.getString("i" + currentLine))
 																			.setPriority(Priority.IMMEDIATE)
 																			.build();
 																	if (newNotepadChunks.size() > currentLine) {
@@ -1605,7 +1608,7 @@ public class BaseActivity extends AppCompatActivity {
 		if (this.isSaving || this.isSyncing) {
 			new AlertDialog.Builder(this)
 					.setTitle("Saving...")
-					.setMessage("Your cannot exit until your notepad has finished saving/syncing")
+					.setMessage("You cannot exit until your notepad has finished saving/syncing")
 					.setPositiveButton("Close", (dialog, which) -> {})
 					.show();
 			return;
