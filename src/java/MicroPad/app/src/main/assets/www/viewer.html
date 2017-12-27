@@ -203,6 +203,33 @@
 			]
 		});
 
+		showdown.extension('hashtags', function() {
+			var matches = [];
+			return [
+				{
+					type: 'lang',
+					regex: /(^|\s)(#[a-z\d-]+)/gi,
+					replace: function(s, match) {
+						matches.push('<a href="javascript:searchHashtag(\'#{1}\');">{0}</a>'.format(s, s.split("#")[1]));
+						var n = matches.length - 1;
+						return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
+					}
+				},
+				{
+					type: 'output',
+					filter: function(text) {
+						for (var i = 0; i < matches.length; ++i) {
+							var pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
+							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+						}
+						//reset array
+						matches = [];
+						return text;
+					}
+				}
+			]
+		});
+
 		var md = new showdown.Converter({
 			parseImgDimensions: true,
 			simplifiedAutoLink: true,
@@ -211,7 +238,7 @@
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			smoothLivePreview: true,
-			extensions: ['maths', 'tex-maths', 'graphs']
+			extensions: ['maths', 'tex-maths', 'graphs', 'hashtags']
 		});
 
 		MathJax.Hub.Config({
@@ -260,6 +287,10 @@
 
 		function downloadElement(uuid, filename) {
 			Native.downloadElement(uuid, filename);
+		}
+
+		function searchHashtag(query) {
+			Native.showSearch(query);
 		}
 
 		$('#content').click(function(e) {

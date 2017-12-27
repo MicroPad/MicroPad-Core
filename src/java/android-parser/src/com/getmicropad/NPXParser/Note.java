@@ -98,7 +98,7 @@ public class Note {
 
 		//Hashtags
 		if (query.length() > 1 && query.charAt(0) == '#') {
-			regexStr = "(^|\\s)"+query;
+			regexStr = "(^|\\s)"+query+"(\\b)";
 			pattern = Pattern.compile(regexStr, Pattern.CASE_INSENSITIVE);
 
 			for (NoteElement element : elements) {

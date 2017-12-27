@@ -808,6 +808,50 @@ public class BaseActivity extends AppCompatActivity {
 		});
 	}
 
+	@JavascriptInterface
+	public void showSearch(String query) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this)
+				.setTitle("Search")
+				.setPositiveButton("Close", (d, w) -> {})
+				.setCancelable(true);
+		LayoutInflater inflater = this.getLayoutInflater();
+		View view = inflater.inflate(R.layout.search_layout, null);
+		builder.setView(view);
+		AlertDialog dialog = builder.create();
+
+		EditText input = view.findViewById(R.id.search_input);
+
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				List<Note> res = notepadSearcher.search(editable.toString());
+
+				ListAdapter searchAdapter = new ArrayAdapter<>(BaseActivity.this, android.R.layout.simple_list_item_1, res);
+				runOnUiThread(() -> {
+					ListView searchList = (ListView)view.findViewById(R.id.search_list);
+					searchList.setAdapter(searchAdapter);
+
+					searchList.setOnItemClickListener((adapterView, v, pos, a4) -> {
+						Note resNote = (Note)adapterView.getItemAtPosition(pos);
+						setParentTree(notepadSearcher.getTree(resNote));
+						loadNote(resNote);
+						dialog.dismiss();
+					});
+				});
+			}
+		});
+
+		if (query.length() > 0) input.setText(query);
+
+		dialog.show();
+	}
+
 	protected String getFilenameFromUri(Uri contentURI) {
 		String uriString = contentURI.toString();
 		File myFile = new File(uriString);
@@ -1551,42 +1595,7 @@ public class BaseActivity extends AppCompatActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.app_bar_search:
-				AlertDialog.Builder builder = new AlertDialog.Builder(this)
-						.setTitle("Search")
-						.setPositiveButton("Close", (d, w) -> {})
-						.setCancelable(true);
-				LayoutInflater inflater = this.getLayoutInflater();
-				View view = inflater.inflate(R.layout.search_layout, null);
-				builder.setView(view);
-				AlertDialog dialog = builder.create();
-
-				((EditText)view.findViewById(R.id.search_input)).addTextChangedListener(new TextWatcher() {
-					@Override
-					public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-					@Override
-					public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-					@Override
-					public void afterTextChanged(Editable editable) {
-						List<Note> res = notepadSearcher.search(editable.toString());
-
-						ListAdapter searchAdapter = new ArrayAdapter<>(BaseActivity.this, android.R.layout.simple_list_item_1, res);
-						runOnUiThread(() -> {
-							ListView searchList = (ListView)view.findViewById(R.id.search_list);
-							searchList.setAdapter(searchAdapter);
-
-							searchList.setOnItemClickListener((adapterView, v, pos, a4) -> {
-								Note resNote = (Note)adapterView.getItemAtPosition(pos);
-								setParentTree(notepadSearcher.getTree(resNote));
-								loadNote(resNote);
-								dialog.dismiss();
-							});
-						});
-					}
-				});
-
-				dialog.show();
+				showSearch("");
 				return true;
 
 			default:
