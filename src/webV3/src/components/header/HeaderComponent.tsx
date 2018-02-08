@@ -10,7 +10,11 @@ export default class HeaderComponent extends React.Component {
 
 	render() {
 		return (
-			<Navbar className="blue-grey" brand={<AppNameComponent />} style={this.navStyle} />
+			<Navbar className="blue-grey" brand={<AppNameComponent />} style={this.navStyle} right={true}>
+				<NavItem><Icon left={true}>file_upload</Icon> Upload Notepad</NavItem>
+				<NavItem><Icon left={true}>search</Icon> Search</NavItem>
+				<NavItem><Icon left={true}>help_outline</Icon> Help</NavItem>
+			</Navbar>
 		);
 	}
 }
