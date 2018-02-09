@@ -10,6 +10,7 @@
 	-->
 	<link rel="manifest" href="%PUBLIC_URL%/manifest.json">
 	<link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+	<link rel="stylesheet" href="%PUBLIC_URL%/assets/please-wait/please-wait.css">
 	<!--
 	Notice the use of %PUBLIC_URL% in the tags above.
 	It will be replaced with the URL of the `public` folder during the build.
@@ -24,7 +25,8 @@
 </head>
 <body>
 	<noscript>
-		You need to enable JavaScript to run this app.
+		You need to enable JavaScript to run this app.<br />
+		Don't worry, it's all open source (MPLv2). Your freedoms are safe.
 	</noscript>
 	<div id="root"></div>
 	<!--
@@ -37,5 +39,20 @@
 	To begin the development, run `npm start` or `yarn start`.
 	To create a production bundle, use `npm run build` or `yarn build`.
 	-->
+	<script type="text/javascript" src="%PUBLIC_URL%/assets/please-wait/please-wait.min.js"></script>
+	<script type="text/javascript">
+		var loadingScreen = window.pleaseWait({
+			logo: "%PUBLIC_URL%/assets/loading.gif",
+			backgroundColor: "#607d8b",
+			loadingHtml: "<p style='font-size: 2rem; color: white; font-weight: 300;'>We're just loading everything now&hellip;" +
+			"<br /><br />While you're waiting, how about a little riddle?" +
+			"<br />Does <a target='_blank' rel='noopener noreferrer' style='color: white;' href='https://en.wikipedia.org/wiki/P_versus_NP_problem'>" +
+			"<em style='font-family: serif;'>p = np</em></a>?</p>"
+		});
+
+		document.addEventListener('DOMContentLoaded', function() {
+			loadingScreen.finish();
+		}, false);
+	</script>
 </body>
 </html>
