@@ -1,7 +1,7 @@
 import { IStoreState } from '../types';
-import { IReducer } from '../types/ReducerType';
 import { IMetaStoreState } from '../types/MetaTypes';
 import { Action } from 'redux';
+import { IReducer } from '../types/ReducerType';
 
 export class MetaReducer implements IReducer {
 	public key: string = 'meta';

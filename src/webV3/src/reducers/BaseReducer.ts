@@ -1,5 +1,5 @@
 import { IReducer } from '../types/ReducerType';
-import { IStoreState } from '../types';
+import { IStoreState } from '../types/index';
 import { MetaReducer } from './MetaReducer';
 import { Action } from 'redux';
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IVersion } from '../../../types/MetaTypes';
-import { APP_NAME } from '../../../types';
+import { APP_NAME } from '../../../types/index';
 import './AppNameComponent.css';
 
 export default class AppNameComponent extends React.Component<IVersion> {

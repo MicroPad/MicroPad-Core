@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
-import { IStoreState } from './types';
+import { IStoreState } from './types/index';
 import { createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import HeaderComponent from './components/header/HeaderComponent';

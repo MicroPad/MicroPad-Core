@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SYNC_NAME } from '../../types';
+import { SYNC_NAME } from '../../types/index';
 // @ts-ignore
 import { Dropdown, Icon, NavItem } from 'react-materialize';
 import UploadNotepadsComponent from './UploadNotepadsComponent/UploadNotepadsComponent';
