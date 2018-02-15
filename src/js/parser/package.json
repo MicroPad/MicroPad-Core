@@ -1,6 +1,6 @@
 {
   "name": "upad-parse",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "This is a parser for the NPX file format that µPad uses",
   "main": "parse.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NickGeek/uPad.git"
+    "url": "https://github.com/NickGeek/MicroPad.git"
   },
   "author": "Nick Webster",
   "license": "MPL-2.0",
