@@ -30,7 +30,7 @@ export interface IElementArgs {
 export interface INotepadStoreState {
 	isLoading: boolean;
 	savedNotepadTitles?: string[];
-	notepads?: INotepadStoreState[];
+	notepad?: INotepadStoreState;
 }
 
 export interface INotepadStoreState {

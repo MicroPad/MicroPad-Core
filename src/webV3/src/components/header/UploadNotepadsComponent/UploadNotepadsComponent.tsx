@@ -1,8 +1,13 @@
 import * as React from 'react';
 // @ts-ignore
 import { Icon, NavItem } from 'react-materialize';
+import { SyntheticEvent } from 'react';
 
-export default class UploadNotepadsComponent extends React.Component {
+export interface IUploadNotepadsComponentProps {
+	parseNpx?: (xml: string) => void;
+}
+
+export default class UploadNotepadsComponent extends React.Component<IUploadNotepadsComponentProps> {
 	private uploadInput: HTMLInputElement;
 
 	render() {
@@ -19,7 +24,24 @@ export default class UploadNotepadsComponent extends React.Component {
 	}
 
 	private onUploadChanged = (event) => {
+		this.readFileInputEventAsText(event)
+			.then(xml => {
+				const { parseNpx } = this.props;
+				parseNpx!(xml);
+			});
+
 		// Ensure we can re-upload the same file again
 		this.uploadInput.value = '';
+	}
+
+	private readFileInputEventAsText(event: SyntheticEvent<HTMLInputElement>): Promise<string> {
+		return new Promise(resolve => {
+			const file = event.currentTarget.files![0];
+			const reader = new FileReader();
+
+			reader.onload = () => resolve(reader.result);
+
+			reader.readAsText(file);
+		});
 	}
 }

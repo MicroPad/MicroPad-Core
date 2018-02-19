@@ -14,10 +14,6 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 	};
 
 	public reducer(state: IMetaStoreState, action: Action): IMetaStoreState {
-		let newState = {
-			...state
-		};
-
-		return Object.freeze(newState);
+		return Object.freeze(state);
 	}
 }

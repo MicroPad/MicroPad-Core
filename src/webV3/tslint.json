@@ -54,7 +54,7 @@
 	"no-switch-case-fall-through": true,
 	"no-trailing-whitespace": false,
 	"no-unused-expression": false,
-	"no-unused-variable": true,
+	"no-unused-variable": false,
 	"no-use-before-declare": true,
 	"one-line": [
 	  true,

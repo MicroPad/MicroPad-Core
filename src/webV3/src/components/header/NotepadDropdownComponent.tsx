@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { SYNC_NAME } from '../../types/index';
+import { SYNC_NAME } from '../../types';
 // @ts-ignore
 import { Dropdown, Icon, NavItem } from 'react-materialize';
-import UploadNotepadsComponent from './UploadNotepadsComponent/UploadNotepadsComponent';
+import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
 
 export default class NotepadDropdownComponent extends React.Component {
 	render() {
