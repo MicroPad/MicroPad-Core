@@ -28,8 +28,14 @@ export interface IElementArgs {
 }
 
 export interface INotepadStoreState {
-	savedNotepadTitles: string[];
-	notepads: INotepad[];
+	isLoading: boolean;
+	savedNotepadTitles?: string[];
+	notepads?: INotepadStoreState[];
+}
+
+export interface INotepadStoreState {
+	isLoading: boolean;
+	item?: INotepad;
 }
 
 export interface INPXObject {

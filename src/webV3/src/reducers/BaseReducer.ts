@@ -2,14 +2,16 @@ import { IReducer } from '../types/ReducerType';
 import { IStoreState } from '../types/index';
 import { MetaReducer } from './MetaReducer';
 import { Action } from 'redux';
+import { NotepadsReducer } from './NotepadsReducer';
 
-export const REDUCERS: Array<IReducer> = [
-	new MetaReducer()
+export const REDUCERS: Array<IReducer<any>> = [
+	new MetaReducer(),
+	new NotepadsReducer()
 ];
 
-export class BaseReducer implements IReducer {
-	public initialState: IStoreState;
-	public key: string = '';
+export class BaseReducer implements IReducer<IStoreState> {
+	public readonly initialState: IStoreState;
+	public readonly key: string = '';
 
 	constructor() {
 		const initialState = {};

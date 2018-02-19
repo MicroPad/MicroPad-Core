@@ -1,10 +1,9 @@
-import { IStoreState } from '../types';
 import { IMetaStoreState } from '../types/MetaTypes';
 import { Action } from 'redux';
 import { IReducer } from '../types/ReducerType';
 
-export class MetaReducer implements IReducer {
-	public key: string = 'meta';
+export class MetaReducer implements IReducer<IMetaStoreState> {
+	public readonly key: string = 'meta';
 	public readonly initialState: IMetaStoreState = {
 		version: {
 			major: 3,
@@ -14,7 +13,7 @@ export class MetaReducer implements IReducer {
 		}
 	};
 
-	public reducer(state: IStoreState, action: Action): IStoreState {
+	public reducer(state: IMetaStoreState, action: Action): IMetaStoreState {
 		let newState = {
 			...state
 		};
