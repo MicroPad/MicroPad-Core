@@ -16,10 +16,10 @@ export class NotepadsReducer implements IReducer<INotepadStoreState> {
 
 			return {
 				...state,
-				savedNotepadTitles: [
+				savedNotepadTitles: Array.from(new Set([
 					...(state.savedNotepadTitles || []),
 					result.title
-				],
+				])),
 				notepad: result
 			};
 		} else if (isType(action, actions.getNotepadList.started)) {
@@ -36,7 +36,10 @@ export class NotepadsReducer implements IReducer<INotepadStoreState> {
 			return {
 				...state,
 				isLoading: false,
-				savedNotepadTitles: action.payload.result
+				savedNotepadTitles: Array.from(new Set([
+					...(state.savedNotepadTitles || []),
+					...action.payload.result
+				]))
 			};
 		}
 

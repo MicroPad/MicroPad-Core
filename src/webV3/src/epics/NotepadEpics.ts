@@ -1,4 +1,4 @@
-import { actions } from '../actions';
+import { actions, emptyAction } from '../actions';
 import { catchError, filter, map } from 'rxjs/operators';
 import { Action, Failure, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
@@ -11,16 +11,20 @@ const parseNpx$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.parseNpx.started)),
 		map((action: Action<string>) => {
-			Parser.parse(action.payload, ['asciimath']);
+			try {
+				Parser.parse(action.payload, ['asciimath']);
+			} catch (err) {
+				return actions.parseNpx.failed({
+					params: '',
+					error: err
+				});
+			}
+
 			return actions.parseNpx.done({
 				params: '',
 				result: Parser.notepad
 			});
-		}),
-		catchError(err => Observable.of(actions.parseNpx.failed({
-			params: '',
-			error: err
-		})))
+		})
 	);
 
 const parseNpxFail$ = action$ =>
@@ -28,7 +32,7 @@ const parseNpxFail$ = action$ =>
 		filter((action: Action<Failure<string, any>>) => isType(action, actions.parseNpx.failed)),
 		map(() => {
 			alert(`Error reading file`);
-			return Observable.empty();
+			return emptyAction(0);
 		})
 	);
 

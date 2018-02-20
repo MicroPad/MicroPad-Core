@@ -8,3 +8,5 @@ export const actions: { [name: string]: AsyncActionCreators<any, any, any> } = {
 	saveNotepad: actionCreator.async<void, void, any>('SAVE_NOTEPAD'),
 	getNotepadList: actionCreator.async<void, string[], any>('GET_NOTEPAD_LIST')
 };
+
+export const emptyAction = actionCreator<any>('EMPTY');
