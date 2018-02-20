@@ -16,12 +16,27 @@ export class NotepadsReducer implements IReducer<INotepadStoreState> {
 
 			return {
 				...state,
-				isLoading: false,
 				savedNotepadTitles: [
 					...(state.savedNotepadTitles || []),
 					result.title
 				],
 				notepad: result
+			};
+		} else if (isType(action, actions.getNotepadList.started)) {
+			return {
+				...state,
+				isLoading: true
+			};
+		} else if (isType(action, actions.getNotepadList.failed)) {
+			return {
+				...state,
+				isLoading: false
+			};
+		} else if (isType(action, actions.getNotepadList.done)) {
+			return {
+				...state,
+				isLoading: false,
+				savedNotepadTitles: action.payload.result
 			};
 		}
 

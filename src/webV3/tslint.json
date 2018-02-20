@@ -13,7 +13,7 @@
 	  true,
 	  "check-space"
 	],
-	"curly": true,
+	"curly": [2, "multi-line"],
 	"eofline": true,
 	"forin": true,
 	"indent": [ true, "tabs" ],

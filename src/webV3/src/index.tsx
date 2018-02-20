@@ -14,6 +14,7 @@ import { Provider } from 'react-redux';
 import { epicMiddleware } from './epics';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import * as localforage from 'localforage';
+import { actions } from './actions';
 
 const baseReducer: BaseReducer = new BaseReducer();
 export const store = createStore<IStoreState>(
@@ -32,6 +33,7 @@ export const ASSET_STORAGE = localforage.createInstance({
 });
 
 Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
+	.then(() => store.dispatch(actions.getNotepadList.started(0)))
 	.then(() => ReactDOM.render(
 		<Provider store={store}>
 			<HeaderComponent />

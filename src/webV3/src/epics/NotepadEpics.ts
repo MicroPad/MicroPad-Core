@@ -1,6 +1,6 @@
 import { actions } from '../actions';
 import { catchError, filter, map } from 'rxjs/operators';
-import { Action, isType } from 'redux-typescript-actions';
+import { Action, Failure, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import * as Parser from 'upad-parse/parse.js';
 import { Observable } from 'rxjs/Observable';
@@ -25,7 +25,7 @@ const parseNpx$ = action$ =>
 
 const parseNpxFail$ = action$ =>
 	action$.pipe(
-		filter((action: Action<string>) => isType(action, actions.parseNpx.failed)),
+		filter((action: Action<Failure<string, any>>) => isType(action, actions.parseNpx.failed)),
 		map(() => {
 			alert(`Error reading file`);
 			return Observable.empty();
