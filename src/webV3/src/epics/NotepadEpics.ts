@@ -1,9 +1,8 @@
 import { actions, emptyAction } from '../actions';
-import { catchError, filter, map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { Action, Failure, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import * as Parser from 'upad-parse/parse.js';
-import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/empty';
 

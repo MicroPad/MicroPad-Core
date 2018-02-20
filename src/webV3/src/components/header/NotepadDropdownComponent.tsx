@@ -4,8 +4,17 @@ import { SYNC_NAME } from '../../types';
 import { Dropdown, Icon, NavItem } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
 
-export default class NotepadDropdownComponent extends React.Component {
+export interface INotepadDropdownComponent {
+	notepadTitles: string[];
+}
+
+export default class NotepadDropdownComponent extends React.Component<INotepadDropdownComponent> {
 	render() {
+		const { notepadTitles } = this.props;
+
+		const notepadNavItems: JSX.Element[] = [];
+		(notepadTitles || []).forEach((title: string, i: number) => notepadNavItems.push(<NavItem key={title} href="#!">{title}</NavItem>));
+
 		return (
 			<li>
 				<Dropdown trigger={
@@ -22,6 +31,7 @@ export default class NotepadDropdownComponent extends React.Component {
 
 					{/* User's notepads from here */}
 					<NavItem divider={true} />
+					{notepadNavItems}
 				</Dropdown>
 			</li>
 		);

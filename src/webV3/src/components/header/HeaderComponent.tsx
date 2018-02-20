@@ -2,7 +2,7 @@ import * as React from 'react';
 import AppNameComponent from '../../containers/header/AppNameContainer';
 // @ts-ignore
 import { Dropdown, Icon, Navbar, NavItem } from 'react-materialize';
-import NotepadDropdownComponent from './NotepadDropdownComponent';
+import NotepadDropdownComponent from '../../containers/header/NotepadDropdownContainer';
 
 export default class HeaderComponent extends React.Component {
 	private readonly navStyle = {

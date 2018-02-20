@@ -27,7 +27,7 @@ export interface IElementArgs {
 	ext?: string;
 }
 
-export interface INotepadStoreState {
+export interface INotepadsStoreState {
 	isLoading: boolean;
 	savedNotepadTitles?: string[];
 	notepad?: INotepadStoreState;

@@ -1,7 +1,7 @@
 import * as React from 'react';
+import { SyntheticEvent } from 'react';
 // @ts-ignore
 import { Icon, NavItem } from 'react-materialize';
-import { SyntheticEvent } from 'react';
 
 export interface IUploadNotepadsComponentProps {
 	parseNpx?: (xml: string) => void;

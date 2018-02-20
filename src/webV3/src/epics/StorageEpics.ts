@@ -1,5 +1,5 @@
 import { actions } from '../actions';
-import { catchError, combineLatest, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { Observable } from 'rxjs/Observable';
