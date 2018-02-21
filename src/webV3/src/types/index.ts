@@ -8,3 +8,4 @@ export interface IStoreState {
 
 export const APP_NAME = 'µPad';
 export const SYNC_NAME = 'µSync';
+export const MICROPAD_URL = 'https://getmicropad.com';

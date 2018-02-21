@@ -1,6 +1,6 @@
-import { actions, emptyAction } from '../actions';
+import { actions } from '../actions';
 import { filter, map } from 'rxjs/operators';
-import { Action, Failure, isType } from 'redux-typescript-actions';
+import { Action, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import * as Parser from 'upad-parse/dist/index.js';
 import 'rxjs/add/observable/of';
@@ -13,6 +13,7 @@ const parseNpx$ = action$ =>
 			try {
 				Parser.parse(action.payload, ['asciimath']);
 			} catch (err) {
+				alert(`Error reading file`);
 				return actions.parseNpx.failed({
 					params: '',
 					error: err
@@ -26,16 +27,6 @@ const parseNpx$ = action$ =>
 		})
 	);
 
-const parseNpxFail$ = action$ =>
-	action$.pipe(
-		filter((action: Action<Failure<string, any>>) => isType(action, actions.parseNpx.failed)),
-		map(() => {
-			alert(`Error reading file`);
-			return emptyAction(0);
-		})
-	);
-
 export const notepadEpics$ = combineEpics(
-	parseNpx$,
-	parseNpxFail$
+	parseNpx$
 );

@@ -6,7 +6,8 @@ const actionCreator = actionCreatorFactory();
 export const actions: { [name: string]: AsyncActionCreators<any, any, any> } = {
 	parseNpx: actionCreator.async<string, INotepad, any>('PARSE_NPX'),
 	saveNotepad: actionCreator.async<void, void, any>('SAVE_NOTEPAD'),
-	getNotepadList: actionCreator.async<void, string[], any>('GET_NOTEPAD_LIST')
+	getNotepadList: actionCreator.async<void, string[], any>('GET_NOTEPAD_LIST'),
+	getHelp: actionCreator.async<void, string, any>('GET_HELP')
 };
 
 export const emptyAction = actionCreator<any>('EMPTY');

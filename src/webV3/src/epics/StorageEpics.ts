@@ -8,11 +8,10 @@ import { INotepad } from '../types/NotepadTypes';
 import { stringify } from '../util';
 import { NOTEPAD_STORAGE } from '../index';
 
-const saveOnParse$ = (action$, store) =>
+const saveOnParse$ = action$ =>
 	action$.pipe(
 		filter((action: Action<Success<string, INotepad>>) => isType(action, actions.parseNpx.done)),
 		map((action: Action<Success<string, INotepad>>) => action.payload.result),
-		tap(() => store.dispatch(actions.saveNotepad.started(0))),
 		switchMap((notepad: INotepad) => Observable.fromPromise(NOTEPAD_STORAGE.setItem(notepad.title, stringify(notepad)))),
 		catchError(err => Observable.of(actions.saveNotepad.failed({ params: 0, error: err }))),
 		map(() => actions.saveNotepad.done({ params: 0, result: 0 }))

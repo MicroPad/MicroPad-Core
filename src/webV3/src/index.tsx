@@ -14,7 +14,7 @@ import * as localforage from 'localforage';
 import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
 import { Provider } from 'react-redux';
-import HeaderComponent from './components/header/HeaderComponent';
+import HeaderComponent from './containers/header/HeaderContainer';
 
 const baseReducer: BaseReducer = new BaseReducer();
 export const store = createStore<IStoreState>(
