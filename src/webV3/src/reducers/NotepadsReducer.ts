@@ -20,7 +20,18 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 					...(state.savedNotepadTitles || []),
 					result.title
 				])),
-				notepad: result
+				notepad: {
+					isLoading: false,
+					item: result
+				}
+			};
+		} else if (isType(action, actions.parseNpx.started)) {
+			return {
+				...state,
+				isLoading: true,
+				notepad: {
+					isLoading: true
+				}
 			};
 		} else if (isType(action, actions.getNotepadList.started)) {
 			return {
