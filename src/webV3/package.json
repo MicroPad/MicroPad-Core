@@ -17,7 +17,7 @@
 		"redux-observable": "^0.18.0",
 		"redux-typescript-actions": "^1.3.0",
 		"rxjs": "^5.5.6",
-		"upad-parse": "^2.5.1"
+		"upad-parse": ">=2.6.0"
 	},
 	"scripts": {
 		"start": "react-scripts-ts start",

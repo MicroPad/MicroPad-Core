@@ -3,18 +3,18 @@ import 'materialize-css/dist/css/materialize.min.css';
 import 'jquery/dist/jquery.slim.js';
 import 'materialize-css/dist/js/materialize.js';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import { IStoreState } from './types';
 import { applyMiddleware, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
-import HeaderComponent from './components/header/HeaderComponent';
-import { Provider } from 'react-redux';
 import { epicMiddleware } from './epics';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import * as localforage from 'localforage';
+import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
+import { Provider } from 'react-redux';
+import HeaderComponent from './components/header/HeaderComponent';
 
 const baseReducer: BaseReducer = new BaseReducer();
 export const store = createStore<IStoreState>(
