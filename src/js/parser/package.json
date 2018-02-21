@@ -1,33 +1,41 @@
 {
-  "name": "upad-parse",
-  "version": "2.5.1",
-  "description": "This is a parser for the NPX file format that µPad uses",
-  "main": "parse.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/NickGeek/MicroPad.git"
-  },
-  "author": "Nick Webster",
-  "license": "MPL-2.0",
-  "bugs": {
-    "url": "https://github.com/NickGeek/uPad/issues"
-  },
-  "homepage": "https://github.com/NickGeek/uPad",
-  "dependencies": {
-    "moment": "^2.16.0",
-    "pretty-data": "^0.40.0",
-    "to-markdown": "^3.0.3",
-    "xml2js": "^0.4.17"
-  },
-  "devDependencies": {},
-  "keywords": [
-    "uPad",
-    "µPad",
-    "parse",
-    "npx",
-    "parser"
-  ]
+	"name": "upad-parse",
+	"version": "2.6.0",
+	"description": "This is a parser for the NPX file format that µPad uses",
+	"main": "src/index.js",
+	"scripts": {
+		"build": "babel src -d dist"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/NickGeek/MicroPad.git"
+	},
+	"author": "Nick Webster",
+	"license": "MPL-2.0",
+	"bugs": {
+		"url": "https://github.com/NickGeek/uPad/issues"
+	},
+	"homepage": "https://github.com/NickGeek/uPad",
+	"dependencies": {
+		"moment": "^2.16.0",
+		"pretty-data": "^0.40.0",
+		"to-markdown": "^3.0.3",
+		"xml2js": "^0.4.17"
+	},
+	"devDependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-preset-env": "^1.6.1"
+	},
+	"babel": {
+		"presets": [
+			"env"
+		]
+	},
+	"keywords": [
+		"uPad",
+		"µPad",
+		"parse",
+		"npx",
+		"parser"
+	]
 }

@@ -1,74 +1,85 @@
-const xml2js = require('xml2js');
-const parseString = require('xml2js').parseString;
+'use strict';
 
-exports.Assets = function() {
+var xml2js = require('xml2js');
+var parseString = require('xml2js').parseString;
+
+exports.Assets = function () {
 	this.assets = [];
-}
+};
 
-exports.Assets.prototype.addAsset = function(asset) {
+exports.Assets.prototype.addAsset = function (asset) {
 	this.assets.push(asset);
-}
+};
 
-exports.Assets.prototype.getXMLObject = function(callback) {
-	var parsedAssets = {asset: []};
+exports.Assets.prototype.getXMLObject = function (callback) {
+	var _this = this;
+
+	var parsedAssets = { asset: [] };
 	if (this.assets.length === 0) {
 		callback(parsedAssets);
 		return;
 	}
 
-	for (let i = 0; i < this.assets.length; i++) {
-		this.assets[i].getXMLObject(obj => {
+	for (var i = 0; i < this.assets.length; i++) {
+		this.assets[i].getXMLObject(function (obj) {
 			parsedAssets.asset.push(obj);
-			if (parsedAssets.asset.length === this.assets.length) callback(parsedAssets);
+			if (parsedAssets.asset.length === _this.assets.length) callback(parsedAssets);
 		});
 	}
-}
+};
 
-exports.Assets.prototype.getBase64Assets = function(callback) {
+exports.Assets.prototype.getBase64Assets = function (callback) {
+	var _this2 = this;
+
 	var parsedAssets = {};
 	if (this.assets.length === 0) {
 		callback(parsedAssets);
 		return;
 	}
 
-	for (let i = 0; i < this.assets.length; i++) {
-		blobToDataURL(this.assets[i].data, b64 => {
-			parsedAssets[this.assets[i].uuid] = b64;
-			if (i === this.assets.length - 1) callback(parsedAssets);
+	var _loop = function _loop(i) {
+		blobToDataURL(_this2.assets[i].data, function (b64) {
+			parsedAssets[_this2.assets[i].uuid] = b64;
+			if (i === _this2.assets.length - 1) callback(parsedAssets);
 		});
-	}
-}
+	};
 
-exports.Asset = function(dataAsBlob, uuid) {
+	for (var i = 0; i < this.assets.length; i++) {
+		_loop(i);
+	}
+};
+
+exports.Asset = function (dataAsBlob, uuid) {
 	if (uuid) {
 		this.uuid = uuid;
-	}
-	else {
+	} else {
 		this.uuid = generateGuid();
 	}
 
 	this.data = dataAsBlob;
-}
+};
 
-exports.Asset.prototype.toString = function(callback) {
-	blobToDataURL(this.data, b64 => {
+exports.Asset.prototype.toString = function (callback) {
+	blobToDataURL(this.data, function (b64) {
 		callback(b64);
 	});
-}
+};
 
-exports.Asset.prototype.getXMLObject = function(callback) {
-	this.toString(b64 => {
+exports.Asset.prototype.getXMLObject = function (callback) {
+	var _this3 = this;
+
+	this.toString(function (b64) {
 		callback({
 			_: b64,
 			$: {
-				uuid: this.uuid
+				uuid: _this3.uuid
 			}
 		});
 	});
-}
+};
 
-exports.parse = function(xml, callback) {
-	parseString(xml, {trim: true}, (e, res) => {
+exports.parse = function (xml, callback) {
+	parseString(xml, { trim: true }, function (e, res) {
 		var assets = new exports.Assets();
 		if (e || !res.notepad.assets) {
 			callback(assets);
@@ -90,17 +101,14 @@ exports.parse = function(xml, callback) {
 		}
 		callback(assets);
 	});
-}
+};
 
 //Thanks to https://stackoverflow.com/a/105074
 function generateGuid() {
 	function s4() {
-		return Math.floor((1 + Math.random()) * 0x10000)
-			.toString(16)
-			.substring(1);
+		return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	}
-	return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-		s4() + '-' + s4() + s4() + s4();
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 
 //Thanks to http://stackoverflow.com/a/12300351/998467
@@ -126,6 +134,8 @@ function dataURItoBlob(dataURI) {
 
 function blobToDataURL(blob, callback) {
 	var a = new FileReader();
-	a.onload = function(e) { callback(e.target.result); }
+	a.onload = function (e) {
+		callback(e.target.result);
+	};
 	a.readAsDataURL(blob);
 }

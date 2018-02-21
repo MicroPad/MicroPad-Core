@@ -1,24 +1,26 @@
+'use strict';
+
 var xml2js = require('xml2js');
 var moment = require('moment');
 
-exports.Note = function(title, time, addons) {
+exports.Note = function (title, time, addons) {
 	this.parent = undefined;
 	this.title = removeHTML(title);
 	this.time = Date.parse(time);
 	this.addons = addons;
 	this.bibliography = [];
 	this.elements = [];
-}
+};
 
-exports.Note.prototype.addSource = function(id, item, content) {
+exports.Note.prototype.addSource = function (id, item, content) {
 	this.bibliography.push({
 		id: id,
 		item: item,
 		content: content
 	});
-}
+};
 
-exports.Note.prototype.addElement = function(type, args, content) {
+exports.Note.prototype.addElement = function (type, args, content) {
 	if (!type) return;
 	if (!content || content.length === 0) return;
 	this.elements.push({
@@ -26,14 +28,14 @@ exports.Note.prototype.addElement = function(type, args, content) {
 		args: args,
 		content: content
 	});
-}
+};
 
-exports.Note.prototype.search = function(query) {
-	var pattern = new RegExp("\\b"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
+exports.Note.prototype.search = function (query) {
+	var pattern = new RegExp("\\b" + query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'i');
 	if (pattern.test(this.title)) return this;
 
 	if (query.length > 1 && query.charAt(0) == '#') {
-		pattern = new RegExp("(^|\\s)"+query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")+"(\\b)", 'i');
+		pattern = new RegExp("(^|\\s)" + query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + "(\\b)", 'i');
 		for (var i = 0; i < this.elements.length; i++) {
 			var el = this.elements[i];
 			if (el.type !== "markdown") continue;
@@ -41,9 +43,9 @@ exports.Note.prototype.search = function(query) {
 		}
 	}
 	return false;
-}
+};
 
-exports.Note.prototype.toXMLObject = function() {
+exports.Note.prototype.toXMLObject = function () {
 	var parseableNote = {
 		note: {
 			$: {
@@ -53,7 +55,7 @@ exports.Note.prototype.toXMLObject = function() {
 			addons: [],
 			bibliography: []
 		}
-	}
+	};
 
 	var imports = {
 		import: []
@@ -82,11 +84,11 @@ exports.Note.prototype.toXMLObject = function() {
 	for (k in this.elements) {
 		var element = this.elements[k];
 		if (!elements[element.type]) elements[element.type] = [];
-		
+
 		var elementToPush = {
 			_: element.content,
 			$: {}
-		}
+		};
 
 		for (argName in element.args) {
 			elementToPush.$[argName] = element.args[argName];
@@ -100,9 +102,9 @@ exports.Note.prototype.toXMLObject = function() {
 	}
 
 	return parseableNote;
-}
+};
 
-exports.Note.prototype.toXML = function() {
+exports.Note.prototype.toXML = function () {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
 		headless: true,
@@ -112,9 +114,9 @@ exports.Note.prototype.toXML = function() {
 		cdata: true
 	});
 	return builder.buildObject(this.toXMLObject());
-}
+};
 
-exports.Note.prototype.toMarkdown = function(assets) {
+exports.Note.prototype.toMarkdown = function (assets) {
 	var mdNote = "";
 	for (var i = 0; i < this.elements.length; i++) {
 		var element = this.elements[i];
@@ -129,7 +131,7 @@ exports.Note.prototype.toMarkdown = function(assets) {
 
 		switch (element.type) {
 			case "markdown":
-				mdNote += element.content+citation+"\n\n";
+				mdNote += element.content + citation + "\n\n";
 				break;
 
 			case "drawing":
@@ -137,8 +139,7 @@ exports.Note.prototype.toMarkdown = function(assets) {
 				var content = "";
 				if (element.args.ext) {
 					content = assets[element.args.ext];
-				}
-				else {
+				} else {
 					content = element.content;
 				}
 
@@ -150,8 +151,7 @@ exports.Note.prototype.toMarkdown = function(assets) {
 				var content = "";
 				if (element.args.ext) {
 					content = assets[element.args.ext];
-				}
-				else {
+				} else {
 					content = element.content;
 				}
 
@@ -160,10 +160,10 @@ exports.Note.prototype.toMarkdown = function(assets) {
 		}
 	}
 
-	return {title: this.title, md: mdNote};
-}
+	return { title: this.title, md: mdNote };
+};
 
-exports.Note.prototype.getUsedAssets = function() {
+exports.Note.prototype.getUsedAssets = function () {
 	var usedAssets = [];
 	for (var i = 0; i < this.elements.length; i++) {
 		var element = this.elements[i];
@@ -171,28 +171,29 @@ exports.Note.prototype.getUsedAssets = function() {
 
 		if (element.type === "markdown") {
 			var inlineImages = [];
-			element.content.replace(/!!\(([^]+?)\)/gi, (match, p1) => { inlineImages.push(p1); });
-			element.content.replace(/!!\[([^]+?)\]/gi, (match, p1) => { inlineImages.push(p1); });
+			element.content.replace(/!!\(([^]+?)\)/gi, function (match, p1) {
+				inlineImages.push(p1);
+			});
+			element.content.replace(/!!\[([^]+?)\]/gi, function (match, p1) {
+				inlineImages.push(p1);
+			});
 
 			if (inlineImages) {
-				let uuid = inlineImages[i];
+				var uuid = inlineImages[i];
 				if (uuid) usedAssets.push(uuid);
 			}
 		}
 	}
 
 	return usedAssets;
-}
+};
 
 // Thanks to http://stackoverflow.com/a/4673436/998467
 if (!String.prototype.format) {
-	String.prototype.format = function() {
+	String.prototype.format = function () {
 		var args = arguments;
-		return this.replace(/{(\d+)}/g, function(match, number) { 
-			return typeof args[number] != 'undefined'
-				? args[number]
-				: match
-			;
+		return this.replace(/{(\d+)}/g, function (match, number) {
+			return typeof args[number] != 'undefined' ? args[number] : match;
 		});
 	};
 }

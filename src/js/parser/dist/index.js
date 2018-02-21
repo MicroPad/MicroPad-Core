@@ -1,11 +1,13 @@
-const xml2js = require('xml2js');
-const parseString = require('xml2js').parseString;
-const moment = require('moment');
-const toMarkdown = require('to-markdown');
-const pd = require('pretty-data').pd;
+'use strict';
 
-const Note = require('./Note.js').Note;
-const Assets = require('./Assets.js');
+var xml2js = require('xml2js');
+var parseString = require('xml2js').parseString;
+var moment = require('moment');
+var toMarkdown = require('to-markdown');
+var pd = require('pretty-data').pd;
+
+var Note = require('./Note.js').Note;
+var Assets = require('./Assets.js');
 
 var searchResults = [];
 
@@ -13,23 +15,22 @@ exports.Assets = Assets.Assets;
 exports.Asset = Assets.Asset;
 exports.parseAssets = Assets.parse;
 
-var Notepad = function(title, lastModified) {
+var Notepad = function Notepad(title, lastModified) {
 	this.title = removeHTML(title);
 	this.sections = [];
 	this.assets = new Assets.Assets();
 
 	if (lastModified) {
 		this.lastModified = lastModified;
-	}
-	else {
+	} else {
 		this.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 	}
-}
-Notepad.prototype.addSection = function(section) {
+};
+Notepad.prototype.addSection = function (section) {
 	section.parent = this;
 	this.sections.push(section);
-}
-Notepad.prototype.search = function(query) {
+};
+Notepad.prototype.search = function (query) {
 	searchResults = [];
 	for (s in this.sections) {
 		var section = this.sections[s];
@@ -37,30 +38,32 @@ Notepad.prototype.search = function(query) {
 	}
 
 	return searchResults;
-}
-Notepad.prototype.toXMLObject = function(callback) {
-	this.assets.getXMLObject(assetsObj => {
+};
+Notepad.prototype.toXMLObject = function (callback) {
+	var _this = this;
+
+	this.assets.getXMLObject(function (assetsObj) {
 		var parseableNotepad = {
 			notepad: {
 				$: {
 					'xsi:noNamespaceSchemaLocation': 'https://getmicropad.com/schema.xsd',
-					title: this.title,
-					lastModified: this.lastModified,
+					title: _this.title,
+					lastModified: _this.lastModified,
 					'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
 				},
 				assets: assetsObj,
 				section: []
 			}
-		}
+		};
 
-		for (k in this.sections) {
-			parseableNotepad.notepad.section.push(this.sections[k].toXMLObject().section);
+		for (k in _this.sections) {
+			parseableNotepad.notepad.section.push(_this.sections[k].toXMLObject().section);
 		}
 
 		callback(parseableNotepad);
 	});
-}
-Notepad.prototype.toXML = function(callback, assets) {
+};
+Notepad.prototype.toXML = function (callback, assets) {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
 		headless: true,
@@ -71,11 +74,13 @@ Notepad.prototype.toXML = function(callback, assets) {
 	});
 
 	this.assets = assets;
-	this.toXMLObject(obj => {
-		callback('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'+builder.buildObject(obj).replace(/&#xD;/g, ''));
+	this.toXMLObject(function (obj) {
+		callback('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + builder.buildObject(obj).replace(/&#xD;/g, ''));
 	});
-}
-Notepad.prototype.toMarkdown = function(callback, assets) {
+};
+Notepad.prototype.toMarkdown = function (callback, assets) {
+	var _this2 = this;
+
 	var notes = [];
 	if (this.sections.length === 0) {
 		callback(notes);
@@ -83,14 +88,14 @@ Notepad.prototype.toMarkdown = function(callback, assets) {
 	}
 
 	this.assets = assets;
-	this.assets.getBase64Assets(b64Assets => {
-		for (var i = 0; i < this.sections.length; i++) {
-			notes.push.apply(notes, this.sections[i].toMarkdown(b64Assets));
-			if (i === this.sections.length - 1) callback(notes);
+	this.assets.getBase64Assets(function (b64Assets) {
+		for (var i = 0; i < _this2.sections.length; i++) {
+			notes.push.apply(notes, _this2.sections[i].toMarkdown(b64Assets));
+			if (i === _this2.sections.length - 1) callback(notes);
 		}
 	});
-}
-Notepad.prototype.getUsedAssets = function() {
+};
+Notepad.prototype.getUsedAssets = function () {
 	var usedAssets = [];
 
 	for (var i = 0; i < this.sections.length; i++) {
@@ -99,23 +104,23 @@ Notepad.prototype.getUsedAssets = function() {
 	}
 
 	return new Set(usedAssets);
-}
+};
 
-var Section = function(title) {
+var Section = function Section(title) {
 	this.parent = undefined;
 	this.title = removeHTML(title);
 	this.sections = [];
 	this.notes = [];
 };
-Section.prototype.addSection = function(section) {
+Section.prototype.addSection = function (section) {
 	section.parent = this;
 	this.sections.push(section);
 };
-Section.prototype.addNote = function(note) {
+Section.prototype.addNote = function (note) {
 	note.parent = this;
 	this.notes.push(note);
 };
-Section.prototype.search = function(query) {
+Section.prototype.search = function (query) {
 	var res = [];
 	for (n in this.notes) {
 		var note = this.notes[n];
@@ -130,8 +135,8 @@ Section.prototype.search = function(query) {
 	}
 
 	return res;
-}
-Section.prototype.toXMLObject = function() {
+};
+Section.prototype.toXMLObject = function () {
 	var parseableSection = {
 		section: {
 			$: {
@@ -140,7 +145,7 @@ Section.prototype.toXMLObject = function() {
 			section: [],
 			note: []
 		}
-	}
+	};
 
 	for (k in this.sections) {
 		parseableSection.section.section.push(this.sections[k].toXMLObject().section);
@@ -151,8 +156,8 @@ Section.prototype.toXMLObject = function() {
 	}
 
 	return parseableSection;
-}
-Section.prototype.toXML = function() {
+};
+Section.prototype.toXML = function () {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
 		headless: true,
@@ -162,8 +167,8 @@ Section.prototype.toXML = function() {
 		cdata: true
 	});
 	return builder.buildObject(this.toXMLObject());
-}
-Section.prototype.toMarkdown = function(b64Assets) {
+};
+Section.prototype.toMarkdown = function (b64Assets) {
 	var mdNoteList = [];
 
 	for (var i = 0; i < this.sections.length; i++) {
@@ -176,8 +181,8 @@ Section.prototype.toMarkdown = function(b64Assets) {
 	}
 
 	return mdNoteList;
-}
-Section.prototype.getUsedAssets = function() {
+};
+Section.prototype.getUsedAssets = function () {
 	var usedAssets = [];
 
 	for (var i = 0; i < this.sections.length; i++) {
@@ -191,12 +196,12 @@ Section.prototype.getUsedAssets = function() {
 	}
 
 	return usedAssets;
-}
+};
 
 var supportedAddons = [];
 exports.parse = function parse(xml, addons) {
 	supportedAddons = addons;
-	parseString(xml, {trim: true}, function(e, res) {
+	parseString(xml, { trim: true }, function (e, res) {
 		exports.notepad = new Notepad(res.notepad.$.title, res.notepad.$.lastModified);
 		if (res.notepad.section) {
 			for (var i = 0; i < res.notepad.section.length; i++) {
@@ -207,11 +212,11 @@ exports.parse = function parse(xml, addons) {
 			}
 		}
 	});
-}
+};
 
 exports.parseFromEvernote = function parseFromEvernote(xml, addons) {
 	supportedAddons = addons;
-	parseString(xml, {trim: true, normalize: false}, function(e, res) {
+	parseString(xml, { trim: true, normalize: false }, function (e, res) {
 		exports.notepad = new Notepad("{0} Import ({1})".format(res['en-export'].$.application, moment(res['en-export'].$['export-date']).format('D MMM h:mmA')));
 		var section = new Section('Imported Notes');
 		var notes = res['en-export'].note;
@@ -235,30 +240,28 @@ exports.parseFromEvernote = function parseFromEvernote(xml, addons) {
 				var y = 10;
 				for (var j = 0; j < resources.length; j++) {
 					var resource = resources[j];
-					var id = 'file'+(j+1);
-					
+					var id = 'file' + (j + 1);
+
 					if (note.elements[note.elements.length - 1].type === 'file') {
 						y = parseInt(note.elements[note.elements.length - 1].args.y) + 100;
 					}
 
 					if (resource['resource-attributes'][0]['file-name']) {
 						var filename = resource['resource-attributes'][0]['file-name'][0];
-					}
-					else if (resource['resource-attributes'][0]['source-url']) {
+					} else if (resource['resource-attributes'][0]['source-url']) {
 						var filename = resource['resource-attributes'][0]['source-url'][0].split('/').pop();
-					}
-					else {
-						var filename = id+'.'+resource.mime[0].split('/').pop();
+					} else {
+						var filename = id + '.' + resource.mime[0].split('/').pop();
 					}
 
 					note.addElement('file', {
 						id: id,
 						x: '650px',
-						y: y+'px',
+						y: y + 'px',
 						width: 'auto',
 						height: 'auto',
 						filename: filename
-					}, 'data:'+resource.mime[0]+';base64,'+resource.data[0]._.replace(/\r?\n|\r/g, ''));
+					}, 'data:' + resource.mime[0] + ';base64,' + resource.data[0]._.replace(/\r?\n|\r/g, ''));
 				}
 			}
 
@@ -266,19 +269,19 @@ exports.parseFromEvernote = function parseFromEvernote(xml, addons) {
 		}
 		exports.notepad.addSection(section);
 	});
-}
+};
 
 exports.createNotepad = function createNotepad(title) {
 	return new Notepad(title);
-}
+};
 
 exports.createSection = function createSection(title) {
 	return new Section(title);
-}
+};
 
 exports.createNote = function createNote(title, addons) {
 	return new Note(title, moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ'), addons);
-}
+};
 
 exports.restoreNotepad = function restoreNotepad(obj) {
 	var restoredNotepad = new Notepad(obj.title, obj.lastModified);
@@ -288,7 +291,7 @@ exports.restoreNotepad = function restoreNotepad(obj) {
 	}
 
 	return restoredNotepad;
-}
+};
 exports.restoreSection = function restoreSection(obj) {
 	var restoredSection = new Section(obj.title);
 	for (k in obj.sections) {
@@ -302,7 +305,7 @@ exports.restoreSection = function restoreSection(obj) {
 	}
 
 	return restoredSection;
-}
+};
 exports.restoreNote = function restoreNote(obj) {
 	var restoredNote = new Note(obj.title, moment(obj.time).format('YYYY-MM-DDTHH:mm:ss.SSSZ'), obj.addons);
 	for (k in obj.bibliography) {
@@ -316,7 +319,7 @@ exports.restoreNote = function restoreNote(obj) {
 	}
 
 	return restoredNote;
-}
+};
 exports.xmlObjToXML = function xmlObjToXml(xmlObj) {
 	var builder = new xml2js.Builder({
 		allowSurrogateChars: true,
@@ -329,7 +332,7 @@ exports.xmlObjToXML = function xmlObjToXml(xmlObj) {
 		cdata: true
 	});
 	return builder.buildObject(xmlObj);
-}
+};
 
 function parseSection(sectionXML, section, parent) {
 	for (var k in sectionXML) {
@@ -347,7 +350,7 @@ function parseSection(sectionXML, section, parent) {
 						if (noteXML.addons[0].import) {
 							for (var j = noteXML.addons[0].import.length - 1; j >= 0; j--) {
 								var addon = noteXML.addons[0].import[j];
-								if (supportedAddons.indexOf(addon) == -1) console.log("This note contains some features that aren't supported: "+addon);
+								if (supportedAddons.indexOf(addon) == -1) console.log("This note contains some features that aren't supported: " + addon);
 								addons.push(addon);
 							}
 						}
@@ -415,7 +418,7 @@ function parseSection(sectionXML, section, parent) {
 
 function enmlToMarkdown(enml) {
 	var lineArr = enml.split('\n');
-	lineArr = lineArr.slice(3, lineArr.length-1);
+	lineArr = lineArr.slice(3, lineArr.length - 1);
 	var html = [];
 	for (var i = 0; i < lineArr.length; i++) {
 		var line = lineArr[i].trim();
@@ -425,48 +428,40 @@ function enmlToMarkdown(enml) {
 	html = html.join('\n');
 	return toMarkdown(html, {
 		gfm: true,
-		converters: [
-			{
-				filter: 'div',
-				replacement: function(content) {
-					return '\n\n'+content+'\n\n';
-				}
-			},
-			{
-				filter: 'en-media',
-				replacement: function(content) {
-					return '`<there was an attachment here>`';
-				}
-			},
-			{
-				filter: 'en-todo',
-				replacement: function(content, node) {
-					var checkStr = ' ';
-					if (node.getAttributeNode('checked')) {
-						if (node.getAttributeNode('checked').value == 'true') checkStr = 'x';
-					}
-					return '- [{0}] {1}'.format(checkStr, content);
-				}
-			},
-			{
-				filter: 'en-crypt',
-				replacement: function(content) {
-					return '`<there was encrypted text here>`';
-				}
+		converters: [{
+			filter: 'div',
+			replacement: function replacement(content) {
+				return '\n\n' + content + '\n\n';
 			}
-		]
+		}, {
+			filter: 'en-media',
+			replacement: function replacement(content) {
+				return '`<there was an attachment here>`';
+			}
+		}, {
+			filter: 'en-todo',
+			replacement: function replacement(content, node) {
+				var checkStr = ' ';
+				if (node.getAttributeNode('checked')) {
+					if (node.getAttributeNode('checked').value == 'true') checkStr = 'x';
+				}
+				return '- [{0}] {1}'.format(checkStr, content);
+			}
+		}, {
+			filter: 'en-crypt',
+			replacement: function replacement(content) {
+				return '`<there was encrypted text here>`';
+			}
+		}]
 	});
 }
 
 // Thanks to http://stackoverflow.com/a/4673436/998467
 if (!String.prototype.format) {
-	String.prototype.format = function() {
+	String.prototype.format = function () {
 		var args = arguments;
-		return this.replace(/{(\d+)}/g, function(match, number) { 
-			return typeof args[number] != 'undefined'
-				? args[number]
-				: match
-			;
+		return this.replace(/{(\d+)}/g, function (match, number) {
+			return typeof args[number] != 'undefined' ? args[number] : match;
 		});
 	};
 }
