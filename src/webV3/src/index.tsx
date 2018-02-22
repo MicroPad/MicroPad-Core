@@ -5,7 +5,7 @@ import 'materialize-css/dist/js/materialize.js';
 import * as React from 'react';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
-import { IStoreState } from './types';
+import { IStoreState, MICROPAD_URL } from './types';
 import { applyMiddleware, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
@@ -15,6 +15,12 @@ import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
 import { Provider } from 'react-redux';
 import HeaderComponent from './containers/header/HeaderContainer';
+
+try {
+	document.domain = MICROPAD_URL.split('//')[1];
+} catch (err) {
+	console.warn(`Couldn't set domain for resolving CORS. If this is prod change 'MICROPAD_URL'.`);
+}
 
 const baseReducer: BaseReducer = new BaseReducer();
 export const store = createStore<IStoreState>(
@@ -26,7 +32,6 @@ export const NOTEPAD_STORAGE = localforage.createInstance({
 	name: 'MicroPad',
 	storeName: 'notepads'
 });
-
 export const ASSET_STORAGE = localforage.createInstance({
 		name: 'MicroPad',
 		storeName: 'assets'
