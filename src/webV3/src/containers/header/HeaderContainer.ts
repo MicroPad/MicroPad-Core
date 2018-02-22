@@ -12,7 +12,7 @@ export function mapStateToProps({ notepads }: IStoreState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 	return {
-		getHelp: () => dispatch(actions.getHelp.started(0))
+		getHelp: () => dispatch(actions.getHelp.started(undefined))
 	};
 }
 

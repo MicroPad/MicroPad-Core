@@ -27,6 +27,28 @@ const parseNpx$ = action$ =>
 		})
 	);
 
+const restoreJsonNotepad$ = action$ =>
+	action$.pipe(
+		filter((action: Action<string>) => isType(action, actions.restoreJsonNotepad)),
+		map((action: Action<string>) => action.payload),
+		map((json: string) => {
+			try {
+				return actions.parseNpx.done({
+					params: '',
+					result: Parser.restoreNotepad(JSON.parse(json))
+				});
+			} catch (err) {
+				alert(`Error restoring notepad`);
+				console.error(err);
+				return actions.parseNpx.failed({
+					params: '',
+					error: err
+				});
+			}
+		})
+	);
+
 export const notepadEpics$ = combineEpics(
-	parseNpx$
+	parseNpx$,
+	restoreJsonNotepad$
 );

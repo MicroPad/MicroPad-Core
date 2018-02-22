@@ -25,20 +25,10 @@
 </head>
 <body>
 	<noscript>
-		You need to enable JavaScript to run this app.<br />
+		You need to enable JavaScript to run this app.<br/>
 		Don't worry, it's all open source (MPLv2). Your freedoms are safe.
 	</noscript>
 	<div id="root"></div>
-	<!--
-	This HTML file is a template.
-	If you open it directly in the browser, you will see an empty page.
-
-	You can add webfonts, meta tags, or analytics to this file.
-	The build step will place the bundled scripts into the <body> tag.
-
-	To begin the development, run `npm start` or `yarn start`.
-	To create a production bundle, use `npm run build` or `yarn build`.
-	-->
 	<script type="text/javascript" src="%PUBLIC_URL%/assets/please-wait/please-wait.min.js"></script>
 	<script type="text/javascript">
 		var loadingScreen = window.pleaseWait({
@@ -50,9 +40,13 @@
 			"<em style='font-family: serif;'>p = np</em></a>?</p>"
 		});
 
-		document.addEventListener('DOMContentLoaded', function() {
+		document.addEventListener('DOMContentLoaded', function () {
 			loadingScreen.finish();
 		}, false);
+
+		if (navigator.storage && navigator.storage.persist) {
+			navigator.storage.persist();
+		}
 	</script>
 </body>
 </html>

@@ -38,7 +38,7 @@ export const ASSET_STORAGE = localforage.createInstance({
 });
 
 Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
-	.then(() => store.dispatch(actions.getNotepadList.started(0)))
+	.then(() => store.dispatch(actions.getNotepadList.started(undefined)))
 	.then(() => ReactDOM.render(
 		<Provider store={store}>
 			<HeaderComponent />
@@ -47,7 +47,7 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
 	))
 	.then(() => localforage.getItem('hasRunBefore'))
 	.then(async (hasRunBefore: boolean) => {
-		if (!hasRunBefore) store.dispatch(actions.getHelp.started(0));
+		if (!hasRunBefore) store.dispatch(actions.getHelp.started(undefined));
 		await localforage.setItem('hasRunBefore', true);
 	});
 

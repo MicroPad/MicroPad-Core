@@ -10,7 +10,7 @@ import { Observable } from 'rxjs/Observable';
 const getHelp$ = action$ =>
 	action$.pipe(
 		filter((action: Action<void>) => isType(action, actions.getHelp.started)),
-		mergeMap((action: Action<void>) =>
+		mergeMap(() =>
 			ajax({
 				url: `${MICROPAD_URL}/Help.npx`,
 				crossDomain: true,
@@ -20,11 +20,14 @@ const getHelp$ = action$ =>
 				responseType: 'text'
 			})
 				.pipe(
-					map((helpNpx: AjaxResponse) => actions.getHelp.done({ params: 0, result: helpNpx.response })),
+					map((helpNpx: AjaxResponse) => actions.getHelp.done({
+						params: undefined,
+						result: helpNpx.response
+					})),
 					retry(2),
 					catchError(err => {
 						alert(`I can't seem to find the help notepad. Are you online?`);
-						return Observable.of(actions.getHelp.failed({ params: 0, error: err }));
+						return Observable.of(actions.getHelp.failed({ params: undefined, error: err }));
 					})
 				)
 		)

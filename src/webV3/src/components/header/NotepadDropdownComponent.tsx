@@ -4,16 +4,17 @@ import { SYNC_NAME } from '../../types';
 import { Dropdown, Icon, NavItem } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
 
-export interface INotepadDropdownComponent {
-	notepadTitles: string[];
+export interface INotepadDropdownProps {
+	notepadTitles?: string[];
+	openNotepadFromStorage?: (title: string) => void;
 }
 
-export default class NotepadDropdownComponent extends React.Component<INotepadDropdownComponent> {
+export default class NotepadDropdownComponent extends React.Component<INotepadDropdownProps> {
 	render() {
 		const { notepadTitles } = this.props;
 
 		const notepadNavItems: JSX.Element[] = [];
-		(notepadTitles || []).forEach((title: string, i: number) => notepadNavItems.push(<NavItem key={title} href="#!">{title}</NavItem>));
+		(notepadTitles || []).forEach((title: string) => notepadNavItems.push(<NavItem key={title} href="#!" onClick={this.openNotepad}>{title}</NavItem>));
 
 		return (
 			<li>
@@ -35,5 +36,13 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 				</Dropdown>
 			</li>
 		);
+	}
+
+	private openNotepad = (event) => {
+		const { openNotepadFromStorage } = this.props;
+		let title = event.currentTarget.innerText;
+		title = title.substr(0, title.length - 1);
+
+		openNotepadFromStorage!(title);
 	}
 }
