@@ -44,6 +44,11 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
 			<HeaderComponent />
 		</Provider>,
 		document.getElementById('root') as HTMLElement
-	));
+	))
+	.then(() => localforage.getItem('hasRunBefore'))
+	.then(async (hasRunBefore: boolean) => {
+		if (!hasRunBefore) store.dispatch(actions.getHelp.started(0));
+		await localforage.setItem('hasRunBefore', true);
+	});
 
 registerServiceWorker();
