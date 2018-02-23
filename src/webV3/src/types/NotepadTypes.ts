@@ -53,7 +53,7 @@ export interface IParent extends INPXObject {
 
 export interface INotepad extends IParent {
 	assets: IAssets;
-	notepadAssets: Set<string>;
+	notepadAssets: string[];
 	lastModified: string;
 
 	getUsedAssets: () => Set<string>;
