@@ -1,6 +1,6 @@
 import { IReducer } from '../types/ReducerType';
 import { Action } from 'redux';
-import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
+import { INotepad, INotepadsStoreState } from '../types/NotepadTypes';
 import { actions } from '../actions';
 import { isType } from 'redux-typescript-actions';
 
@@ -51,6 +51,20 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 					...(state.savedNotepadTitles || []),
 					...action.payload.result
 				]))
+			};
+		} else if (isType(action, actions.newNotepad)) {
+			const notepad: INotepad = action.payload;
+
+			return {
+				...state,
+				savedNotepadTitles: Array.from(new Set([
+					...(state.savedNotepadTitles || []),
+					notepad.title
+				])),
+				notepad: {
+					isLoading: false,
+					item: notepad
+				}
 			};
 		}
 

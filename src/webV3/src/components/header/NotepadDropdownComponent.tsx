@@ -3,10 +3,13 @@ import { SYNC_NAME } from '../../types';
 // @ts-ignore
 import { Dropdown, Icon, NavItem } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
+import * as Parser from 'upad-parse/dist/index.js';
+import { INotepad } from '../../types/NotepadTypes';
 
 export interface INotepadDropdownProps {
 	notepadTitles?: string[];
 	openNotepadFromStorage?: (title: string) => void;
+	newNotepad?: (notepad: INotepad) => void;
 }
 
 export default class NotepadDropdownComponent extends React.Component<INotepadDropdownProps> {
@@ -25,7 +28,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 						</NavItem>
 					</ul>
 				}>
-					<NavItem href="#!"><Icon left={true}>add</Icon> New</NavItem>
+					<NavItem href="#!" onClick={this.createNotepad}><Icon left={true}>add</Icon> New</NavItem>
 					<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Open ({SYNC_NAME})</NavItem>
 					<UploadNotepadsComponent />
 					<NavItem href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>
@@ -44,5 +47,15 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 		title = title.substr(0, title.length - 1);
 
 		openNotepadFromStorage!(title);
+	}
+
+	private createNotepad = () => {
+		const title = prompt('Notepad Title:');
+
+		if (title) {
+			this.props.newNotepad!(Parser.createNotepad(title));
+		} else {
+			alert('You must enter a title');
+		}
 	}
 }
