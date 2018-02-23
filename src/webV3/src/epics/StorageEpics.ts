@@ -1,6 +1,6 @@
 import { actions } from '../actions';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
-import { Action, isType, Success } from 'redux-typescript-actions';
+import { Action, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/fromPromise';
@@ -8,13 +8,13 @@ import { INotepad } from '../types/NotepadTypes';
 import { stringify } from '../util';
 import { NOTEPAD_STORAGE } from '../index';
 
-const saveOnParse$ = action$ =>
+const saveNotepad$ = action$ =>
 	action$.pipe(
-		filter((action: Action<Success<string, INotepad>>) => isType(action, actions.parseNpx.done)),
-		map((action: Action<Success<string, INotepad>>) => action.payload.result),
+		filter((action: Action<INotepad>) => isType(action, actions.saveNotepad.started)),
+		map((action: Action<INotepad>) => action.payload),
 		switchMap((notepad: INotepad) => Observable.fromPromise(NOTEPAD_STORAGE.setItem(notepad.title, stringify(notepad)))),
-		catchError(err => Observable.of(actions.saveNotepad.failed({ params: undefined, error: err }))),
-		map(() => actions.saveNotepad.done({ params: undefined, result: undefined }))
+		catchError(err => Observable.of(actions.saveNotepad.failed({ params: <INotepad> {}, error: err }))),
+		map(() => actions.saveNotepad.done({ params: <INotepad> {}, result: undefined }))
 	);
 
 const getNotepadList$ = action$ =>
@@ -43,7 +43,7 @@ const openNotepadFromStorage$ = action$ =>
 	);
 
 export const storageEpics$ = combineEpics(
-	saveOnParse$,
+	saveNotepad$,
 	getNotepadList$,
 	openNotepadFromStorage$
 );

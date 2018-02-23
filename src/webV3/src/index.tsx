@@ -15,6 +15,9 @@ import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
 import { Provider } from 'react-redux';
 import HeaderComponent from './containers/header/HeaderContainer';
+import { from } from 'rxjs/observable/from';
+import { debounceTime, distinctUntilChanged, filter, map } from 'rxjs/operators';
+import { INotepad, INotepadStoreState } from './types/NotepadTypes';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -27,6 +30,7 @@ export const store = createStore<IStoreState>(
 	baseReducer.reducer,
 	baseReducer.initialState,
 	composeWithDevTools(applyMiddleware(epicMiddleware)));
+export const state$ = from(store as any);
 
 export const NOTEPAD_STORAGE = localforage.createInstance({
 	name: 'MicroPad',
@@ -52,3 +56,15 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
 	});
 
 registerServiceWorker();
+
+// Save open notepad on changes
+state$
+	.pipe(
+		map((state: IStoreState) => state.notepads.notepad),
+		filter(Boolean),
+		map((notepadState: INotepadStoreState) => notepadState.item),
+		filter(Boolean),
+		distinctUntilChanged(),
+		debounceTime(1000)
+	)
+	.subscribe((notepad: INotepad) => store.dispatch(actions.saveNotepad.started(notepad)));
