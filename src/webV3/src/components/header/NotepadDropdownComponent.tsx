@@ -52,10 +52,6 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 	private createNotepad = () => {
 		const title = prompt('Notepad Title:');
 
-		if (title) {
-			this.props.newNotepad!(Parser.createNotepad(title));
-		} else {
-			alert('You must enter a title');
-		}
+		if (title) this.props.newNotepad!(Parser.createNotepad(title));
 	}
 }
