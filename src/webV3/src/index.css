@@ -5,6 +5,17 @@ body {
 
 nav {
 	z-index: 1000 !important;
+	cursor: default;
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.dropdown-content {
+	overflow: auto !important;
 }
 
 .material-icons.left {

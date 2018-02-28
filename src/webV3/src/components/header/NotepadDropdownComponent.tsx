@@ -17,7 +17,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 		const { notepadTitles } = this.props;
 
 		const notepadNavItems: JSX.Element[] = [];
-		(notepadTitles || []).forEach((title: string) => notepadNavItems.push(<NavItem key={title} href="#!" onClick={this.openNotepad}>{title}</NavItem>));
+		(notepadTitles || []).forEach((title: string) => notepadNavItems.push(<NavItem key={`npdd-${title}`} href="#!" onClick={this.openNotepad}>{title}</NavItem>));
 
 		return (
 			<li>
