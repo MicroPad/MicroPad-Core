@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { IStoreState } from '../../types';
 import NotepadBreadcrumbsComponent, { INotepadBreadcrumbsProps } from '../../components/header/NotepadBreadcrumbsComponent/NotepadBreadcrumbsComponent';
-import { INote, INotepad, INotepadStoreState, INoteStoreState, IParent, ISection } from '../../types/NotepadTypes';
+import { INote, INotepad, INotepadStoreState, ISection } from '../../types/NotepadTypes';
 
 export function mapStateToProps({ notepads, currentNote }: IStoreState) {
 	const breadcrumbs: string[] = [];
