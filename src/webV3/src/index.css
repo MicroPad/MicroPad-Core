@@ -14,6 +14,10 @@ nav {
 	user-select: none;
 }
 
+.side-nav li {
+	color: rgba(0,0,0,0.87);
+}
+
 .dropdown-content {
 	overflow: auto !important;
 }

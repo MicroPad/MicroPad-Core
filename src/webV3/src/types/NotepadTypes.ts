@@ -35,6 +35,7 @@ export interface INotepadsStoreState {
 
 export interface INotepadStoreState {
 	isLoading: boolean;
+	saving: boolean;
 	item?: INotepad;
 }
 

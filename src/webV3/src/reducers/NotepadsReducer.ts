@@ -22,6 +22,7 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				])),
 				notepad: {
 					isLoading: false,
+					saving: false,
 					item: result
 				}
 			};
@@ -30,6 +31,7 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				...state,
 				isLoading: true,
 				notepad: {
+					saving: false,
 					isLoading: true
 				}
 			};
@@ -63,7 +65,32 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				])),
 				notepad: {
 					isLoading: false,
+					saving: false,
 					item: notepad
+				}
+			};
+		} else if (isType(action, actions.saveNotepad.started)) {
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					saving: true
+				}
+			};
+		} else if (isType(action, actions.saveNotepad.done)) {
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					saving: false
+				}
+			};
+		} else if (isType(action, actions.saveNotepad.failed)) {
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					saving: false
 				}
 			};
 		}

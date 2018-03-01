@@ -22,9 +22,16 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 	render() {
 		const { getHelp, notepad } = this.props;
 
+		const saveText: string = (!!notepad && !!notepad.item)
+			? (notepad.saving)
+				? 'Saving...'
+				: 'All changes saved'
+			: '';
+
 		return (
 			<header>
 				<Navbar className="blue-grey" brand={<AppNameComponent />} style={this.navStyle} right={true}>
+					<li style={{ marginRight: '10px' }}>{saveText}</li>
 					<NotepadDropdownComponent />
 					{!!notepad && !!notepad.item && <NavItem href="#!"><Icon left={true}>search</Icon> Search</NavItem>}
 					<NavItem href="#!" onClick={getHelp}><Icon left={true}>help_outline</Icon> Help</NavItem>
