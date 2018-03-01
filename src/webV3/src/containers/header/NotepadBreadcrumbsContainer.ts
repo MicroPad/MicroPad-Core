@@ -11,8 +11,7 @@ export function mapStateToProps({ notepads, currentNote }: IStoreState) {
 			|| 'Open/Create a notepad using the drop-down or the sidebar to start');
 	} else {
 		// Get parent list up the tree
-		const note = currentNote.item;
-		let parent: ISection | INote = note;
+		let parent: ISection | INote = currentNote.item;
 
 		while (!!parent.parent) {
 			breadcrumbs.unshift(parent.title);
