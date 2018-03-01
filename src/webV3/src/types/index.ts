@@ -1,9 +1,10 @@
 import { IMetaStoreState } from './MetaTypes';
-import { INotepadsStoreState } from './NotepadTypes';
+import { INotepadsStoreState, INoteStoreState } from './NotepadTypes';
 
 export interface IStoreState {
 	readonly meta: IMetaStoreState;
 	readonly notepads: INotepadsStoreState;
+	readonly currentNote: INoteStoreState;
 }
 
 export const APP_NAME = 'µPad';

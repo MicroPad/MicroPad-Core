@@ -38,6 +38,11 @@ export interface INotepadStoreState {
 	item?: INotepad;
 }
 
+export interface INoteStoreState {
+	isLoading: boolean;
+	item?: INote;
+}
+
 export interface INPXObject {
 	title: string;
 	toXML: (callback: ToXMLCallback, assets: IAssets) => void;

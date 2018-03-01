@@ -3,10 +3,12 @@ import { IStoreState } from '../types/index';
 import { MetaReducer } from './MetaReducer';
 import { Action } from 'redux';
 import { NotepadsReducer } from './NotepadsReducer';
+import { NoteReducer } from '../types/NoteReducer';
 
 export const REDUCERS: Array<IReducer<any>> = [
 	new MetaReducer(),
-	new NotepadsReducer()
+	new NotepadsReducer(),
+	new NoteReducer()
 ];
 
 export class BaseReducer implements IReducer<IStoreState> {

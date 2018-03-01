@@ -1,12 +1,29 @@
 import { connect } from 'react-redux';
 import { IStoreState } from '../../types';
 import NotepadBreadcrumbsComponent, { INotepadBreadcrumbsProps } from '../../components/header/NotepadBreadcrumbsComponent/NotepadBreadcrumbsComponent';
+import { INote, INotepad, INotepadStoreState, INoteStoreState, IParent, ISection } from '../../types/NotepadTypes';
 
-export function mapStateToProps({ notepads }: IStoreState) {
+export function mapStateToProps({ notepads, currentNote }: IStoreState) {
+	const breadcrumbs: string[] = [];
+
+	if (!currentNote.item) {
+		breadcrumbs.push(((notepads.notepad || <INotepadStoreState> {}).item || <INotepad> {}).title
+			|| 'Open/Create a notepad using the drop-down or the sidebar to start');
+	} else {
+		// Get parent list up the tree
+		const note = currentNote.item;
+		let parent: ISection | INote = note;
+
+		while (!!parent.parent) {
+			breadcrumbs.unshift(parent.title);
+			parent = <ISection | INote> parent.parent;
+		}
+
+		breadcrumbs.unshift(parent.title);
+	}
+
 	return {
-		breadcrumbs: [
-
-		]
+		breadcrumbs
 	};
 }
 
