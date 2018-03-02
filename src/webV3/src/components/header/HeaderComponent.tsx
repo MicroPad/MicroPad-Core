@@ -29,7 +29,7 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 			: '';
 
 		return (
-			<header>
+			<header style={{position: 'fixed'}}>
 				<Navbar className="blue-grey" brand={<AppNameComponent />} style={this.navStyle} right={true}>
 					<li style={{ marginRight: '10px' }}>{saveText}</li>
 					<NotepadDropdownComponent />

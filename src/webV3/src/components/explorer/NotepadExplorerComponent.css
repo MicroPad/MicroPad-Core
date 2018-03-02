@@ -1,0 +1,10 @@
+#notepad-explorer {
+	order: 1;
+	padding-left: 5px;
+	padding-right: 5px;
+	width: 300px;
+	background-color: #607d8b;
+	overflow: auto;
+	color: #fff;
+	border-left: 2px solid #ffb300;
+}

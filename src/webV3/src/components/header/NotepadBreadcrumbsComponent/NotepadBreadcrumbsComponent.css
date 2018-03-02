@@ -3,4 +3,6 @@
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
+	height: 64px;
+	line-height: 64px;
 }

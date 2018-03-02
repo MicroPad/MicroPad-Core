@@ -18,6 +18,8 @@ import HeaderComponent from './containers/header/HeaderContainer';
 import { from } from 'rxjs/observable/from';
 import { debounceTime, distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { INotepad, INotepadStoreState } from './types/NotepadTypes';
+import NotepadExplorerComponent from './components/explorer/NotepadExplorerComponent';
+import NoteViewerComponent from './components/note-viewer/NoteViewerComponent';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -45,7 +47,13 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
 	.then(() => store.dispatch(actions.getNotepadList.started(undefined)))
 	.then(() => ReactDOM.render(
 		<Provider store={store}>
-			<HeaderComponent />
+			<div>
+				<HeaderComponent />
+				<div id="body">
+					<NoteViewerComponent />
+					<NotepadExplorerComponent />
+				</div>
+			</div>
 		</Provider>,
 		document.getElementById('root') as HTMLElement
 	))

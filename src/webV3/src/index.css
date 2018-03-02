@@ -3,6 +3,14 @@ body {
 	padding: 0;
 }
 
+#body {
+	position: fixed;
+	display: flex;
+	top: 128px;
+	width: 100vw;
+	height: 100vw;
+}
+
 nav {
 	z-index: 1000 !important;
 	cursor: default;
