@@ -1,3 +1,7 @@
+import { IAsset, IAssets, INotepad } from './types/NotepadTypes';
+import * as Parser from 'upad-parse/dist/index';
+import { ASSET_STORAGE } from './index';
+
 export function stringify(obj: object) {
 	const seen: any[] = [];
 	return JSON.stringify(obj, (key, val) => {
@@ -7,6 +11,53 @@ export function stringify(obj: object) {
 		}
 		return val;
 	});
+}
+
+export interface IExportedNotepad {
+	title: string;
+	xml: string;
+}
+
+export function getNotepadXmlWithAssets(notepad: INotepad): Promise<IExportedNotepad> {
+	return new Promise<IExportedNotepad>((resolve, reject) => {
+		try {
+			getAssets(notepad.notepadAssets)
+				.then((assets: IAssets) => notepad.toXML((xml: string) => {
+					notepad.assets = new Parser.Assets();
+					resolve({title: notepad.title, xml});
+				}, assets))
+				.catch((err) => reject(err));
+		} catch (err) {
+			reject(err);
+		}
+	});
+
+	function getAssets(notepadAssets: string[]): Promise<IAssets> {
+		return new Promise<IAssets>(resolve => {
+			const assets: IAssets = new Parser.Assets();
+
+			if (!notepadAssets || notepadAssets.length === 0) {
+				resolve(assets);
+				return;
+			}
+
+			const resolvedAssets: Promise<Blob>[] = [];
+			for (let uuid of notepadAssets) {
+				resolvedAssets.push(ASSET_STORAGE.getItem(uuid));
+			}
+
+			Promise.all(resolvedAssets)
+				.then((blobs: Blob[]) => {
+					blobs.forEach((blob: Blob, i: number) => {
+						let asset: IAsset = new Parser.Asset(blob);
+						asset.uuid = notepadAssets[i];
+						assets.addAsset(asset);
+					});
+
+					resolve(assets);
+				});
+		});
+	}
 }
 
 // Thanks to https://stackoverflow.com/a/105074

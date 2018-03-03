@@ -1,5 +1,5 @@
 import { actions } from '../actions';
-import { catchError, filter, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import * as Parser from 'upad-parse/dist/index.js';
@@ -7,10 +7,12 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/empty';
 import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
-import { IAsset, IAssets, INotepad, INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
-import { ASSET_STORAGE } from '../index';
+import { IAssets, INotepad, INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
+import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
+import { getNotepadXmlWithAssets, IExportedNotepad } from '../util';
+import * as JSZip from 'jszip';
 
 const parseNpx$ = action$ =>
 	action$.pipe(
@@ -78,50 +80,61 @@ const exportNotepad$ = (action$, store) =>
 		map((state: INotepadsStoreState) => (state.notepad || <INotepadStoreState> {}).item),
 		filter(Boolean),
 		switchMap((notepad: INotepad) =>
-			Observable.fromPromise(getAssets(notepad.notepadAssets))
-				.pipe(
-					map((assets: IAssets) => [notepad, assets])
-				)
+			Observable.fromPromise(getNotepadXmlWithAssets(notepad))
 		),
-		tap(([notepad, assets]: [INotepad, IAssets]) => {
-			notepad.toXML((xml: string) => {
-				const blob = new Blob([xml], { type: 'text/xml;charset=utf-8' });
-				notepad.assets = new Parser.Assets();
-				saveAs(blob, `${notepad.title}.npx`);
-			}, assets);
+		tap((exportedNotepad: IExportedNotepad) => {
+			const blob = new Blob([exportedNotepad.xml], { type: 'text/xml;charset=utf-8' });
+			saveAs(blob, `${exportedNotepad.title}.npx`);
 		}),
 		map(() => actions.empty(undefined))
 	);
 
-function getAssets(notepadAssets: string[]): Promise<IAssets> {
-	return new Promise<IAssets>(resolve => {
-		const assets: IAssets = new Parser.Assets();
+const exportAll$ = (action$, store) =>
+	action$.pipe(filter((action: Action<void>) => isType(action, actions.exportAll)),
+		map(() => store.getState()),
+		map((state: IStoreState) => state.notepads),
+		filter(Boolean),
+		map((state: INotepadsStoreState) => state.savedNotepadTitles),
+		filter(Boolean),
+		switchMap((titles: string[]) => {
+			const notepadsInStorage: Promise<string>[] = [];
+			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
-		if (!notepadAssets || notepadAssets.length === 0) {
-			resolve(assets);
-			return;
-		}
+			return Observable.fromPromise(Promise.all(notepadsInStorage));
+		}),
+		switchMap((notepads: string[]) => {
+			const pendingXml: Promise<IExportedNotepad>[] = [];
+			notepads.forEach((notepadJSON: string) => {
+				const res = JSON.parse(notepadJSON);
+				const notepad: INotepad = Parser.restoreNotepad(res);
+				notepad.notepadAssets = res.notepadAssets;
 
-		const resolvedAssets: Promise<Blob>[] = [];
-		for (let uuid of notepadAssets) {
-			resolvedAssets.push(ASSET_STORAGE.getItem(uuid));
-		}
-
-		Promise.all(resolvedAssets)
-			.then((blobs: Blob[]) => {
-				blobs.forEach((blob: Blob, i: number) => {
-					let asset: IAsset = new Parser.Asset(blob);
-					asset.uuid = notepadAssets[i];
-					assets.addAsset(asset);
-				});
-
-				resolve(assets);
+				pendingXml.push(getNotepadXmlWithAssets(notepad));
 			});
-	});
-}
+
+			return Observable.fromPromise(Promise.all(pendingXml));
+		}),
+		tap((exportNotepads: IExportedNotepad[]) => {
+			const zip: JSZip = new JSZip();
+
+			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
+				const blob: Blob = new Blob([exportedNotepad.xml], { type: 'text/xml;charset=utf-8' });
+				zip.file(`${exportedNotepad.title}.npx`, blob);
+			});
+
+			zip.generateAsync({
+				type: 'blob',
+				compression: 'DEFLATE'
+			}).then((blob: Blob) => {
+				saveAs(blob, `notepads.zip`);
+			});
+		}),
+		map(() => actions.empty(undefined))
+	);
 
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	restoreJsonNotepad$,
-	exportNotepad$
+	exportNotepad$,
+	exportAll$
 );

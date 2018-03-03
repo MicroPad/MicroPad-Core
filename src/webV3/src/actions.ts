@@ -14,5 +14,6 @@ export const actions = {
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),
 	flipFullScreenState: actionCreator<void>('FLIP_FULL_SCREEN'),
 	deleteNotepad: actionCreator<string>('DELETE_NOTEPAD'),
-	exportNotepad: actionCreator<void>('EXPORT_NOTEPAD')
+	exportNotepad: actionCreator<void>('EXPORT_NOTEPAD'),
+	exportAll: actionCreator<void>('EXPORT_ALL_NOTEPADS')
 };

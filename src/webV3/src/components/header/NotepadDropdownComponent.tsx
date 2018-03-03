@@ -11,11 +11,12 @@ export interface INotepadDropdownProps {
 	notepadTitles?: string[];
 	openNotepadFromStorage?: (title: string) => void;
 	newNotepad?: (notepad: INotepad) => void;
+	exportAll?: () => void;
 }
 
 export default class NotepadDropdownComponent extends React.Component<INotepadDropdownProps> {
 	render() {
-		const { notepadTitles } = this.props;
+		const { notepadTitles, exportAll } = this.props;
 
 		const notepadNavItems: JSX.Element[] = [];
 		(notepadTitles || []).forEach((title: string) => notepadNavItems.push(<NavItem key={generateGuid()} href="#!" onClick={this.openNotepad}>{title}</NavItem>));
@@ -32,7 +33,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 					<NavItem href="#!" onClick={this.createNotepad}><Icon left={true}>add</Icon> New</NavItem>
 					<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Open ({SYNC_NAME})</NavItem>
 					<UploadNotepadsComponent />
-					<NavItem href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>
+					<NavItem href="#!" onClick={exportAll}><Icon left={true}>file_download</Icon> Export All</NavItem>
 
 					{/* User's notepads from here */}
 					<NavItem divider={true} />

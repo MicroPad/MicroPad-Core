@@ -8,7 +8,8 @@ import { INotepad } from '../../types/NotepadTypes';
 export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 	return {
 		openNotepadFromStorage: (title: string) => dispatch(actions.openNotepadFromStorage.started(title)),
-		newNotepad: (notepad: INotepad) => dispatch(actions.newNotepad(notepad))
+		newNotepad: (notepad: INotepad) => dispatch(actions.newNotepad(notepad)),
+		exportAll: () => dispatch(actions.exportAll(undefined))
 	};
 }
 
