@@ -15,7 +15,8 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 	return {
-		flipFullScreenState: () => dispatch(actions.flipFullScreenState(undefined))
+		flipFullScreenState: () => dispatch(actions.flipFullScreenState(undefined)),
+		deleteNotepad: (title: string) => dispatch(actions.deleteNotepad(title))
 	};
 }
 

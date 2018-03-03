@@ -1,5 +1,5 @@
 import { actions } from '../actions';
-import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { catchError, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { Observable } from 'rxjs/Observable';
@@ -42,8 +42,17 @@ const openNotepadFromStorage$ = action$ =>
 		])
 	);
 
+const deleteNotepad$ = action$ =>
+	action$.pipe(
+		filter((action: Action<string>) => isType(action, actions.deleteNotepad)),
+		map((action: Action<string>) => action.payload),
+		tap((notepadTitle: string) => Observable.fromPromise(NOTEPAD_STORAGE.removeItem(notepadTitle))),
+		map(() => actions.empty(undefined))
+	);
+
 export const storageEpics$ = combineEpics(
 	saveNotepad$,
 	getNotepadList$,
-	openNotepadFromStorage$
+	openNotepadFromStorage$,
+	deleteNotepad$
 );

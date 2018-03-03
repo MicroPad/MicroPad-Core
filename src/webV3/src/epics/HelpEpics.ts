@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { catchError, filter, map, mergeMap, retry, takeUntil } from 'rxjs/operators';
+import { catchError, filter, map, mergeMap, retry } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { ajax } from 'rxjs/observable/dom/ajax';

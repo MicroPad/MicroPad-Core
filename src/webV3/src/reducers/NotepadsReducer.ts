@@ -93,6 +93,12 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 					saving: false
 				}
 			};
+		} else if (isType(action, actions.deleteNotepad)) {
+			return {
+				...state,
+				notepad: undefined,
+				savedNotepadTitles: (state.savedNotepadTitles || []).filter(title => title !== action.payload)
+			};
 		}
 
 		return Object.freeze(state);
