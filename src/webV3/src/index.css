@@ -9,7 +9,7 @@ body {
 	z-index: -100;
 	top: 128px;
 	width: 100vw;
-	height: 100vw;
+	height: 100vh;
 }
 
 nav {
@@ -33,4 +33,12 @@ nav {
 
 .material-icons.left {
 	margin-right: 10px;
+}
+
+.material-icons {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }

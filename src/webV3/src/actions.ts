@@ -10,5 +10,6 @@ export const actions = {
 	getHelp: actionCreator.async<void, string, any>('GET_HELP'),
 	openNotepadFromStorage: actionCreator.async<string, void, any>('OPEN_NOTEPAD_FROM_STORAGE'),
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
-	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD')
+	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),
+	flipFullScreenState: actionCreator<void>('FLIP_FULL_SCREEN')
 };

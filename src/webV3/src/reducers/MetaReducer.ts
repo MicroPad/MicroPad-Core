@@ -1,6 +1,8 @@
 import { IMetaStoreState } from '../types/MetaTypes';
 import { Action } from 'redux';
 import { IReducer } from '../types/ReducerType';
+import { isType } from 'redux-typescript-actions';
+import { actions } from '../actions';
 
 export class MetaReducer implements IReducer<IMetaStoreState> {
 	public readonly key: string = 'meta';
@@ -15,6 +17,13 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 	};
 
 	public reducer(state: IMetaStoreState, action: Action): IMetaStoreState {
-		return Object.freeze(state);
+		if (isType(action, actions.flipFullScreenState)) {
+			return {
+				...state,
+				isFullScreen: !state.isFullScreen
+			};
+		}
+
+		return state;
 	}
 }

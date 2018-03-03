@@ -9,6 +9,8 @@ import NotepadBreadcrumbs from '../../containers/header/NotepadBreadcrumbsContai
 export interface IHeaderComponentProps {
 	getHelp?: () => void;
 	notepad?: INotepadStoreState;
+	isFullScreen: boolean;
+	flipFullScreenState?: () => void;
 }
 
 export default class HeaderComponent extends React.Component<IHeaderComponentProps> {
@@ -20,7 +22,7 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 	};
 
 	render() {
-		const { getHelp, notepad } = this.props;
+		const { getHelp, notepad, isFullScreen, flipFullScreenState } = this.props;
 
 		const saveText: string = (!!notepad && !!notepad.item)
 			? (notepad.saving)
@@ -29,12 +31,13 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 			: '';
 
 		return (
-			<header style={{position: 'fixed'}}>
+			<header style={{position: 'fixed', zIndex: 1000}}>
 				<Navbar className="blue-grey" brand={<AppNameComponent />} style={this.navStyle} right={true}>
 					<li style={{ marginRight: '10px' }}>{saveText}</li>
 					<NotepadDropdownComponent />
 					{!!notepad && !!notepad.item && <NavItem href="#!"><Icon left={true}>search</Icon> Search</NavItem>}
 					<NavItem href="#!" onClick={getHelp}><Icon left={true}>help_outline</Icon> Help</NavItem>
+					{isFullScreen && <NavItem href="#!" onClick={flipFullScreenState}><Icon left={true}>fullscreen_exit</Icon> Exit Full Screen</NavItem>}
 				</Navbar>
 				<NotepadBreadcrumbs />
 			</header>
