@@ -1,5 +1,5 @@
 import { actions } from '../actions';
-import { catchError, filter, map, switchMap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import * as Parser from 'upad-parse/dist/index.js';
@@ -7,8 +7,10 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/empty';
 import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
-import { IAssets, INotepad } from '../types/NotepadTypes';
+import { IAsset, IAssets, INotepad, INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { ASSET_STORAGE } from '../index';
+import { IStoreState } from '../types';
+import saveAs from 'save-as';
 
 const parseNpx$ = action$ =>
 	action$.pipe(
@@ -67,7 +69,59 @@ const restoreJsonNotepad$ = action$ =>
 		})
 	);
 
+const exportNotepad$ = (action$, store) =>
+	action$.pipe(
+		filter((action: Action<void>) => isType(action, actions.exportNotepad)),
+		map(() => store.getState()),
+		map((state: IStoreState) => state.notepads),
+		filter(Boolean),
+		map((state: INotepadsStoreState) => (state.notepad || <INotepadStoreState> {}).item),
+		filter(Boolean),
+		switchMap((notepad: INotepad) =>
+			Observable.fromPromise(getAssets(notepad.notepadAssets))
+				.pipe(
+					map((assets: IAssets) => [notepad, assets])
+				)
+		),
+		tap(([notepad, assets]: [INotepad, IAssets]) => {
+			notepad.toXML((xml: string) => {
+				const blob = new Blob([xml], { type: 'text/xml;charset=utf-8' });
+				notepad.assets = new Parser.Assets();
+				saveAs(blob, `${notepad.title}.npx`);
+			}, assets);
+		}),
+		map(() => actions.empty(undefined))
+	);
+
+function getAssets(notepadAssets: string[]): Promise<IAssets> {
+	return new Promise<IAssets>(resolve => {
+		const assets: IAssets = new Parser.Assets();
+
+		if (notepadAssets.length === 0) {
+			resolve(assets);
+			return;
+		}
+
+		const resolvedAssets: Promise<Blob>[] = [];
+		for (let uuid of notepadAssets) {
+			resolvedAssets.push(ASSET_STORAGE.getItem(uuid));
+		}
+
+		Promise.all(resolvedAssets)
+			.then((blobs: Blob[]) => {
+				blobs.forEach((blob: Blob, i: number) => {
+					let asset: IAsset = new Parser.Asset(blob);
+					asset.uuid = notepadAssets[i];
+					assets.addAsset(asset);
+				});
+
+				resolve(assets);
+			});
+	});
+}
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
-	restoreJsonNotepad$
+	restoreJsonNotepad$,
+	exportNotepad$
 );

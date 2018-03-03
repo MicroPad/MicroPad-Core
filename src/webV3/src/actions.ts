@@ -13,5 +13,6 @@ export const actions = {
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),
 	flipFullScreenState: actionCreator<void>('FLIP_FULL_SCREEN'),
-	deleteNotepad: actionCreator<string>('DELETE_NOTEPAD')
+	deleteNotepad: actionCreator<string>('DELETE_NOTEPAD'),
+	exportNotepad: actionCreator<void>('EXPORT_NOTEPAD')
 };

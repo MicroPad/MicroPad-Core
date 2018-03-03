@@ -12,11 +12,15 @@ export interface INotepadExplorerComponentProps {
 	isFullScreen: boolean;
 	flipFullScreenState?: () => void;
 	deleteNotepad?: (title: string) => void;
+	exportNotepad?: () => void;
+	renameNotepad?: (newTitle: string) => void;
+	deleteNotepadObject?: (internalId: string) => void;
+	renameNotepadObject?: (internalId: string) => void;
 }
 
 export default class NotepadExplorerComponent extends React.Component<INotepadExplorerComponentProps> {
 	render() {
-		const { notepad, currentNote, isFullScreen, flipFullScreenState, deleteNotepad } = this.props;
+		const { notepad, currentNote, isFullScreen, flipFullScreenState, deleteNotepad, exportNotepad } = this.props;
 
 		const notepadExplorerStyle = {
 			display: 'initial'
@@ -36,7 +40,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						<a href="#!" onClick={flipFullScreenState} style={{color: 'white', paddingRight: '5px', fontSize: '24px'}}>»</a>
 						<strong style={{display: 'inline-flex'}}>
 							{notepad.title}
-							<ExplorerOptionsComponent objToEdit={notepad} type="notepad" deleteNotepad={deleteNotepad} />
+							<ExplorerOptionsComponent objToEdit={notepad} type="notepad" deleteNotepad={deleteNotepad} exportNotepad={exportNotepad} />
 						</strong>
 						{treeViews}
 					</div>

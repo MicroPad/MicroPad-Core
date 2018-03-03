@@ -13,10 +13,11 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 	};
 }
 
-export function mapDispatchToProps(dispatch: Dispatch<Action>) {
+export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepadExplorerComponentProps> {
 	return {
 		flipFullScreenState: () => dispatch(actions.flipFullScreenState(undefined)),
-		deleteNotepad: (title: string) => dispatch(actions.deleteNotepad(title))
+		deleteNotepad: (title: string) => dispatch(actions.deleteNotepad(title)),
+		exportNotepad: () => dispatch(actions.exportNotepad(undefined))
 	};
 }
 

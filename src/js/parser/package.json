@@ -1,6 +1,6 @@
 {
 	"name": "upad-parse",
-	"version": "2.6.0",
+	"version": "2.6.2",
 	"description": "This is a parser for the NPX file format that µPad uses",
 	"main": "src/index.js",
 	"scripts": {

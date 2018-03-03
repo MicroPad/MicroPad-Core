@@ -7,15 +7,19 @@ export interface IExplorerOptionsComponentProps {
 	objToEdit: INPXObject;
 	type: 'notepad' | 'section' | 'note';
 	deleteNotepad?: (title: string) => void;
+	exportNotepad?: () => void;
+	renameNotepad?: (newTitle: string) => void;
+	deleteNotepadObject?: (internalId: string) => void;
+	renameNotepadObject?: (internalId: string) => void;
 }
 
 export default class ExplorerOptionsComponent extends React.Component<IExplorerOptionsComponentProps> {
 	render() {
-		const { objToEdit, type } = this.props;
+		const { objToEdit, type, exportNotepad } = this.props;
 
 		const notepadOptions: JSX.Element = (
 			<div>
-				<Row><Button className="blue" waves="light"><Icon left={true}>file_download</Icon> Export Notepad</Button></Row>
+				<Row><Button className="blue" waves="light" onClick={exportNotepad}><Icon left={true}>file_download</Icon> Export Notepad</Button></Row>
 			</div>
 		);
 

@@ -80,7 +80,7 @@ exports.Note.prototype.toXMLObject = function () {
 	}
 	parseableNote.note.bibliography.push(sources);
 
-	elements = {};
+	var elements = {};
 	for (k in this.elements) {
 		var element = this.elements[k];
 		if (!elements[element.type]) elements[element.type] = [];
