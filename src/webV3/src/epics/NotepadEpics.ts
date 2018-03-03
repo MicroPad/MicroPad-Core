@@ -97,7 +97,7 @@ function getAssets(notepadAssets: string[]): Promise<IAssets> {
 	return new Promise<IAssets>(resolve => {
 		const assets: IAssets = new Parser.Assets();
 
-		if (notepadAssets.length === 0) {
+		if (!notepadAssets || notepadAssets.length === 0) {
 			resolve(assets);
 			return;
 		}
