@@ -6,6 +6,7 @@ body {
 #body {
 	position: fixed;
 	display: flex;
+	z-index: -100;
 	top: 128px;
 	width: 100vw;
 	height: 100vw;

@@ -18,7 +18,7 @@ import HeaderComponent from './containers/header/HeaderContainer';
 import { from } from 'rxjs/observable/from';
 import { debounceTime, distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { INotepad, INotepadStoreState } from './types/NotepadTypes';
-import NotepadExplorerComponent from './components/explorer/NotepadExplorerComponent';
+import NotepadExplorerComponent from './containers/NotepadExplorerContainer';
 import NoteViewerComponent from './components/note-viewer/NoteViewerComponent';
 
 try {

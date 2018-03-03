@@ -1,5 +1,6 @@
 export interface IMetaStoreState {
 	version: IVersion;
+	isFullScreen: boolean;
 }
 
 export interface IVersion {

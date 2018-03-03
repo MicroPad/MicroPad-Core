@@ -10,7 +10,8 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 			minor: 0,
 			patch: 0,
 			status: 'dev'
-		}
+		},
+		isFullScreen: false
 	};
 
 	public reducer(state: IMetaStoreState, action: Action): IMetaStoreState {
