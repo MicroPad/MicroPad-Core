@@ -56,6 +56,7 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 			};
 		} else if (isType(action, actions.newNotepad)) {
 			const notepad: INotepad = action.payload;
+			notepad.notepadAssets = [];
 
 			return {
 				...state,
