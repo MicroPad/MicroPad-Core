@@ -5,6 +5,7 @@ import { Dropdown, Icon, NavItem } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
 import * as Parser from 'upad-parse/dist/index.js';
 import { INotepad } from '../../types/NotepadTypes';
+import { generateGuid } from '../../util';
 
 export interface INotepadDropdownProps {
 	notepadTitles?: string[];
@@ -17,7 +18,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 		const { notepadTitles } = this.props;
 
 		const notepadNavItems: JSX.Element[] = [];
-		(notepadTitles || []).forEach((title: string) => notepadNavItems.push(<NavItem key={`npdd-${title}`} href="#!" onClick={this.openNotepad}>{title}</NavItem>));
+		(notepadTitles || []).forEach((title: string) => notepadNavItems.push(<NavItem key={generateGuid()} href="#!" onClick={this.openNotepad}>{title}</NavItem>));
 
 		return (
 			<li>
