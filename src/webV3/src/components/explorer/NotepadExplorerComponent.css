@@ -2,7 +2,6 @@
 	order: 1;
 	padding: 5px;
 	width: 300px;
-	transition: width .5s;
 	background-color: #607d8b;
 	overflow: auto;
 	color: #fff;
@@ -14,7 +13,7 @@
 }
 
 .tree-view_children-collapsed {
-	height: 0px;
+	height: 0;
 }
 
 .tree-view_arrow {
@@ -39,6 +38,19 @@
 }
 
 .explorer-note {
+	display: inline-flex;
 	white-space: nowrap;
 	margin-left: 16px;
+}
+
+.explorer-note {
+	display: flex;
+	white-space: nowrap;
+	margin-left: 16px;
+	padding-bottom: 5px;
+	padding-top: 5px
+}
+
+.explorer-note > .material-icons {
+	padding-right: 5px;
 }
