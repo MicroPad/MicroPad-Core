@@ -12,6 +12,7 @@
 		"react-materialize": "^1.1.2",
 		"react-redux": "^5.0.6",
 		"react-scripts-ts": "2.13.0",
+		"react-treeview": "^0.4.7",
 		"redux": "^3.7.2",
 		"redux-devtools-extension": "^2.13.2",
 		"redux-observable": "^0.18.0",

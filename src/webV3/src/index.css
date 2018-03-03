@@ -31,7 +31,7 @@ nav {
 	overflow: auto !important;
 }
 
-.material-icons.left {
+nav .material-icons.left {
 	margin-right: 10px;
 }
 

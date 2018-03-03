@@ -55,6 +55,7 @@ export interface IParent extends INPXObject {
 
 	search: (query: string) => INote[];
 	addSection: (section: ISection) => void;
+	internalRef?: string;
 }
 
 export interface INotepad extends IParent {
