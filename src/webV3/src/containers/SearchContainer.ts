@@ -8,7 +8,8 @@ import { actions } from '../actions';
 export function mapStateToProps({ notepads, search }: IStoreState) {
 	return {
 		notepad: ((notepads || <INotepadsStoreState> {}).notepad || <INotepadStoreState> {}).item!,
-		hashTagResults: search.hashTagResults
+		hashTagResults: search.hashTagResults,
+		query: search.query
 	};
 }
 

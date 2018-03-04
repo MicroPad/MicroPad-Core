@@ -6,29 +6,9 @@ import { generateGuid } from '../../util';
 export interface ISearchComponentProps {
 	notepad: INotepad;
 	hashTagResults: INote[];
+	query: string;
 	loadNote?: (note: INote) => void;
 	search?: (query: string) => void;
-}
-
-export class HashTagSearchResultsComponent extends React.Component<{
-	hashTagResults: INote[];
-	loadNote: (note: INote) => void;
-}> {
-	render() {
-		const { hashTagResults, loadNote } = this.props;
-		console.log(hashTagResults);
-
-		const resultElements: JSX.Element[] = hashTagResults.map((note: INote) =>
-			<CollectionItem key={generateGuid()} href="#!" onClick={() => loadNote(note)}>{note.title}</CollectionItem>
-		);
-
-		return (
-			<div>
-				<h4>Hashtag Search</h4>
-				<Collection>{resultElements}</Collection>
-			</div>
-		);
-	}
 }
 
 export default class SearchComponent extends React.Component<ISearchComponentProps> {
@@ -36,7 +16,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	private autoCompleteOptions: object;
 
 	render() {
-		const { notepad, hashTagResults, loadNote } = this.props;
+		const { notepad, query, hashTagResults, loadNote } = this.props;
 
 		this.autoCompleteOptions = {};
 		this.mappedNotesToOptions = [];
@@ -44,6 +24,10 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 			this.autoCompleteOptions[`${i}. ${note.title}`] = null;
 			this.mappedNotesToOptions[i] = note;
 		});
+
+		const resultElements: JSX.Element[] = hashTagResults.map((note: INote) =>
+			<CollectionItem key={generateGuid()} href="#!" onClick={() => loadNote!(note)}>{note.title}</CollectionItem>
+		);
 
 		return (
 			<Modal
@@ -53,15 +37,19 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 				<Row>
 					<Autocomplete
 						s={12}
-						title="Search by note title"
+						title="Search by note title or a hashtag"
 						onChange={this.onInput}
+						value={query}
 						onAutocomplete={this.loadNoteFromInput}
 						data={this.autoCompleteOptions} />
 				</Row>
 
 				{
 					hashTagResults.length > 0
-					&& <HashTagSearchResultsComponent hashTagResults={hashTagResults} loadNote={loadNote!} />
+					&& <div>
+						<h4>Hashtag Search Results</h4>
+						<Collection>{resultElements}</Collection>
+					</div>
 				}
 			</Modal>
 		);
