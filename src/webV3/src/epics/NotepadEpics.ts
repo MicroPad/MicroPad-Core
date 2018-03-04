@@ -99,7 +99,8 @@ const exportNotepad$ = (action$, store) =>
 	);
 
 const exportAll$ = (action$, store) =>
-	action$.pipe(filter((action: Action<void>) => isType(action, actions.exportAll)),
+	action$.pipe(
+		filter((action: Action<void>) => isType(action, actions.exportAll)),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads),
 		filter(Boolean),
@@ -141,9 +142,16 @@ const exportAll$ = (action$, store) =>
 		map(() => actions.empty(undefined))
 	);
 
+const renameNotepad$ = action$ =>
+	action$.pipe(
+		filter((action: Action<string>) => isType(action, actions.renameNotepad)),
+		map(() => actions.getNotepadList.started(undefined))
+	);
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	restoreJsonNotepad$,
 	exportNotepad$,
-	exportAll$
+	exportAll$,
+	renameNotepad$
 );

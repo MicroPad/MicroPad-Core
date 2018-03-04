@@ -2,6 +2,8 @@ import * as React from 'react';
 import { INPXObject } from '../../types/NotepadTypes';
 import { Button, Icon, Input, Modal, Row } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL } from '../../types';
+import { Observable } from 'rxjs/Observable';
+import { debounceTime, tap } from 'rxjs/operators';
 
 export interface IExplorerOptionsComponentProps {
 	objToEdit: INPXObject;
@@ -31,11 +33,11 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 
 		return (
 			<Modal
-				key={`np-${objToEdit.title}`}
+				key={JSON.stringify({ ...objToEdit, title: '' })}
 				header={`Options for ${objToEdit.title}`}
 				trigger={<a href="#!" style={{color: 'white'}}><Icon tiny={true}>settings</Icon></a>}>
 				<div id="explorer-options-modal">
-					<Row><Input s={12} label="Title" defaultValue={objToEdit.title} /></Row>
+					<Row><Input s={12} label="Title" value={objToEdit.title} onChange={this.onInput} /></Row>
 					<Row><Button className="red" waves="light" onClick={this.delete}><Icon left={true}>delete_forever</Icon> Delete {type}</Button></Row>
 					{(type === 'notepad') && notepadOptions}
 					{(type === 'note') && noteOptions}
@@ -50,6 +52,21 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 				</div>
 			</Modal>
 		);
+	}
+
+	private onInput = (event, value: string) => {
+		const { objToEdit, type, renameNotepad } = this.props;
+
+		switch (type) {
+			case 'notepad':
+				Observable.of(value)
+					.pipe(debounceTime(1000))
+					.subscribe(title => renameNotepad!(title));
+				break;
+
+			default:
+				break;
+		}
 	}
 
 	private delete = () => {

@@ -25,7 +25,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 	private openSections: Set<string>;
 
 	render() {
-		const { notepad, isFullScreen, flipFullScreenState, deleteNotepad, exportNotepad } = this.props;
+		const { notepad, isFullScreen, flipFullScreenState, deleteNotepad, exportNotepad, renameNotepad } = this.props;
 		this.openSections = new Set<string>(this.props.openSections);
 
 		const notepadExplorerStyle = {
@@ -46,7 +46,12 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						<a href="#!" onClick={flipFullScreenState} style={{color: 'white', paddingRight: '5px', fontSize: '24px'}}>»</a>
 						<strong style={{display: 'inline-flex'}}>
 							{notepad.title}
-							<ExplorerOptionsComponent objToEdit={notepad} type="notepad" deleteNotepad={deleteNotepad} exportNotepad={exportNotepad} />
+							<ExplorerOptionsComponent
+								objToEdit={notepad}
+								type="notepad"
+								deleteNotepad={deleteNotepad}
+								exportNotepad={exportNotepad}
+								renameNotepad={renameNotepad} />
 						</strong>
 						{treeViews}
 					</div>
