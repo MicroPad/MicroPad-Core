@@ -70,6 +70,7 @@ export interface INotepad extends IParent {
 export interface ISection extends IParent {
 	parent: IParent;
 	notes: INote[];
+	internalRef: string;
 
 	addNote: (note: INote) => void;
 	getUsedAssets: () => string[];
@@ -82,6 +83,7 @@ export interface INote extends INPXObject {
 	elements: Element[];
 	parent: IParent;
 	time: number;
+	internalRef: string;
 
 	addSource: (id: string, item: string, content: string) => void;
 	addElement: (type: string, args: IElementArgs, content: string) => void;

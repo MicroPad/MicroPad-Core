@@ -8,6 +8,7 @@ exports.Note = function (title, time, addons) {
 	this.addons = addons;
 	this.bibliography = [];
 	this.elements = [];
+	this.internalRef = generateGuid();
 };
 
 exports.Note.prototype.addSource = function (id, item, content) {
@@ -58,7 +59,7 @@ exports.Note.prototype.toXMLObject = function () {
 	var imports = {
 		import: []
 	};
-	for (k in this.addons) {
+	for (let k in this.addons) {
 		imports.import.push(this.addons[k]);
 	}
 	parseableNote.note.addons.push(imports);
@@ -66,7 +67,7 @@ exports.Note.prototype.toXMLObject = function () {
 	var sources = {
 		source: []
 	};
-	for (k in this.bibliography) {
+	for (let k in this.bibliography) {
 		var source = this.bibliography[k];
 		sources.source.push({
 			_: source.content,
@@ -79,7 +80,7 @@ exports.Note.prototype.toXMLObject = function () {
 	parseableNote.note.bibliography.push(sources);
 
 	let elements = {};
-	for (k in this.elements) {
+	for (let k in this.elements) {
 		var element = this.elements[k];
 		if (!elements[element.type]) elements[element.type] = [];
 
@@ -88,13 +89,13 @@ exports.Note.prototype.toXMLObject = function () {
 			$: {}
 		};
 
-		for (argName in element.args) {
+		for (let argName in element.args) {
 			elementToPush.$[argName] = element.args[argName];
 		}
 
 		elements[element.type].push(elementToPush);
 	}
-	for (k in elements) {
+	for (let k in elements) {
 		var elementGroup = elements[k];
 		parseableNote.note[k] = elementGroup;
 	}
@@ -194,6 +195,14 @@ if (!String.prototype.format) {
 			return typeof args[number] != 'undefined' ? args[number] : match;
 		});
 	};
+}
+
+//Thanks to https://stackoverflow.com/a/105074
+function generateGuid() {
+	function s4() {
+		return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	}
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 
 function removeHTML(string) {

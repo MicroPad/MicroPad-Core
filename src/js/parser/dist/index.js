@@ -32,7 +32,7 @@ Notepad.prototype.addSection = function (section) {
 };
 Notepad.prototype.search = function (query) {
 	searchResults = [];
-	for (s in this.sections) {
+	for (var s in this.sections) {
 		var section = this.sections[s];
 		Array.prototype.push.apply(searchResults, section.search(query));
 	}
@@ -56,7 +56,7 @@ Notepad.prototype.toXMLObject = function (callback) {
 			}
 		};
 
-		for (k in _this.sections) {
+		for (var k in _this.sections) {
 			parseableNotepad.notepad.section.push(_this.sections[k].toXMLObject().section);
 		}
 
@@ -111,6 +111,7 @@ var Section = function Section(title) {
 	this.title = removeHTML(title);
 	this.sections = [];
 	this.notes = [];
+	this.internalRef = generateGuid();
 };
 Section.prototype.addSection = function (section) {
 	section.parent = this;
@@ -122,7 +123,7 @@ Section.prototype.addNote = function (note) {
 };
 Section.prototype.search = function (query) {
 	var res = [];
-	for (n in this.notes) {
+	for (var n in this.notes) {
 		var note = this.notes[n];
 		var searchRes = note.search(query);
 		if (searchRes) {
@@ -130,7 +131,7 @@ Section.prototype.search = function (query) {
 		}
 	}
 
-	for (s in this.sections) {
+	for (var s in this.sections) {
 		Array.prototype.push.apply(searchResults, this.sections[s].search(query));
 	}
 
@@ -147,12 +148,12 @@ Section.prototype.toXMLObject = function () {
 		}
 	};
 
-	for (k in this.sections) {
+	for (var k in this.sections) {
 		parseableSection.section.section.push(this.sections[k].toXMLObject().section);
 	}
 
-	for (k in this.notes) {
-		parseableSection.section.note.push(this.notes[k].toXMLObject().note);
+	for (var _k in this.notes) {
+		parseableSection.section.note.push(this.notes[_k].toXMLObject().note);
 	}
 
 	return parseableSection;
@@ -285,7 +286,7 @@ exports.createNote = function createNote(title, addons) {
 
 exports.restoreNotepad = function restoreNotepad(obj) {
 	var restoredNotepad = new Notepad(obj.title, obj.lastModified);
-	for (k in obj.sections) {
+	for (var k in obj.sections) {
 		var section = obj.sections[k];
 		restoredNotepad.addSection(exports.restoreSection(section));
 	}
@@ -294,13 +295,13 @@ exports.restoreNotepad = function restoreNotepad(obj) {
 };
 exports.restoreSection = function restoreSection(obj) {
 	var restoredSection = new Section(obj.title);
-	for (k in obj.sections) {
+	for (var k in obj.sections) {
 		var section = obj.sections[k];
 		restoredSection.addSection(exports.restoreSection(section));
 	}
 
-	for (k in obj.notes) {
-		var note = obj.notes[k];
+	for (var _k2 in obj.notes) {
+		var note = obj.notes[_k2];
 		restoredSection.addNote(exports.restoreNote(note));
 	}
 
@@ -308,13 +309,13 @@ exports.restoreSection = function restoreSection(obj) {
 };
 exports.restoreNote = function restoreNote(obj) {
 	var restoredNote = new Note(obj.title, moment(obj.time).format('YYYY-MM-DDTHH:mm:ss.SSSZ'), obj.addons);
-	for (k in obj.bibliography) {
+	for (var k in obj.bibliography) {
 		var source = obj.bibliography[k];
 		restoredNote.addSource(source.id, source.item, source.content);
 	}
 
-	for (k in obj.elements) {
-		var element = obj.elements[k];
+	for (var _k3 in obj.elements) {
+		var element = obj.elements[_k3];
 		restoredNote.addElement(element.type, element.args, element.content);
 	}
 
@@ -464,6 +465,14 @@ if (!String.prototype.format) {
 			return typeof args[number] != 'undefined' ? args[number] : match;
 		});
 	};
+}
+
+//Thanks to https://stackoverflow.com/a/105074
+function generateGuid() {
+	function s4() {
+		return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	}
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 
 function removeHTML(string) {
