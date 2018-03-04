@@ -5,6 +5,7 @@ import { Dropdown, Icon, Navbar, NavItem } from 'react-materialize';
 import NotepadDropdownComponent from '../../containers/header/NotepadDropdownContainer';
 import { INotepadStoreState } from '../../types/NotepadTypes';
 import NotepadBreadcrumbs from '../../containers/header/NotepadBreadcrumbsContainer';
+import SearchComponent from '../../containers/SearchContainer';
 
 export interface IHeaderComponentProps {
 	getHelp?: () => void;
@@ -35,7 +36,7 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 				<Navbar className="blue-grey" brand={<AppNameComponent />} style={this.navStyle} right={true}>
 					<li style={{ marginRight: '10px' }}>{saveText}</li>
 					<NotepadDropdownComponent />
-					{!!notepad && !!notepad.item && <NavItem href="#!"><Icon left={true}>search</Icon> Search</NavItem>}
+					{!!notepad && !!notepad.item && <SearchComponent />}
 					<NavItem href="#!" onClick={getHelp}><Icon left={true}>help_outline</Icon> Help</NavItem>
 					{isFullScreen && <NavItem href="#!" onClick={flipFullScreenState}><Icon left={true}>fullscreen_exit</Icon> Exit Full Screen</NavItem>}
 				</Navbar>
