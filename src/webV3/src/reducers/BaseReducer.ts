@@ -5,12 +5,14 @@ import { Action } from 'redux';
 import { NotepadsReducer } from './NotepadsReducer';
 import { NoteReducer } from './NoteReducer';
 import { ExplorerReducer } from './ExplorerReducer';
+import { SearchReducer } from './SearchReducer';
 
 export const REDUCERS: Array<IReducer<any>> = [
 	new MetaReducer(),
 	new NotepadsReducer(),
 	new NoteReducer(),
-	new ExplorerReducer()
+	new ExplorerReducer(),
+	new SearchReducer()
 ];
 
 export class BaseReducer implements IReducer<IStoreState> {

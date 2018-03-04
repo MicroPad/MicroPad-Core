@@ -11,8 +11,8 @@ export const actions = {
 	getNotepadList: actionCreator.async<void, string[], any>('GET_NOTEPAD_LIST'),
 	getHelp: actionCreator.async<void, string, any>('GET_HELP'),
 	openNotepadFromStorage: actionCreator.async<string, void, any>('OPEN_NOTEPAD_FROM_STORAGE'),
-	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 
+	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),
 	flipFullScreenState: actionCreator<void>('FLIP_FULL_SCREEN'),
 	deleteNotepad: actionCreator<string>('DELETE_NOTEPAD'),
@@ -20,5 +20,7 @@ export const actions = {
 	exportAll: actionCreator<void>('EXPORT_ALL_NOTEPADS'),
 	loadNote: actionCreator<INote>('LOAD_NOTE'),
 	expandSection: actionCreator<string>('OPEN_SECTION'),
-	collapseSelection: actionCreator<string>('CLOSE_SECTION')
+	collapseSelection: actionCreator<string>('CLOSE_SECTION'),
+	search: actionCreator<string>('SEARCH'),
+	displayHashTagSearchResults: actionCreator<INote[]>('DISPLAY_HASH_TAG_SEARCH_RESULTS')
 };
