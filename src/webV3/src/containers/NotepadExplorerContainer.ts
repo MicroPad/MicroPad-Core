@@ -1,7 +1,7 @@
 import { IStoreState } from '../types';
 import { connect, Dispatch } from 'react-redux';
 import NotepadExplorerComponent, { INotepadExplorerComponentProps } from '../components/explorer/NotepadExplorerComponent';
-import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
+import { INote, INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { Action } from 'redux';
 import { actions } from '../actions';
 
@@ -17,7 +17,8 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepad
 	return {
 		flipFullScreenState: () => dispatch(actions.flipFullScreenState(undefined)),
 		deleteNotepad: (title: string) => dispatch(actions.deleteNotepad(title)),
-		exportNotepad: () => dispatch(actions.exportNotepad(undefined))
+		exportNotepad: () => dispatch(actions.exportNotepad(undefined)),
+		loadNote: (note: INote) => dispatch(actions.loadNote(note))
 	};
 }
 

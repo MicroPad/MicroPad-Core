@@ -16,6 +16,7 @@ export interface INotepadExplorerComponentProps {
 	renameNotepad?: (newTitle: string) => void;
 	deleteNotepadObject?: (internalId: string) => void;
 	renameNotepadObject?: (internalId: string) => void;
+	loadNote?: (note: INote) => void;
 }
 
 export default class NotepadExplorerComponent extends React.Component<INotepadExplorerComponentProps> {
@@ -50,6 +51,8 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 	}
 
 	private generateSectionTreeView(section: ISection): JSX.Element {
+		const { loadNote } = this.props;
+
 		const nodeLabelStyle = {
 			display: 'inline-flex',
 			verticalAlign: 'middle',
@@ -65,7 +68,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		((section || {} as ISection).notes || [])
 			.forEach((child: INote) => childNotes.push(
 				<div className="explorer-note" key={generateGuid()}>
-					<span><a href="#!" style={{color: 'white'}}><Icon>note</Icon> {child.title}</a>
+					<span><a href="#!" style={{color: 'white'}} onClick={() => loadNote!(child)}><Icon>note</Icon> {child.title}</a>
 					<ExplorerOptionsComponent objToEdit={child} type="note" /></span>
 				</div>
 			));

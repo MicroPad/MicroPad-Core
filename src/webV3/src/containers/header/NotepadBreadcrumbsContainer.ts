@@ -2,9 +2,11 @@ import { connect } from 'react-redux';
 import { IStoreState } from '../../types';
 import NotepadBreadcrumbsComponent, { INotepadBreadcrumbsProps } from '../../components/header/NotepadBreadcrumbsComponent/NotepadBreadcrumbsComponent';
 import { INote, INotepad, INotepadStoreState, ISection } from '../../types/NotepadTypes';
+import { format } from 'date-fns';
 
-export function mapStateToProps({ notepads, currentNote }: IStoreState) {
+export function mapStateToProps({ notepads, currentNote }: IStoreState): INotepadBreadcrumbsProps {
 	const breadcrumbs: string[] = [];
+	let time: string | undefined = undefined;
 
 	if (!currentNote.item) {
 		breadcrumbs.push(((notepads.notepad || <INotepadStoreState> {}).item || <INotepad> {}).title
@@ -19,10 +21,15 @@ export function mapStateToProps({ notepads, currentNote }: IStoreState) {
 		}
 
 		breadcrumbs.unshift(parent.title);
+
+		if (breadcrumbs.length > 1) {
+			time = format(new Date(currentNote.item.time), 'dddd, D MMMM h:mm A');
+		}
 	}
 
 	return {
-		breadcrumbs
+		breadcrumbs,
+		noteTime: time
 	};
 }
 

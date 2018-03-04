@@ -6,6 +6,7 @@ import { generateGuid } from '../../../util';
 
 export interface INotepadBreadcrumbsProps {
 	breadcrumbs: string[];
+	noteTime?: string;
 }
 
 export default class NotepadBreadcrumbsComponent extends React.Component<INotepadBreadcrumbsProps> {
@@ -15,10 +16,22 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 		top: '64px'
 	};
 
+	private readonly timeStyle = {
+		paddingLeft: '20px',
+		fontFamily: 'Roboto',
+		fontWeight:  200 as 200
+	};
+
 	render() {
-		const { breadcrumbs } = this.props;
+		const { breadcrumbs, noteTime } = this.props;
+
 		const crumbs: JSX.Element[] = [];
-		(breadcrumbs || []).forEach(title => crumbs.push(<MenuItem key={generateGuid()}>{title}</MenuItem>));
+		(breadcrumbs || []).forEach((title: string, i: number) =>
+			crumbs.push(
+				<MenuItem key={generateGuid()}>
+					{title} {i === breadcrumbs.length - 1 && !!noteTime && <span style={this.timeStyle}>{noteTime}</span>}
+				</MenuItem>
+			));
 
 		return (
 			<div id="breadcrumb-holder" style={this.breadcrumbStyle as any}>
