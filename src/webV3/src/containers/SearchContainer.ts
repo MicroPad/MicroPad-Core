@@ -5,15 +5,17 @@ import { Action } from 'redux';
 import { ISearchComponentProps, default as SearchComponent } from '../components/search/SearchComponent';
 import { actions } from '../actions';
 
-export function mapStateToProps({ notepads }: IStoreState) {
+export function mapStateToProps({ notepads, search }: IStoreState) {
 	return {
-		notepad: ((notepads || <INotepadsStoreState> {}).notepad || <INotepadStoreState> {}).item!
+		notepad: ((notepads || <INotepadsStoreState> {}).notepad || <INotepadStoreState> {}).item!,
+		hashTagResults: search.hashTagResults
 	};
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<ISearchComponentProps> {
 	return {
-		loadNote: (note: INote) => dispatch(actions.loadNote(note))
+		loadNote: (note: INote) => dispatch(actions.loadNote(note)),
+		search: (query: string) => dispatch(actions.search(query))
 	};
 }
 

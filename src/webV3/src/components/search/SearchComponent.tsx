@@ -5,22 +5,28 @@ import { generateGuid } from '../../util';
 
 export interface ISearchComponentProps {
 	notepad: INotepad;
+	hashTagResults: INote[];
 	loadNote?: (note: INote) => void;
+	search?: (query: string) => void;
 }
 
 export class HashTagSearchResultsComponent extends React.Component<{
 	hashTagResults: INote[];
+	loadNote: (note: INote) => void;
 }> {
 	render() {
-		const { hashTagResults } = this.props;
+		const { hashTagResults, loadNote } = this.props;
 		console.log(hashTagResults);
 
 		const resultElements: JSX.Element[] = hashTagResults.map((note: INote) =>
-			<CollectionItem key={generateGuid()}>{note.title}</CollectionItem>
+			<CollectionItem key={generateGuid()} href="#!" onClick={() => loadNote(note)}>{note.title}</CollectionItem>
 		);
 
 		return (
-			<Collection>{resultElements}</Collection>
+			<div>
+				<h4>Hashtag Search</h4>
+				<Collection>{resultElements}</Collection>
+			</div>
 		);
 	}
 }
@@ -28,14 +34,12 @@ export class HashTagSearchResultsComponent extends React.Component<{
 export default class SearchComponent extends React.Component<ISearchComponentProps> {
 	private mappedNotesToOptions: INote[];
 	private autoCompleteOptions: object;
-	private hashTagResults: INote[];
 
 	render() {
-		const { notepad } = this.props;
+		const { notepad, hashTagResults, loadNote } = this.props;
 
 		this.autoCompleteOptions = {};
 		this.mappedNotesToOptions = [];
-		this.hashTagResults = [];
 		notepad.search('').forEach((note: INote, i: number) => {
 			this.autoCompleteOptions[`${i}. ${note.title}`] = null;
 			this.mappedNotesToOptions[i] = note;
@@ -55,18 +59,17 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						data={this.autoCompleteOptions} />
 				</Row>
 
-				<HashTagSearchResultsComponent hashTagResults={this.hashTagResults} />
+				{
+					hashTagResults.length > 0
+					&& <HashTagSearchResultsComponent hashTagResults={hashTagResults} loadNote={loadNote!} />
+				}
 			</Modal>
 		);
 	}
 
 	private onInput = (event, value: string) => {
-		this.hashTagResults = [];
-		if (value.length <= 1 || value.substring(0, 1) !== '#') return;
-
-		const { notepad } = this.props;
-		this.hashTagResults = notepad.search(value);
-		console.log(this.hashTagResults);
+		const { search } = this.props;
+		search!(value);
 	}
 
 	private loadNoteFromInput = (value: string) => {
