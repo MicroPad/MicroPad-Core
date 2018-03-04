@@ -18,32 +18,41 @@ const parseNpx$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.parseNpx.started)),
 		switchMap((action: Action<string>) => {
-			try {
-				Parser.parse(action.payload, ['asciimath']);
-			} catch (err) {
-				alert(`Error reading file`);
-				console.error(err);
-				throw err;
-			}
+			return fromPromise(new Promise((resolve, reject) => {
+				try {
+					Parser.parse(action.payload, ['asciimath']);
+				} catch (err) {
+					alert(`Error reading file`);
+					console.error(err);
+					reject(err);
+					return;
+				}
 
-			return fromPromise(new Promise(resolve => {
 				const notepad: INotepad = Parser.notepad;
 
 				// Sort out assets
-				Parser.parseAssets(action.payload, async (assets: IAssets) => {
-					const notepadAssets = new Set((notepad.notepadAssets || []));
-					for (let i = 0; i < assets.assets.length; i++) {
-						if (!notepadAssets.has(assets.assets[i].uuid)) notepadAssets.add(assets.assets[i].uuid);
-						await ASSET_STORAGE.setItem(assets.assets[i].uuid, assets.assets[i].data);
-					}
+				try {
+					Parser.parseAssets(action.payload, async (assets: IAssets) => {
+						const notepadAssets = new Set((notepad.notepadAssets || []));
+						for (let i = 0; i < assets.assets.length; i++) {
+							if (!notepadAssets.has(assets.assets[i].uuid)) notepadAssets.add(assets.assets[i].uuid);
+							await ASSET_STORAGE.setItem(assets.assets[i].uuid, assets.assets[i].data);
+						}
 
-					notepad.notepadAssets = Array.from(notepadAssets);
-					resolve(notepad);
-				});
-			}));
-		}),
-		catchError(err => Observable.of(actions.parseNpx.failed({ params: '', error: err }))),
-		map((notepad: INotepad) => actions.parseNpx.done({ params: '', result: notepad }))
+						notepad.notepadAssets = Array.from(notepadAssets);
+						resolve(notepad);
+					});
+				} catch (err) {
+					alert(`Error reading file`);
+					console.error(err);
+					reject(err);
+				}
+			}))
+				.pipe(
+					map((notepad: INotepad) => actions.parseNpx.done({ params: '', result: notepad })),
+					catchError(err => Observable.of(actions.parseNpx.failed({ params: '', error: err })))
+				);
+		})
 	);
 
 const restoreJsonNotepad$ = action$ =>
