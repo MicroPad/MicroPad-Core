@@ -18,5 +18,7 @@ export const actions = {
 	deleteNotepad: actionCreator<string>('DELETE_NOTEPAD'),
 	exportNotepad: actionCreator<void>('EXPORT_NOTEPAD'),
 	exportAll: actionCreator<void>('EXPORT_ALL_NOTEPADS'),
-	loadNote: actionCreator<INote>('LOAD_NOTE')
+	loadNote: actionCreator<INote>('LOAD_NOTE'),
+	expandSection: actionCreator<string>('OPEN_SECTION'),
+	collapseSelection: actionCreator<string>('CLOSE_SECTION')
 };

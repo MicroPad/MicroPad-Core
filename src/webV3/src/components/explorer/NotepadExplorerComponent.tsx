@@ -8,7 +8,7 @@ import ExplorerOptionsComponent from './ExplorerOptionsComponent';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: INotepad;
-	currentNote?: INote;
+	openSections: string[];
 	isFullScreen: boolean;
 	flipFullScreenState?: () => void;
 	deleteNotepad?: (title: string) => void;
@@ -17,11 +17,16 @@ export interface INotepadExplorerComponentProps {
 	deleteNotepadObject?: (internalId: string) => void;
 	renameNotepadObject?: (internalId: string) => void;
 	loadNote?: (note: INote) => void;
+	expandSection?: (guid: string) => void;
+	collapseSection?: (guid: string) => void;
 }
 
 export default class NotepadExplorerComponent extends React.Component<INotepadExplorerComponentProps> {
+	private openSections: Set<string>;
+
 	render() {
-		const { notepad, currentNote, isFullScreen, flipFullScreenState, deleteNotepad, exportNotepad } = this.props;
+		const { notepad, isFullScreen, flipFullScreenState, deleteNotepad, exportNotepad } = this.props;
+		this.openSections = new Set<string>(this.props.openSections);
 
 		const notepadExplorerStyle = {
 			display: 'initial'
@@ -76,11 +81,22 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		return (
 			<TreeView
 				key={generateGuid()}
+				onClick={() => this.sectionArrowClick(section.internalRef)}
 				nodeLabel={<span style={nodeLabelStyle}><Icon>book</Icon> {section.title} <ExplorerOptionsComponent objToEdit={section} type="section" /></span>}
-				defaultCollapsed={true}>
+				collapsed={!this.openSections.has(section.internalRef)}>
 				{childSections}
 				{childNotes}
 			</TreeView>
 		);
+	}
+
+	private sectionArrowClick = (guid: string) => {
+		const { expandSection, collapseSection } = this.props;
+
+		if (this.openSections.has(guid)) {
+			collapseSection!(guid);
+		} else {
+			expandSection!(guid);
+		}
 	}
 }

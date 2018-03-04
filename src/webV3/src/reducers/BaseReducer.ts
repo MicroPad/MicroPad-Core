@@ -4,11 +4,13 @@ import { MetaReducer } from './MetaReducer';
 import { Action } from 'redux';
 import { NotepadsReducer } from './NotepadsReducer';
 import { NoteReducer } from './NoteReducer';
+import { ExplorerReducer } from './ExplorerReducer';
 
 export const REDUCERS: Array<IReducer<any>> = [
 	new MetaReducer(),
 	new NotepadsReducer(),
-	new NoteReducer()
+	new NoteReducer(),
+	new ExplorerReducer()
 ];
 
 export class BaseReducer implements IReducer<IStoreState> {

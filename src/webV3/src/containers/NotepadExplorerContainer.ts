@@ -5,10 +5,10 @@ import { INote, INotepadsStoreState, INotepadStoreState } from '../types/Notepad
 import { Action } from 'redux';
 import { actions } from '../actions';
 
-export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
+export function mapStateToProps({ notepads, explorer, meta }: IStoreState) {
 	return {
 		notepad: ((notepads || <INotepadsStoreState> {}).notepad || <INotepadStoreState> {}).item,
-		currentNote: currentNote.item,
+		openSections: explorer.openSections,
 		isFullScreen: meta.isFullScreen
 	};
 }
@@ -18,7 +18,9 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepad
 		flipFullScreenState: () => dispatch(actions.flipFullScreenState(undefined)),
 		deleteNotepad: (title: string) => dispatch(actions.deleteNotepad(title)),
 		exportNotepad: () => dispatch(actions.exportNotepad(undefined)),
-		loadNote: (note: INote) => dispatch(actions.loadNote(note))
+		loadNote: (note: INote) => dispatch(actions.loadNote(note)),
+		expandSection: (guid: string) => dispatch(actions.expandSection(guid)),
+		collapseSection: (guid: string) => dispatch(actions.collapseSelection(guid))
 	};
 }
 
