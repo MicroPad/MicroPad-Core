@@ -102,18 +102,22 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				notepad: undefined,
 				savedNotepadTitles: (state.savedNotepadTitles || []).filter(title => title !== action.payload)
 			};
-		} else if (isType(action, actions.renameNotepad)) {
+		} else if (isType(action, actions.renameNotepad.done)) {
 			const notepad = <INotepad> restoreObject({
 				...state.notepad!.item!,
-				title: action.payload
-			}, Parser.createNotepad(action.payload));
+				title: action.payload.params
+			}, Parser.createNotepad(action.payload.params));
 
 			return {
 				...state,
 				notepad: {
 					...state.notepad!,
 					item: notepad
-				}
+				},
+				savedNotepadTitles: [
+					...(state.savedNotepadTitles || []).filter(title => title !== action.payload.result),
+					action.payload.params
+				]
 			};
 		}
 

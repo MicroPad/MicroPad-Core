@@ -1,5 +1,5 @@
 import { actions } from '../actions';
-import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, debounceTime, filter, map, switchMap, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import * as Parser from 'upad-parse/dist/index.js';
@@ -144,11 +144,17 @@ const exportAll$ = (action$, store) =>
 
 const renameNotepad$ = (action$, store) =>
 	action$.pipe(
-		filter((action: Action<string>) => isType(action, actions.renameNotepad)),
+		filter((action: Action<string>) => isType(action, actions.renameNotepad.started)),
+		debounceTime(350),
 		switchMap((action: Action<string>) => {
-			return Observable.of({});
+			const oldTitle = store.getState().notepads.notepad.item.title;
+
+			return Observable.fromPromise(NOTEPAD_STORAGE.removeItem(oldTitle))
+				.pipe(
+					map(() => { return { newTitle: action.payload, oldTitle }; })
+				);
 		}),
-		map(() => actions.getNotepadList.started(undefined))
+		map((res: {newTitle: string, oldTitle: string}) => actions.renameNotepad.done({params: res.newTitle, result: res.oldTitle}))
 	);
 
 export const notepadEpics$ = combineEpics(
