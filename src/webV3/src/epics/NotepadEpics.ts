@@ -142,9 +142,12 @@ const exportAll$ = (action$, store) =>
 		map(() => actions.empty(undefined))
 	);
 
-const renameNotepad$ = action$ =>
+const renameNotepad$ = (action$, store) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.renameNotepad)),
+		switchMap((action: Action<string>) => {
+			return Observable.of({});
+		}),
 		map(() => actions.getNotepadList.started(undefined))
 	);
 
