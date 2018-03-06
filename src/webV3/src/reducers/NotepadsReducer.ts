@@ -1,9 +1,9 @@
 import { IReducer } from '../types/ReducerType';
 import { Action } from 'redux';
-import { INotepad, INotepadsStoreState } from '../types/NotepadTypes';
+import { INote, INotepad, INotepadsStoreState, ISection } from '../types/NotepadTypes';
 import { actions } from '../actions';
 import { isType } from 'redux-typescript-actions';
-import { restoreObject } from '../util';
+import { getNotepadObjectByRef, restoreObject } from '../util';
 import * as Parser from 'upad-parse/dist/index.js';
 
 export class NotepadsReducer implements IReducer<INotepadsStoreState> {
@@ -118,6 +118,30 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 					...(state.savedNotepadTitles || []).filter(title => title !== action.payload.result),
 					action.payload.params
 				]
+			};
+		} else if (isType(action, actions.deleteNotepadObject)) {
+			let newNotepad = { ...state.notepad!.item! };
+			newNotepad = getNotepadObjectByRef(newNotepad, action.payload, (obj) => {
+				if (!!(<ISection> obj).notes) {
+					// Delete a section
+					obj.parent.sections.splice(obj.parent.sections.indexOf(<ISection> obj), 1);
+				} else {
+					// Delete a note
+					let section = <ISection> obj.parent;
+					section.notes.splice(section.notes.indexOf(<INote> obj), 1);
+				}
+
+				return <INote> {};
+			});
+
+			const notepad = <INotepad> restoreObject(newNotepad, Parser.createNotepad(newNotepad.title));
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					item: notepad
+				}
 			};
 		}
 

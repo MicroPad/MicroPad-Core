@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { INPXObject } from '../../types/NotepadTypes';
+import { INote, INPXObject, ISection } from '../../types/NotepadTypes';
 import { Button, Icon, Input, Modal, Row } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL } from '../../types';
 import { Observable } from 'rxjs/Observable';
@@ -70,13 +70,19 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 	}
 
 	private delete = () => {
-		const { objToEdit, type, deleteNotepad } = this.props;
+		const { objToEdit, type, deleteNotepad, deleteNotepadObject } = this.props;
 		if (!confirm(`Are you sure you want to delete '${objToEdit.title}'?`)) return;
+
+		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
 
 		switch (type) {
 			case 'notepad':
-				document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
 				deleteNotepad!(objToEdit.title);
+				break;
+
+			case 'section':
+			case 'note':
+				deleteNotepadObject!((objToEdit as INote | ISection).internalRef);
 				break;
 
 			default:

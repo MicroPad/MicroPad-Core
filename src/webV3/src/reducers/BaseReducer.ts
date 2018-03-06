@@ -29,7 +29,7 @@ export class BaseReducer implements IReducer<IStoreState> {
 		let newState = {
 			...state
 		};
-		REDUCERS.forEach(reducer => newState[reducer.key] = reducer.reducer(state[reducer.key], action));
+		REDUCERS.forEach(reducer => newState[reducer.key] = Object.freeze(reducer.reducer(Object.freeze(state[reducer.key]), action)));
 
 		return Object.freeze(newState);
 	}

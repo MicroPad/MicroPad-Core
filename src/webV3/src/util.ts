@@ -1,4 +1,4 @@
-import { IAsset, IAssets, INotepad } from './types/NotepadTypes';
+import { IAsset, IAssets, INote, INotepad, INPXObject, ISection } from './types/NotepadTypes';
 import * as Parser from 'upad-parse/dist/index';
 import { ASSET_STORAGE } from './index';
 
@@ -63,6 +63,29 @@ export function getNotepadXmlWithAssets(notepad: INotepad): Promise<IExportedNot
 export function restoreObject(objectToRestore: object, template: object): object {
 	objectToRestore['__proto__'] = { ...template['__proto__'] };
 	return objectToRestore;
+}
+
+export function getNotepadObjectByRef(notepad: INotepad, ref: string, actionOnObj: (obj: ISection | INote) => ISection | INote): INotepad {
+	for (let section of notepad.sections) {
+		let res = findInSection(section);
+		if (!!res) {
+			res = actionOnObj(res);
+			return notepad;
+		}
+	}
+
+	function findInSection(section: ISection): ISection | INote | false {
+		if (section.internalRef === ref) return section;
+		for (let note of section.notes) if (note.internalRef === ref) return note;
+		for (let subSection of section.sections) {
+			const res = findInSection(subSection);
+			if (!!res) return res;
+		}
+
+		return false;
+	}
+
+	return notepad;
 }
 
 // Thanks to https://stackoverflow.com/a/105074

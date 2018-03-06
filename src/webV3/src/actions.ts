@@ -1,5 +1,5 @@
 import actionCreatorFactory from 'redux-typescript-actions';
-import { INote, INotepad } from './types/NotepadTypes';
+import { INote, INotepad, IRenameNotepadObjectAction } from './types/NotepadTypes';
 
 const actionCreator = actionCreatorFactory();
 
@@ -23,5 +23,7 @@ export const actions = {
 	expandSection: actionCreator<string>('OPEN_SECTION'),
 	collapseSelection: actionCreator<string>('CLOSE_SECTION'),
 	search: actionCreator<string>('SEARCH'),
-	displayHashTagSearchResults: actionCreator<INote[]>('DISPLAY_HASH_TAG_SEARCH_RESULTS')
+	displayHashTagSearchResults: actionCreator<INote[]>('DISPLAY_HASH_TAG_SEARCH_RESULTS'),
+	deleteNotepadObject: actionCreator<string>('DELETE_NOTEPAD_OBJECT'),
+	renameNotepadObject: actionCreator<IRenameNotepadObjectAction>('RENAME_NOTEPAD_OBJECT')
 };
