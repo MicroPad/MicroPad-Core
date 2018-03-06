@@ -1,6 +1,7 @@
 const xml2js = require('xml2js');
 const parseString = require('xml2js').parseString;
-const moment = require('moment');
+const format = require('date-fns/format');
+const parseDate = require('date-fns/parse');
 const toMarkdown = require('to-markdown');
 const pd = require('pretty-data').pd;
 
@@ -21,7 +22,7 @@ var Notepad = function (title, lastModified) {
 	if (lastModified) {
 		this.lastModified = lastModified;
 	} else {
-		this.lastModified = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+		this.lastModified = format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ');
 	}
 };
 Notepad.prototype.addSection = function (section) {
@@ -212,12 +213,12 @@ exports.parse = function parse(xml, addons) {
 exports.parseFromEvernote = function parseFromEvernote(xml, addons) {
 	supportedAddons = addons;
 	parseString(xml, { trim: true, normalize: false }, function (e, res) {
-		exports.notepad = new Notepad("{0} Import ({1})".format(res['en-export'].$.application, moment(res['en-export'].$['export-date']).format('D MMM h:mmA')));
+		exports.notepad = new Notepad("{0} Import ({1})".format(res['en-export'].$.application, format(parseDate(res['en-export'].$['export-date']), 'D MMM h:mmA')));
 		var section = new Section('Imported Notes');
 		var notes = res['en-export'].note;
 		for (var i = 0; i < notes.length; i++) {
 			var noteXML = notes[i];
-			var note = new Note(noteXML.title[0], moment(noteXML.created[0]).format('YYYY-MM-DDTHH:mm:ss.SSSZ'), supportedAddons);
+			var note = new Note(noteXML.title[0], format(parseDate(noteXML.created[0]), 'YYYY-MM-DDTHH:mm:ss.SSSZ'), supportedAddons);
 
 			//Add the general note content
 			note.addElement('markdown', {
@@ -275,7 +276,7 @@ exports.createSection = function createSection(title) {
 };
 
 exports.createNote = function createNote(title, addons) {
-	return new Note(title, moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ'), addons);
+	return new Note(title, format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ'), addons);
 };
 
 exports.restoreNotepad = function restoreNotepad(obj) {
@@ -302,7 +303,7 @@ exports.restoreSection = function restoreSection(obj) {
 	return restoredSection;
 };
 exports.restoreNote = function restoreNote(obj) {
-	var restoredNote = new Note(obj.title, moment(obj.time).format('YYYY-MM-DDTHH:mm:ss.SSSZ'), obj.addons);
+	var restoredNote = new Note(obj.title, format(parseDate(obj.time), 'YYYY-MM-DDTHH:mm:ss.SSSZ'), obj.addons);
 	for(let k in obj.bibliography) {
 		var source = obj.bibliography[k];
 		restoredNote.addSource(source.id, source.item, source.content);

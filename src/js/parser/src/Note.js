@@ -1,5 +1,6 @@
-var xml2js = require('xml2js');
-var moment = require('moment');
+const xml2js = require('xml2js');
+const format = require('date-fns/format');
+const parseDate = require('date-fns/parse');
 
 exports.Note = function (title, time, addons) {
 	this.parent = undefined;
@@ -49,7 +50,7 @@ exports.Note.prototype.toXMLObject = function () {
 		note: {
 			$: {
 				title: removeHTML(this.title),
-				time: moment(this.time).format('YYYY-MM-DDTHH:mm:ss.SSSZ')
+				time: format(parseDate(this.time, 'YYYY-MM-DDTHH:mm:ss.SSSZ'))
 			},
 			addons: [],
 			bibliography: []
