@@ -11,6 +11,7 @@ export const actions = {
 	getNotepadList: actionCreator.async<void, string[], any>('GET_NOTEPAD_LIST'),
 	getHelp: actionCreator.async<void, string, any>('GET_HELP'),
 	openNotepadFromStorage: actionCreator.async<string, void, any>('OPEN_NOTEPAD_FROM_STORAGE'),
+	renameNotepad: actionCreator.async<string, string, any>('RENAME_NOTEPAD'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),

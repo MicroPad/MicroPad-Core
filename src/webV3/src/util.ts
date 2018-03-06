@@ -60,6 +60,11 @@ export function getNotepadXmlWithAssets(notepad: INotepad): Promise<IExportedNot
 	}
 }
 
+export function restoreObject(objectToRestore: object, template: object): object {
+	objectToRestore['__proto__'] = { ...template['__proto__'] };
+	return objectToRestore;
+}
+
 // Thanks to https://stackoverflow.com/a/105074
 export function generateGuid(): string {
 	function s4() {

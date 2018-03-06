@@ -3,6 +3,8 @@ import { Action } from 'redux';
 import { INotepad, INotepadsStoreState } from '../types/NotepadTypes';
 import { actions } from '../actions';
 import { isType } from 'redux-typescript-actions';
+import { restoreObject } from '../util';
+import * as Parser from 'upad-parse/dist/index.js';
 
 export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 	public readonly key: string = 'notepads';
@@ -99,6 +101,23 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				...state,
 				notepad: undefined,
 				savedNotepadTitles: (state.savedNotepadTitles || []).filter(title => title !== action.payload)
+			};
+		} else if (isType(action, actions.renameNotepad.done)) {
+			const notepad = <INotepad> restoreObject({
+				...state.notepad!.item!,
+				title: action.payload.params
+			}, Parser.createNotepad(action.payload.params));
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					item: notepad
+				},
+				savedNotepadTitles: [
+					...(state.savedNotepadTitles || []).filter(title => title !== action.payload.result),
+					action.payload.params
+				]
 			};
 		}
 
