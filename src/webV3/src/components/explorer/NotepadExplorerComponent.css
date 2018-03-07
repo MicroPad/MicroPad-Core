@@ -71,3 +71,7 @@
 #explorer-options-modal button {
 	width: 260px;
 }
+
+#explorer-options-modal .col > button {
+	width: initial;
+}

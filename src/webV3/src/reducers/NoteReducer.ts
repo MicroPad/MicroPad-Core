@@ -11,7 +11,11 @@ export class NoteReducer implements IReducer<INoteStoreState> {
 	};
 
 	public reducer(state: INoteStoreState, action: Action): INoteStoreState {
-		if (isType(action, actions.parseNpx.started) || isType(action, actions.newNotepad) || isType(action, actions.openNotepadFromStorage.started) || isType(action, actions.deleteNotepad)) {
+		if (isType(action, actions.parseNpx.started)
+			|| isType(action, actions.newNotepad)
+			|| isType(action, actions.openNotepadFromStorage.started)
+			|| isType(action, actions.deleteNotepad
+			|| isType(action, actions.renameNotepad.done))) {
 			return this.initialState;
 		} else if (isType(action, actions.loadNote)) {
 			const note: INote = action.payload;

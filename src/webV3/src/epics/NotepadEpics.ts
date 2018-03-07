@@ -145,7 +145,6 @@ const exportAll$ = (action$, store) =>
 const renameNotepad$ = (action$, store) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.renameNotepad.started)),
-		debounceTime(350),
 		switchMap((action: Action<string>) => {
 			const oldTitle = store.getState().notepads.notepad.item.title;
 

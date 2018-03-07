@@ -25,6 +25,5 @@ export const actions = {
 	search: actionCreator<string>('SEARCH'),
 	displayHashTagSearchResults: actionCreator<INote[]>('DISPLAY_HASH_TAG_SEARCH_RESULTS'),
 	deleteNotepadObject: actionCreator<string>('DELETE_NOTEPAD_OBJECT'),
-	renameNotepadObject: actionCreator<IRenameNotepadObjectAction>('RENAME_NOTEPAD_OBJECT'),
-	reloadNote: actionCreator<string>('RELOAD_NOTE')
+	renameNotepadObject: actionCreator<IRenameNotepadObjectAction>('RENAME_NOTEPAD_OBJECT')
 };

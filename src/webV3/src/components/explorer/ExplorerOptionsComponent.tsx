@@ -1,11 +1,7 @@
 import * as React from 'react';
 import { INote, INPXObject, ISection } from '../../types/NotepadTypes';
-import { Button, Icon, Input, Modal, Row } from 'react-materialize';
+import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL } from '../../types';
-import { Observable } from 'rxjs/Observable';
-import { debounceTime, tap } from 'rxjs/operators';
-import { stringify } from '../../util';
-import * as md5 from 'md5';
 
 export interface IExplorerOptionsComponentProps {
 	objToEdit: INPXObject;
@@ -18,6 +14,8 @@ export interface IExplorerOptionsComponentProps {
 }
 
 export default class ExplorerOptionsComponent extends React.Component<IExplorerOptionsComponentProps> {
+	private titleInput: Input;
+
 	render() {
 		const { objToEdit, type, exportNotepad } = this.props;
 
@@ -35,11 +33,14 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 
 		return (
 			<Modal
-				key={md5(stringify({ ...objToEdit, title: '' }))}
+				key={`npeo-${objToEdit.title}`}
 				header={`Options for ${objToEdit.title}`}
 				trigger={<a href="#!" style={{color: 'white'}}><Icon tiny={true}>settings</Icon></a>}>
 				<div id="explorer-options-modal">
-					<Row><Input s={12} label="Title" defaultValue={objToEdit.title} onChange={this.onInput} /></Row>
+					<Row>
+						<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title} />
+						<Col s={6}><Button waves="light" onClick={this.rename}>Rename {type}</Button></Col>
+					</Row>
 					<Row><Button className="red" waves="light" onClick={this.delete}><Icon left={true}>delete_forever</Icon> Delete {type}</Button></Row>
 					{(type === 'notepad') && notepadOptions}
 					{(type === 'note') && noteOptions}
@@ -56,8 +57,11 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 		);
 	}
 
-	private onInput = (event, value: string) => {
-		const { objToEdit, type, renameNotepad } = this.props;
+	private rename = () => {
+		const { type, renameNotepad } = this.props;
+		const value = this.titleInput.state.value;
+
+		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
 
 		switch (type) {
 			case 'notepad':
