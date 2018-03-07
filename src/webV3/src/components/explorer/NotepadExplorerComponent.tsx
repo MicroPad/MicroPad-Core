@@ -1,6 +1,6 @@
 import * as React from 'react';
 import './NotepadExplorerComponent.css';
-import { INote, INotepad, ISection } from '../../types/NotepadTypes';
+import { INote, INotepad, IRenameNotepadObjectAction, ISection } from '../../types/NotepadTypes';
 import { Icon } from 'react-materialize';
 import TreeView from 'react-treeview';
 import { generateGuid } from '../../util';
@@ -15,7 +15,7 @@ export interface INotepadExplorerComponentProps {
 	exportNotepad?: () => void;
 	renameNotepad?: (newTitle: string) => void;
 	deleteNotepadObject?: (internalId: string) => void;
-	renameNotepadObject?: (internalId: string) => void;
+	renameNotepadObject?: (params: IRenameNotepadObjectAction) => void;
 	loadNote?: (note: INote) => void;
 	expandSection?: (guid: string) => void;
 	collapseSection?: (guid: string) => void;
@@ -42,16 +42,16 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 			<div id="notepad-explorer" style={notepadExplorerStyle}>
 				{
 					!!notepad &&
-					<div style={{paddingBottom: '200px'}}>
-						<a href="#!" onClick={flipFullScreenState} style={{color: 'white', paddingRight: '5px', fontSize: '24px'}}>»</a>
-						<strong style={{display: 'inline-flex'}}>
+					<div style={{ paddingBottom: '200px' }}>
+						<a href="#!" onClick={flipFullScreenState} style={{ color: 'white', paddingRight: '5px', fontSize: '24px' }}>»</a>
+						<strong style={{ display: 'inline-flex' }}>
 							{notepad.title}
 							<ExplorerOptionsComponent
 								objToEdit={notepad}
 								type="notepad"
 								deleteNotepad={deleteNotepad}
 								exportNotepad={exportNotepad}
-								renameNotepad={renameNotepad} />
+								renameNotepad={renameNotepad}/>
 						</strong>
 						{treeViews}
 					</div>
@@ -78,8 +78,14 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		((section || {} as ISection).notes || [])
 			.forEach((child: INote) => childNotes.push(
 				<div className="explorer-note" key={generateGuid()}>
-					<span><a href="#!" style={{color: 'white'}} onClick={() => loadNote!(child)}><Icon>note</Icon> {child.title}</a>
-					<ExplorerOptionsComponent objToEdit={child} type="note" deleteNotepadObject={deleteNotepadObject} /></span>
+					<span>
+						<a href="#!" style={{ color: 'white' }} onClick={() => loadNote!(child)}><Icon>note</Icon> {child.title}</a>
+						<ExplorerOptionsComponent
+							objToEdit={child}
+							type="note"
+							deleteNotepadObject={deleteNotepadObject}
+							renameNotepadObject={renameNotepadObject}/>
+					</span>
 				</div>
 			));
 
@@ -95,8 +101,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 							type="section"
 							deleteNotepadObject={deleteNotepadObject}
 							renameNotepadObject={renameNotepadObject}/>
-					</span>
-				}
+					</span>}
 				collapsed={!this.openSections.has(section.internalRef)}>
 				{childSections}
 				{childNotes}

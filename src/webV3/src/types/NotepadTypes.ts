@@ -114,3 +114,8 @@ export interface IAsset {
 	toString: (callback: Function) => void;
 	getXmlObject: (callback: ToXMLObjectCallback) => void;
 }
+
+export interface IRenameNotepadObjectAction {
+	internalRef: string;
+	newName: string;
+}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { INote, INPXObject, ISection } from '../../types/NotepadTypes';
+import { INote, INPXObject, IRenameNotepadObjectAction, ISection } from '../../types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL } from '../../types';
 
@@ -10,7 +10,7 @@ export interface IExplorerOptionsComponentProps {
 	exportNotepad?: () => void;
 	renameNotepad?: (newTitle: string) => void;
 	deleteNotepadObject?: (internalId: string) => void;
-	renameNotepadObject?: (internalId: string) => void;
+	renameNotepadObject?: (params: IRenameNotepadObjectAction) => void;
 }
 
 export default class ExplorerOptionsComponent extends React.Component<IExplorerOptionsComponentProps> {
@@ -21,7 +21,8 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 
 		const notepadOptions: JSX.Element = (
 			<div>
-				<Row><Button className="blue" waves="light" onClick={exportNotepad}><Icon left={true}>file_download</Icon> Export Notepad</Button></Row>
+				<Row><Button className="blue" waves="light" onClick={exportNotepad}><Icon
+					left={true}>file_download</Icon> Export Notepad</Button></Row>
 			</div>
 		);
 
@@ -35,19 +36,20 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			<Modal
 				key={`npeo-${objToEdit.title}`}
 				header={`Options for ${objToEdit.title}`}
-				trigger={<a href="#!" style={{color: 'white'}}><Icon tiny={true}>settings</Icon></a>}>
+				trigger={<a href="#!" style={{ color: 'white' }}><Icon tiny={true}>settings</Icon></a>}>
 				<div id="explorer-options-modal">
 					<Row>
-						<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title} />
+						<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>
 						<Col s={6}><Button waves="light" onClick={this.rename}>Rename {type}</Button></Col>
 					</Row>
-					<Row><Button className="red" waves="light" onClick={this.delete}><Icon left={true}>delete_forever</Icon> Delete {type}</Button></Row>
+					<Row><Button className="red" waves="light" onClick={this.delete}><Icon
+						left={true}>delete_forever</Icon> Delete {type}</Button></Row>
 					{(type === 'notepad') && notepadOptions}
 					{(type === 'note') && noteOptions}
 					{
 						(type === 'note' || type === 'section') &&
 						<p>
-							Changing the path of a {type} isn't supported in the new {APP_NAME}.<br />
+							Changing the path of a {type} isn't supported in the new {APP_NAME}.<br/>
 							If you want to do that, you can import your notepad
 							into <a href={`${MICROPAD_URL}/web`}>{APP_NAME} classic</a> and change the path there.
 						</p>
@@ -70,7 +72,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 
 			case 'section':
 			case 'note':
-				renameNotepadObject!((objToEdit as INote | ISection).internalRef);
+				renameNotepadObject!({ internalRef: (objToEdit as INote | ISection).internalRef, newName: value });
 				break;
 
 			default:
