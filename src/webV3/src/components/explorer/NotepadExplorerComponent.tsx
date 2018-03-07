@@ -61,7 +61,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 	}
 
 	private generateSectionTreeView(section: ISection): JSX.Element {
-		const { loadNote, deleteNotepadObject } = this.props;
+		const { loadNote, deleteNotepadObject, renameNotepadObject } = this.props;
 
 		const nodeLabelStyle = {
 			display: 'inline-flex',
@@ -87,7 +87,16 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 			<TreeView
 				key={generateGuid()}
 				onClick={() => this.sectionArrowClick(section.internalRef)}
-				nodeLabel={<span style={nodeLabelStyle}><Icon>book</Icon> {section.title} <ExplorerOptionsComponent objToEdit={section} type="section" deleteNotepadObject={deleteNotepadObject} /></span>}
+				nodeLabel={
+					<span style={nodeLabelStyle}>
+						<Icon>book</Icon> {section.title}
+						<ExplorerOptionsComponent
+							objToEdit={section}
+							type="section"
+							deleteNotepadObject={deleteNotepadObject}
+							renameNotepadObject={renameNotepadObject}/>
+					</span>
+				}
 				collapsed={!this.openSections.has(section.internalRef)}>
 				{childSections}
 				{childNotes}

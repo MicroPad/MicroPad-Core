@@ -58,7 +58,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 	}
 
 	private rename = () => {
-		const { type, renameNotepad } = this.props;
+		const { objToEdit, type, renameNotepad, renameNotepadObject } = this.props;
 		const value = this.titleInput.state.value;
 
 		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
@@ -66,6 +66,11 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 		switch (type) {
 			case 'notepad':
 				renameNotepad!(value);
+				break;
+
+			case 'section':
+			case 'note':
+				renameNotepadObject!((objToEdit as INote | ISection).internalRef);
 				break;
 
 			default:
