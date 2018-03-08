@@ -21,7 +21,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 		this.autoCompleteOptions = {};
 		this.mappedNotesToOptions = [];
 		notepad.search('').forEach((note: INote, i: number) => {
-			this.autoCompleteOptions[`${i}. ${note.title}`] = null;
+			this.autoCompleteOptions[`${i + 1}. ${note.title}`] = null;
 			this.mappedNotesToOptions[i] = note;
 		});
 
@@ -62,7 +62,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 
 	private loadNoteFromInput = (value: string) => {
 		const { loadNote } = this.props;
-		const index: number = parseInt(value.split('.')[0], 10);
+		const index: number = parseInt(value.split('.')[0], 10) - 1;
 
 		loadNote!(this.mappedNotesToOptions[index].internalRef);
 	}
