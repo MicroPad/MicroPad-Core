@@ -67,29 +67,3 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
 
 registerServiceWorker();
 miscRx.initSubscriptions();
-
-// // Update notepad when currentNote changes
-// state$
-// 	.pipe(
-// 		map((state: IStoreState) => state.notepads.notepad),
-// 		filter(Boolean),
-// 		map((notepadState: INotepadStoreState) => notepadState.item),
-// 		filter(Boolean),
-// 		distinctUntilChanged(),
-// 		withLatestFrom(
-// 			from(state$)
-// 				.pipe(
-// 					map((state: IStoreState) => state.currentNote.item),
-// 					filter(Boolean),
-// 					map((note: INote) => note.internalRef)
-// 				)
-// 		),
-// 		filter(([notepad, ref]: [INotepad, string]) => !!notepad && !!ref),
-// 		map(([notepad, ref]: [INotepad, string]) => {
-// 			let noteInNotepad: INote | false = false;
-// 			getNotepadObjectByRef(notepad, ref, obj => noteInNotepad = obj as INote);
-// 			return noteInNotepad;
-// 		}),
-// 		filter(Boolean)
-// 	)
-// 	.subscribe((note: INote) => store.dispatch(actions.updateNoteInNotepad(note)));

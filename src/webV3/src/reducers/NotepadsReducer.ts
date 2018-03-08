@@ -152,13 +152,25 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 			newNotepad = getNotepadObjectByRef(newNotepad, action.payload.internalRef, (obj) => {
 				if (!!(<ISection> obj).notes) {
 					// Rename a section
-					const index = obj.parent.sections.indexOf(<ISection> obj);
-					obj.parent.sections[index] = restoreObject<ISection>({
-						...obj.parent.sections[index],
+					let section = <ISection> obj;
+					const index = section.parent.sections.indexOf(<ISection> obj);
+					section = restoreObject<ISection>({
+						...section,
 						title: action.payload.newName
 					}, Parser.createSection(''));
 
-					return obj.parent.sections[index];
+					const deepRename = (parentSection) => {
+						parentSection.notes.forEach((note: INote) => note.parent = parentSection);
+						parentSection.sections.forEach((subSection: ISection) => {
+							subSection.parent = parentSection;
+							deepRename(subSection);
+						});
+					};
+					deepRename(section);
+
+					obj.parent.sections[index] = section;
+
+					return section;
 				} else {
 					// Rename a note
 					const section = <ISection> obj.parent;

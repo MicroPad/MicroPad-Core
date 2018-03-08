@@ -9,8 +9,8 @@ import { SearchReducer } from './SearchReducer';
 
 export const REDUCERS: Array<IReducer<any>> = [
 	new MetaReducer(),
-	new NoteReducer(),
 	new NotepadsReducer(),
+	new NoteReducer(),
 	new ExplorerReducer(),
 	new SearchReducer()
 ];
