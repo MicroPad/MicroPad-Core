@@ -5,10 +5,18 @@ import {
 	default as NoteViewerComponent,
 	INoteViewerComponentProps
 } from '../components/note-viewer/NoteViewerComponent';
+import { getNotepadObjectByRef } from '../util';
+import { INote } from '../types/NotepadTypes';
 
 export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
+	let note;
+	if (currentNote.length !== 0) {
+		getNotepadObjectByRef(notepads.notepad!.item!, currentNote, obj => note = <INote> obj);
+	}
+
 	return {
-		isFullscreen: meta.isFullScreen
+		isFullscreen: meta.isFullScreen,
+		note
 	};
 }
 
