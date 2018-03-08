@@ -15,12 +15,8 @@ import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
 import { Provider } from 'react-redux';
 import HeaderComponent from './containers/header/HeaderContainer';
-import { from } from 'rxjs/observable/from';
-import { debounceTime, distinctUntilChanged, filter, map, withLatestFrom } from 'rxjs/operators';
-import { INote, INotepad, INotepadStoreState } from './types/NotepadTypes';
 import NotepadExplorerComponent from './containers/NotepadExplorerContainer';
-import NoteViewerComponent from './components/note-viewer/NoteViewerComponent';
-import { getNotepadObjectByRef } from './util';
+import NoteViewerComponent from './containers/NoteViewerContainer';
 import { MiscRx } from './MiscRx';
 
 try {
