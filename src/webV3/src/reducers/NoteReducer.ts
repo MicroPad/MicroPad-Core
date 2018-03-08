@@ -3,6 +3,8 @@ import { INote, INoteStoreState, ISection } from '../types/NotepadTypes';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
+import { restoreObject } from '../util';
+import * as Parser from 'upad-parse/dist/index.js';
 
 export class NoteReducer implements IReducer<INoteStoreState> {
 	public readonly key: string = 'currentNote';
@@ -15,10 +17,10 @@ export class NoteReducer implements IReducer<INoteStoreState> {
 			|| isType(action, actions.newNotepad)
 			|| isType(action, actions.openNotepadFromStorage.started)
 			|| isType(action, actions.deleteNotepad
-			|| isType(action, actions.renameNotepad.done))) {
+				|| isType(action, actions.renameNotepad.done))) {
 			return this.initialState;
 		} else if (isType(action, actions.loadNote)) {
-			const note: INote = action.payload;
+			const note: INote = restoreObject<INote>({ ...action.payload }, Parser.createNote(''));
 
 			return {
 				...state,
@@ -41,6 +43,11 @@ export class NoteReducer implements IReducer<INoteStoreState> {
 			if (noteFamily.has(action.payload)) return this.initialState;
 
 			return state;
+		} else if (isType(action, actions.updateNoteInNotepad)) {
+			return {
+				...state,
+				item: action.payload
+			};
 		}
 
 		return state;

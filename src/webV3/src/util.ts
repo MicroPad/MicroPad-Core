@@ -1,4 +1,4 @@
-import { IAsset, IAssets, INote, INotepad, INPXObject, ISection } from './types/NotepadTypes';
+import { IAsset, IAssets, INote, INotepad, ISection } from './types/NotepadTypes';
 import * as Parser from 'upad-parse/dist/index';
 import { ASSET_STORAGE } from './index';
 
@@ -60,7 +60,7 @@ export function getNotepadXmlWithAssets(notepad: INotepad): Promise<IExportedNot
 	}
 }
 
-export function restoreObject(objectToRestore: object, template: object): object {
+export function restoreObject<T>(objectToRestore: T, template: T): T {
 	objectToRestore['__proto__'] = { ...template['__proto__'] };
 	return objectToRestore;
 }
