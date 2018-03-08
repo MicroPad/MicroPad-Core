@@ -18,6 +18,8 @@ export class NoteReducer implements IReducer<string> {
 			return this.initialState;
 		} else if (isType(action, actions.loadNote)) {
 			return action.payload;
+		} else if (isType(action, actions.deleteNotepadObject)) {
+			if (action.payload === state) return this.initialState;
 		}
 
 		return state;
