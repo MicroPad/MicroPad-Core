@@ -64,9 +64,9 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 								exportNotepad={exportNotepad}
 								renameNotepad={renameNotepad}/>
 						</strong>
-						<span style={{paddingLeft: '10px'}}>
+						<p style={{paddingLeft: '10px', marginTop: '0px'}}>
 							(<a href="#!" onClick={expandAll}>Expand All</a> | <a href="#!" onClick={collapseAll}>Collapse All</a>)
-						</span>
+						</p>
 						{treeViews}
 					</div>
 				}

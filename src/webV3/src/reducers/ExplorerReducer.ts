@@ -53,6 +53,14 @@ export class ExplorerReducer implements IReducer<IExplorerState> {
 				...state,
 				openSections: []
 			};
+		} else if (isType(action, actions.expandAllExplorer.done)) {
+			return {
+				...state,
+				openSections: [
+					...state.openSections,
+					...action.payload.result
+				]
+			};
 		}
 
 		return state;
