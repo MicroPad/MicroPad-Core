@@ -75,3 +75,7 @@
 #explorer-options-modal .col > button {
 	width: initial;
 }
+
+#notepad-explorer a {
+	color: white;
+}

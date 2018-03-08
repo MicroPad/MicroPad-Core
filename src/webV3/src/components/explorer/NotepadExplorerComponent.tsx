@@ -19,13 +19,24 @@ export interface INotepadExplorerComponentProps {
 	loadNote?: (ref: string) => void;
 	expandSection?: (guid: string) => void;
 	collapseSection?: (guid: string) => void;
+	expandAll?: () => void;
+	collapseAll?: () => void;
 }
 
 export default class NotepadExplorerComponent extends React.Component<INotepadExplorerComponentProps> {
 	private openSections: Set<string>;
 
 	render() {
-		const { notepad, isFullScreen, flipFullScreenState, deleteNotepad, exportNotepad, renameNotepad } = this.props;
+		const {
+			notepad,
+			isFullScreen,
+			flipFullScreenState,
+			deleteNotepad,
+			exportNotepad,
+			renameNotepad,
+			expandAll,
+			collapseAll
+		} = this.props;
 		this.openSections = new Set<string>(this.props.openSections);
 
 		const notepadExplorerStyle = {
@@ -43,7 +54,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 				{
 					!!notepad &&
 					<div style={{ paddingBottom: '200px' }}>
-						<a href="#!" onClick={flipFullScreenState} style={{ color: 'white', paddingRight: '5px', fontSize: '24px' }}>»</a>
+						<a href="#!" onClick={flipFullScreenState} style={{ paddingRight: '5px', fontSize: '24px' }}>»</a>
 						<strong style={{ display: 'inline-flex' }}>
 							{notepad.title}
 							<ExplorerOptionsComponent
@@ -53,7 +64,9 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 								exportNotepad={exportNotepad}
 								renameNotepad={renameNotepad}/>
 						</strong>
-						<span style={{paddingLeft: '10px'}}>(Expand All | Collapse All)</span>
+						<span style={{paddingLeft: '10px'}}>
+							(<a href="#!" onClick={expandAll}>Expand All</a> | <a href="#!" onClick={collapseAll}>Collapse All</a>)
+						</span>
 						{treeViews}
 					</div>
 				}

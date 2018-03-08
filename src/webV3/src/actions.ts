@@ -27,6 +27,6 @@ export const actions = {
 	deleteNotepadObject: actionCreator<string>('DELETE_NOTEPAD_OBJECT'),
 	renameNotepadObject: actionCreator<IRenameNotepadObjectAction>('RENAME_NOTEPAD_OBJECT'),
 	expandFromNote: actionCreator<INote>('EXPAND_FROM_NOTE'),
-	expandAllExplorer: actionCreator<void>('EXPAND_ALL_EXPLORER'),
+	expandAllExplorer: actionCreator.async<void, void, any>('EXPAND_ALL_EXPLORER'),
 	collapseAllExplorer: actionCreator<void>('COLLAPSE_ALL_EXPLORER')
 };
