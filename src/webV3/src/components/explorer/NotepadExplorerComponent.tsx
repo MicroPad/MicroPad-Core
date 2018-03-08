@@ -16,7 +16,7 @@ export interface INotepadExplorerComponentProps {
 	renameNotepad?: (newTitle: string) => void;
 	deleteNotepadObject?: (internalId: string) => void;
 	renameNotepadObject?: (params: IRenameNotepadObjectAction) => void;
-	loadNote?: (note: INote) => void;
+	loadNote?: (ref: string) => void;
 	expandSection?: (guid: string) => void;
 	collapseSection?: (guid: string) => void;
 }
@@ -79,7 +79,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 			.forEach((child: INote) => childNotes.push(
 				<div className="explorer-note" key={generateGuid()}>
 					<span>
-						<a href="#!" style={{ color: 'white' }} onClick={() => loadNote!(child)}><Icon>note</Icon> {child.title}</a>
+						<a href="#!" style={{ color: 'white' }} onClick={() => loadNote!(child.internalRef)}><Icon>note</Icon> {child.title}</a>
 						<ExplorerOptionsComponent
 							objToEdit={child}
 							type="note"

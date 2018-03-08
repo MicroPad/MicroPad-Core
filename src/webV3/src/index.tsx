@@ -21,6 +21,7 @@ import { INote, INotepad, INotepadStoreState } from './types/NotepadTypes';
 import NotepadExplorerComponent from './containers/NotepadExplorerContainer';
 import NoteViewerComponent from './components/note-viewer/NoteViewerComponent';
 import { getNotepadObjectByRef } from './util';
+import { MiscRx } from './MiscRx';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -29,11 +30,11 @@ try {
 }
 
 const baseReducer: BaseReducer = new BaseReducer();
-export const store = createStore<IStoreState>(
+const store = createStore<IStoreState>(
 	baseReducer.reducer,
 	baseReducer.initialState,
 	composeWithDevTools(applyMiddleware(epicMiddleware)));
-export const state$ = from(store as any);
+export const miscRx: MiscRx = new MiscRx(store);
 
 export const NOTEPAD_STORAGE = localforage.createInstance({
 	name: 'MicroPad',
@@ -65,41 +66,30 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
 	});
 
 registerServiceWorker();
+miscRx.initSubscriptions();
 
-// Save open notepad on changes
-state$
-	.pipe(
-		map((state: IStoreState) => state.notepads.notepad),
-		filter(Boolean),
-		map((notepadState: INotepadStoreState) => notepadState.item),
-		filter(Boolean),
-		distinctUntilChanged(),
-		debounceTime(1000)
-	)
-	.subscribe((notepad: INotepad) => store.dispatch(actions.saveNotepad.started(notepad)));
-
-// Update notepad when currentNote changes
-state$
-	.pipe(
-		map((state: IStoreState) => state.notepads.notepad),
-		filter(Boolean),
-		map((notepadState: INotepadStoreState) => notepadState.item),
-		filter(Boolean),
-		distinctUntilChanged(),
-		withLatestFrom(
-			from(state$)
-				.pipe(
-					map((state: IStoreState) => state.currentNote.item),
-					filter(Boolean),
-					map((note: INote) => note.internalRef)
-				)
-		),
-		filter(([notepad, ref]: [INotepad, string]) => !!notepad && !!ref),
-		map(([notepad, ref]: [INotepad, string]) => {
-			let noteInNotepad: INote | false = false;
-			getNotepadObjectByRef(notepad, ref, obj => noteInNotepad = obj as INote);
-			return noteInNotepad;
-		}),
-		filter(Boolean)
-	)
-	.subscribe((note: INote) => store.dispatch(actions.updateNoteInNotepad(note)));
+// // Update notepad when currentNote changes
+// state$
+// 	.pipe(
+// 		map((state: IStoreState) => state.notepads.notepad),
+// 		filter(Boolean),
+// 		map((notepadState: INotepadStoreState) => notepadState.item),
+// 		filter(Boolean),
+// 		distinctUntilChanged(),
+// 		withLatestFrom(
+// 			from(state$)
+// 				.pipe(
+// 					map((state: IStoreState) => state.currentNote.item),
+// 					filter(Boolean),
+// 					map((note: INote) => note.internalRef)
+// 				)
+// 		),
+// 		filter(([notepad, ref]: [INotepad, string]) => !!notepad && !!ref),
+// 		map(([notepad, ref]: [INotepad, string]) => {
+// 			let noteInNotepad: INote | false = false;
+// 			getNotepadObjectByRef(notepad, ref, obj => noteInNotepad = obj as INote);
+// 			return noteInNotepad;
+// 		}),
+// 		filter(Boolean)
+// 	)
+// 	.subscribe((note: INote) => store.dispatch(actions.updateNoteInNotepad(note)));

@@ -7,7 +7,7 @@ export interface ISearchComponentProps {
 	notepad: INotepad;
 	hashTagResults: INote[];
 	query: string;
-	loadNote?: (note: INote) => void;
+	loadNote?: (ref: string) => void;
 	search?: (query: string) => void;
 }
 
@@ -26,7 +26,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 		});
 
 		const resultElements: JSX.Element[] = hashTagResults.map((note: INote) =>
-			<CollectionItem key={generateGuid()} href="#!" onClick={() => loadNote!(note)}>{note.title}</CollectionItem>
+			<CollectionItem key={generateGuid()} href="#!" onClick={() => loadNote!(note.internalRef)}>{note.title}</CollectionItem>
 		);
 
 		return (
@@ -64,6 +64,6 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 		const { loadNote } = this.props;
 		const index: number = parseInt(value.split('.')[0], 10);
 
-		loadNote!(this.mappedNotesToOptions[index]);
+		loadNote!(this.mappedNotesToOptions[index].internalRef);
 	}
 }

@@ -15,7 +15,7 @@ export function mapStateToProps({ notepads, search }: IStoreState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<ISearchComponentProps> {
 	return {
-		loadNote: (note: INote) => dispatch(actions.loadNote(note)),
+		loadNote: (ref: string) => dispatch(actions.loadNote(ref)),
 		search: (query: string) => dispatch(actions.search(query))
 	};
 }

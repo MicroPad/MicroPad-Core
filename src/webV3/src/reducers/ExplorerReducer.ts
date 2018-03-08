@@ -32,7 +32,7 @@ export class ExplorerReducer implements IReducer<IExplorerState> {
 			return {
 				openSections: state.openSections.filter((guid: string) => guid !== guidToClose)
 			};
-		} else if (isType(action, actions.loadNote)) {
+		} else if (isType(action, actions.expandFromNote)) {
 			const note: INote = action.payload;
 			const noteFamily: Set<string> = new Set<string>(state.openSections);
 

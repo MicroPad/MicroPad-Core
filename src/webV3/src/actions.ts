@@ -19,12 +19,12 @@ export const actions = {
 	deleteNotepad: actionCreator<string>('DELETE_NOTEPAD'),
 	exportNotepad: actionCreator<void>('EXPORT_NOTEPAD'),
 	exportAll: actionCreator<void>('EXPORT_ALL_NOTEPADS'),
-	loadNote: actionCreator<INote>('LOAD_NOTE'),
+	loadNote: actionCreator<string>('LOAD_NOTE'),
 	expandSection: actionCreator<string>('OPEN_SECTION'),
 	collapseSelection: actionCreator<string>('CLOSE_SECTION'),
 	search: actionCreator<string>('SEARCH'),
 	displayHashTagSearchResults: actionCreator<INote[]>('DISPLAY_HASH_TAG_SEARCH_RESULTS'),
 	deleteNotepadObject: actionCreator<string>('DELETE_NOTEPAD_OBJECT'),
 	renameNotepadObject: actionCreator<IRenameNotepadObjectAction>('RENAME_NOTEPAD_OBJECT'),
-	updateNoteInNotepad: actionCreator<INote>('UPDATE_NOTE_IN_NOTEPAD')
+	expandFromNote: actionCreator<INote>('EXPAND_FROM_NOTE')
 };
