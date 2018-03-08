@@ -21,6 +21,7 @@ export class ExplorerReducer implements IReducer<IExplorerState> {
 			const guid: string = action.payload;
 
 			return {
+				...state,
 				openSections: [
 					...state.openSections,
 					guid
@@ -44,7 +45,13 @@ export class ExplorerReducer implements IReducer<IExplorerState> {
 			}
 
 			return {
+				...state,
 				openSections: Array.from(noteFamily)
+			};
+		} else if (isType(action, actions.collapseAllExplorer)) {
+			return {
+				...state,
+				openSections: []
 			};
 		}
 
