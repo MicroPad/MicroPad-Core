@@ -1,6 +1,7 @@
 import * as React from 'react';
 import './NoteViewerComponent.css';
 import { INote } from '../../types/NotepadTypes';
+import NoteElementComponent from './elements/NoteElementComponent';
 
 export interface INoteViewerComponentProps {
 	isFullscreen: boolean;
@@ -28,7 +29,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		return (
 			<div id="note-viewer" className={classes} style={styles}>
 				<div id="note-container" style={containerStyles}>
-					{!!note && <p style={{position: 'absolute', paddingRight: '100px', paddingBottom: '100px'}}>{note.elements[0].content}</p>}
+					{!!note && <NoteElementComponent element={note.elements[0]} />}
 				</div>
 			</div>
 		);
