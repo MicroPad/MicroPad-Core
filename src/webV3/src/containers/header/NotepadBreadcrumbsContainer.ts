@@ -9,12 +9,12 @@ export function mapStateToProps({ notepads, currentNote }: IStoreState): INotepa
 	const breadcrumbs: string[] = [];
 	let time: string | undefined = undefined;
 
-	if (currentNote.length === 0) {
+	if (currentNote.ref.length === 0) {
 		breadcrumbs.push(((notepads.notepad || <INotepadStoreState> {}).item || <INotepad> {}).title
 			|| 'Open/Create a notepad using the drop-down or the sidebar to start');
 	} else {
 		let note: INote | false = false;
-		getNotepadObjectByRef(notepads.notepad!.item!, currentNote, obj => note = <INote> obj);
+		getNotepadObjectByRef(notepads.notepad!.item!, currentNote.ref, obj => note = <INote> obj);
 		if (!note) return { breadcrumbs: ['Error loading note'] };
 		note = <INote> note;
 

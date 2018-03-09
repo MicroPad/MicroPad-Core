@@ -2,4 +2,22 @@
 	position: absolute;
 	padding-right: 100px;
 	padding-bottom: 100px;
+	min-width: 170px;
+	min-height: 50px;
+}
+
+.noteElement > div {
+	word-wrap: break-word;
+	overflow: auto;
+}
+
+.handle {
+	text-align: center;
+	user-select: none;
+	width: 3ch;
+	left: 0;
+	right: 0;
+	margin: auto;
+	cursor: move;
+	font-size: 16px;
 }

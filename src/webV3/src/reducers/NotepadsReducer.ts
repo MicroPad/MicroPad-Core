@@ -194,6 +194,14 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 					item: notepad
 				}
 			};
+		} else if (isType(action, actions.checkNoteAssets.done)) {
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					item: restoreObject<INotepad>({ ...action.payload.result }, Parser.createNotepad(''))
+				}
+			};
 		}
 
 		return Object.freeze(state);

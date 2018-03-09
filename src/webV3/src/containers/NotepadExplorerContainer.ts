@@ -18,7 +18,7 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepad
 		flipFullScreenState: () => dispatch(actions.flipFullScreenState(undefined)),
 		deleteNotepad: (title: string) => dispatch(actions.deleteNotepad(title)),
 		exportNotepad: () => dispatch(actions.exportNotepad(undefined)),
-		loadNote: (ref: string) => dispatch(actions.loadNote(ref)),
+		loadNote: (ref: string) => dispatch(actions.loadNote.started(ref)),
 		expandSection: (guid: string) => dispatch(actions.expandSection(guid)),
 		collapseSection: (guid: string) => dispatch(actions.collapseSelection(guid)),
 		renameNotepad: newTitle => dispatch(actions.renameNotepad.started(newTitle)),

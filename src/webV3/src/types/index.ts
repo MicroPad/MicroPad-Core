@@ -2,11 +2,12 @@ import { IMetaStoreState } from './MetaTypes';
 import { INotepadsStoreState } from './NotepadTypes';
 import { IExplorerState } from '../reducers/ExplorerReducer';
 import { ISearchState } from '../reducers/SearchReducer';
+import { ICurrentNoteState } from '../reducers/NoteReducer';
 
 export interface IStoreState {
 	readonly meta: IMetaStoreState;
 	readonly notepads: INotepadsStoreState;
-	readonly currentNote: string;
+	readonly currentNote: ICurrentNoteState;
 	readonly explorer: IExplorerState;
 	readonly search: ISearchState;
 }

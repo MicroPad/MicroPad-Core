@@ -10,7 +10,7 @@ export type Source = {
 	content: string;
 };
 
-export type Element = {
+export type NoteElement = {
 	type: string;
 	content: string;
 	args: IElementArgs;
@@ -75,7 +75,7 @@ export interface ISection extends IParent {
 export interface INote extends INPXObject {
 	addons: string[];
 	bibliography: Source[];
-	elements: Element[];
+	elements: NoteElement[];
 	parent: IParent;
 	time: number;
 	internalRef: string;

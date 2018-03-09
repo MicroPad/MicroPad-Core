@@ -7,16 +7,18 @@ import {
 } from '../components/note-viewer/NoteViewerComponent';
 import { getNotepadObjectByRef } from '../util';
 import { INote } from '../types/NotepadTypes';
+import { actions } from '../actions';
 
 export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 	let note;
-	if (currentNote.length !== 0) {
-		getNotepadObjectByRef(notepads.notepad!.item!, currentNote, obj => note = <INote> obj);
+	if (currentNote.ref.length !== 0) {
+		getNotepadObjectByRef(notepads.notepad!.item!, currentNote.ref, obj => note = <INote> obj);
 	}
 
 	return {
 		isFullscreen: meta.isFullScreen,
-		note
+		note,
+		noteAssets: currentNote.assetUrls
 	};
 }
 

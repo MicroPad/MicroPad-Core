@@ -3,11 +3,19 @@ import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 
-export class NoteReducer implements IReducer<string> {
-	public readonly key: string = 'currentNote';
-	public readonly initialState: string = ''; // Internal reference of the current note
+export interface ICurrentNoteState {
+	ref: string;
+	assetUrls: object;
+}
 
-	public reducer(state: string, action: Action): string {
+export class NoteReducer implements IReducer<ICurrentNoteState> {
+	public readonly key: string = 'currentNote';
+	public readonly initialState: ICurrentNoteState = {
+		ref: '',
+		assetUrls: []
+	};
+
+	public reducer(state: ICurrentNoteState, action: Action): ICurrentNoteState {
 		if (
 			isType(action, actions.parseNpx.started)
 			|| isType(action, actions.newNotepad)
@@ -16,10 +24,14 @@ export class NoteReducer implements IReducer<string> {
 			|| isType(action, actions.renameNotepad.done)
 		) {
 			return this.initialState;
-		} else if (isType(action, actions.loadNote)) {
-			return action.payload;
+		} else if (isType(action, actions.loadNote.done)) {
+			return {
+				...state,
+				ref: action.payload.params,
+				assetUrls: action.payload.result
+			};
 		} else if (isType(action, actions.deleteNotepadObject)) {
-			if (action.payload === state) return this.initialState;
+			if (action.payload === state.ref) return this.initialState;
 		}
 
 		return state;

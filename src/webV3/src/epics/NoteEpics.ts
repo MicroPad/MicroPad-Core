@@ -1,14 +1,17 @@
 import { combineEpics } from 'redux-observable';
-import { filter, map } from 'rxjs/operators';
-import { Action, isType } from 'redux-typescript-actions';
+import { filter, map, mergeMap, switchMap, withLatestFrom } from 'rxjs/operators';
+import { Action, isType, Success } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { INote, INotepad, INotepadStoreState } from '../types/NotepadTypes';
-import { getNotepadObjectByRef } from '../util';
+import { NoteElement, INote, INotepad, INotepadStoreState, IAsset } from '../types/NotepadTypes';
+import { dataURItoBlob, getNotepadObjectByRef } from '../util';
+import * as Parser from 'upad-parse/dist/index.js';
+import { ASSET_STORAGE } from '../index';
+import { fromPromise } from 'rxjs/observable/fromPromise';
 
 const loadNote$ = (action$, store) =>
 	action$.pipe(
-		filter((action: Action<string>) => isType(action, actions.loadNote)),
-		map((action: Action<string>) => [action.payload, (store.getState().notepads.notepad || <INotepadStoreState> {}).item]),
+		filter((action: Action<string>) => isType(action, actions.loadNote.started)),
+		map((action: Action<string>) => [action.payload, { ...(store.getState().notepads.notepad || <INotepadStoreState> {}).item }]),
 		filter(([ref, notepad]: [string, INotepad]) => !!ref && !!notepad),
 		map(([ref, notepad]: [string, INotepad]) => {
 			let note: INote | false = false;
@@ -17,9 +20,75 @@ const loadNote$ = (action$, store) =>
 			return note;
 		}),
 		filter(Boolean),
-		map((note: INote) => actions.expandFromNote(note))
+		mergeMap((note: INote) => [actions.expandFromNote(note), actions.checkNoteAssets.started([note.internalRef, note.elements])])
 	);
 
+const checkNoteAssets$ = (action$, store) =>
+	action$.pipe(
+		filter((action: Action<[string, NoteElement[]]>) => isType(action, actions.checkNoteAssets.started)),
+		map((action: Action<[string, NoteElement[]]>) => action.payload),
+		switchMap(([ref, elements]) =>
+			fromPromise(getNoteAssets(elements))
+				.pipe(map((res) => [ref, res.elements, res.blobUrls]))
+		),
+		map(([ref, elements, blobUrls]) => [ref, elements, blobUrls, (store.getState().notepads.notepad || <INotepadStoreState> {}).item]),
+		filter(([ref, elements, blobUrls, notepad]) => !!notepad),
+		mergeMap(([ref, elements, blobUrls, notepad]: [string, NoteElement[], object, INotepad]) => {
+			const newNotepad = getNotepadObjectByRef(notepad, ref, obj => {
+				(<INote> obj).elements = elements;
+				return obj;
+			});
+
+			const notepadAssets: Set<string> = new Set(notepad.notepadAssets);
+			elements.forEach(element => {
+				if (element.content === 'AS') {
+					notepadAssets.add(element.args.ext!);
+				}
+			});
+			newNotepad.notepadAssets = Array.from(notepadAssets);
+
+			return [
+				actions.checkNoteAssets.done({ params: <any> [], result: newNotepad }),
+				actions.loadNote.done({ params: ref, result: blobUrls })
+			];
+		})
+	);
+
+function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {
+	const storageRequests: Promise<Blob>[] = [];
+	const blobRefs: string[] = [];
+
+	elements.map(element => {
+		if (element.type !== 'markdown' && element.content !== 'AS') {
+			const asset: IAsset = new Parser.Asset(dataURItoBlob(element.content));
+			element.args.ext = asset.uuid;
+			element.content = 'AS';
+
+			storageRequests.push(ASSET_STORAGE.setItem(asset.uuid, asset.data));
+			blobRefs.push(asset.uuid);
+		} else if (!!element.args.ext) {
+			storageRequests.push(ASSET_STORAGE.getItem(element.args.ext));
+			blobRefs.push(element.args.ext);
+		}
+
+		return element;
+	});
+
+	return new Promise(resolve =>
+		Promise.all(storageRequests)
+			.then((blobs: Blob[]) => {
+				const blobUrls = {};
+				blobs.forEach((blob, i) => blobUrls[blobRefs[i]] = URL.createObjectURL(blob));
+
+				resolve({
+					elements,
+					blobUrls
+				});
+			})
+	);
+}
+
 export const noteEpics$ = combineEpics(
-	loadNote$
+	loadNote$,
+	checkNoteAssets$
 );
