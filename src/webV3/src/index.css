@@ -4,12 +4,12 @@ body {
 }
 
 #body {
-	position: fixed;
+	position: absolute;
 	display: flex;
 	z-index: -100;
 	top: 128px;
 	width: 100vw;
-	height: 100vh;
+	height: calc(100vh - 128px);
 }
 
 nav {

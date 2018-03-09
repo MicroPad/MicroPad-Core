@@ -1,6 +1,7 @@
 #note-viewer {
 	order: 0;
 	width: calc(100vw - 300px);
+	overflow: auto;
 }
 
 #note-viewer.empty {

@@ -19,8 +19,18 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			width: '100vw'
 		};
 
+		const containerStyles = {
+			minWidth: '100%',
+			minHeight: '100%',
+			position: 'relative' as 'relative'
+		};
+
 		return (
-			<div id="note-viewer" className={classes} style={styles} />
+			<div id="note-viewer" className={classes} style={styles}>
+				<div id="note-container" style={containerStyles}>
+					{!!note && <p style={{position: 'absolute', paddingRight: '100px', paddingBottom: '100px'}}>{note.elements[0].content}</p>}
+				</div>
+			</div>
 		);
 	}
 }
