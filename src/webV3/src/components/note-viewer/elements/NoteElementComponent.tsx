@@ -10,8 +10,15 @@ export default class NoteElementComponent extends React.Component<INoteElement> 
 	render() {
 		const { element } = this.props;
 
+		const styles = {
+			left: element.args.x,
+			top: element.args.y,
+			width: element.args.width,
+			height: element.args.height
+		};
+
 		return (
-			<div className="noteElement">
+			<div className="noteElement" style={styles}>
 				<p>{element.content}</p>
 			</div>
 		);

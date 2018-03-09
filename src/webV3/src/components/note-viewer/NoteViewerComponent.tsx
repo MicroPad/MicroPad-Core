@@ -2,6 +2,7 @@ import * as React from 'react';
 import './NoteViewerComponent.css';
 import { INote } from '../../types/NotepadTypes';
 import NoteElementComponent from './elements/NoteElementComponent';
+import { generateGuid } from 'src/util';
 
 export interface INoteViewerComponentProps {
 	isFullscreen: boolean;
@@ -26,10 +27,15 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			position: 'relative' as 'relative'
 		};
 
+		const elements: JSX.Element[] = [];
+		if (!!note) note.elements.forEach(element => elements.push(
+			<NoteElementComponent key={generateGuid()} element={element} />
+		));
+
 		return (
 			<div id="note-viewer" className={classes} style={styles}>
 				<div id="note-container" style={containerStyles}>
-					{!!note && <NoteElementComponent element={note.elements[0]} />}
+					{elements}
 				</div>
 			</div>
 		);
