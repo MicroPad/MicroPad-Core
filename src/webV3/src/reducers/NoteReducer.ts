@@ -12,7 +12,7 @@ export class NoteReducer implements IReducer<ICurrentNoteState> {
 	public readonly key: string = 'currentNote';
 	public readonly initialState: ICurrentNoteState = {
 		ref: '',
-		assetUrls: []
+		assetUrls: {}
 	};
 
 	public reducer(state: ICurrentNoteState, action: Action): ICurrentNoteState {
@@ -23,17 +23,30 @@ export class NoteReducer implements IReducer<ICurrentNoteState> {
 			|| isType(action, actions.deleteNotepad)
 			|| isType(action, actions.renameNotepad.done)
 		) {
+			this.cleanUpObjectUrls(state.assetUrls);
 			return this.initialState;
 		} else if (isType(action, actions.loadNote.done)) {
+			this.cleanUpObjectUrls(state.assetUrls);
 			return {
 				...state,
 				ref: action.payload.params,
 				assetUrls: action.payload.result
 			};
 		} else if (isType(action, actions.deleteNotepadObject)) {
-			if (action.payload === state.ref) return this.initialState;
+			if (action.payload === state.ref) {
+				this.cleanUpObjectUrls(state.assetUrls);
+				return this.initialState;
+			}
 		}
 
 		return state;
+	}
+
+	private cleanUpObjectUrls(assetUrls: object) {
+		for (let ref in assetUrls) {
+			if (!assetUrls.hasOwnProperty(ref)) continue;
+
+			URL.revokeObjectURL(assetUrls[ref]);
+		}
 	}
 }
