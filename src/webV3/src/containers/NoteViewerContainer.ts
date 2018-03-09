@@ -7,7 +7,6 @@ import {
 } from '../components/note-viewer/NoteViewerComponent';
 import { getNotepadObjectByRef } from '../util';
 import { INote } from '../types/NotepadTypes';
-import { actions } from '../actions';
 
 export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 	let note;

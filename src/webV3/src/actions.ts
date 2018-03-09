@@ -1,5 +1,5 @@
 import actionCreatorFactory from 'redux-typescript-actions';
-import { NoteElement, INote, INotepad, IRenameNotepadObjectAction } from './types/NotepadTypes';
+import { INote, INotepad, IRenameNotepadObjectAction, NoteElement } from './types/NotepadTypes';
 
 const actionCreator = actionCreatorFactory();
 

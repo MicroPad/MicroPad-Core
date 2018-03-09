@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Icon, Autocomplete, Modal, NavItem, Row, Collection, CollectionItem } from 'react-materialize';
+import { Autocomplete, Collection, CollectionItem, Icon, Modal, NavItem, Row } from 'react-materialize';
 import { INote, INotepad } from '../../types/NotepadTypes';
 import { generateGuid } from '../../util';
 

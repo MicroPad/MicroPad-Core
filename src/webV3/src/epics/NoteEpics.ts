@@ -1,8 +1,8 @@
 import { combineEpics } from 'redux-observable';
-import { filter, map, mergeMap, switchMap, withLatestFrom } from 'rxjs/operators';
-import { Action, isType, Success } from 'redux-typescript-actions';
+import { filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { NoteElement, INote, INotepad, INotepadStoreState, IAsset } from '../types/NotepadTypes';
+import { IAsset, INote, INotepad, INotepadStoreState, NoteElement } from '../types/NotepadTypes';
 import { dataURItoBlob, getNotepadObjectByRef } from '../util';
 import * as Parser from 'upad-parse/dist/index.js';
 import { ASSET_STORAGE } from '../index';
