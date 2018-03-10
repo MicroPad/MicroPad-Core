@@ -113,7 +113,6 @@
 				MathJax.Hub.Queue(['Typeset', MathJax.Hub, content]);
 				MathJax.Hub.Queue(function () {
 					if (!element.args.width || element.args.width === 'auto') {
-						console.log(element);
 						content.style.width = 'fit-content';
 						document.documentElement.style.overflow = 'hidden';
 					}
