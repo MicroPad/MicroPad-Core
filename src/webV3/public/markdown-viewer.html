@@ -81,6 +81,7 @@
 <script>
 	var content = document.getElementById('content');
 	var id = window.location.search.split('?id=')[1];
+	var element;
 
 	window.addEventListener('message', handleMessage);
 
@@ -101,30 +102,60 @@
 				break;
 
 			case 'render':
-				var element = message.payload;
+				element = message.payload;
 				content.style.width = element.args.width || 'auto';
 				content.style.height = element.args.height || 'auto';
 				content.style.fontSize = element.args.fontSize || '16px';
 
 				document.getElementById('content').innerHTML = element.content;
+				adjustWidth();
 
-				if (content.style.width === 'auto') {
-					var computedWidth = window.getComputedStyle(content, null).getPropertyValue('width');
-					content.style.width = computedWidth;
-
-					parent.postMessage({
-						id,
-						type: 'resize',
-						payload: {
-							width: computedWidth
-						}
-					}, '*');
-				}
-
-				handleMessage({ data: { type: 'resize', id } });
+				MathJax.Hub.Queue(['Typeset', MathJax.Hub, content]);
+				MathJax.Hub.Queue(function () {
+					if (!element.args.width || element.args.width === 'auto') {
+						console.log(element);
+						content.style.width = 'fit-content';
+						document.documentElement.style.overflow = 'hidden';
+					}
+					adjustWidth();
+				});
 				break;
 		}
 	}
+
+	function adjustWidth() {
+		if (content.style.width === 'auto' || content.style.width === 'fit-content') {
+			var computedWidth = parseInt(window.getComputedStyle(content, null).getPropertyValue('width'), 10) + 10 + 'px';
+			content.style.width = computedWidth;
+
+			parent.postMessage({
+				id,
+				type: 'resize',
+				payload: {
+					width: computedWidth
+				}
+			}, '*');
+		}
+
+		handleMessage({ data: { type: 'resize', id } });
+	}
+</script>
+
+<script src="/assets/mathjax/MathJax.js"></script>
+<script>
+	MathJax.Hub.Config({
+		jax: ['input/AsciiMath', 'input/TeX', 'output/SVG'],
+		extensions: ['Safe.js', 'tex2jax.js', 'asciimath2jax.js'],
+		messageStyle: 'none',
+		tex2jax: {
+			inlineMath: [[';;', ';;']]
+		},
+		asciimath2jax: {
+			delimiters: [['===', '===']]
+		},
+		showMathMenu: false,
+		skipStartupTypeset: true
+	});
 </script>
 </body>
 </html>

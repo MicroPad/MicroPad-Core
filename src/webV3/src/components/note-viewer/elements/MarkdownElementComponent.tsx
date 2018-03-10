@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
-import { Converter, ConverterOptions } from 'showdown';
+import { Converter, ConverterOptions, extension } from 'showdown';
+import { NoteElement } from '../../../types/NotepadTypes';
 
 interface IMarkdownViewMessage {
 	type: string;
@@ -19,6 +20,7 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 	constructor(props: INoteElementComponentProps, state: object) {
 		super(props, state);
 
+		this.configureExtensions();
 		this.converter = new Converter({
 			parseImgDimensions: true,
 			simplifiedAutoLink: true,
@@ -26,7 +28,8 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 			tables: true,
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
-			emoji: true
+			emoji: true,
+			extensions: ['maths', 'quick-maths']
 		} as IShowdownOpts);
 	}
 
@@ -47,16 +50,19 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 	componentWillReceiveProps(nextProps: INoteElementComponentProps) {
 		const { element } = nextProps;
 
-		this.iframe.onload = () => {
-			this.sendMessage({
-				type: 'render',
-				id: element.args.id,
-				payload: {
-					...element,
-					content: this.converter.makeHtml(element.content)
+		this.generateHtml(element)
+			.then(html =>
+				this.iframe.onload = () => {
+					this.sendMessage({
+						type: 'render',
+						id: element.args.id,
+						payload: {
+							...element,
+							content: html
+						}
+					});
 				}
-			});
-		};
+			);
 	}
 
 	componentDidMount() {
@@ -70,6 +76,13 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 
 	shouldComponentUpdate() {
 		return false;
+	}
+
+	private generateHtml = (element: NoteElement): Promise<string> => {
+		return new Promise<string>(resolve => {
+			let html = this.converter.makeHtml(element.content);
+			resolve(html);
+		});
 	}
 
 	private handleMessages = event => {
@@ -90,5 +103,61 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 
 	private sendMessage = (message: IMarkdownViewMessage) => {
 		this.iframe.contentWindow.postMessage(message, '*');
+	}
+
+	private configureExtensions = () => {
+		extension('maths', function() {
+			let matches: string[] = [];
+			return [
+				{
+					type: 'lang',
+					regex: /===([^]+?)===/gi,
+					replace: function(s: string, match: string) {
+						matches.push('===' + match + '===');
+						let n = matches.length - 1;
+						return '%ASCIIMATHPLACEHOLDER1' + n + 'ENDASCIIMATHPLACEHOLDER1%';
+					}
+				},
+				{
+					type: 'output',
+					filter: function(text: string) {
+						for (let i = 0; i < matches.length; ++i) {
+							let pat = '%ASCIIMATHPLACEHOLDER1' + i + 'ENDASCIIMATHPLACEHOLDER1%';
+							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+						}
+						// reset array
+						matches = [];
+						return text;
+					}
+				}
+			];
+		});
+
+		extension('quick-maths', function() {
+			let matches: string[] = [];
+			return [
+				{
+					type: 'lang',
+					regex: /''([^]+?)''/gi,
+					replace: function(s: string, match: string) {
+						matches.push(`===${match}===`);
+						let n = matches.length - 1;
+						return '%PLACEHOLDER4' + n + 'ENDPLACEHOLDER4%';
+					}
+				},
+				{
+					type: 'output',
+					filter: function(text: string) {
+						for (let i = 0; i < matches.length; ++i) {
+							let pat = '%PLACEHOLDER4' + i + 'ENDPLACEHOLDER4%';
+							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+						}
+						// reset array
+						matches = [];
+						return text;
+					}
+				}
+			];
+		});
 	}
 }
