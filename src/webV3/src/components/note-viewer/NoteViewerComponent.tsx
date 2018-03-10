@@ -31,7 +31,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 
 		const elements: JSX.Element[] = [];
 		if (!!note) note.elements.forEach(element => elements.push(
-			<NoteElementComponent key={generateGuid()} element={element} noteAssets={noteAssets} />
+			<NoteElementComponent key={element.args.id} element={element} noteAssets={noteAssets} />
 		));
 
 		if (!!note && elements.length === 0) Materialize.toast('Welcome to your note! Press anywhere on here to insert an element.', 3000);

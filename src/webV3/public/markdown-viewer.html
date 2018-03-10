@@ -90,7 +90,7 @@
 					id,
 					type: 'resize',
 					payload: {
-						width: '100%',
+						width: window.getComputedStyle(content, null).getPropertyValue('width'),
 						height: window.getComputedStyle(content, null).getPropertyValue('height')
 					}
 				}, '*');
@@ -103,6 +103,20 @@
 				content.style.fontSize = element.args.fontSize || '16px';
 
 				document.getElementById('content').innerHTML = element.content;
+
+				if (content.style.width === 'auto') {
+					var computedWidth = window.getComputedStyle(content, null).getPropertyValue('width');
+					content.style.width = computedWidth;
+
+					parent.postMessage({
+						id,
+						type: 'resize',
+						payload: {
+							width: computedWidth
+						}
+					}, '*');
+				}
+
 				handleMessage({ data: { type: 'resize', id } });
 				break;
 		}
