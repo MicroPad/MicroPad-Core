@@ -21,12 +21,12 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 		this.autoCompleteOptions = {};
 		this.mappedNotesToOptions = [];
 		notepad.search('').forEach((note: INote, i: number) => {
-			this.autoCompleteOptions[`${i + 1}. ${note.title}`] = null;
+			this.autoCompleteOptions[`${i + 1}. ${note.parent.title} > ${note.title}`] = null;
 			this.mappedNotesToOptions[i] = note;
 		});
 
 		const resultElements: JSX.Element[] = hashTagResults.map((note: INote) =>
-			<CollectionItem key={generateGuid()} href="#!" onClick={() => loadNote!(note.internalRef)}>{note.title}</CollectionItem>
+			<CollectionItem key={generateGuid()} href="#!" onClick={() => loadNote!(note.internalRef)}>{note.parent.title} > {note.title}</CollectionItem>
 		);
 
 		return (
