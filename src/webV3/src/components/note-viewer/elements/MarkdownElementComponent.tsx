@@ -1,17 +1,37 @@
 import * as React from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
+import { Converter, ConverterOptions } from 'showdown';
 
 interface IMarkdownViewMessage {
 	type: string;
+	id: string;
 	payload?: any;
+}
+
+interface IShowdownOpts extends ConverterOptions {
+	emoji: boolean;
 }
 
 export default class MarkdownElementComponent extends React.Component<INoteElementComponentProps> {
 	private iframe: HTMLIFrameElement;
+	private converter: Converter;
+
+	constructor(props: INoteElementComponentProps, state: object) {
+		super(props, state);
+
+		this.converter = new Converter({
+			parseImgDimensions: true,
+			simplifiedAutoLink: true,
+			strikethrough: true,
+			tables: true,
+			tasklists: true,
+			prefixHeaderId: 'mdheader_',
+			emoji: true
+		} as IShowdownOpts);
+	}
 
 	render() {
 		const { element } = this.props;
-		console.log(element.args.height);
 
 		const iframeStyle = {
 			borderStyle: 'none',
@@ -20,7 +40,7 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 		};
 
 		return (
-			<iframe style={iframeStyle} ref={iframe => this.iframe = iframe!} src="/markdown-viewer.html" sandbox="allow-scripts" />
+			<iframe style={iframeStyle} ref={iframe => this.iframe = iframe!} src={`/markdown-viewer.html?id=${element.args.id}`} sandbox="allow-scripts" />
 		);
 	}
 
@@ -30,7 +50,11 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 		this.iframe.onload = () => {
 			this.sendMessage({
 				type: 'render',
-				payload: element
+				id: element.args.id,
+				payload: {
+					...element,
+					content: this.converter.makeHtml(element.content)
+				}
 			});
 		};
 	}
@@ -38,7 +62,6 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 	componentDidMount() {
 		this.componentWillReceiveProps(this.props);
 		window.addEventListener('message', this.handleMessages);
-		{/*<div style={{padding: '5px', height: element.args.height}}>{element.content}</div>*/}
 	}
 
 	componentWillUnmount() {
@@ -52,10 +75,12 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 	private handleMessages = event => {
 		const { element } = this.props;
 		const message: IMarkdownViewMessage = event.data;
+		if (message.id !== element.args.id) return;
 
 		switch (message.type) {
 			case 'resize':
-				this.iframe.style.height = parseInt(message.payload, 10) + 15 + 'px';
+				this.iframe.style.width = message.payload.width;
+				this.iframe.style.height = message.payload.height;
 				break;
 
 			default:
