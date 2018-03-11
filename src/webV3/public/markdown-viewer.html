@@ -104,7 +104,7 @@
 			case 'render':
 				element = message.payload;
 				content.style.width = element.args.width || 'auto';
-				content.style.height = element.args.height || 'auto';
+				content.style.height = element.args.height || '50px';
 				content.style.fontSize = element.args.fontSize || '16px';
 
 				document.getElementById('content').innerHTML = element.content;
@@ -124,6 +124,12 @@
 
 	function adjustWidth() {
 		if (content.style.width === 'auto' || content.style.width === 'fit-content') {
+			// Expand tables
+			var style = document.createElement('style');
+			style.type = 'text/css';
+			style.appendChild(document.createTextNode('table { width: max-content; }'));
+			document.head.appendChild(style);
+
 			var computedWidth = parseInt(window.getComputedStyle(content, null).getPropertyValue('width'), 10) + 10 + 'px';
 			content.style.width = computedWidth;
 
