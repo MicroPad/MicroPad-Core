@@ -29,7 +29,7 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			emoji: true,
-			extensions: ['maths', 'quick-maths']
+			extensions: ['maths', 'quick-maths', 'graphs']
 		} as IShowdownOpts);
 	}
 
@@ -43,7 +43,7 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 		};
 
 		return (
-			<iframe style={iframeStyle} ref={iframe => this.iframe = iframe!} src={`/markdown-viewer.html?id=${element.args.id}`} sandbox="allow-scripts" />
+			<iframe style={iframeStyle} ref={iframe => this.iframe = iframe!} src={`/markdown-viewer.html?id=${element.args.id}`} />
 		);
 	}
 
@@ -107,7 +107,7 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 	}
 
 	private configureExtensions = () => {
-		extension('maths', function() {
+		extension('maths', () => {
 			let matches: string[] = [];
 			return [
 				{
@@ -134,7 +134,7 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 			];
 		});
 
-		extension('quick-maths', function() {
+		extension('quick-maths', () => {
 			let matches: string[] = [];
 			return [
 				{
@@ -151,6 +151,33 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 					filter: function(text: string) {
 						for (let i = 0; i < matches.length; ++i) {
 							let pat = '%PLACEHOLDER4' + i + 'ENDPLACEHOLDER4%';
+							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+						}
+						// reset array
+						matches = [];
+						return text;
+					}
+				}
+			];
+		});
+
+		extension('graphs', () => {
+			let matches: string[] = [];
+			return [
+				{
+					type: 'lang',
+					regex: /=-=([^]+?)=-=/gi,
+					replace: function(s: string, match: string) {
+						matches.push(`<embed width='400' height='400' src='/assets/d.svg' script='${match}'></embed>`);
+						var n = matches.length - 1;
+						return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
+					}
+				},
+				{
+					type: 'output',
+					filter: function(text: string) {
+						for (var i = 0; i < matches.length; ++i) {
+							var pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
 							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 						}
 						// reset array
