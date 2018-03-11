@@ -130,6 +130,8 @@
 			style.appendChild(document.createTextNode('table { width: max-content; }'));
 			document.head.appendChild(style);
 
+			content.style.width = 'max-content';
+
 			var computedWidth = parseInt(window.getComputedStyle(content, null).getPropertyValue('width'), 10) + 10 + 'px';
 			content.style.width = computedWidth;
 
@@ -143,6 +145,16 @@
 		}
 
 		handleMessage({ data: { type: 'resize', id } });
+	}
+
+	try {
+		new ResizeObserver(function() {
+			if (!!element && element.args.width === 'auto') content.style.width = 'auto';
+
+			adjustWidth();
+		}).observe(content);
+	} catch (e) {
+		console.warn('Resize Observer not supported. IFrame rendering might be slightly off.')
 	}
 </script>
 

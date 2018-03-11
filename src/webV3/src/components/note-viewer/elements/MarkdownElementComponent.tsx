@@ -72,6 +72,7 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 
 	componentWillUnmount() {
 		window.removeEventListener('message', this.handleMessages);
+		this.iframe.src = 'about:blank';
 	}
 
 	shouldComponentUpdate() {
