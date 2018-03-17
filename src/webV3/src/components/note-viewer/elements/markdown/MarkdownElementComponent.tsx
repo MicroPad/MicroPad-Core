@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { INoteElementComponentProps } from './NoteElementComponent';
+import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
-import { NoteElement } from '../../../types/NotepadTypes';
+import { NoteElement } from '../../../../types/NotepadTypes';
 import { MarkDownViewer } from './MarkdownViewerHtml';
-import { UNSUPPORTED_MESSAGE } from '../../../types';
+import { UNSUPPORTED_MESSAGE } from '../../../../types/index';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;

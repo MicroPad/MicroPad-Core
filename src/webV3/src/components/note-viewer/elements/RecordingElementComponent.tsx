@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
 
-export default class RecordingElement extends React.Component<INoteElementComponentProps> {
+export default class RecordingElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {
 		const { element, noteAssets } = this.props;
 

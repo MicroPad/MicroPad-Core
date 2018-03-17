@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { NoteElement } from '../../../types/NotepadTypes';
 import './NoteElementComponent.css';
-import MarkdownElementComponent from './MarkdownElementComponent';
+import MarkdownElementComponent from './markdown/MarkdownElementComponent';
 import ImageElementComponent from './ImageElementComponent';
 import FileElementComponent from './FileElementComponent';
-import RecordingElement from './RecordingElement';
+import RecordingElement from './RecordingElementComponent';
+import DrawingElementComponent from './drawing/DrawingElementComponent';
 
 export interface INoteElementComponentProps {
 	element: NoteElement;
@@ -41,6 +42,10 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 
 			case 'recording':
 				elementComponent = <RecordingElement element={element} noteAssets={noteAssets} />;
+				break;
+
+			case 'drawing':
+				elementComponent = <DrawingElementComponent element={element} noteAssets={noteAssets} />;
 				break;
 
 			default:
