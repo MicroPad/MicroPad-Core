@@ -1,7 +1,7 @@
 .noteElement {
 	position: absolute;
-	padding-right: 100px;
-	padding-bottom: 100px;
+	padding-right: 500px;
+	padding-bottom: 500px;
 	min-width: 170px;
 	min-height: 50px;
 }

@@ -3,6 +3,7 @@ import { NoteElement } from '../../../types/NotepadTypes';
 import './NoteElementComponent.css';
 import MarkdownElementComponent from './MarkdownElementComponent';
 import ImageElementComponent from './ImageElementComponent';
+import FileElementComponent from './FileElementComponent';
 
 export interface INoteElementComponentProps {
 	element: NoteElement;
@@ -31,6 +32,10 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				
 			case 'image':
 				elementComponent = <ImageElementComponent element={element} noteAssets={noteAssets} />;
+				break;
+
+			case 'file':
+				elementComponent = <FileElementComponent element={element} noteAssets={noteAssets} />;
 				break;
 
 			default:
