@@ -7,6 +7,7 @@ import {
 } from '../components/note-viewer/NoteViewerComponent';
 import { getNotepadObjectByRef } from '../util';
 import { INote } from '../types/NotepadTypes';
+import { actions } from '../actions';
 
 export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 	let note;
@@ -22,7 +23,9 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteViewerComponentProps> {
-	return {};
+	return {
+		search: query => dispatch(actions.search(query))
+	};
 }
 
 export default connect<INoteViewerComponentProps>(mapStateToProps, mapDispatchToProps)(NoteViewerComponent);

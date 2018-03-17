@@ -2,6 +2,12 @@ import * as React from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
 import { NoteElement } from '../../../types/NotepadTypes';
+import { MarkDownViewer } from './MarkdownViewerHtml';
+import { UNSUPPORTED_MESSAGE } from '../../../types';
+
+export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
+	search: (query: string) => void;
+}
 
 interface IMarkdownViewMessage {
 	type: string;
@@ -13,11 +19,11 @@ interface IShowdownOpts extends ConverterOptions {
 	emoji: boolean;
 }
 
-export default class MarkdownElementComponent extends React.Component<INoteElementComponentProps> {
+export default class MarkdownElementComponent extends React.Component<IMarkdownElementComponentProps> {
 	private iframe: HTMLIFrameElement;
 	private converter: Converter;
 
-	constructor(props: INoteElementComponentProps, state: object) {
+	constructor(props: IMarkdownElementComponentProps, state: object) {
 		super(props, state);
 
 		this.configureExtensions();
@@ -29,7 +35,7 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			emoji: true,
-			extensions: ['maths', 'quick-maths', 'graphs']
+			extensions: ['maths', 'quick-maths', 'graphs', 'hashtags']
 		} as IShowdownOpts);
 	}
 
@@ -43,16 +49,16 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 		};
 
 		return (
-			<iframe style={iframeStyle} ref={iframe => this.iframe = iframe!} src={`/markdown-viewer.html?id=${element.args.id}`} />
+			<iframe style={iframeStyle} ref={iframe => this.iframe = iframe!} srcDoc={MarkDownViewer.getHtml(element.args.id)} sandbox="allow-scripts" />
 		);
 	}
 
 	componentWillReceiveProps(nextProps: INoteElementComponentProps) {
 		const { element } = nextProps;
 
-		this.generateHtml(element)
-			.then(html =>
-				this.iframe.onload = () => {
+		this.iframe.onload = () => {
+			this.generateHtml(element)
+				.then(html =>
 					this.sendMessage({
 						type: 'render',
 						id: element.args.id,
@@ -60,9 +66,9 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 							...element,
 							content: html
 						}
-					});
-				}
-			);
+					})
+				);
+		};
 	}
 
 	componentDidMount() {
@@ -87,7 +93,7 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 	}
 
 	private handleMessages = event => {
-		const { element } = this.props;
+		const { element, search } = this.props;
 		const message: IMarkdownViewMessage = event.data;
 		if (message.id !== element.args.id) return;
 
@@ -95,6 +101,11 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 			case 'resize':
 				this.iframe.style.width = message.payload.width;
 				this.iframe.style.height = message.payload.height;
+				break;
+
+			case 'hashtag':
+				search(message.payload);
+				document.getElementById(`search-button`)!.click();
 				break;
 
 			default:
@@ -168,7 +179,7 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 					type: 'lang',
 					regex: /=-=([^]+?)=-=/gi,
 					replace: function(s: string, match: string) {
-						matches.push(`<embed width='400' height='400' src='/assets/d.svg' script='${match}'></embed>`);
+						matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
 						var n = matches.length - 1;
 						return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
 					}
@@ -178,6 +189,33 @@ export default class MarkdownElementComponent extends React.Component<INoteEleme
 					filter: function(text: string) {
 						for (var i = 0; i < matches.length; ++i) {
 							var pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
+							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+						}
+						// reset array
+						matches = [];
+						return text;
+					}
+				}
+			];
+		});
+
+		extension('hashtags', () => {
+			let matches: string[] = [];
+			return [
+				{
+					type: 'lang',
+					regex: /(^|\s)(#[a-z\d-]+)/gi,
+					replace: function(s: string, match: string) {
+						matches.push(`<a href="javascript:searchHashtag(\'#${s.split('#')[1]}\');">${s}</a>`);
+						var n = matches.length - 1;
+						return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
+					}
+				},
+				{
+					type: 'output',
+					filter: function(text: string) {
+						for (var i = 0; i < matches.length; ++i) {
+							var pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
 							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 						}
 						// reset array

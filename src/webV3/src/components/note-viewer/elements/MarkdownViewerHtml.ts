@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+export namespace MarkDownViewer {
+	export const getHtml = (id: string): string => `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
@@ -53,7 +54,7 @@
 			border-left: 10px solid #ffb300;
 			margin: 1.5em 10px;
 			padding: 0.5em 10px;
-			quotes: "\201C""\201D""\2018""\2019";
+			quotes: "\\201C""\\201D""\\2018""\\2019";
 		}
 
 		blockquote:before {
@@ -80,7 +81,7 @@
 
 <script>
 	var content = document.getElementById('content');
-	var id = window.location.search.split('?id=')[1];
+	var id = '${id}';
 	var element;
 
 	window.addEventListener('message', handleMessage);
@@ -146,6 +147,14 @@
 
 		handleMessage({ data: { type: 'resize', id } });
 	}
+	
+	function searchHashtag(query) {
+		parent.postMessage({
+			id,
+			type: 'hashtag',
+			payload: query
+		}, '*');
+	}
 
 	try {
 		new ResizeObserver(function() {
@@ -159,7 +168,6 @@
 </script>
 
 <script src="/assets/mathjax/MathJax.js"></script>
-<script src="/assets/ASCIIsvg.js"></script>
 <script>
 	MathJax.Hub.Config({
 		jax: ['input/AsciiMath', 'input/TeX', 'output/SVG'],
@@ -176,4 +184,5 @@
 	});
 </script>
 </body>
-</html>
+</html>`;
+}

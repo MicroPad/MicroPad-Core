@@ -33,7 +33,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 			<Modal
 				key={`search-${notepad.title}`}
 				header="Search Notepad"
-				trigger={<NavItem href="#!"><Icon left={true}>search</Icon> Search</NavItem>}>
+				trigger={<NavItem id={`search-button`} href="#!"><Icon left={true}>search</Icon> Search</NavItem>}>
 				<Row>
 					<Autocomplete
 						s={12}

@@ -15,3 +15,4 @@ export interface IStoreState {
 export const APP_NAME = 'µPad';
 export const SYNC_NAME = 'µSync';
 export const MICROPAD_URL = 'https://getmicropad.com';
+export const UNSUPPORTED_MESSAGE = 'Support for this type of content was removed in v3. You can go to https://getmicropad.com/web to access v2.';
