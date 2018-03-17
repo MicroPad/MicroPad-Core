@@ -4,6 +4,7 @@ import './NoteElementComponent.css';
 import MarkdownElementComponent from './MarkdownElementComponent';
 import ImageElementComponent from './ImageElementComponent';
 import FileElementComponent from './FileElementComponent';
+import RecordingElement from './RecordingElement';
 
 export interface INoteElementComponentProps {
 	element: NoteElement;
@@ -36,6 +37,10 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 
 			case 'file':
 				elementComponent = <FileElementComponent element={element} noteAssets={noteAssets} />;
+				break;
+
+			case 'recording':
+				elementComponent = <RecordingElement element={element} noteAssets={noteAssets} />;
 				break;
 
 			default:
