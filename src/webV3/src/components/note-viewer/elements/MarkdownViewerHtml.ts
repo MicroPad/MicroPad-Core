@@ -109,6 +109,13 @@ export namespace MarkDownViewer {
 				content.style.fontSize = element.args.fontSize || '16px';
 
 				document.getElementById('content').innerHTML = element.content;
+				
+				document.querySelectorAll('a').forEach(function(link) {
+					if (link.getAttribute('href').substring(0, 24) !== 'javascript:searchHashtag') {
+						link.setAttribute('target', '_blank');
+						link.setAttribute('rel', 'noopener noreferrer');
+					}
+				});
 				adjustWidth();
 
 				MathJax.Hub.Queue(['Typeset', MathJax.Hub, content]);

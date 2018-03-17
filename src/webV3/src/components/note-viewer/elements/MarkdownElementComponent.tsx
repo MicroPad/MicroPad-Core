@@ -49,7 +49,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		};
 
 		return (
-			<iframe style={iframeStyle} ref={iframe => this.iframe = iframe!} srcDoc={MarkDownViewer.getHtml(element.args.id)} sandbox="allow-scripts" />
+			<iframe style={iframeStyle} ref={iframe => this.iframe = iframe!} srcDoc={MarkDownViewer.getHtml(element.args.id)} sandbox="allow-scripts allow-popups" />
 		);
 	}
 
@@ -177,7 +177,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			return [
 				{
 					type: 'lang',
-					regex: /=-=([^]+?)=-=/gi,
+					regex: /(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi,
 					replace: function(s: string, match: string) {
 						matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
 						var n = matches.length - 1;
