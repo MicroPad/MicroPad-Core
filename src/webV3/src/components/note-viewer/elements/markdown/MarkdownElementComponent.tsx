@@ -110,8 +110,12 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 			case 'link':
 				const newWindow = window.open(message.payload, '_blank');
-				newWindow!.opener = null;
-				newWindow!.focus();
+				if (!!newWindow) {
+					newWindow.opener = null;
+					newWindow.focus();
+				} else {
+					alert('Your browser blocked opening the link');
+				}
 				break;
 
 			default:

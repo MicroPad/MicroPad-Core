@@ -42,7 +42,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				break;
 
 			case 'recording':
-				elementComponent = <RecordingElement element={element} noteAssets={noteAssets} />;
+				elementComponent = <RecordingElement element={element} noteAssets={noteAssets} downloadAsset={downloadAsset!} />;
 				break;
 
 			case 'drawing':

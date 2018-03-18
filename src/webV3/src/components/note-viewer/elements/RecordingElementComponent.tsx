@@ -1,13 +1,18 @@
 import * as React from 'react';
-import { INoteElementComponentProps } from './NoteElementComponent';
+import { IFileElementComponent } from './FileElementComponent';
+import { BAD_BROWSER_AUDIO } from '../../../types';
 
-export default class RecordingElementComponent extends React.Component<INoteElementComponentProps> {
+export default class RecordingElementComponent extends React.Component<IFileElementComponent> {
 	render() {
-		const { element, noteAssets } = this.props;
+		const { element, noteAssets, downloadAsset } = this.props;
 
 		return (
 			<div style={{padding: '5px', width: 'max-content'}}>
-				<p><em>{element.args.filename}</em></p>
+				<p>
+					<a title={BAD_BROWSER_AUDIO} href="#!" onClick={() => downloadAsset(element.args.filename!, element.args.ext!)}>
+						<em>{element.args.filename}</em>
+					</a>
+				</p>
 				<audio controls={true} src={noteAssets[element.args.ext!]} />
 			</div>
 		);
