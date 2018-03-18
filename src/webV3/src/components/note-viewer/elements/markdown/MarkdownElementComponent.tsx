@@ -108,6 +108,12 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				document.getElementById(`search-button`)!.click();
 				break;
 
+			case 'link':
+				const newWindow = window.open(message.payload, '_blank');
+				newWindow!.opener = null;
+				newWindow!.focus();
+				break;
+
 			default:
 				break;
 		}

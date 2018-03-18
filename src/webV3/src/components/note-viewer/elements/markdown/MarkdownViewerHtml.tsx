@@ -155,7 +155,14 @@ export namespace MarkDownViewer {
 	}
 	
 	function redirectLinkClick(event) {
-	  
+	    parent.postMessage({
+	    	id,
+	    	type: 'link',
+	    	payload: event.target.getAttribute('href')
+	    }, '*');
+	    
+	    event.preventDefault();
+	    return false;
 	}
 	
 	function searchHashtag(query) {
