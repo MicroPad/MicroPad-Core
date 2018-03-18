@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
-import { Row, Button } from 'react-materialize';
+import { Button, Row } from 'react-materialize';
 
 export interface IFileElementComponent extends INoteElementComponentProps {
 	downloadAsset: (filename: string, uuid: string) => void;
