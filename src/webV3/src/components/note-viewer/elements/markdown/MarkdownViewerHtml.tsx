@@ -112,8 +112,7 @@ export namespace MarkDownViewer {
 				
 				document.querySelectorAll('a').forEach(function(link) {
 					if (link.getAttribute('href').substring(0, 24) !== 'javascript:searchHashtag') {
-						link.setAttribute('target', '_blank');
-						link.setAttribute('rel', 'noopener noreferrer');
+						link.setAttribute('onclick', 'redirectLinkClick(event);');
 					}
 				});
 				adjustWidth();
@@ -153,6 +152,10 @@ export namespace MarkDownViewer {
 		}
 
 		handleMessage({ data: { type: 'resize', id } });
+	}
+	
+	function redirectLinkClick(event) {
+	  
 	}
 	
 	function searchHashtag(query) {

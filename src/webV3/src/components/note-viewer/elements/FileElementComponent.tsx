@@ -8,7 +8,7 @@ export interface IFileElementComponent extends INoteElementComponentProps {
 
 export default class FileElementComponent extends React.Component<IFileElementComponent> {
 	render() {
-		const { element, noteAssets, downloadAsset } = this.props;
+		const { element, downloadAsset } = this.props;
 
 		return (
 			<div style={{padding: '5px', width: 'max-content'}}>
