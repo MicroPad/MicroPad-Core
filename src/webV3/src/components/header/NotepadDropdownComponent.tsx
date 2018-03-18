@@ -45,8 +45,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 
 	private openNotepad = (event) => {
 		const { openNotepadFromStorage } = this.props;
-		let title = event.currentTarget.innerText;
-		title = title.substr(0, title.length - 1);
+		let title = event.currentTarget.textContent;
 
 		openNotepadFromStorage!(title);
 	}
