@@ -1,10 +1,11 @@
 import { combineEpics } from 'redux-observable';
-import { filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { IAsset, INote, INotepad, INotepadStoreState, NoteElement } from '../types/NotepadTypes';
 import { dataURItoBlob, getNotepadObjectByRef } from '../util';
 import * as Parser from 'upad-parse/dist/index.js';
+import saveAs from 'save-as';
 import { ASSET_STORAGE } from '../index';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 
@@ -54,6 +55,21 @@ const checkNoteAssets$ = (action$, store) =>
 		})
 	);
 
+const downloadAsset$ = action$ =>
+	action$.pipe(
+		filter((action: Action<{ filename: string, uuid: string }>) => isType(action, actions.downloadAsset.started)),
+		map((action: Action<{ filename: string, uuid: string }>) => action.payload),
+		switchMap(({filename, uuid}: { filename: string, uuid: string }) =>
+			fromPromise(ASSET_STORAGE.getItem(uuid))
+				.pipe(
+					map((blob: Blob) => [blob, filename])
+				)
+		),
+		filter(Boolean),
+		tap(([blob, filename]: [Blob, string]) => saveAs(blob, filename)),
+		map(([blob, filename]: [Blob, string]) => actions.downloadAsset.done({ params: { filename, uuid: '' }, result: undefined }))
+	);
+
 function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {
 	const storageRequests: Promise<Blob>[] = [];
 	const blobRefs: string[] = [];
@@ -90,5 +106,6 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 
 export const noteEpics$ = combineEpics(
 	loadNote$,
-	checkNoteAssets$
+	checkNoteAssets$,
+	downloadAsset$
 );

@@ -24,7 +24,8 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteViewerComponentProps> {
 	return {
-		search: query => dispatch(actions.search(query))
+		search: query => dispatch(actions.search(query)),
+		downloadAsset: (filename, uuid) => dispatch(actions.downloadAsset.started({ filename, uuid }))
 	};
 }
 

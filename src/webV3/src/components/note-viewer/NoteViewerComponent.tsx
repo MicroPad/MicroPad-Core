@@ -10,11 +10,12 @@ export interface INoteViewerComponentProps {
 	note?: INote;
 	noteAssets: object;
 	search?: (query: string) => void;
+	downloadAsset?: (filename: string, uuid: string) => void;
 }
 
 export default class NoteViewerComponent extends React.Component<INoteViewerComponentProps> {
 	render() {
-		const { isFullscreen, note, noteAssets, search } = this.props;
+		const { isFullscreen, note, noteAssets, search, downloadAsset } = this.props;
 
 		const classes: string = (!note || note.elements.length === 0) ? 'empty' : '';
 		let styles = {};
@@ -32,7 +33,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 
 		const elements: JSX.Element[] = [];
 		if (!!note) note.elements.forEach(element => elements.push(
-			<NoteElementComponent key={md5(JSON.stringify(element))} element={element} noteAssets={noteAssets} search={search!} />
+			<NoteElementComponent key={md5(JSON.stringify(element))} element={element} noteAssets={noteAssets} search={search!} downloadAsset={downloadAsset} />
 		));
 
 		if (!!note && elements.length === 0) Materialize.toast('Welcome to your note! Press anywhere on here to insert an element.', 3000);

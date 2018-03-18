@@ -14,6 +14,7 @@ export const actions = {
 	renameNotepad: actionCreator.async<string, string, any>('RENAME_NOTEPAD'),
 	checkNoteAssets: actionCreator.async<[string, NoteElement[]], INotepad, any>('CHECK_NOTE_ASSETS'),
 	loadNote: actionCreator.async<string, object, any>('LOAD_NOTE'),
+	downloadAsset: actionCreator.async<{ filename: string, uuid: string }, void, any>('DOWNLOAD_ASSET'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),
@@ -29,5 +30,5 @@ export const actions = {
 	renameNotepadObject: actionCreator<IRenameNotepadObjectAction>('RENAME_NOTEPAD_OBJECT'),
 	expandFromNote: actionCreator<INote>('EXPAND_FROM_NOTE'),
 	expandAllExplorer: actionCreator.async<void, string[], any>('EXPAND_ALL_EXPLORER'),
-	collapseAllExplorer: actionCreator<void>('COLLAPSE_ALL_EXPLORER'),
+	collapseAllExplorer: actionCreator<void>('COLLAPSE_ALL_EXPLORER')
 };

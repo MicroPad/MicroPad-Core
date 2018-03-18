@@ -11,11 +11,12 @@ export interface INoteElementComponentProps {
 	element: NoteElement;
 	noteAssets: object;
 	search?: (query: string) => void;
+	downloadAsset?: (filename: string, uuid: string) => void;
 }
 
 export default class NoteElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {
-		const { element, noteAssets, search } = this.props;
+		const { element, noteAssets, search, downloadAsset } = this.props;
 
 		const containerStyles = {
 			left: element.args.x,
@@ -37,7 +38,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				break;
 
 			case 'file':
-				elementComponent = <FileElementComponent element={element} noteAssets={noteAssets} />;
+				elementComponent = <FileElementComponent element={element} noteAssets={noteAssets} downloadAsset={downloadAsset!} />;
 				break;
 
 			case 'recording':
