@@ -85,6 +85,17 @@ export namespace MarkDownViewer {
 	var element;
 
 	window.addEventListener('message', handleMessage);
+	
+	document.body.onclick = function(event) {
+		var path = event.path || (event.composedPath && event.composedPath()) || [event.target];
+		if (path[0].tagName.toLowerCase() === 'a') return;
+		
+		parent.postMessage({
+			id,
+			type: 'edit',
+			payload: {}
+		}, '*');
+	};
 
 	function handleMessage(event) {
 		var message = event.data;

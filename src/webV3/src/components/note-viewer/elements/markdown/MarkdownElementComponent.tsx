@@ -40,7 +40,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	}
 
 	render() {
-		const { element } = this.props;
+		const { element, elementEditing } = this.props;
 
 		const iframeStyle = {
 			borderStyle: 'none',
@@ -48,13 +48,28 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			height: element.args.height
 		};
 
+		const isEditing = elementEditing === element.args.id;
+
 		return (
-			<iframe style={iframeStyle} ref={iframe => this.iframe = iframe!} srcDoc={MarkDownViewer.getHtml(element.args.id)} sandbox="allow-scripts allow-popups" />
+			<div>
+				{
+					!isEditing
+					&& <iframe
+					style={iframeStyle}
+					ref={iframe => this.iframe = iframe!}
+					srcDoc={MarkDownViewer.getHtml(element.args.id)}
+					sandbox="allow-scripts allow-popups" />
+				}
+
+				{isEditing && <textarea style={{height: '400px'}} defaultValue={element.content} />}
+			</div>
 		);
 	}
 
 	componentWillReceiveProps(nextProps: INoteElementComponentProps) {
 		const { element } = nextProps;
+
+		if (!this.iframe) return;
 
 		this.iframe.onload = () => {
 			this.generateHtml(element)
@@ -78,6 +93,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 	componentWillUnmount() {
 		window.removeEventListener('message', this.handleMessages);
+
+		if (!this.iframe) return;
 		this.iframe.src = 'about:blank';
 	}
 
@@ -116,6 +133,10 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				} else {
 					alert('Your browser blocked opening the link');
 				}
+				break;
+
+			case 'edit':
+				console.log(element.args.id);
 				break;
 
 			default:

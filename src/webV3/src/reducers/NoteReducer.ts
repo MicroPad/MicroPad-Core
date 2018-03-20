@@ -6,13 +6,15 @@ import { actions } from '../actions';
 export interface ICurrentNoteState {
 	ref: string;
 	assetUrls: object;
+	elementEditing: string;
 }
 
 export class NoteReducer implements IReducer<ICurrentNoteState> {
 	public readonly key: string = 'currentNote';
 	public readonly initialState: ICurrentNoteState = {
 		ref: '',
-		assetUrls: {}
+		assetUrls: {},
+		elementEditing: ''
 	};
 
 	public reducer(state: ICurrentNoteState, action: Action): ICurrentNoteState {
@@ -30,7 +32,8 @@ export class NoteReducer implements IReducer<ICurrentNoteState> {
 			return {
 				...state,
 				ref: action.payload.params,
-				assetUrls: action.payload.result
+				assetUrls: action.payload.result,
+				elementEditing: ''
 			};
 		} else if (isType(action, actions.deleteNotepadObject)) {
 			if (action.payload === state.ref) {

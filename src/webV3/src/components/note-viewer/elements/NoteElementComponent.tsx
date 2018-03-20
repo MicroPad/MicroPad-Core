@@ -9,6 +9,7 @@ import DrawingElementComponent from './drawing/DrawingElementComponent';
 
 export interface INoteElementComponentProps {
 	element: NoteElement;
+	elementEditing: string;
 	noteAssets: object;
 	search?: (query: string) => void;
 	downloadAsset?: (filename: string, uuid: string) => void;
@@ -16,7 +17,7 @@ export interface INoteElementComponentProps {
 
 export default class NoteElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {
-		const { element, noteAssets, search, downloadAsset } = this.props;
+		const { element, noteAssets, search, downloadAsset, elementEditing } = this.props;
 
 		const containerStyles = {
 			left: element.args.x,
@@ -30,23 +31,23 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 		let elementComponent: JSX.Element | undefined = undefined;
 		switch (element.type) {
 			case 'markdown':
-				elementComponent = <MarkdownElementComponent element={element} noteAssets={noteAssets} search={search!} />;
+				elementComponent = <MarkdownElementComponent element={element} elementEditing={elementEditing} noteAssets={noteAssets} search={search!} />;
 				break;
 				
 			case 'image':
-				elementComponent = <ImageElementComponent element={element} noteAssets={noteAssets} />;
+				elementComponent = <ImageElementComponent element={element} elementEditing={elementEditing} noteAssets={noteAssets} />;
 				break;
 
 			case 'file':
-				elementComponent = <FileElementComponent element={element} noteAssets={noteAssets} downloadAsset={downloadAsset!} />;
+				elementComponent = <FileElementComponent element={element} elementEditing={elementEditing} noteAssets={noteAssets} downloadAsset={downloadAsset!} />;
 				break;
 
 			case 'recording':
-				elementComponent = <RecordingElement element={element} noteAssets={noteAssets} downloadAsset={downloadAsset!} />;
+				elementComponent = <RecordingElement element={element} elementEditing={elementEditing} noteAssets={noteAssets} downloadAsset={downloadAsset!} />;
 				break;
 
 			case 'drawing':
-				elementComponent = <DrawingElementComponent element={element} noteAssets={noteAssets} />;
+				elementComponent = <DrawingElementComponent element={element} elementEditing={elementEditing} noteAssets={noteAssets} />;
 				break;
 
 			default:

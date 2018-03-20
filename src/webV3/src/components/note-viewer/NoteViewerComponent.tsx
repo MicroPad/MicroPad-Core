@@ -8,6 +8,7 @@ import * as md5 from 'md5';
 export interface INoteViewerComponentProps {
 	isFullscreen: boolean;
 	note?: INote;
+	elementEditing: string;
 	noteAssets: object;
 	search?: (query: string) => void;
 	downloadAsset?: (filename: string, uuid: string) => void;
@@ -18,7 +19,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	private lastZoom: number | null;
 
 	render() {
-		const { isFullscreen, note, noteAssets, search, downloadAsset } = this.props;
+		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing } = this.props;
 
 		const classes: string = (!note || note.elements.length === 0) ? 'empty' : '';
 		let styles = {};
@@ -36,7 +37,13 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 
 		const elements: JSX.Element[] = [];
 		if (!!note) note.elements.forEach(element => elements.push(
-			<NoteElementComponent key={md5(JSON.stringify(element))} element={element} noteAssets={noteAssets} search={search!} downloadAsset={downloadAsset} />
+			<NoteElementComponent
+				key={md5(JSON.stringify(element))}
+				element={element}
+				noteAssets={noteAssets}
+				search={search!}
+				downloadAsset={downloadAsset}
+				elementEditing={elementEditing} />
 		));
 
 		if (!!note && elements.length === 0) Materialize.toast('Welcome to your note! Press anywhere on here to insert an element.', 3000);
