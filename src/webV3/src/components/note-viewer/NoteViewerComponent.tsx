@@ -50,8 +50,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		if (!!note && elements.length === 0) Materialize.toast('Welcome to your note! Press anywhere on here to insert an element.', 3000);
 
 		return (
-			<div id="note-viewer" className={classes} style={styles}>
-				<div id="note-container" style={containerStyles} ref={div => this.viewerDiv = div!} onClick={this.handleEmptyClick}>
+			<div id="note-viewer" className={classes} style={styles} ref={div => this.viewerDiv = div!} onClick={this.handleEmptyClick}>
+				<div id="note-container" style={containerStyles}>
 					{elements}
 				</div>
 			</div>
