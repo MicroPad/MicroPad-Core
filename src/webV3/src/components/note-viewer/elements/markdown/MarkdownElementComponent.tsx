@@ -61,13 +61,13 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					sandbox="allow-scripts allow-popups" />
 				}
 
-				{isEditing && <textarea style={{height: '400px'}} defaultValue={element.content} />}
+				{isEditing && <textarea style={{height: '400px', backgroundColor: 'white'}} defaultValue={element.content} />}
 			</div>
 		);
 	}
 
-	componentWillReceiveProps(nextProps: INoteElementComponentProps) {
-		const { element } = nextProps;
+	componentDidUpdate(props: INoteElementComponentProps) {
+		const { element } = props;
 
 		if (!this.iframe) return;
 
@@ -87,7 +87,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	}
 
 	componentDidMount() {
-		this.componentWillReceiveProps(this.props);
+		this.componentDidUpdate(this.props);
 		window.addEventListener('message', this.handleMessages);
 	}
 
@@ -98,8 +98,10 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		this.iframe.src = 'about:blank';
 	}
 
-	shouldComponentUpdate() {
-		return false;
+	shouldComponentUpdate(nextProps: INoteElementComponentProps) {
+		const { element, elementEditing } = nextProps;
+
+		return (element.args.id === elementEditing || this.props.element.args.id === this.props.elementEditing);
 	}
 
 	private generateHtml = (element: NoteElement): Promise<string> => {

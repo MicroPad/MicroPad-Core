@@ -22,7 +22,8 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 
 		const containerStyles = {
 			left: element.args.x,
-			top: element.args.y
+			top: element.args.y,
+			zIndex: (element.args.id === elementEditing) ? 5000 : undefined
 		};
 
 		const elementStyles = {
