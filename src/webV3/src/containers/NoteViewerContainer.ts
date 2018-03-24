@@ -9,7 +9,11 @@ import { getNotepadObjectByRef } from '../util';
 import { INote } from '../types/NotepadTypes';
 import { actions } from '../actions';
 
+let noteRef: string = '';
+
 export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
+	noteRef = currentNote.ref;
+
 	let note;
 	if (currentNote.ref.length !== 0) {
 		getNotepadObjectByRef(notepads.notepad!.item!, currentNote.ref, obj => note = <INote> obj);
@@ -27,7 +31,14 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 	return {
 		search: query => dispatch(actions.search(query)),
 		downloadAsset: (filename, uuid) => dispatch(actions.downloadAsset.started({ filename, uuid })),
-		edit: id => dispatch(actions.openEditor(id))
+		edit: id => dispatch(actions.openEditor(id)),
+		updateElement: (id, changes) => dispatch(
+			actions.updateElement({
+				elementId: id,
+				element: changes,
+				noteRef: noteRef
+			})
+		)
 	};
 }
 

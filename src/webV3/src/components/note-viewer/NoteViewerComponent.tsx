@@ -1,9 +1,8 @@
 import * as React from 'react';
 import './NoteViewerComponent.css';
-import { INote } from '../../types/NotepadTypes';
+import { INote, NoteElement } from '../../types/NotepadTypes';
 import NoteElementComponent from './elements/NoteElementComponent';
 import * as Materialize from 'materialize-css/dist/js/materialize.js';
-import * as md5 from 'md5';
 
 export interface INoteViewerComponentProps {
 	isFullscreen: boolean;
@@ -13,13 +12,15 @@ export interface INoteViewerComponentProps {
 	edit?: (id: string) => void;
 	search?: (query: string) => void;
 	downloadAsset?: (filename: string, uuid: string) => void;
+	updateElement?: (id: string, changes: NoteElement) => void;
 }
 
 export default class NoteViewerComponent extends React.Component<INoteViewerComponentProps> {
 	private viewerDiv: HTMLDivElement;
+	private containerDiv: HTMLDivElement;
 
 	render() {
-		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit} = this.props;
+		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement} = this.props;
 
 		const classes: string = (!note || note.elements.length === 0) ? 'empty' : '';
 		let styles = {};
@@ -38,11 +39,12 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		const elements: JSX.Element[] = [];
 		if (!!note) note.elements.forEach(element => elements.push(
 			<NoteElementComponent
-				key={md5(JSON.stringify(element))}
+				key={`${note.internalRef}-${element.args.id}`}
 				element={element}
 				noteAssets={noteAssets}
 				edit={edit!}
 				search={search!}
+				updateElement={updateElement}
 				downloadAsset={downloadAsset}
 				elementEditing={elementEditing} />
 		));
@@ -51,7 +53,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 
 		return (
 			<div id="note-viewer" className={classes} style={styles} ref={div => this.viewerDiv = div!} onClick={this.handleEmptyClick}>
-				<div id="note-container" style={containerStyles}>
+				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}  onClick={this.handleEmptyClick}>
 					{elements}
 				</div>
 			</div>
@@ -60,7 +62,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 
 	private handleEmptyClick = (event) => {
 		const { note, edit } = this.props;
-		if (!note || event.target !== this.viewerDiv) return;
+		if (!note || (event.target !== this.viewerDiv && event.target !== this.containerDiv)) return;
 
 		edit!('');
 	}

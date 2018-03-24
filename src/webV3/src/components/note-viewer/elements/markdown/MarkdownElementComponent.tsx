@@ -3,7 +3,8 @@ import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
 import { NoteElement } from '../../../../types/NotepadTypes';
 import { MarkDownViewer } from './MarkdownViewerHtml';
-import { UNSUPPORTED_MESSAGE } from '../../../../types/index';
+import { UNSUPPORTED_MESSAGE } from '../../../../types';
+import * as md5 from 'md5';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -61,7 +62,20 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					sandbox="allow-scripts allow-popups" />
 				}
 
-				{isEditing && <textarea style={{height: '400px', backgroundColor: 'white'}} defaultValue={element.content} />}
+				{
+					isEditing &&
+					<textarea
+						style={
+							{
+								height: '400px',
+								backgroundColor: 'white',
+								maxWidth: '100%',
+								minWidth: (element.args.width !== 'auto') ? '100%' : '400px',
+							}
+						}
+						value={element.content}
+						onChange={this.onElementEdit} />
+				}
 			</div>
 		);
 	}
@@ -98,10 +112,19 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		this.iframe.src = 'about:blank';
 	}
 
-	shouldComponentUpdate(nextProps: INoteElementComponentProps) {
-		const { element, elementEditing } = nextProps;
+	// shouldComponentUpdate(nextProps: INoteElementComponentProps) {
+	// 	const { element, elementEditing } = nextProps;
+	//
+	// 	return (element.args.id === elementEditing || this.props.element.args.id === this.props.elementEditing);
+	// }
 
-		return (element.args.id === elementEditing || this.props.element.args.id === this.props.elementEditing);
+	private onElementEdit = (event) => {
+		const { element, updateElement } = this.props;
+
+		updateElement!(element.args.id, {
+			...element,
+			content: event.target.value
+		});
 	}
 
 	private generateHtml = (element: NoteElement): Promise<string> => {

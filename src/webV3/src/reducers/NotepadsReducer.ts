@@ -202,6 +202,34 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 					item: restoreObject<INotepad>({ ...action.payload.result }, Parser.createNotepad(''))
 				}
 			};
+		} else if (isType(action, actions.updateElement)) {
+			const newNotepad = getNotepadObjectByRef({ ...state.notepad!.item! }, action.payload.noteRef, (obj) => {
+				// Rename a note
+				const section = <ISection> obj.parent;
+				const index = section.notes.indexOf(<INote> obj);
+
+				const newElements = section.notes[index].elements.map(element =>
+					(element.args.id === action.payload.elementId) ? action.payload.element : element
+				);
+
+				section.notes[index] = restoreObject<INote>({
+					...section.notes[index],
+					elements: newElements
+
+				}, Parser.createNote(''));
+
+				return section.notes[index];
+			});
+
+			const notepad = <INotepad> restoreObject({ ...newNotepad }, Parser.createNotepad(newNotepad.title));
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					item: notepad
+				}
+			};
 		}
 
 		return Object.freeze(state);

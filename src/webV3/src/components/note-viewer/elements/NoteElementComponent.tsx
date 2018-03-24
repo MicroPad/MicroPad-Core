@@ -6,8 +6,9 @@ import ImageElementComponent from './ImageElementComponent';
 import FileElementComponent from './FileElementComponent';
 import RecordingElement from './RecordingElementComponent';
 import DrawingElementComponent from './drawing/DrawingElementComponent';
+import { INoteViewerComponentProps } from '../NoteViewerComponent';
 
-export interface INoteElementComponentProps {
+export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
 	elementEditing: string;
 	noteAssets: object;
@@ -18,7 +19,7 @@ export interface INoteElementComponentProps {
 
 export default class NoteElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {
-		const { element, noteAssets, search, downloadAsset, elementEditing, edit } = this.props;
+		const { element, noteAssets, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
 
 		const containerStyles = {
 			left: element.args.x,
@@ -38,6 +39,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					element={element}
 					elementEditing={elementEditing}
 					noteAssets={noteAssets}
+					updateElement={updateElement}
 					edit={edit}
 					search={search!} />
 				);
@@ -48,6 +50,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					<ImageElementComponent
 					element={element}
 					elementEditing={elementEditing}
+					updateElement={updateElement}
 					noteAssets={noteAssets}
 					edit={edit} />
 				);
@@ -58,6 +61,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					<FileElementComponent
 					element={element}
 					elementEditing={elementEditing}
+					updateElement={updateElement}
 					noteAssets={noteAssets}
 					downloadAsset={downloadAsset!}
 					edit={edit} />
@@ -69,6 +73,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					<RecordingElement
 					element={element}
 					elementEditing={elementEditing}
+					updateElement={updateElement}
 					noteAssets={noteAssets}
 					downloadAsset={downloadAsset!}
 					edit={edit} />
@@ -80,6 +85,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					<DrawingElementComponent
 					element={element}
 					elementEditing={elementEditing}
+					updateElement={updateElement}
 					noteAssets={noteAssets}
 					edit={edit} />
 				);
