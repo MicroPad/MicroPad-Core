@@ -4,11 +4,13 @@
 	padding-bottom: 500px;
 	min-width: 170px;
 	min-height: 50px;
+	pointer-events:none;
 }
 
-.noteElement > div {
+.noteElement > * {
 	word-wrap: break-word;
 	overflow: auto;
+	pointer-events: auto;
 }
 
 .handle {
