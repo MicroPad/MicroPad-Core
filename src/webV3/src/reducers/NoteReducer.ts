@@ -40,6 +40,11 @@ export class NoteReducer implements IReducer<ICurrentNoteState> {
 				this.cleanUpObjectUrls(state.assetUrls);
 				return this.initialState;
 			}
+		} else if (isType(action, actions.openEditor)) {
+			return {
+				...state,
+				elementEditing: action.payload
+			};
 		}
 
 		return state;

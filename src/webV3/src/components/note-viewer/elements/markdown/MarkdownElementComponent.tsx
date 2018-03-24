@@ -110,7 +110,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	}
 
 	private handleMessages = event => {
-		const { element, search } = this.props;
+		const { element, search, edit } = this.props;
 		const message: IMarkdownViewMessage = event.data;
 		if (message.id !== element.args.id) return;
 
@@ -136,7 +136,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				break;
 
 			case 'edit':
-				console.log(element.args.id);
+				edit(element.args.id);
 				break;
 
 			default:

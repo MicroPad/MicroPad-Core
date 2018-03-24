@@ -10,6 +10,7 @@ export interface INoteViewerComponentProps {
 	note?: INote;
 	elementEditing: string;
 	noteAssets: object;
+	edit?: (id: string) => void;
 	search?: (query: string) => void;
 	downloadAsset?: (filename: string, uuid: string) => void;
 }
@@ -19,7 +20,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	private lastZoom: number | null;
 
 	render() {
-		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing } = this.props;
+		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit} = this.props;
 
 		const classes: string = (!note || note.elements.length === 0) ? 'empty' : '';
 		let styles = {};
@@ -41,6 +42,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				key={md5(JSON.stringify(element))}
 				element={element}
 				noteAssets={noteAssets}
+				edit={edit!}
 				search={search!}
 				downloadAsset={downloadAsset}
 				elementEditing={elementEditing} />
