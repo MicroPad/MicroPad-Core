@@ -2,7 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import { Store } from 'redux';
 import { IStoreState } from './types';
 import { INotepad, INotepadStoreState } from './types/NotepadTypes';
-import { debounceTime, distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
+import { debounceTime, filter, map, tap } from 'rxjs/operators';
 import { actions } from './actions';
 import { from } from 'rxjs/observable/from';
 import { stringify } from './util';
