@@ -30,7 +30,7 @@ export class MiscRx {
 				filter(Boolean),
 				map((notepadState: INotepadStoreState) => notepadState.item),
 				filter(Boolean),
-				debounceTime(800),
+				debounceTime(1000),
 				map((notepad: INotepad) => [notepad, md5(stringify(notepad))]),
 				filter(([notepad, newHash]: [INotepad, string]) => this.lastNotepadHash !== newHash),
 				tap(([notepad, newHash]: [INotepad, string]) => this.lastNotepadHash = newHash),
