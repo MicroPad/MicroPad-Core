@@ -4,7 +4,11 @@ import { Converter, ConverterOptions, extension } from 'showdown';
 import { NoteElement } from '../../../../types/NotepadTypes';
 import { MarkDownViewer } from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
-import * as md5 from 'md5';
+import { enableTabs } from './enable-tabs';
+import { fromEvent } from 'rxjs/observable/fromEvent';
+import { filter, first, map, share, shareReplay, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -22,7 +26,9 @@ interface IShowdownOpts extends ConverterOptions {
 
 export default class MarkdownElementComponent extends React.Component<IMarkdownElementComponentProps> {
 	private iframe: HTMLIFrameElement;
+	private editBox: HTMLTextAreaElement;
 	private converter: Converter;
+	private escapeHit$: Observable<number>;
 
 	constructor(props: IMarkdownElementComponentProps, state: object) {
 		super(props, state);
@@ -38,6 +44,13 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			emoji: true,
 			extensions: ['maths', 'quick-maths', 'graphs', 'hashtags']
 		} as IShowdownOpts);
+
+		this.escapeHit$ = fromEvent(document, 'keyup')
+			.pipe(
+				map((event: KeyboardEvent) => event.keyCode),
+				filter(keyCode => keyCode === 27),
+				share()
+			);
 	}
 
 	render() {
@@ -70,9 +83,10 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 								height: '400px',
 								backgroundColor: 'white',
 								maxWidth: '100%',
-								minWidth: (element.args.width !== 'auto') ? '100%' : '400px',
+								minWidth: (element.args.width !== 'auto') ? '100%' : '400px'
 							}
 						}
+						ref={input => this.editBox = input!}
 						value={element.content}
 						onChange={this.onElementEdit} />
 				}
@@ -81,23 +95,31 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	}
 
 	componentDidUpdate(props: INoteElementComponentProps) {
-		const { element } = props;
+		const { element, edit } = props;
 
-		if (!this.iframe) return;
+		if (!!this.iframe) {
+			this.iframe.onload = () => {
+				this.generateHtml(element)
+					.then(html =>
+						this.sendMessage({
+							type: 'render',
+							id: element.args.id,
+							payload: {
+								...element,
+								content: html
+							}
+						})
+					);
+			};
+		} else if (!!this.editBox) {
+			this.editBox.onkeydown = enableTabs;
 
-		this.iframe.onload = () => {
-			this.generateHtml(element)
-				.then(html =>
-					this.sendMessage({
-						type: 'render',
-						id: element.args.id,
-						payload: {
-							...element,
-							content: html
-						}
-					})
-				);
-		};
+			this.escapeHit$
+				.pipe(first())
+				.subscribe(() => {
+					edit('');
+				});
+		}
 	}
 
 	componentDidMount() {
@@ -111,12 +133,6 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		if (!this.iframe) return;
 		this.iframe.src = 'about:blank';
 	}
-
-	// shouldComponentUpdate(nextProps: INoteElementComponentProps) {
-	// 	const { element, elementEditing } = nextProps;
-	//
-	// 	return (element.args.id === elementEditing || this.props.element.args.id === this.props.elementEditing);
-	// }
 
 	private onElementEdit = (event) => {
 		const { element, updateElement } = this.props;
