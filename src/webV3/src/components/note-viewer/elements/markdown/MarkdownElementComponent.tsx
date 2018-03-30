@@ -6,8 +6,7 @@ import { MarkDownViewer } from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import { fromEvent } from 'rxjs/observable/fromEvent';
-import { filter, first, map, share, shareReplay, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
+import { filter, first, map, share } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
