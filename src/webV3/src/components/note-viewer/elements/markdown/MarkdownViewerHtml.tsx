@@ -74,6 +74,10 @@ export namespace MarkDownViewer {
 		blockquote > p {
 			display: inline;
 		}
+		
+		.hidden {
+			display: none;
+		}
 	</style>
 </head>
 <body>
@@ -83,6 +87,7 @@ export namespace MarkDownViewer {
 	var content = document.getElementById('content');
 	var id = '${id}';
 	var element;
+	var showHidden = true;
 
 	window.addEventListener('message', handleMessage);
 	
@@ -126,6 +131,8 @@ export namespace MarkDownViewer {
 						link.setAttribute('onclick', 'redirectLinkClick(event);');
 					}
 				});
+				
+				manageToDoItems();
 				adjustWidth();
 
 				MathJax.Hub.Queue(['Typeset', MathJax.Hub, content]);
@@ -137,7 +144,26 @@ export namespace MarkDownViewer {
 					adjustWidth();
 				});
 				break;
+				
+			case 'toggle':
+				showHidden = !showHidden;
+				manageToDoItems();
+				break;
 		}
+	}
+	
+	function manageToDoItems() {
+		document.querySelectorAll('.task-list-item input:checked').forEach(function(item) {
+			if (showHidden) {
+				getParentsUntil(item, '#content').forEach(function(parent) {
+					parent.classList.remove('hidden');
+				});
+			} else {
+				getParentsUntil(item, 'ul').forEach(function(parent) {
+					parent.classList.add('hidden');
+				});
+			}
+		});
 	}
 
 	function adjustWidth() {
@@ -193,6 +219,93 @@ export namespace MarkDownViewer {
 	} catch (e) {
 		console.warn('Resize Observer not supported. IFrame rendering might be slightly off.')
 	}
+	
+	var getParentsUntil = function (elem, parent, selector) {
+
+		var parents = [];
+		if ( parent ) {
+			var parentType = parent.charAt(0);
+		}
+		if ( selector ) {
+			var selectorType = selector.charAt(0);
+		}
+
+		// Get matches
+		for ( ; elem && elem !== document; elem = elem.parentNode ) {
+
+			// Check if parent has been reached
+			if ( parent ) {
+
+				// If parent is a class
+				if ( parentType === '.' ) {
+					if ( elem.classList.contains( parent.substr(1) ) ) {
+						break;
+					}
+				}
+
+				// If parent is an ID
+				if ( parentType === '#' ) {
+					if ( elem.id === parent.substr(1) ) {
+						break;
+					}
+				}
+
+				// If parent is a data attribute
+				if ( parentType === '[' ) {
+					if ( elem.hasAttribute( parent.substr(1, parent.length - 1) ) ) {
+						break;
+					}
+				}
+
+				// If parent is a tag
+				if ( elem.tagName.toLowerCase() === parent ) {
+					break;
+				}
+
+			}
+
+			if ( selector ) {
+
+				// If selector is a class
+				if ( selectorType === '.' ) {
+					if ( elem.classList.contains( selector.substr(1) ) ) {
+						parents.push( elem );
+					}
+				}
+
+				// If selector is an ID
+				if ( selectorType === '#' ) {
+					if ( elem.id === selector.substr(1) ) {
+						parents.push( elem );
+					}
+				}
+
+				// If selector is a data attribute
+				if ( selectorType === '[' ) {
+					if ( elem.hasAttribute( selector.substr(1, selector.length - 1) ) ) {
+						parents.push( elem );
+					}
+				}
+
+				// If selector is a tag
+				if ( elem.tagName.toLowerCase() === selector ) {
+					parents.push( elem );
+				}
+
+			} else {
+				parents.push( elem );
+			}
+
+		}
+
+		// Return parents if any exist
+		if ( parents.length === 0 ) {
+			return null;
+		} else {
+			return parents;
+		}
+
+	};
 </script>
 
 <script src="/assets/mathjax/MathJax.js"></script>

@@ -8,6 +8,7 @@ import { enableTabs } from './enable-tabs';
 import { fromEvent } from 'rxjs/observable/fromEvent';
 import { filter, first, map, share } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
+import TodoListComponent from './TodoListComponent';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -65,30 +66,37 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 		return (
 			<div>
-				{
-					!isEditing
-					&& <iframe
-					style={iframeStyle}
-					ref={iframe => this.iframe = iframe!}
-					srcDoc={MarkDownViewer.getHtml(element.args.id)}
-					sandbox="allow-scripts allow-popups" />
-				}
+				<TodoListComponent html={this.generateHtml(element)} toggle={() => this.sendMessage({
+					id: element.args.id,
+					type: 'toggle',
+					payload: {}
+				})} />
+				<div>
+					{
+						!isEditing
+						&& <iframe
+							style={iframeStyle}
+							ref={iframe => this.iframe = iframe!}
+							srcDoc={MarkDownViewer.getHtml(element.args.id)}
+							sandbox="allow-scripts allow-popups" />
+					}
 
-				{
-					isEditing &&
-					<textarea
-						style={
-							{
-								height: '400px',
-								backgroundColor: 'white',
-								maxWidth: '100%',
-								minWidth: (element.args.width !== 'auto') ? '100%' : '400px'
+					{
+						isEditing &&
+						<textarea
+							style={
+								{
+									height: '400px',
+									backgroundColor: 'white',
+									maxWidth: '100%',
+									minWidth: (element.args.width !== 'auto') ? '100%' : '400px'
+								}
 							}
-						}
-						ref={input => this.editBox = input!}
-						value={element.content}
-						onChange={this.onElementEdit} />
-				}
+							ref={input => this.editBox = input!}
+							value={element.content}
+							onChange={this.onElementEdit} />
+					}
+				</div>
 			</div>
 		);
 	}
@@ -99,7 +107,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		if (!!this.iframe) {
 			this.iframe.onload = () => {
 				this.generateHtml(element)
-					.then(html =>
+					.then(html => {
 						this.sendMessage({
 							type: 'render',
 							id: element.args.id,
@@ -107,8 +115,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 								...element,
 								content: html
 							}
-						})
-					);
+						});
+					});
 			};
 		} else if (!!this.editBox) {
 			this.editBox.onkeydown = enableTabs;
@@ -185,6 +193,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	}
 
 	private sendMessage = (message: IMarkdownViewMessage) => {
+		if (!this.iframe) return;
 		this.iframe.contentWindow.postMessage(message, '*');
 	}
 
