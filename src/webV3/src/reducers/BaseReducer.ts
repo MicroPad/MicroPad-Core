@@ -1,11 +1,13 @@
 import { IReducer } from '../types/ReducerType';
-import { IStoreState } from '../types/index';
+import { IStoreState } from '../types';
 import { MetaReducer } from './MetaReducer';
 import { Action } from 'redux';
 import { NotepadsReducer } from './NotepadsReducer';
 import { NoteReducer } from './NoteReducer';
 import { ExplorerReducer } from './ExplorerReducer';
 import { SearchReducer } from './SearchReducer';
+import * as deepFreeze from 'deep-freeze';
+import { isDev } from '../util';
 
 export const REDUCERS: Array<IReducer<any>> = [
 	new MetaReducer(),
@@ -30,7 +32,7 @@ export class BaseReducer implements IReducer<IStoreState> {
 			...state
 		};
 		REDUCERS.forEach(reducer => newState[reducer.key] = Object.freeze(reducer.reducer(Object.freeze(state[reducer.key]), action)));
-
-		return Object.freeze(newState);
+		
+		return (!isDev) ? Object.freeze(newState) : deepFreeze(newState);
 	}
 }

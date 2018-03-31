@@ -88,6 +88,10 @@ export function getNotepadObjectByRef(notepad: INotepad, ref: string, actionOnOb
 	return notepad;
 }
 
+export function isDev(): boolean {
+	return (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+}
+
 // Thanks to https://stackoverflow.com/a/105074
 export function generateGuid(): string {
 	function s4() {

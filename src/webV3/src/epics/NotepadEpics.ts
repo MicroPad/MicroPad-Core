@@ -1,6 +1,6 @@
 import { actions } from '../actions';
 import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
-import { Action, isType } from 'redux-typescript-actions';
+import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import * as Parser from 'upad-parse/dist/index.js';
 import 'rxjs/add/observable/of';
@@ -156,10 +156,19 @@ const renameNotepad$ = (action$, store) =>
 		map((res: {newTitle: string, oldTitle: string}) => actions.renameNotepad.done({params: res.newTitle, result: res.oldTitle}))
 	);
 
+const renameNotepadDone$ = (action$, store) =>
+	action$
+		.pipe(
+			filter((action: Action<Success<string, string>>) => isType(action, actions.renameNotepad.done)),
+			map(() => store.getState().notepads.notepad.item),
+			map((notepad: INotepad) => actions.saveNotepad.started(notepad))
+		);
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	restoreJsonNotepad$,
 	exportNotepad$,
 	exportAll$,
-	renameNotepad$
+	renameNotepad$,
+	renameNotepadDone$
 );
