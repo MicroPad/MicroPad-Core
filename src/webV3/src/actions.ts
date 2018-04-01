@@ -23,6 +23,7 @@ export const actions = {
 	deleteNotepad: actionCreator<string>('DELETE_NOTEPAD'),
 	exportNotepad: actionCreator<void>('EXPORT_NOTEPAD'),
 	exportAll: actionCreator<void>('EXPORT_ALL_NOTEPADS'),
+	exportToMarkdown: actionCreator<void>('EXPORT_ALL_NOTEPADS_TO_MD'),
 	expandSection: actionCreator<string>('OPEN_SECTION'),
 	collapseSelection: actionCreator<string>('CLOSE_SECTION'),
 	search: actionCreator<string>('SEARCH'),

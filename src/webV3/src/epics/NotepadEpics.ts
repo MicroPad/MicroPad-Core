@@ -7,11 +7,16 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/empty';
 import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
-import { IAssets, INotepad, INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
+import {
+	IAsset,
+	IAssets, IMarkdownNote,
+	INotepad,
+	INotepadsStoreState,
+	INotepadStoreState
+} from '../types/NotepadTypes';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
-import { getNotepadXmlWithAssets, IExportedNotepad } from '../util';
 import * as JSZip from 'jszip';
 
 const parseNpx$ = action$ =>
@@ -60,6 +65,7 @@ const restoreJsonNotepad$ = action$ =>
 		filter((action: Action<string>) => isType(action, actions.restoreJsonNotepad)),
 		map((action: Action<string>) => action.payload),
 		map((json: string) => {
+			console.log(json);
 			try {
 				const res = JSON.parse(json);
 				const notepad: INotepad = Parser.restoreNotepad(res);
@@ -92,7 +98,7 @@ const exportNotepad$ = (action$, store) =>
 			Observable.fromPromise(getNotepadXmlWithAssets(notepad))
 		),
 		tap((exportedNotepad: IExportedNotepad) => {
-			const blob = new Blob([exportedNotepad.xml], { type: 'text/xml;charset=utf-8' });
+			const blob = new Blob([exportedNotepad.content], { type: 'text/xml;charset=utf-8' });
 			saveAs(blob, `${exportedNotepad.title}.npx`);
 		}),
 		map(() => actions.empty(undefined))
@@ -128,8 +134,57 @@ const exportAll$ = (action$, store) =>
 			const zip: JSZip = new JSZip();
 
 			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
-				const blob: Blob = new Blob([exportedNotepad.xml], { type: 'text/xml;charset=utf-8' });
+				const blob: Blob = new Blob([exportedNotepad.content], { type: 'text/xml;charset=utf-8' });
 				zip.file(`${exportedNotepad.title}.npx`, blob);
+			});
+
+			zip.generateAsync({
+				type: 'blob',
+				compression: 'DEFLATE'
+			}).then((blob: Blob) => {
+				saveAs(blob, `notepads.zip`);
+			});
+		}),
+		map(() => actions.empty(undefined))
+	);
+
+const exportAllToMarkdown$ = (action$, store) =>
+	action$.pipe(
+		filter((action: Action<void>) => isType(action, actions.exportToMarkdown)),
+		map(() => store.getState()),
+		map((state: IStoreState) => state.notepads),
+		filter(Boolean),
+		map((state: INotepadsStoreState) => state.savedNotepadTitles),
+		filter(Boolean),
+		switchMap((titles: string[]) => {
+			const notepadsInStorage: Promise<string>[] = [];
+			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
+
+			return Observable.fromPromise(Promise.all(notepadsInStorage));
+		}),
+		switchMap((notepads: string[]) => {
+			const pendingContent: Promise<IExportedNotepad>[] = [];
+			notepads.forEach((notepadJSON: string) => {
+				const res = JSON.parse(notepadJSON);
+				const notepad: INotepad = Parser.restoreNotepad(res);
+				notepad.notepadAssets = res.notepadAssets;
+				debugger;
+
+				pendingContent.push(getNotepadMarkdownWithAssets(notepad));
+			});
+
+			return Observable.fromPromise(Promise.all(pendingContent));
+		}),
+		tap((exportNotepads: IExportedNotepad[]) => {
+			const zip: JSZip = new JSZip();
+
+			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
+				(<IMarkdownNote[]> exportedNotepad.content).forEach(mdNote =>
+					zip.file(
+						`${exportedNotepad.title}/${mdNote.title}.md`,
+						new Blob([mdNote.md], { type: 'text/markdown;charset=utf-8' })
+					)
+				);
 			});
 
 			zip.generateAsync({
@@ -156,10 +211,10 @@ const renameNotepad$ = (action$, store) =>
 		map((res: {newTitle: string, oldTitle: string}) => actions.renameNotepad.done({params: res.newTitle, result: res.oldTitle}))
 	);
 
-const renameNotepadDone$ = (action$, store) =>
+const saveNotepadOnRenameOrNew$ = (action$, store) =>
 	action$
 		.pipe(
-			filter((action: Action<Success<string, string>>) => isType(action, actions.renameNotepad.done)),
+			filter((action: Action<Success<any, any>>) => isType(action, actions.renameNotepad.done) || isType(action, actions.parseNpx.done)),
 			map(() => store.getState().notepads.notepad.item),
 			map((notepad: INotepad) => actions.saveNotepad.started(notepad))
 		);
@@ -170,5 +225,68 @@ export const notepadEpics$ = combineEpics(
 	exportNotepad$,
 	exportAll$,
 	renameNotepad$,
-	renameNotepadDone$
+	saveNotepadOnRenameOrNew$,
+	exportAllToMarkdown$
 );
+
+interface IExportedNotepad {
+	title: string;
+	content: string | IMarkdownNote[];
+}
+
+function getNotepadXmlWithAssets(notepad: INotepad): Promise<IExportedNotepad> {
+	return new Promise<IExportedNotepad>((resolve, reject) => {
+		try {
+			getAssets(notepad.notepadAssets)
+				.then((assets: IAssets) => notepad.toXML((xml: string) => {
+					notepad.assets = new Parser.Assets();
+					resolve({title: notepad.title, content: xml});
+				}, assets))
+				.catch((err) => reject(err));
+		} catch (err) {
+			reject(err);
+		}
+	});
+}
+
+function getNotepadMarkdownWithAssets(notepad: INotepad): Promise<IExportedNotepad> {
+	return new Promise<IExportedNotepad>((resolve, reject) => {
+		try {
+			getAssets(notepad.notepadAssets)
+				.then((assets: IAssets) => notepad.toMarkdown((md: IMarkdownNote[]) => {
+					notepad.assets = new Parser.Assets();
+					resolve({title: notepad.title, content: md});
+				}, assets))
+				.catch((err) => reject(err));
+		} catch (err) {
+			reject(err);
+		}
+	});
+}
+
+function getAssets(notepadAssets: string[]): Promise<IAssets> {
+	return new Promise<IAssets>(resolve => {
+		const assets: IAssets = new Parser.Assets();
+
+		if (!notepadAssets || notepadAssets.length === 0) {
+			resolve(assets);
+			return;
+		}
+
+		const resolvedAssets: Promise<Blob>[] = [];
+		for (let uuid of notepadAssets) {
+			resolvedAssets.push(ASSET_STORAGE.getItem(uuid));
+		}
+
+		Promise.all(resolvedAssets)
+			.then((blobs: Blob[]) => {
+				blobs.forEach((blob: Blob, i: number) => {
+					let asset: IAsset = new Parser.Asset(blob);
+					asset.uuid = notepadAssets[i];
+					assets.addAsset(asset);
+				});
+
+				resolve(assets);
+			});
+	});
+}
