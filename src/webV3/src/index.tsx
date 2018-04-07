@@ -17,6 +17,7 @@ import { Provider } from 'react-redux';
 import HeaderComponent from './containers/header/HeaderContainer';
 import NotepadExplorerComponent from './containers/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
+import { enableKeyboardShortcuts } from './shortcuts';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -60,4 +61,5 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
 		await localforage.setItem('hasRunBefore', true);
 	});
 
+enableKeyboardShortcuts(store);
 registerServiceWorker();
