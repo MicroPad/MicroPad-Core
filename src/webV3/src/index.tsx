@@ -17,7 +17,6 @@ import { Provider } from 'react-redux';
 import HeaderComponent from './containers/header/HeaderContainer';
 import NotepadExplorerComponent from './containers/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
-import { MiscRx } from './MiscRx';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -30,12 +29,12 @@ const store = createStore<IStoreState>(
 	baseReducer.reducer,
 	baseReducer.initialState,
 	composeWithDevTools(applyMiddleware(epicMiddleware)));
-export const miscRx: MiscRx = new MiscRx(store);
 
 export const NOTEPAD_STORAGE = localforage.createInstance({
 	name: 'MicroPad',
 	storeName: 'notepads'
 });
+
 export const ASSET_STORAGE = localforage.createInstance({
 		name: 'MicroPad',
 		storeName: 'assets'
@@ -62,4 +61,3 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
 	});
 
 registerServiceWorker();
-miscRx.initSubscriptions();

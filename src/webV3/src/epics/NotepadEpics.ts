@@ -65,7 +65,6 @@ const restoreJsonNotepad$ = action$ =>
 		filter((action: Action<string>) => isType(action, actions.restoreJsonNotepad)),
 		map((action: Action<string>) => action.payload),
 		map((json: string) => {
-			console.log(json);
 			try {
 				const res = JSON.parse(json);
 				const notepad: INotepad = Parser.restoreNotepad(res);
@@ -168,7 +167,6 @@ const exportAllToMarkdown$ = (action$, store) =>
 				const res = JSON.parse(notepadJSON);
 				const notepad: INotepad = Parser.restoreNotepad(res);
 				notepad.notepadAssets = res.notepadAssets;
-				debugger;
 
 				pendingContent.push(getNotepadMarkdownWithAssets(notepad));
 			});

@@ -1,17 +1,4 @@
-import { IAsset, IAssets, INote, INotepad, ISection } from './types/NotepadTypes';
-import * as Parser from 'upad-parse/dist/index';
-import { ASSET_STORAGE } from './index';
-
-export function stringify(obj: object) {
-	const seen: any[] = [];
-	return JSON.stringify(obj, (key, val) => {
-		if (val != null && typeof val === 'object') {
-			if (seen.indexOf(val) > -1) return;
-			seen.push(val);
-		}
-		return val;
-	});
-}
+import { INote, INotepad, ISection } from './types/NotepadTypes';
 
 export function restoreObject<T>(objectToRestore: T, template: T): T {
 	objectToRestore['__proto__'] = { ...template['__proto__'] };

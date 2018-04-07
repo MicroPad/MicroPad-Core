@@ -15,8 +15,6 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 	public reducer(state: INotepadsStoreState, action: Action): INotepadsStoreState {
 		if (isType(action, actions.parseNpx.done)) {
 			const result = action.payload.result;
-			console.log(result.notepadAssets);
-			debugger;
 
 			return {
 				...state,
