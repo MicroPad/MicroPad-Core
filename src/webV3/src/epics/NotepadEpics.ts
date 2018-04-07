@@ -9,7 +9,8 @@ import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import {
 	IAsset,
-	IAssets, IMarkdownNote,
+	IAssets,
+	IMarkdownNote,
 	INotepad,
 	INotepadsStoreState,
 	INotepadStoreState

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { SYNC_NAME } from '../../types';
-import { Dropdown, Icon, NavItem, Modal, Row, Col } from 'react-materialize';
+import { Col, Dropdown, Icon, Modal, NavItem, Row } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
 import * as Parser from 'upad-parse/dist/index.js';
 import { INotepad } from '../../types/NotepadTypes';
