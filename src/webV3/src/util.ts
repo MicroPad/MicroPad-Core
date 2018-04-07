@@ -59,3 +59,15 @@ export function dataURItoBlob(dataURI: string) {
 	// write the ArrayBuffer to a blob, and you're done
 	return new Blob([ab], { type: mimeString });
 }
+
+// Thanks to https://gist.github.com/nmsdvid/8807205
+export function debounce(callback: (...args: any[]) => void, time: number) {
+	let interval;
+	return (...args) => {
+		clearTimeout(interval);
+		interval = setTimeout(() => {
+			interval = null;
+			callback(...args);
+		}, time);
+	};
+}

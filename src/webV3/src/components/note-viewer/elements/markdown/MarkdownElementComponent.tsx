@@ -9,6 +9,8 @@ import { fromEvent } from 'rxjs/observable/fromEvent';
 import { filter, first, map, share } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import TodoListComponent from './TodoListComponent';
+import { debounce } from '../../../../util';
+import { Subscription } from 'rxjs/Subscription';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -29,6 +31,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private editBox: HTMLTextAreaElement;
 	private converter: Converter;
 	private escapeHit$: Observable<number>;
+	private escapeHitSub: Subscription;
+	private readonly updateWithDebounce: (element: NoteElement) => void;
 
 	constructor(props: IMarkdownElementComponentProps, state: object) {
 		super(props, state);
@@ -51,6 +55,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				filter(keyCode => keyCode === 27),
 				share()
 			);
+
+		this.updateWithDebounce = this.createUpdateWithDebounce();
 	}
 
 	render() {
@@ -93,7 +99,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 								}
 							}
 							ref={input => this.editBox = input!}
-							value={element.content}
+							defaultValue={element.content}
 							onChange={this.onElementEdit} />
 					}
 				</div>
@@ -121,12 +127,16 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		} else if (!!this.editBox) {
 			this.editBox.onkeydown = enableTabs;
 
-			this.escapeHit$
+			this.escapeHitSub = this.escapeHit$
 				.pipe(first())
 				.subscribe(() => {
 					edit('');
 				});
 		}
+	}
+
+	componentWillUpdate() {
+		if (!!this.escapeHitSub) this.escapeHitSub.unsubscribe();
 	}
 
 	componentDidMount() {
@@ -142,12 +152,14 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	}
 
 	private onElementEdit = (event) => {
-		const { element, updateElement } = this.props;
+		const { element } = this.props;
 
-		updateElement!(element.args.id, {
+		const newElement: NoteElement = {
 			...element,
 			content: event.target.value
-		});
+		};
+
+		this.updateWithDebounce(newElement);
 	}
 
 	private generateHtml = (element: NoteElement): Promise<string> => {
@@ -195,6 +207,14 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private sendMessage = (message: IMarkdownViewMessage) => {
 		if (!this.iframe) return;
 		this.iframe.contentWindow.postMessage(message, '*');
+	}
+
+	private createUpdateWithDebounce = () => {
+		const { updateElement } = this.props;
+
+		return debounce((element: NoteElement) => {
+			updateElement!(element.args.id, element);
+		}, 100);
 	}
 
 	private configureExtensions = () => {
