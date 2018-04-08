@@ -263,7 +263,7 @@ function getNotepadMarkdownWithAssets(notepad: INotepad): Promise<IExportedNotep
 	});
 }
 
-function getAssets(notepadAssets: string[]): Promise<IAssets> {
+export function getAssets(notepadAssets: string[]): Promise<IAssets> {
 	return new Promise<IAssets>(resolve => {
 		const assets: IAssets = new Parser.Assets();
 

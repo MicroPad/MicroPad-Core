@@ -18,6 +18,7 @@ import HeaderComponent from './containers/header/HeaderContainer';
 import NotepadExplorerComponent from './containers/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './shortcuts';
+import { OldSyncHandler } from './old-sync/OldSyncHandler';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -61,5 +62,6 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()])
 		await localforage.setItem('hasRunBefore', true);
 	});
 
+new OldSyncHandler(store);
 enableKeyboardShortcuts(store);
 registerServiceWorker();
