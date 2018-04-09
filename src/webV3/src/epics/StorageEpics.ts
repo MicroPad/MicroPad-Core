@@ -37,10 +37,7 @@ const saveOnChanges$ = (action$, store) =>
 			return condition;
 		}),
 		map((notepad: INotepad) => {
-			return actions.saveNotepad.started({
-				...notepad,
-				lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ')
-			});
+			return actions.saveNotepad.started(notepad);
 		})
 	);
 

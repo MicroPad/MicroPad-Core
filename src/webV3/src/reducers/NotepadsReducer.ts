@@ -5,6 +5,8 @@ import { actions } from '../actions';
 import { isType } from 'redux-typescript-actions';
 import { getNotepadObjectByRef, restoreObject } from '../util';
 import * as Parser from 'upad-parse/dist/index.js';
+import { format } from 'date-fns';
+import * as stringify from 'json-stringify-safe';
 
 export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 	public readonly key: string = 'notepads';
@@ -105,7 +107,8 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 		} else if (isType(action, actions.renameNotepad.done)) {
 			const notepad = <INotepad> restoreObject(<INotepad> {
 				...state.notepad!.item!,
-				title: action.payload.params
+				title: action.payload.params,
+				lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ')
 			}, Parser.createNotepad(action.payload.params));
 			notepad.sections = notepad.sections.map((section: ISection) => {
 				section.parent = notepad;
@@ -124,7 +127,7 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				]
 			};
 		} else if (isType(action, actions.deleteNotepadObject)) {
-			let newNotepad = { ...state.notepad!.item! };
+			let newNotepad = { ...state.notepad!.item!, lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ') };
 			newNotepad = getNotepadObjectByRef(newNotepad, action.payload, (obj) => {
 				if (!!(<ISection> obj).notes) {
 					// Delete a section
@@ -148,7 +151,7 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				}
 			};
 		} else if (isType(action, actions.renameNotepadObject)) {
-			let newNotepad = { ...state.notepad!.item! };
+			let newNotepad = { ...state.notepad!.item!, lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ') };
 			newNotepad = getNotepadObjectByRef(newNotepad, action.payload.internalRef, (obj) => {
 				if (!!(<ISection> obj).notes) {
 					// Rename a section
@@ -195,15 +198,21 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				}
 			};
 		} else if (isType(action, actions.checkNoteAssets.done)) {
+			const newNotepad = restoreObject<INotepad>({ ...action.payload.result }, Parser.createNotepad(''));
+			if (stringify(state.notepad!.item) !== stringify(action.payload.result)) newNotepad.lastModified = format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ');
+
 			return {
 				...state,
 				notepad: {
 					...state.notepad!,
-					item: restoreObject<INotepad>({ ...action.payload.result }, Parser.createNotepad(''))
+					item: newNotepad
 				}
 			};
 		} else if (isType(action, actions.updateElement)) {
-			const newNotepad = getNotepadObjectByRef({ ...state.notepad!.item! }, action.payload.noteRef, (obj) => {
+			const newNotepad = getNotepadObjectByRef({
+				...state.notepad!.item!,
+				lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ')
+			}, action.payload.noteRef, (obj) => {
 				// Rename a note
 				const section = <ISection> obj.parent;
 				const index = section.notes.indexOf(<INote> obj);
