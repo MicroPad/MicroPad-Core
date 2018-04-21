@@ -25,7 +25,9 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepad
 		deleteNotepadObject: internalId => dispatch(actions.deleteNotepadObject(internalId)),
 		renameNotepadObject: params => dispatch(actions.renameNotepadObject(params)),
 		expandAll: () => dispatch(actions.expandAllExplorer.started(undefined)),
-		collapseAll: () => dispatch(actions.collapseAllExplorer(undefined))
+		collapseAll: () => dispatch(actions.collapseAllExplorer(undefined)),
+		newSection: obj => dispatch(actions.newSection(obj)),
+		newNote: obj => dispatch(actions.newNote(obj))
 	};
 }
 

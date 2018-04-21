@@ -1,6 +1,6 @@
 import actionCreatorFactory from 'redux-typescript-actions';
 import { INote, INotepad, IRenameNotepadObjectAction, NoteElement } from './types/NotepadTypes';
-import { IUpdateElementAction } from './types/ActionTypes';
+import { INewNotepadObjectAction, IUpdateElementAction } from './types/ActionTypes';
 
 const actionCreator = actionCreatorFactory();
 
@@ -35,5 +35,7 @@ export const actions = {
 	collapseAllExplorer: actionCreator<void>('COLLAPSE_ALL_EXPLORER'),
 	openEditor: actionCreator<string>('OPEN_EDITOR'),
 	updateElement: actionCreator<IUpdateElementAction>('UPDATE_ELEMENT'),
-	updateDefaultFontSize: actionCreator<string>('UPDATE_DEFAULT_FONT_SIZE')
+	updateDefaultFontSize: actionCreator<string>('UPDATE_DEFAULT_FONT_SIZE'),
+	newSection: actionCreator<INewNotepadObjectAction>('NEW_SECTION'),
+	newNote: actionCreator<INewNotepadObjectAction>('NEW_NOTE')
 };

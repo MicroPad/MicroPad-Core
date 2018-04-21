@@ -1,10 +1,11 @@
 import * as React from 'react';
 import './NotepadExplorerComponent.css';
-import { INote, INotepad, IRenameNotepadObjectAction, ISection } from '../../types/NotepadTypes';
+import { INote, INotepad, IParent, IRenameNotepadObjectAction, ISection } from '../../types/NotepadTypes';
 import { Icon } from 'react-materialize';
 import TreeView from 'react-treeview';
 import { generateGuid } from '../../util';
 import ExplorerOptionsComponent from './ExplorerOptionsComponent';
+import { INewNotepadObjectAction } from '../../types/ActionTypes';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: INotepad;
@@ -21,6 +22,8 @@ export interface INotepadExplorerComponentProps {
 	collapseSection?: (guid: string) => void;
 	expandAll?: () => void;
 	collapseAll?: () => void;
+	newSection?: (obj: INewNotepadObjectAction) => void;
+	newNote?: (obj: INewNotepadObjectAction) => void;
 }
 
 export default class NotepadExplorerComponent extends React.Component<INotepadExplorerComponentProps> {
@@ -68,8 +71,8 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 							(<a href="#!" onClick={expandAll}>Expand All</a> | <a href="#!" onClick={collapseAll}>Collapse All</a>)
 						</p>
 
-						<div className="explorer-note add-button" key={generateGuid()}>
-							<a href="#!" style={{ color: 'white' }}> <Icon>add</Icon> Section</a>
+						<div className="explorer-note add-button" key={generateGuid()} style={{margin: 0}}>
+							<a href="#!" style={{ color: 'white' }} onClick={() => this.newNotepadObject('section', notepad)}> <Icon>add</Icon> Section</a>
 						</div>
 
 						{treeViews}
@@ -77,6 +80,20 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 				}
 			</div>
 		);
+	}
+
+	private newNotepadObject = (type: 'note' | 'section', parent: IParent) => {
+		const { newNote, newSection } = this.props;
+		const title = prompt('Title:');
+
+		if (title) {
+			const action: INewNotepadObjectAction = {
+				title,
+				parent
+			};
+
+			(type === 'note') ? newNote!(action) : newSection!(action);
+		}
 	}
 
 	private generateSectionTreeView(section: ISection): JSX.Element {
@@ -123,8 +140,8 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 					</span>}
 				collapsed={!this.openSections.has(section.internalRef)}>
 				<div className="explorer-note add-button" key={generateGuid()}>
-					<a href="#!" style={{ color: 'white', paddingRight: '3px' }}><Icon>add</Icon> Note </a>
-					<a href="#!" style={{ color: 'white', paddingLeft: '3px' }}> <Icon>add</Icon> Section</a>
+					<a href="#!" style={{ color: 'white', paddingRight: '3px' }} onClick={() => this.newNotepadObject('note', section)}><Icon>add</Icon> Note </a>
+					<a href="#!" style={{ color: 'white', paddingLeft: '3px' }} onClick={() => this.newNotepadObject('section', section)}> <Icon>add</Icon> Section</a>
 				</div>
 
 				{childSections}

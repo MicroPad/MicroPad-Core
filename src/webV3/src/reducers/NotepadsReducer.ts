@@ -1,6 +1,6 @@
 import { IReducer } from '../types/ReducerType';
 import { Action } from 'redux';
-import { INote, INotepad, INotepadsStoreState, ISection } from '../types/NotepadTypes';
+import { INote, INotepad, INotepadsStoreState, IParent, ISection } from '../types/NotepadTypes';
 import { actions } from '../actions';
 import { isType } from 'redux-typescript-actions';
 import { getNotepadObjectByRef, restoreObject } from '../util';
@@ -237,6 +237,59 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				notepad: {
 					...state.notepad!,
 					item: notepad
+				}
+			};
+		} else if (isType(action, actions.newSection)) {
+			const newObj = action.payload;
+
+			const newSection = Parser.createSection(newObj.title);
+			newSection.parent = newObj.parent;
+
+			const newParent: IParent = {
+				...newObj.parent,
+				sections: [
+					...newObj.parent.sections,
+					newSection
+				]
+			};
+
+			if (!newParent.internalRef) {
+				// Adding to the root notepad
+				return {
+					...state,
+					notepad: {
+						...state.notepad!,
+						item: restoreObject<INotepad>(<INotepad> newParent, Parser.createNotepad(''))
+					}
+				};
+			} else {
+				const newNotepad = getNotepadObjectByRef({ ...state.notepad!.item! }, newParent.internalRef, obj => {
+					(<ISection> obj).addSection(newSection);
+					return obj;
+				});
+
+				return {
+					...state,
+					notepad: {
+						...state.notepad!,
+						item: restoreObject<INotepad>(newNotepad, Parser.createNotepad(''))
+					}
+				};
+			}
+		} else if (isType(action, actions.newNote)) {
+			const newObj = action.payload;
+
+			const newNote = Parser.createNote(newObj.title, []);
+			const newNotepad = getNotepadObjectByRef({ ...state.notepad!.item! }, newObj.parent.internalRef!, obj => {
+				(<ISection> obj).addNote(newNote);
+				return obj;
+			});
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					item: restoreObject<INotepad>(newNotepad, Parser.createNotepad(''))
 				}
 			};
 		}
