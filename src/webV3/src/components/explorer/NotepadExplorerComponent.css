@@ -6,6 +6,12 @@
 	overflow: auto;
 	color: #fff;
 	border-left: 2px solid #ffb300;
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .tree-view_children {
@@ -53,6 +59,14 @@
 
 .explorer-note > span > .material-icons {
 	padding-right: 5px;
+}
+
+.add-button > a > .material-icons {
+	vertical-align: bottom;
+}
+
+.add-button {
+	margin: 0;
 }
 
 .explorer-note > span > a:nth-child(2) {

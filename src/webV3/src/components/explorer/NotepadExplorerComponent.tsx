@@ -67,6 +67,11 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						<p style={{paddingLeft: '10px', marginTop: '0px'}}>
 							(<a href="#!" onClick={expandAll}>Expand All</a> | <a href="#!" onClick={collapseAll}>Collapse All</a>)
 						</p>
+
+						<div className="explorer-note add-button" key={generateGuid()}>
+							<a href="#!" style={{ color: 'white' }}> <Icon>add</Icon> Section</a>
+						</div>
+
 						{treeViews}
 					</div>
 				}
@@ -117,6 +122,11 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 							renameNotepadObject={renameNotepadObject}/>
 					</span>}
 				collapsed={!this.openSections.has(section.internalRef)}>
+				<div className="explorer-note add-button" key={generateGuid()}>
+					<a href="#!" style={{ color: 'white', paddingRight: '3px' }}><Icon>add</Icon> Note </a>
+					<a href="#!" style={{ color: 'white', paddingLeft: '3px' }}> <Icon>add</Icon> Section</a>
+				</div>
+
 				{childSections}
 				{childNotes}
 			</TreeView>
