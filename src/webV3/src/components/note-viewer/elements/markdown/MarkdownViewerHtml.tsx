@@ -33,6 +33,8 @@ export namespace MarkDownViewer {
 
 		h1, h2, h3, h4, h5, h6 {
 			font-weight: 400;
+			margin: 10px;
+			line-height: 110%;
 		}
 
 		table {
