@@ -2,6 +2,9 @@ import * as React from 'react';
 import { Autocomplete, Collection, CollectionItem, Icon, Modal, NavItem, Row } from 'react-materialize';
 import { INote, INotepad } from '../../types/NotepadTypes';
 import { generateGuid } from '../../util';
+import { fromEvent } from 'rxjs/observable/fromEvent';
+import { shareReplay } from 'rxjs/operators';
+import { Subscription } from 'rxjs/Subscription';
 
 export interface ISearchComponentProps {
 	notepad: INotepad;
@@ -14,6 +17,7 @@ export interface ISearchComponentProps {
 export default class SearchComponent extends React.Component<ISearchComponentProps> {
 	private mappedNotesToOptions: INote[];
 	private autoCompleteOptions: object;
+	private triggerClickedSub: Subscription;
 
 	render() {
 		const { notepad, query, hashTagResults, loadNote } = this.props;
@@ -36,6 +40,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 				trigger={<NavItem id={`search-button`} href="#!"><Icon left={true}>search</Icon> Search</NavItem>}>
 				<Row>
 					<Autocomplete
+						id="search-input"
 						s={12}
 						title="Search by note title or a hashtag"
 						onChange={this.onInput}
@@ -53,6 +58,31 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 				}
 			</Modal>
 		);
+	}
+
+	componentDidMount() {
+		this.componentDidUpdate();
+	}
+
+	componentDidUpdate() {
+		const searchTrigger = document.getElementById('search-button');
+		if (!searchTrigger) return;
+
+		if (!!this.triggerClickedSub) this.triggerClickedSub.unsubscribe();
+		this.triggerClickedSub = fromEvent(searchTrigger, 'click')
+			.pipe(
+				shareReplay()
+			)
+			.subscribe(() => {
+				const input = document.getElementById('search-input');
+				if (!input) return;
+
+				setTimeout(() => input.focus(), 0);
+			});
+	}
+
+	componentWillUnmount() {
+		this.triggerClickedSub.unsubscribe();
 	}
 
 	private onInput = (event, value: string) => {
