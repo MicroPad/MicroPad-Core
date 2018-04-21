@@ -11,6 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
 import { Subscription } from 'rxjs/Subscription';
+import { Input } from 'react-materialize';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -77,6 +78,17 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					type: 'toggle',
 					payload: {}
 				})} />
+
+				{
+					isEditing &&
+					<div style={{paddingLeft: '5px', paddingRight: '5px'}}>
+						<Input
+							label="Font Size"
+							defaultValue={element.args.fontSize}
+							onChange={this.onFontSizeEdit}
+						/>
+					</div>
+				}
 				<div>
 					{
 						!isEditing
@@ -157,6 +169,20 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		const newElement: NoteElement = {
 			...element,
 			content: event.target.value
+		};
+
+		this.updateWithDebounce(newElement);
+	}
+
+	private onFontSizeEdit = (event) => {
+		const { element } = this.props;
+
+		const newElement: NoteElement = {
+			...element,
+			args: {
+				...element.args,
+				fontSize: event.target.value
+			}
 		};
 
 		this.updateWithDebounce(newElement);

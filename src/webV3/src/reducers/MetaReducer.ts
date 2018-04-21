@@ -13,7 +13,8 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 			patch: 0,
 			status: 'dev'
 		},
-		isFullScreen: false
+		isFullScreen: false,
+		defaultFontSize: '16px'
 	};
 
 	public reducer(state: IMetaStoreState, action: Action): IMetaStoreState {
@@ -21,6 +22,11 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 			return {
 				...state,
 				isFullScreen: !state.isFullScreen
+			};
+		} else if (isType(action, actions.updateDefaultFontSize)) {
+			return {
+				...state,
+				defaultFontSize: action.payload
 			};
 		}
 

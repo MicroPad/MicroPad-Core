@@ -4,11 +4,13 @@ import { Action, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/fromPromise';
-import { INotepad, INotepadStoreState } from '../types/NotepadTypes';
+import { INote, INotepad, INotepadStoreState, NoteElement } from '../types/NotepadTypes';
 import { NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
-import { format } from 'date-fns';
 import * as stringify from 'json-stringify-safe';
+import { ICurrentNoteState } from '../reducers/NoteReducer';
+import { getNotepadObjectByRef } from '../util';
+import * as localforage from 'localforage';
 
 let currentNotepadTitle = '';
 
@@ -39,6 +41,26 @@ const saveOnChanges$ = (action$, store) =>
 		map((notepad: INotepad) => {
 			return actions.saveNotepad.started(notepad);
 		})
+	);
+
+const saveDefaultFontSize$ = (action$, store) =>
+	action$.pipe(
+		map(() => store.getState()),
+		map((state: IStoreState) => [state.notepads.notepad, state.currentNote]),
+		filter(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => !!notepad && !!notepad.item && !!current && current.ref.length > 0),
+		map(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => {
+			let note: INote | false = false;
+			getNotepadObjectByRef(notepad.item!, current.ref, obj => note = <INote> obj);
+
+			return [note, current.elementEditing];
+		}),
+		filter(([note, id]: [INote, string]) => !!note && id.length > 0),
+		map(([note, id]: [INote, string]) => note.elements.filter((element: NoteElement) => element.args.id === id)[0]),
+		map((element: NoteElement) => element.args.fontSize),
+		filter(Boolean),
+		distinctUntilChanged(),
+		tap((fontSize: string) => localforage.setItem('font size', fontSize)),
+		map((fontSize: string) => actions.updateDefaultFontSize(fontSize))
 	);
 
 const getNotepadList$ = action$ =>
@@ -79,5 +101,6 @@ export const storageEpics$ = combineEpics(
 	getNotepadList$,
 	openNotepadFromStorage$,
 	deleteNotepad$,
-	saveOnChanges$
+	saveOnChanges$,
+	saveDefaultFontSize$
 );

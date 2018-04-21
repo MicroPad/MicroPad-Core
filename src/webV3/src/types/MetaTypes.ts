@@ -1,6 +1,7 @@
 export interface IMetaStoreState {
 	version: IVersion;
 	isFullScreen: boolean;
+	defaultFontSize: string;
 }
 
 export interface IVersion {
