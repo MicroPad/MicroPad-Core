@@ -7,6 +7,7 @@ export namespace MarkDownViewer {
 		html, body, #content {
 			margin: 0;
 			padding: 0;
+			overflow-x: hidden;
 		}
 
 		#content {
