@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-04-24T23:31:13.354+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
+<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-04-25T00:07:09.158+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
 µPad, also known as *MicroPad*, is a note taking application that is built upon the principles of power and openness.
 
 µPad acts like a whiteboard to take notes on, rather than a linear metaphor, like a page.
 
-*Last Updated for µPad v2.6.12-beta*</markdown></note><note title="Licence" time="2017-05-02T17:17:13.512+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px">The licence for µPad and included works can be found [here](https://github.com/NickGeek/MicroPad/blob/master/LICENSE).</markdown></note></section><section title="General Use"><note title="µPad Text Formatting Guide for People in a Hurry" time="2017-05-02T17:15:33.650+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="727px" height="auto" fontSize="16px"><![CDATA[µPad uses *[GitHub Flavoured Markdown](https://guides.github.com/features/mastering-markdown/)* as a base for its formatting, so feel free to read their guide for a more complete tutorial. There is a pretty good chance you have used Markdown before, it's the formatting system on [Reddit](https://reddit.com), [Discord](https://discordapp.com), and more.
+*Last Updated for µPad v3.0.0-beta (DRAFT)*</markdown></note><note title="Licence" time="2017-05-02T17:17:13.512+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px">The licence for µPad and included works can be found [here](https://github.com/NickGeek/MicroPad/blob/master/LICENSE).</markdown></note></section><section title="General Use"><note title="µPad Text Formatting Guide for People in a Hurry" time="2017-05-02T17:15:33.650+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="727px" height="auto" fontSize="16px"><![CDATA[µPad uses *[GitHub Flavoured Markdown](https://guides.github.com/features/mastering-markdown/)* as a base for its formatting, so feel free to read their guide for a more complete tutorial. There is a pretty good chance you have used Markdown before, it's the formatting system on [Reddit](https://reddit.com), [Discord](https://discordapp.com), and more.
 
 ## The Basics
 ### Creating a new line
@@ -133,13 +133,9 @@ For more powerful maths you can always use ;;\LaTeX;; like so:
 
 ;;a^2 = b^2 + c^2;;]]></markdown></note><note title="Keyboard Shortcuts" time="2017-05-02T17:34:32.349+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px">| Shortcut | Use |
 |--|--|
-| S | If a notepad is open, creates a section. |
-| N | If a section is open, creates a note. |
-| F | If a note is open, hides the *Notepad Explorer*. |
-| E | If a note is open, opens the editor for the last edited element. |
+| F | Goes fullscreen |
 | Ctrl+F/⌘+F | If a notepad is open, search that notepad for a note. |
-| Ctrl+P/⌘+P | If a note is open, opens the Print/Export to PDF dialog |
-| Ctrl+[1... 9]/⌘+[1... 9] | Navigates through the layers of what is open. |</markdown></note><note title="Notepad Structure" time="2017-10-29T21:43:39.056+13:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px"># Notepad
+| Ctrl+P/⌘+P | If a note is open, opens the Print/Export to PDF dialog |</markdown></note><note title="Notepad Structure" time="2017-10-29T21:43:39.056+13:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px"># Notepad
 - Can have ''oo'' sections in it
 - Can not have any notes directly in it
 

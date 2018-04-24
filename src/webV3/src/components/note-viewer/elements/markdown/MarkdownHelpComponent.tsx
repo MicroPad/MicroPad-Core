@@ -6,6 +6,7 @@ import * as Parser from 'upad-parse';
 import helpNpx from '!raw-loader!../../../../assets/Help.npx';
 import { Converter, extension } from 'showdown';
 import { IShowdownOpts } from './MarkdownElementComponent';
+import './MarkdownHelpComponent.css';
 
 export default class MarkdownHelpComponent extends React.Component {
 	render() {
@@ -20,7 +21,7 @@ export default class MarkdownHelpComponent extends React.Component {
 					type: 'lang',
 					regex: /(===([^]+?)===|''([^]+?)''|;;([^]+?);;)/gi,
 					replace: function(s: string, match: string) {
-						matches.push('&lt;Maths not displaying in this view. See the help notepad.&gt;<br />' + match);
+						matches.push('&lt;Maths won\'t display in this view. See the help notepad.&gt;<br />' + match);
 						let n = matches.length - 1;
 						return '%ph' + n + 'ph%';
 					}
@@ -56,7 +57,11 @@ export default class MarkdownHelpComponent extends React.Component {
 				header={mdGuide.title}
 				trigger={<a href="#!">Formatting Help</a>}
 				fixedFooter={true}>
-				<div dangerouslySetInnerHTML={{ __html: html }} />
+				<div id="markdown-help" dangerouslySetInnerHTML={{
+					__html: html
+						.split('<ul>').join('<ul class="browser-default">')
+						.split('<li>').join('<li class="browser-default">')
+				}} />
 			</Modal>
 		);
 	}
