@@ -272,7 +272,7 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 					...state,
 					notepad: {
 						...state.notepad!,
-						item: restoreObject<INotepad>(newNotepad, Parser.createNotepad(''))
+						item: restoreObject<INotepad>({ ...newNotepad, lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ')}, Parser.createNotepad(''))
 					}
 				};
 			}
@@ -280,7 +280,10 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 			const newObj = action.payload;
 
 			const newNote = Parser.createNote(newObj.title, []);
-			const newNotepad = getNotepadObjectByRef({ ...state.notepad!.item! }, newObj.parent.internalRef!, obj => {
+			const newNotepad = getNotepadObjectByRef({
+				...state.notepad!.item!,
+				lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ')
+			}, newObj.parent.internalRef!, obj => {
 				(<ISection> obj).addNote(newNote);
 				return obj;
 			});

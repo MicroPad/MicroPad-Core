@@ -20,7 +20,7 @@
 		"react-materialize": "^1.1.2",
 		"react-promise": "^2.0.2",
 		"react-redux": "^5.0.6",
-		"react-scripts-ts": "2.13.0",
+		"react-scripts-ts": "^2.15.1",
 		"react-treeview": "^0.4.7",
 		"redux": "^3.7.2",
 		"redux-devtools-extension": "^2.13.2",
@@ -52,8 +52,9 @@
 		"@types/showdown": "^1.7.3",
 		"enzyme": "^3.3.0",
 		"enzyme-adapter-react-16": "^1.1.1",
+		"raw-loader": "^0.5.1",
 		"react-addons-test-utils": "^15.6.2",
-		"react-scripts": "^1.1.0",
+		"react-scripts": "^1.1.4",
 		"typescript": "^2.7.1"
 	}
 }

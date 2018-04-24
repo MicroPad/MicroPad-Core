@@ -12,6 +12,7 @@ import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
 import { Subscription } from 'rxjs/Subscription';
 import { Input } from 'react-materialize';
+import MarkdownHelpComponent from './MarkdownHelpComponent';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -23,7 +24,7 @@ interface IMarkdownViewMessage {
 	payload?: any;
 }
 
-interface IShowdownOpts extends ConverterOptions {
+export interface IShowdownOpts extends ConverterOptions {
 	emoji: boolean;
 }
 
@@ -89,6 +90,9 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 						/>
 					</div>
 				}
+
+				{isEditing && <MarkdownHelpComponent />}
+
 				<div>
 					{
 						!isEditing
@@ -111,6 +115,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 								}
 							}
 							ref={input => this.editBox = input!}
+							placeholder="Text (in Markdown)"
 							defaultValue={element.content}
 							onChange={this.onElementEdit} />
 					}
@@ -278,7 +283,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					type: 'lang',
 					regex: /''([^]+?)''/gi,
 					replace: function(s: string, match: string) {
-						matches.push(`===${match}===`);
+						matches.push(`''${match}''`);
 						let n = matches.length - 1;
 						return '%PLACEHOLDER4' + n + 'ENDPLACEHOLDER4%';
 					}

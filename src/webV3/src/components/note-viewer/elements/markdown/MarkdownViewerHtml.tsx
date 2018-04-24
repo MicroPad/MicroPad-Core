@@ -1,5 +1,8 @@
+// @ts-ignore
+import MathJax from '!raw-loader!../../../../assets/MathJax.js';
+
 export namespace MarkDownViewer {
-	export const getHtml = (id: string): string => `<!DOCTYPE html>
+	export const getHtml = (id: string, initialContent?: string, doInitialMathJaxRender?: boolean): string => `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
@@ -82,9 +85,27 @@ export namespace MarkDownViewer {
 			display: none;
 		}
 	</style>
+	
+	<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			root: '/assets/mathjax',
+			jax: ['input/AsciiMath', 'input/TeX', 'output/SVG'],
+			extensions: ['tex2jax.js', 'asciimath2jax.js'],
+			messageStyle: 'none',
+			tex2jax: {
+				inlineMath: [[';;', ';;']]
+			},
+			asciimath2jax: {
+				delimiters: [['===', '==='], ["''", "''"]]
+			},
+			showMathMenu: false,
+			skipStartupTypeset: ${(!doInitialMathJaxRender) ? 'true' : 'false'}
+		});
+	</script>
+	<script>${MathJax}</script>
 </head>
 <body>
-<div id="content"></div>
+<div id="content">${(!!initialContent) ? initialContent : ''}</div>
 
 <script>
 	var content = document.getElementById('content');
@@ -309,23 +330,6 @@ export namespace MarkDownViewer {
 		}
 
 	};
-</script>
-
-<script src="/assets/mathjax/MathJax.js"></script>
-<script>
-	MathJax.Hub.Config({
-		jax: ['input/AsciiMath', 'input/TeX', 'output/SVG'],
-		extensions: ['Safe.js', 'tex2jax.js', 'asciimath2jax.js'],
-		messageStyle: 'none',
-		tex2jax: {
-			inlineMath: [[';;', ';;']]
-		},
-		asciimath2jax: {
-			delimiters: [['===', '===']]
-		},
-		showMathMenu: false,
-		skipStartupTypeset: true
-	});
 </script>
 </body>
 </html>`;
