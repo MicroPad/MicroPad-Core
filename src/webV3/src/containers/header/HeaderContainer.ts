@@ -13,7 +13,7 @@ export function mapStateToProps({ notepads, meta }: IStoreState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 	return {
-		getHelp: () => dispatch(actions.getHelp.started(undefined)),
+		getHelp: () => dispatch(actions.getHelp(undefined)),
 		flipFullScreenState: () => dispatch(actions.flipFullScreenState(undefined))
 	};
 }

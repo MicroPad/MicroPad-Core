@@ -10,7 +10,7 @@ export const actions = {
 	parseNpx: actionCreator.async<string, INotepad, any>('PARSE_NPX'),
 	saveNotepad: actionCreator.async<INotepad, void, any>('SAVE_NOTEPAD'),
 	getNotepadList: actionCreator.async<void, string[], any>('GET_NOTEPAD_LIST'),
-	getHelp: actionCreator.async<void, string, any>('GET_HELP'),
+	downloadNotepad: actionCreator.async<void, string, any>('DOWNLOAD_NOTEPAD'),
 	openNotepadFromStorage: actionCreator.async<string, void, any>('OPEN_NOTEPAD_FROM_STORAGE'),
 	renameNotepad: actionCreator.async<string, string, any>('RENAME_NOTEPAD'),
 	checkNoteAssets: actionCreator.async<[string, NoteElement[]], INotepad, any>('CHECK_NOTE_ASSETS'),
@@ -37,5 +37,6 @@ export const actions = {
 	updateElement: actionCreator<IUpdateElementAction>('UPDATE_ELEMENT'),
 	updateDefaultFontSize: actionCreator<string>('UPDATE_DEFAULT_FONT_SIZE'),
 	newSection: actionCreator<INewNotepadObjectAction>('NEW_SECTION'),
-	newNote: actionCreator<INewNotepadObjectAction>('NEW_NOTE')
+	newNote: actionCreator<INewNotepadObjectAction>('NEW_NOTE'),
+	getHelp: actionCreator<void>('GET_HELP')
 };

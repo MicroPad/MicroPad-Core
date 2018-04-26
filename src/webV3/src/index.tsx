@@ -59,7 +59,7 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), localforage.getItem
 	))
 	.then(() => localforage.getItem('hasRunBefore'))
 	.then(async (hasRunBefore: boolean) => {
-		if (!hasRunBefore) store.dispatch(actions.getHelp.started(undefined));
+		if (!hasRunBefore) store.dispatch(actions.getHelp(undefined));
 		await localforage.setItem('hasRunBefore', true);
 	});
 
