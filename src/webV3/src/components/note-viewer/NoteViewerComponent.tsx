@@ -3,6 +3,9 @@ import './NoteViewerComponent.css';
 import { INote, NoteElement } from '../../types/NotepadTypes';
 import NoteElementComponent from './elements/NoteElementComponent';
 import * as Materialize from 'materialize-css/dist/js/materialize.js';
+import { Observable } from 'rxjs/Observable';
+import { filter, map } from 'rxjs/operators';
+import { fromEvent } from 'rxjs/observable/fromEvent';
 
 export interface INoteViewerComponentProps {
 	isFullscreen: boolean;
@@ -18,6 +21,17 @@ export interface INoteViewerComponentProps {
 export default class NoteViewerComponent extends React.Component<INoteViewerComponentProps> {
 	private viewerDiv: HTMLDivElement;
 	private containerDiv: HTMLDivElement;
+	private escapeHit$: Observable<number>;
+
+	constructor(props: INoteViewerComponentProps) {
+		super(props);
+
+		this.escapeHit$ = fromEvent(document, 'keyup')
+			.pipe(
+				map((event: KeyboardEvent) => event.keyCode),
+				filter(keyCode => keyCode === 27)
+			);
+	}
 
 	render() {
 		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement} = this.props;
@@ -58,6 +72,15 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				</div>
 			</div>
 		);
+	}
+
+	componentDidMount() {
+		const { edit } = this.props;
+
+		this.escapeHit$
+			.subscribe(() => {
+				edit!('');
+			});
 	}
 
 	private handleEmptyClick = (event) => {

@@ -5,12 +5,8 @@ import { NoteElement } from '../../../../types/NotepadTypes';
 import { MarkDownViewer } from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
-import { fromEvent } from 'rxjs/observable/fromEvent';
-import { filter, first, map, share } from 'rxjs/operators';
-import { Observable } from 'rxjs/Observable';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
-import { Subscription } from 'rxjs/Subscription';
 import { Input } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
 
@@ -32,8 +28,6 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private iframe: HTMLIFrameElement;
 	private editBox: HTMLTextAreaElement;
 	private converter: Converter;
-	private escapeHit$: Observable<number>;
-	private escapeHitSub: Subscription;
 	private readonly updateWithDebounce: (element: NoteElement) => void;
 
 	constructor(props: IMarkdownElementComponentProps, state: object) {
@@ -50,13 +44,6 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			emoji: true,
 			extensions: ['maths', 'quick-maths', 'graphs', 'hashtags']
 		} as IShowdownOpts);
-
-		this.escapeHit$ = fromEvent(document, 'keyup')
-			.pipe(
-				map((event: KeyboardEvent) => event.keyCode),
-				filter(keyCode => keyCode === 27),
-				share()
-			);
 
 		this.updateWithDebounce = this.createUpdateWithDebounce();
 	}
@@ -125,7 +112,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	}
 
 	componentDidUpdate(props: INoteElementComponentProps) {
-		const { element, edit } = props;
+		const { element } = props;
 
 		if (!!this.iframe) {
 			this.iframe.onload = () => {
@@ -143,17 +130,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			};
 		} else if (!!this.editBox) {
 			this.editBox.onkeydown = enableTabs;
-
-			this.escapeHitSub = this.escapeHit$
-				.pipe(first())
-				.subscribe(() => {
-					edit('');
-				});
 		}
-	}
-
-	componentWillUpdate() {
-		if (!!this.escapeHitSub) this.escapeHitSub.unsubscribe();
 	}
 
 	componentDidMount() {
