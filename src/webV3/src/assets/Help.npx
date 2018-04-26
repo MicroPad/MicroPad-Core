@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-04-25T00:07:09.158+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
+<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-04-26T18:59:29.849+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
 µPad, also known as *MicroPad*, is a note taking application that is built upon the principles of power and openness.
 
 µPad acts like a whiteboard to take notes on, rather than a linear metaphor, like a page.
 
-*Last Updated for µPad v3.0.0-beta (DRAFT)*</markdown></note><note title="Licence" time="2017-05-02T17:17:13.512+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px">The licence for µPad and included works can be found [here](https://github.com/NickGeek/MicroPad/blob/master/LICENSE).</markdown></note></section><section title="General Use"><note title="µPad Text Formatting Guide for People in a Hurry" time="2017-05-02T17:15:33.650+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="727px" height="auto" fontSize="16px"><![CDATA[µPad uses *[GitHub Flavoured Markdown](https://guides.github.com/features/mastering-markdown/)* as a base for its formatting, so feel free to read their guide for a more complete tutorial. There is a pretty good chance you have used Markdown before, it's the formatting system on [Reddit](https://reddit.com), [Discord](https://discordapp.com), and more.
+*Last Updated for µPad v3.0.0-dev (DRAFT)*</markdown></note><note title="Licence" time="2017-05-02T17:17:13.512+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px">The licence for µPad and included works can be found [here](https://github.com/NickGeek/MicroPad/blob/master/LICENSE) and [here for webv3](https://github.com/NickGeek/MicroPad/blob/webv3/src/webV3/LICENCE.md).</markdown></note></section><section title="General Use"><note title="µPad Text Formatting Guide for People in a Hurry" time="2017-05-02T17:15:33.650+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="727px" height="auto" fontSize="16px"><![CDATA[µPad uses *[GitHub Flavoured Markdown](https://guides.github.com/features/mastering-markdown/)* as a base for its formatting, so feel free to read their guide for a more complete tutorial. There is a pretty good chance you have used #Markdown before, it's the formatting system on [Reddit](https://reddit.com), [Discord](https://discordapp.com), and more.
 
 ## The Basics
 ### Creating a new line
@@ -133,27 +133,28 @@ For more powerful maths you can always use ;;\LaTeX;; like so:
 
 ;;a^2 = b^2 + c^2;;]]></markdown></note><note title="Keyboard Shortcuts" time="2017-05-02T17:34:32.349+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px">| Shortcut | Use |
 |--|--|
-| F | Goes fullscreen |
+| F | Shows/hides the *Notepad Explorer* (side-bar) |
 | Ctrl+F/⌘+F | If a notepad is open, search that notepad for a note. |
 | Ctrl+P/⌘+P | If a note is open, opens the Print/Export to PDF dialog |</markdown></note><note title="Notepad Structure" time="2017-10-29T21:43:39.056+13:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px"># Notepad
-- Can have ''oo'' sections in it
-- Can not have any notes directly in it
+Notepads act like the binder that everything else goes in.
+
+Inside a notepad you can have as many sections as you want.
 
 ## Section
-- Can have ''oo'' sections in it (as sub-sections)
-- Can have ''oo'' notes in it
+Sections are the parents of notes and more sections. You can have as many notes as you like in a section, and as many sub-sections as you would like.
+
+By nesting sections you can create a well organised notepad.
 
 ### Note
-- Infinite canvas
-- Can have ''oo'' elements on it
+Notes are like a whiteboard, you can put an element anywhere on the page. There is no limit to how many elements you can have on a note, or how wide/long a note can be.
 
 #### Element
-- Appear as boxes on the note
+- Appear as cards on the note
 - Can be
-	- text
-	- images
-	- drawings
-	- recordings
+	- Text (formatted with #markdown)
+	- Images
+	- Drawings
+	- Recordings
 	- and more</markdown></note></section><section title="Development"><section title="Open Notepad XML (NPX)"><note title="Introduction" time="2017-05-02T18:58:58.581+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="700px" height="auto" fontSize="16px"><![CDATA[Note: *the following guidelines will work but were written before the asset system was introduced.*
 
 The *Open Notepad XML* Format (also known as NPX) is an XML based format with an XSD schema available [here](https://getmicropad.com/schema.xsd). An example notepad using this format (with comments) can be found [here](https://github.com/NickGeek/MicroPad/blob/master/examples/Example%20Notepad.npx).
@@ -163,5 +164,7 @@ NPX is designed to  be highly extensible. When you could be adding features to a
 | Markdown | Markdown text. Making the feature as compatible with GitHub Markdown as possible is a bonus. |
 | Images | Display images stored inside the tag as base64 |
 | Drawings | Display drawings as images and automatically crop out unused space. Allowing editing of drawings is a bonus. |
-| Files | Embed files inside the tag as base64
-| Recordings | Recordings should be stored inside the tag as base64. MicroPad uses Opus. |</markdown></note></section></section></notepad>
+| Files | Embed files inside the tag as base64 |
+| Recordings | Recordings should be stored inside the tag as base64. MicroPad uses Opus. |
+
+*N.B. Binary asset handling changed as of µPad v2. More information coming soon.*</markdown></note></section></section></notepad>

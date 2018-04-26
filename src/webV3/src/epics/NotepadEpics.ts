@@ -22,7 +22,6 @@ import * as JSZip from 'jszip';
 import { isAction } from '../util';
 import { ajax } from 'rxjs/observable/dom/ajax';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
-import * as QueryString from 'querystring';
 
 const parseNpx$ = action$ =>
 	action$.pipe(
