@@ -1,4 +1,9 @@
 import { INote, INotepad, ISection } from './types/NotepadTypes';
+import { Action, ActionCreator, AsyncActionCreators, isType } from 'redux-typescript-actions';
+import { filter } from 'rxjs/operators';
+
+export const isAction = (typeOfAction: ActionCreator<any>) =>
+	filter((action: Action<any>) => isType(action, typeOfAction));
 
 export function restoreObject<T>(objectToRestore: T, template: T): T {
 	objectToRestore['__proto__'] = { ...template['__proto__'] };

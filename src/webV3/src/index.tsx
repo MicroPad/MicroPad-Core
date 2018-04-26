@@ -19,6 +19,7 @@ import NotepadExplorerComponent from './containers/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './shortcuts';
 import { OldSyncHandler } from './old-sync/OldSyncHandler';
+import * as QueryString from 'querystring';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -61,6 +62,10 @@ Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), localforage.getItem
 	.then(async (hasRunBefore: boolean) => {
 		if (!hasRunBefore) store.dispatch(actions.getHelp(undefined));
 		await localforage.setItem('hasRunBefore', true);
+	})
+	.then(() => {
+		const downloadNotepadUrl = QueryString.parse(location.search.slice(1)).download;
+		if (!!downloadNotepadUrl && typeof downloadNotepadUrl === 'string') store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
 	});
 
 new OldSyncHandler(store);

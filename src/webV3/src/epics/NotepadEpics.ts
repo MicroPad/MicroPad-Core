@@ -1,5 +1,5 @@
 import { actions } from '../actions';
-import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, mergeMap, retry, switchMap, tap } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import * as Parser from 'upad-parse/dist/index.js';
@@ -19,6 +19,10 @@ import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
 import * as JSZip from 'jszip';
+import { isAction } from '../util';
+import { ajax } from 'rxjs/observable/dom/ajax';
+import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
+import * as QueryString from 'querystring';
 
 const parseNpx$ = action$ =>
 	action$.pipe(
@@ -218,6 +222,32 @@ const saveNotepadOnRenameOrNew$ = (action$, store) =>
 			map((notepad: INotepad) => actions.saveNotepad.started(notepad))
 		);
 
+const downloadExternalNotepad$ = action$ =>
+	action$.pipe(
+		isAction(actions.downloadNotepad.started),
+		map((action: Action<string>) => action.payload),
+		map(url => [url, confirm(`Are you sure you want to download this notepad: ${url}?`)]),
+		filter(([url, shouldDownload]: [string, boolean]) => shouldDownload),
+		map(([url]: [string]) => url),
+		mergeMap((url: string) =>
+			ajax({
+				url,
+				crossDomain: true,
+				headers: {
+					'Content-Type': 'text/plain; charset=UTF-8'
+				},
+				responseType: 'text'
+			}).pipe(
+				map((res: AjaxResponse) => actions.parseNpx.started(res.response)),
+				retry(2),
+				catchError(err => {
+					alert(`Download failed. Are you online?`);
+					return Observable.of(actions.downloadNotepad.failed({ params: url, error: err }));
+				})
+			)
+		)
+	);
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	restoreJsonNotepad$,
@@ -225,7 +255,8 @@ export const notepadEpics$ = combineEpics(
 	exportAll$,
 	renameNotepad$,
 	saveNotepadOnRenameOrNew$,
-	exportAllToMarkdown$
+	exportAllToMarkdown$,
+	downloadExternalNotepad$
 );
 
 interface IExportedNotepad {

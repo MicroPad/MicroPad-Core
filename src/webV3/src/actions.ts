@@ -10,7 +10,7 @@ export const actions = {
 	parseNpx: actionCreator.async<string, INotepad, any>('PARSE_NPX'),
 	saveNotepad: actionCreator.async<INotepad, void, any>('SAVE_NOTEPAD'),
 	getNotepadList: actionCreator.async<void, string[], any>('GET_NOTEPAD_LIST'),
-	downloadNotepad: actionCreator.async<void, string, any>('DOWNLOAD_NOTEPAD'),
+	downloadNotepad: actionCreator.async<string, string, any>('DOWNLOAD_NOTEPAD'),
 	openNotepadFromStorage: actionCreator.async<string, void, any>('OPEN_NOTEPAD_FROM_STORAGE'),
 	renameNotepad: actionCreator.async<string, string, any>('RENAME_NOTEPAD'),
 	checkNoteAssets: actionCreator.async<[string, NoteElement[]], INotepad, any>('CHECK_NOTE_ASSETS'),
