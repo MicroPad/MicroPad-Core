@@ -9,6 +9,7 @@ import saveAs from 'save-as';
 import { ASSET_STORAGE } from '../index';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { IUpdateElementAction } from '../types/ActionTypes';
+import { IStoreState } from '../types';
 
 const loadNote$ = (action$, store) =>
 	action$.pipe(
@@ -95,15 +96,27 @@ const binaryElementUpdate$ = action$ =>
 						ext: guid
 					}
 				}
-			})
+			}),
+			actions.reloadNote(undefined)
 		])
+	);
+
+const reloadNote$ = (action$, store) =>
+	action$.pipe(
+		isAction(actions.reloadNote),
+		map(() => store.getState()),
+		map((state: IStoreState) => state.currentNote.ref),
+		filter((noteRef: string) => !!noteRef && noteRef.length > 0),
+		map((noteRef: string) => actions.loadNote.started(noteRef))
+
 	);
 
 export const noteEpics$ = combineEpics(
 	loadNote$,
 	checkNoteAssets$,
 	downloadAsset$,
-	binaryElementUpdate$
+	binaryElementUpdate$,
+	reloadNote$
 );
 
 function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {

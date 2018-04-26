@@ -39,5 +39,6 @@ export const actions = {
 	newSection: actionCreator<INewNotepadObjectAction>('NEW_SECTION'),
 	newNote: actionCreator<INewNotepadObjectAction>('NEW_NOTE'),
 	getHelp: actionCreator<void>('GET_HELP'),
-	trackAsset: actionCreator<string>('TRACK_ASSET')
+	trackAsset: actionCreator<string>('TRACK_ASSET'),
+	reloadNote: actionCreator<void>('RELOAD_NOTE')
 };
