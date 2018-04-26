@@ -38,5 +38,6 @@ export const actions = {
 	updateDefaultFontSize: actionCreator<string>('UPDATE_DEFAULT_FONT_SIZE'),
 	newSection: actionCreator<INewNotepadObjectAction>('NEW_SECTION'),
 	newNote: actionCreator<INewNotepadObjectAction>('NEW_NOTE'),
-	getHelp: actionCreator<void>('GET_HELP')
+	getHelp: actionCreator<void>('GET_HELP'),
+	trackAsset: actionCreator<string>('TRACK_ASSET')
 };

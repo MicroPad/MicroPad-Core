@@ -32,11 +32,12 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 		search: query => dispatch(actions.search(query)),
 		downloadAsset: (filename, uuid) => dispatch(actions.downloadAsset.started({ filename, uuid })),
 		edit: id => dispatch(actions.openEditor(id)),
-		updateElement: (id, changes) => dispatch(
+		updateElement: (id, changes, newAsset) => dispatch(
 			actions.updateElement({
 				elementId: id,
 				element: changes,
-				noteRef: noteRef
+				noteRef,
+				newAsset
 			})
 		)
 	};

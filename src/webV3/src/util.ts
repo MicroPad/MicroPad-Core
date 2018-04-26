@@ -1,5 +1,5 @@
 import { INote, INotepad, ISection } from './types/NotepadTypes';
-import { Action, ActionCreator, AsyncActionCreators, isType } from 'redux-typescript-actions';
+import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
 
 export const isAction = (typeOfAction: ActionCreator<any>) =>

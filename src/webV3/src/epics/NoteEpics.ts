@@ -3,11 +3,12 @@ import { filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { IAsset, INote, INotepad, INotepadStoreState, NoteElement } from '../types/NotepadTypes';
-import { dataURItoBlob, getNotepadObjectByRef } from '../util';
+import { dataURItoBlob, generateGuid, getNotepadObjectByRef, isAction } from '../util';
 import * as Parser from 'upad-parse/dist/index.js';
 import saveAs from 'save-as';
 import { ASSET_STORAGE } from '../index';
 import { fromPromise } from 'rxjs/observable/fromPromise';
+import { IUpdateElementAction } from '../types/ActionTypes';
 
 const loadNote$ = (action$, store) =>
 	action$.pipe(
@@ -70,6 +71,41 @@ const downloadAsset$ = action$ =>
 		map(([blob, filename]: [Blob, string]) => actions.downloadAsset.done({ params: { filename, uuid: '' }, result: undefined }))
 	);
 
+const binaryElementUpdate$ = action$ =>
+	action$.pipe(
+		isAction(actions.updateElement),
+		map((action: Action<IUpdateElementAction>) => action.payload),
+		filter((params: IUpdateElementAction) => !!params.newAsset),
+		switchMap((params: IUpdateElementAction) =>
+			fromPromise(
+				ASSET_STORAGE.setItem(params.element.args.ext || generateGuid(), params.newAsset)
+					.then(() => [params, params.element.args.ext || generateGuid()])
+			)
+		),
+		mergeMap(([params, guid]: [IUpdateElementAction, string]) => [
+			actions.trackAsset(guid),
+			actions.updateElement({
+				elementId: params.elementId,
+				noteRef: params.noteRef,
+				element: {
+					...params.element,
+					content: 'AS',
+					args: {
+						...params.element.args,
+						ext: guid
+					}
+				}
+			})
+		])
+	);
+
+export const noteEpics$ = combineEpics(
+	loadNote$,
+	checkNoteAssets$,
+	downloadAsset$,
+	binaryElementUpdate$
+);
+
 function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {
 	const storageRequests: Promise<Blob>[] = [];
 	const blobRefs: string[] = [];
@@ -103,9 +139,3 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 			})
 	);
 }
-
-export const noteEpics$ = combineEpics(
-	loadNote$,
-	checkNoteAssets$,
-	downloadAsset$
-);

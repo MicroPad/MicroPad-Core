@@ -15,7 +15,7 @@ export interface INoteViewerComponentProps {
 	edit?: (id: string) => void;
 	search?: (query: string) => void;
 	downloadAsset?: (filename: string, uuid: string) => void;
-	updateElement?: (id: string, changes: NoteElement) => void;
+	updateElement?: (id: string, changes: NoteElement, newAsset?: Blob) => void;
 }
 
 export default class NoteViewerComponent extends React.Component<INoteViewerComponentProps> {

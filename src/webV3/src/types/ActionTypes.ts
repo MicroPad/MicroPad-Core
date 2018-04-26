@@ -4,6 +4,7 @@ export interface IUpdateElementAction {
 	noteRef: string;
 	elementId: string;
 	element: NoteElement;
+	newAsset?: Blob;
 }
 
 export interface INewNotepadObjectAction {
