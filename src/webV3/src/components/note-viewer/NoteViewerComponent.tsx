@@ -77,10 +77,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	componentDidMount() {
 		const { edit } = this.props;
 
-		this.escapeHit$
-			.subscribe(() => {
-				edit!('');
-			});
+		this.escapeHit$.subscribe(() => edit!(''));
 	}
 
 	private handleEmptyClick = (event) => {
