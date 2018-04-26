@@ -143,7 +143,7 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 		Promise.all(storageRequests)
 			.then((blobs: Blob[]) => {
 				const blobUrls = {};
-				blobs.forEach((blob, i) => blobUrls[blobRefs[i]] = URL.createObjectURL(blob));
+				blobs.filter(b => !!b).forEach((blob, i) => blobUrls[blobRefs[i]] = URL.createObjectURL(blob));
 
 				resolve({
 					elements,

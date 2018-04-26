@@ -6,6 +6,8 @@ import * as Materialize from 'materialize-css/dist/js/materialize.js';
 import { Observable } from 'rxjs/Observable';
 import { filter, map } from 'rxjs/operators';
 import { fromEvent } from 'rxjs/observable/fromEvent';
+import { IInsertElementState } from '../../reducers/NoteReducer';
+import InsertElementComponent from '../../containers/InsertElementContainer';
 
 export interface INoteViewerComponentProps {
 	isFullscreen: boolean;
@@ -16,6 +18,7 @@ export interface INoteViewerComponentProps {
 	search?: (query: string) => void;
 	downloadAsset?: (filename: string, uuid: string) => void;
 	updateElement?: (id: string, changes: NoteElement, newAsset?: Blob) => void;
+	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
 }
 
 export default class NoteViewerComponent extends React.Component<INoteViewerComponentProps> {
@@ -34,7 +37,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	render() {
-		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement} = this.props;
+		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
 
 		const classes: string = (!note || note.elements.length === 0) ? 'empty' : '';
 		let styles = {};
@@ -67,7 +70,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 
 		return (
 			<div id="note-viewer" className={classes} style={styles} ref={div => this.viewerDiv = div!} onClick={this.handleEmptyClick}>
-				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}  onClick={this.handleEmptyClick}>
+				{!!note && <InsertElementComponent />}
+				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}>
 					{elements}
 				</div>
 			</div>
@@ -81,9 +85,17 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	private handleEmptyClick = (event) => {
-		const { note, edit } = this.props;
+		const { note, edit, elementEditing, toggleInsertMenu } = this.props;
 		if (!note || (event.target !== this.viewerDiv && event.target !== this.containerDiv)) return;
 
-		edit!('');
+		if (elementEditing.length === 0) {
+			// Insert a new element
+			toggleInsertMenu!({
+				x: event.clientX,
+				y: event.clientY - 128
+			});
+		} else {
+			edit!('');
+		}
 	}
 }

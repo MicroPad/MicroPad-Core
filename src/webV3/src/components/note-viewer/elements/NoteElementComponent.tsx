@@ -24,12 +24,12 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 		const containerStyles = {
 			left: element.args.x,
 			top: element.args.y,
-			zIndex: (element.args.id === elementEditing) ? 5000 : undefined,
-			backgroundColor: (element.args.id === elementEditing) ? 'white' : undefined
+			zIndex: (element.args.id === elementEditing) ? 5000 : undefined
 		};
 
 		const elementStyles = {
-			width: element.args.width
+			width: element.args.width,
+			backgroundColor: (element.args.id === elementEditing) ? 'white' : undefined
 		};
 
 		let elementComponent: JSX.Element | undefined = undefined;

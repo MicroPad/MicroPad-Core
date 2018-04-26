@@ -39,7 +39,8 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 				noteRef,
 				newAsset
 			})
-		)
+		),
+		toggleInsertMenu: opts => dispatch(actions.toggleInsertMenu(opts))
 	};
 }
 

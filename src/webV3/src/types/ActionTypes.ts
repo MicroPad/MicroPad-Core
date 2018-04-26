@@ -11,3 +11,8 @@ export interface INewNotepadObjectAction {
 	title: string;
 	parent: IParent;
 }
+
+export interface IInsertElementAction {
+	noteRef: string;
+	element: NoteElement;
+}

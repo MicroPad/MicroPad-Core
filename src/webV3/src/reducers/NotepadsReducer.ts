@@ -213,7 +213,6 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				...state.notepad!.item!,
 				lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ')
 			}, action.payload.noteRef, (obj) => {
-				// Rename a note
 				const section = <ISection> obj.parent;
 				const index = section.notes.indexOf(<INote> obj);
 
@@ -312,6 +311,37 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				notepad: {
 					...state.notepad!,
 					item: newNotepad,
+				}
+			};
+		} else if (isType(action, actions.insertElement)) {
+			const newNotepad = getNotepadObjectByRef({
+				...state.notepad!.item!,
+				lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ')
+			}, action.payload.noteRef, (obj) => {
+				const section = <ISection> obj.parent;
+				const index = section.notes.indexOf(<INote> obj);
+
+				const newElements = [
+					...section.notes[index].elements,
+					action.payload.element
+				];
+
+				section.notes[index] = restoreObject<INote>({
+					...section.notes[index],
+					elements: newElements
+
+				}, Parser.createNote(''));
+
+				return section.notes[index];
+			});
+
+			const notepad = <INotepad> restoreObject({ ...newNotepad }, Parser.createNotepad(newNotepad.title));
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					item: notepad
 				}
 			};
 		}

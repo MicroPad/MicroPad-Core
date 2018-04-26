@@ -3,10 +3,17 @@ import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 
+export interface IInsertElementState {
+	x: number;
+	y: number;
+	enabled: boolean;
+}
+
 export interface ICurrentNoteState {
 	ref: string;
 	assetUrls: object;
 	elementEditing: string;
+	insertElement: IInsertElementState;
 }
 
 export class NoteReducer implements IReducer<ICurrentNoteState> {
@@ -14,7 +21,12 @@ export class NoteReducer implements IReducer<ICurrentNoteState> {
 	public readonly initialState: ICurrentNoteState = {
 		ref: '',
 		assetUrls: {},
-		elementEditing: ''
+		elementEditing: '',
+		insertElement: {
+			x: 0,
+			y: 0,
+			enabled: false
+		}
 	};
 
 	public reducer(state: ICurrentNoteState, action: Action): ICurrentNoteState {
@@ -44,6 +56,15 @@ export class NoteReducer implements IReducer<ICurrentNoteState> {
 			return {
 				...state,
 				elementEditing: action.payload
+			};
+		} else if (isType(action, actions.toggleInsertMenu)) {
+			return {
+				...state,
+				insertElement: {
+					...state.insertElement,
+					enabled: !state.insertElement.enabled,
+					...action.payload
+				}
 			};
 		}
 
