@@ -18,6 +18,7 @@
 		"query-string": "^6.0.0",
 		"react": "^16.2.0",
 		"react-dom": "^16.2.0",
+		"react-draggable": "^3.0.5",
 		"react-materialize": "^1.1.2",
 		"react-promise": "^2.0.2",
 		"react-redux": "^5.0.6",

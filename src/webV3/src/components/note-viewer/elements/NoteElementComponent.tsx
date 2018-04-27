@@ -8,6 +8,7 @@ import RecordingElement from './RecordingElementComponent';
 import DrawingElementComponent from './drawing/DrawingElementComponent';
 import { INoteViewerComponentProps } from '../NoteViewerComponent';
 import { Button, Row, Icon } from 'react-materialize';
+import Draggable, { DraggableData } from 'react-draggable';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
@@ -20,12 +21,12 @@ export interface INoteElementComponentProps extends Partial<INoteViewerComponent
 }
 
 export default class NoteElementComponent extends React.Component<INoteElementComponentProps> {
+	private element: HTMLDivElement;
+
 	render() {
 		const { element, noteAssets, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
 
 		const containerStyles = {
-			left: element.args.x,
-			top: element.args.y,
 			zIndex: (element.args.id === elementEditing) ? 5000 : undefined
 		};
 
@@ -99,19 +100,44 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 		}
 
 		return (
-			<div className="noteElement" style={containerStyles}>
-				<div className="z-depth-2 hoverable" style={elementStyles}>
-					<p className="handle">::::</p>
-					{!!elementComponent && elementComponent}
-					{
-						!!elementComponent && element.args.id === elementEditing &&
-						<Row style={{paddingLeft: '5px'}}>
-							<Button className="red" waves="light" onClick={this.delete}><Icon left={true}>delete_forever</Icon> Delete</Button>
-						</Row>
-					}
+			<Draggable
+				onStart={() => {
+					if (navigator.vibrate) navigator.vibrate(100);
+				}}
+				onStop={this.handleDrag}
+				defaultPosition={{ x: parseInt(element.args.x, 10), y: parseInt(element.args.y, 10) }}
+				handle=".handle">
+				<div className="noteElement" style={containerStyles} ref={e => this.element = e!}>
+					<div className="z-depth-2 hoverable" style={elementStyles}>
+						<p className="handle">::::</p>
+						{!!elementComponent && elementComponent}
+						{
+							!!elementComponent && element.args.id === elementEditing &&
+							<Row style={{paddingLeft: '5px'}}>
+								<Button className="red" waves="light" onClick={this.delete}><Icon left={true}>delete_forever</Icon> Delete</Button>
+							</Row>
+						}
+					</div>
 				</div>
-			</div>
+			</Draggable>
 		);
+	}
+
+	private handleDrag = (event: Event, data: DraggableData) => {
+		const { element, updateElement } = this.props;
+		if (data.x < 0) data.x = 0;
+		if (data.y < 0) data.y = 0;
+
+		updateElement!(element.args.id, {
+			...element,
+			args: {
+				...element.args,
+				x: data.x + 'px',
+				y: data.y + 'px'
+			}
+		});
+
+		// this.element.style.transform = '';
 	}
 
 	private delete = () => {
