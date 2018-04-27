@@ -112,6 +112,7 @@ export namespace MarkDownViewer {
 	var id = '${id}';
 	var element;
 	var showHidden = true;
+	var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
 	window.addEventListener('message', handleMessage);
 	
@@ -198,7 +199,7 @@ export namespace MarkDownViewer {
 			style.appendChild(document.createTextNode('table { width: max-content; }'));
 			document.head.appendChild(style);
 
-			content.style.width = 'max-content';
+			content.style.width = (!isFirefox) ? 'max-content' : '-moz-max-content';
 
 			var computedWidth = parseInt(window.getComputedStyle(content, null).getPropertyValue('width'), 10) + 10 + 'px';
 			content.style.width = computedWidth;
