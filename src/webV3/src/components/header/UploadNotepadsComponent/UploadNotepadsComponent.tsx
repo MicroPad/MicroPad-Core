@@ -6,6 +6,7 @@ import * as JSZip from 'jszip';
 
 export interface IUploadNotepadsComponentProps {
 	parseNpx?: (xml: string) => void;
+	parseEnex?: (enex: string) => void;
 }
 
 export default class UploadNotepadsComponent extends React.Component<IUploadNotepadsComponentProps> {
@@ -25,7 +26,7 @@ export default class UploadNotepadsComponent extends React.Component<IUploadNote
 	}
 
 	private onUploadChanged = (event: SyntheticEvent<HTMLInputElement>) => {
-		const { parseNpx } = this.props;
+		const { parseNpx, parseEnex } = this.props;
 		const fileName = event.currentTarget.files![0].name;
 		const ext = fileName.split('.').pop()!.toLowerCase();
 
@@ -51,6 +52,13 @@ export default class UploadNotepadsComponent extends React.Component<IUploadNote
 										.then(xml => parseNpx!(xml));
 								}
 							});
+					});
+				break;
+
+			case 'enex':
+				this.readFileInputEventAsText(event)
+					.then(xml => {
+						parseEnex!(xml);
 					});
 				break;
 

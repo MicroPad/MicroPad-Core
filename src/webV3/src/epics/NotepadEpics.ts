@@ -66,6 +66,28 @@ const parseNpx$ = action$ =>
 		})
 	);
 
+const parseEnex$ = action$ =>
+	action$.pipe(
+		isAction(actions.parseEnex),
+		map((action: Action<string>) => action.payload),
+		map((enex: string) => {
+			try {
+				Parser.parseFromEvernote(enex, ['asciimath']);
+			} catch (err) {
+				alert(`Error reading file`);
+				console.error(err);
+				return;
+			}
+
+			const notepad: INotepad = Parser.notepad;
+			notepad.notepadAssets = [];
+
+			return notepad;
+		}),
+		filter(Boolean),
+		map((notepad: INotepad) => actions.parseNpx.done({ params: '', result: notepad }))
+	);
+
 const restoreJsonNotepad$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.restoreJsonNotepad)),
@@ -264,9 +286,9 @@ const queueParseNpx$ = action$ =>
 const getNextParse$ = action$ =>
 	action$.pipe(
 		isAction(actions.parseNpx.done),
-		filter(() => parseQueue.length > 0),
 		tap(() => parseQueue.shift()),
-		filter((xml: string) => xml.length > 0),
+		filter(() => parseQueue.length > 0),
+		filter(() => parseQueue[0].length > 0),
 		map(() => actions.parseNpx.started(parseQueue[0]))
 	);
 
@@ -280,7 +302,8 @@ export const notepadEpics$ = combineEpics(
 	exportAllToMarkdown$,
 	downloadExternalNotepad$,
 	queueParseNpx$,
-	getNextParse$
+	getNextParse$,
+	parseEnex$
 );
 
 interface IExportedNotepad {

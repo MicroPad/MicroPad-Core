@@ -51,5 +51,6 @@ export const actions = {
 	insertElement: actionCreator<IInsertElementAction>('INSERT_ELEMENT'),
 	toggleInsertMenu: actionCreator<Partial<IInsertElementState>>('TOGGLE_INSERT_MENU'),
 	deleteElement: actionCreator<IDeleteElementAction>('DELETE_ELEMENT'),
-	queueParseNpx: actionCreator<string>('QUEUE_PARSE_NPX')
+	queueParseNpx: actionCreator<string>('QUEUE_PARSE_NPX'),
+	parseEnex: actionCreator<string>('PARSE_ENEX')
 };

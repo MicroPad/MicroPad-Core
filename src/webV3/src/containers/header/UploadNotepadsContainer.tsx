@@ -5,7 +5,8 @@ import { actions } from '../../actions';
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 	return {
-		parseNpx: (xml: string) => dispatch(actions.queueParseNpx(xml))
+		parseNpx: (xml: string) => dispatch(actions.queueParseNpx(xml)),
+		parseEnex: (enex: string) => dispatch(actions.parseEnex(enex))
 	};
 }
 
