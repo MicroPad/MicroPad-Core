@@ -3,7 +3,7 @@ import { INote, INotepad, IRenameNotepadObjectAction, NoteElement } from './type
 import {
 	IDeleteElementAction,
 	IInsertElementAction,
-	INewNotepadObjectAction,
+	INewNotepadObjectAction, IUpdateBibliographyAction,
 	IUpdateElementAction
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
@@ -52,5 +52,6 @@ export const actions = {
 	toggleInsertMenu: actionCreator<Partial<IInsertElementState>>('TOGGLE_INSERT_MENU'),
 	deleteElement: actionCreator<IDeleteElementAction>('DELETE_ELEMENT'),
 	queueParseNpx: actionCreator<string>('QUEUE_PARSE_NPX'),
-	parseEnex: actionCreator<string>('PARSE_ENEX')
+	parseEnex: actionCreator<string>('PARSE_ENEX'),
+	updateBibliography: actionCreator<IUpdateBibliographyAction>('UPDATE_BIBLIOGRAPHY')
 };

@@ -1,4 +1,4 @@
-import { IParent, NoteElement } from './NotepadTypes';
+import { IParent, NoteElement, Source } from './NotepadTypes';
 
 export interface IUpdateElementAction {
 	noteRef: string;
@@ -20,4 +20,9 @@ export interface IInsertElementAction {
 export interface IDeleteElementAction {
 	noteRef: string;
 	elementId: string;
+}
+
+export interface IUpdateBibliographyAction {
+	noteRef: string;
+	sources: Source[];
 }

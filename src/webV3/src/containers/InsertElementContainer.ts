@@ -9,11 +9,7 @@ import {
 	IInsertElementComponentProps
 } from '../components/note-viewer/InsertElementComponent';
 
-let noteRef: string = '';
-
 export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
-	noteRef = currentNote.ref;
-
 	let note = <INote> {};
 	if (currentNote.ref.length !== 0) {
 		getNotepadObjectByRef(notepads.notepad!.item!, currentNote.ref, obj => note = <INote> obj);

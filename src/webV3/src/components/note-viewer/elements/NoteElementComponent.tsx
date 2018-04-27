@@ -9,6 +9,7 @@ import DrawingElementComponent from './drawing/DrawingElementComponent';
 import { INoteViewerComponentProps } from '../NoteViewerComponent';
 import { Button, Row, Icon } from 'react-materialize';
 import Draggable, { DraggableData } from 'react-draggable';
+import SourcesComponent from '../../../containers/SourcesContainer';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
@@ -25,14 +26,15 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 
 	render() {
 		const { element, noteAssets, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
+		const isEditing = element.args.id === elementEditing;
 
 		const containerStyles = {
-			zIndex: (element.args.id === elementEditing) ? 5000 : undefined
+			zIndex: (isEditing) ? 5000 : undefined
 		};
 
 		const elementStyles = {
 			width: element.args.width,
-			backgroundColor: (element.args.id === elementEditing) ? 'white' : undefined
+			backgroundColor: (isEditing) ? 'white' : undefined
 		};
 
 		let elementComponent: JSX.Element | undefined = undefined;
@@ -111,10 +113,12 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					<div className="z-depth-2 hoverable" style={elementStyles}>
 						<p className="handle">::::</p>
 						{!!elementComponent && elementComponent}
+
 						{
-							!!elementComponent && element.args.id === elementEditing &&
+							!!elementComponent && isEditing &&
 							<Row style={{paddingLeft: '5px'}}>
-								<Button className="red" waves="light" onClick={this.delete}><Icon left={true}>delete_forever</Icon> Delete</Button>
+								<Button className="red" waves="light" onClick={this.delete} style={{marginRight: '5px'}}><Icon left={true}>delete_forever</Icon> Delete</Button>
+								<span style={{marginRight: '5px'}}><SourcesComponent /></span>
 							</Row>
 						}
 					</div>
