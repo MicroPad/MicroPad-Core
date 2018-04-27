@@ -14,7 +14,7 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 				{
 					isEditing &&
 					<div>
-						<em>Upload a new image...</em>
+						<em>Upload a new image...</em><br />
 						<input type="file" onChange={this.fileSelected} style={{padding: '5px'}} />
 					</div>
 				}

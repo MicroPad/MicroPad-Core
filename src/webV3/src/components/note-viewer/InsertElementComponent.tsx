@@ -87,7 +87,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 						})}>File</a></li>
 
 						<li><a href="#!" onClick={() => this.doInsert({
-							type: 'image',
+							type: 'recording',
 							args: {
 								id: '',
 								x: x + 'px',
