@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-04-26T18:59:29.849+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
+<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-04-28T00:59:52.956+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
 µPad, also known as *MicroPad*, is a note taking application that is built upon the principles of power and openness.
 
 µPad acts like a whiteboard to take notes on, rather than a linear metaphor, like a page.
@@ -155,7 +155,12 @@ Notes are like a whiteboard, you can put an element anywhere on the page. There 
 	- Images
 	- Drawings
 	- Recordings
-	- and more</markdown></note></section><section title="Development"><section title="Open Notepad XML (NPX)"><note title="Introduction" time="2017-05-02T18:58:58.581+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="700px" height="auto" fontSize="16px"><![CDATA[Note: *the following guidelines will work but were written before the asset system was introduced.*
+	- and more
+
+#### Bibliography
+Every element in a note can have URLs attached to it so you can keep track of where you got the information from.
+
+You can have as many sources as you like in your bibliography.</markdown></note></section><section title="Development"><section title="Open Notepad XML (NPX)"><note title="Introduction" time="2017-05-02T18:58:58.581+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="700px" height="auto" fontSize="16px"><![CDATA[Note: *the following guidelines will work but were written before the asset system was introduced.*
 
 The *Open Notepad XML* Format (also known as NPX) is an XML based format with an XSD schema available [here](https://getmicropad.com/schema.xsd). An example notepad using this format (with comments) can be found [here](https://github.com/NickGeek/MicroPad/blob/master/examples/Example%20Notepad.npx).
 
