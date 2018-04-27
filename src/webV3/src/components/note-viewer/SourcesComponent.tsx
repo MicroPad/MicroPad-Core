@@ -24,7 +24,7 @@ export default class SourcesComponent extends React.Component<ISourcesComponent>
 		return (
 			<Modal
 				header="Bibliography"
-				trigger={<Button className="blue" waves="light"><Icon left={true}>school</Icon> Bibliography</Button>}>
+				trigger={<Button className="blue" waves="light"><Icon left={true}>school</Icon> Bibliography ({bibliography.length})</Button>}>
 				<Button className="blue" waves="light" onClick={this.addSource}><Icon left={true}>add</Icon> Add Source</Button>
 				<br /><br />
 
