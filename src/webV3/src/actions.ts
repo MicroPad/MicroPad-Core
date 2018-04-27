@@ -46,6 +46,7 @@ export const actions = {
 	newNote: actionCreator<INewNotepadObjectAction>('NEW_NOTE'),
 	getHelp: actionCreator<void>('GET_HELP'),
 	trackAsset: actionCreator<string>('TRACK_ASSET'),
+	untrackAsset: actionCreator<string>('UNTRACK_ASSET'),
 	reloadNote: actionCreator<void>('RELOAD_NOTE'),
 	insertElement: actionCreator<IInsertElementAction>('INSERT_ELEMENT'),
 	toggleInsertMenu: actionCreator<Partial<IInsertElementState>>('TOGGLE_INSERT_MENU'),

@@ -313,6 +313,20 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 					item: newNotepad,
 				}
 			};
+		} else if (isType(action, actions.untrackAsset)) {
+			const newNotepad = restoreObject<INotepad>({
+				...state.notepad!.item!,
+				lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ'),
+				notepadAssets: state.notepad!.item!.notepadAssets.filter(guid => guid !== action.payload)
+			}, Parser.createNotepad(''));
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					item: newNotepad,
+				}
+			};
 		} else if (isType(action, actions.insertElement)) {
 			const newNotepad = getNotepadObjectByRef({
 				...state.notepad!.item!,

@@ -5,12 +5,13 @@ import { combineEpics } from 'redux-observable';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/fromPromise';
 import { INote, INotepad, INotepadStoreState, NoteElement } from '../types/NotepadTypes';
-import { NOTEPAD_STORAGE } from '../index';
+import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import * as stringify from 'json-stringify-safe';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
-import { getNotepadObjectByRef } from '../util';
+import { getNotepadObjectByRef, isAction } from '../util';
 import * as localforage from 'localforage';
+import { fromPromise } from 'rxjs/observable/fromPromise';
 
 let currentNotepadTitle = '';
 
@@ -89,6 +90,26 @@ const openNotepadFromStorage$ = action$ =>
 		])
 	);
 
+const cleanUnusedAssets$ = (action$, store) =>
+	action$
+		.pipe(
+			filter((action: Action<any>) => isType(action, actions.parseNpx.done) || isType(action, actions.deleteElement)),
+			map(() => store.getState()),
+			map((state: IStoreState) => state.notepads.notepad),
+			filter(Boolean),
+			map((notepadState: INotepadStoreState) => notepadState.item),
+			filter(Boolean),
+			map((notepad: INotepad) => [notepad.getUsedAssets(), notepad.notepadAssets]),
+			switchMap(([usedAssets, npAssets]: [Set<string>, string[]]) => {
+				const unusedAssets = npAssets.filter(guid => !usedAssets.has(guid));
+				return fromPromise(Promise.all(unusedAssets.map(guid => ASSET_STORAGE.removeItem(guid))).then(() => unusedAssets));
+			}),
+			mergeMap((unusedAssets: string[]) => [
+				...unusedAssets.map(guid => actions.untrackAsset(guid)),
+				actions.empty(undefined)
+			])
+		);
+
 const deleteNotepad$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.deleteNotepad)),
@@ -103,5 +124,6 @@ export const storageEpics$ = combineEpics(
 	openNotepadFromStorage$,
 	deleteNotepad$,
 	saveOnChanges$,
-	saveDefaultFontSize$
+	saveDefaultFontSize$,
+	cleanUnusedAssets$
 );
