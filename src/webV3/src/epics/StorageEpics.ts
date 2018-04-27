@@ -56,6 +56,7 @@ const saveDefaultFontSize$ = (action$, store) =>
 		}),
 		filter(([note, id]: [INote, string]) => !!note && id.length > 0),
 		map(([note, id]: [INote, string]) => note.elements.filter((element: NoteElement) => element.args.id === id)[0]),
+		filter(Boolean),
 		map((element: NoteElement) => element.args.fontSize),
 		filter(Boolean),
 		distinctUntilChanged(),

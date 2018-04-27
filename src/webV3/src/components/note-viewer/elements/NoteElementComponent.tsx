@@ -7,12 +7,14 @@ import FileElementComponent from './FileElementComponent';
 import RecordingElement from './RecordingElementComponent';
 import DrawingElementComponent from './drawing/DrawingElementComponent';
 import { INoteViewerComponentProps } from '../NoteViewerComponent';
+import { Button, Row, Icon } from 'react-materialize';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
 	elementEditing: string;
 	noteAssets: object;
 	edit: (id: string) => void;
+	deleteElement?: (id: string) => void;
 	search?: (query: string) => void;
 	downloadAsset?: (filename: string, uuid: string) => void;
 }
@@ -101,8 +103,22 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				<div className="z-depth-2 hoverable" style={elementStyles}>
 					<p className="handle">::::</p>
 					{!!elementComponent && elementComponent}
+					{
+						!!elementComponent && element.args.id === elementEditing &&
+						<Row style={{paddingLeft: '5px'}}>
+							<Button className="red" waves="light" onClick={this.delete}><Icon left={true}>delete_forever</Icon> Delete</Button>
+						</Row>
+					}
 				</div>
 			</div>
 		);
+	}
+
+	private delete = () => {
+		const { element, deleteElement, edit } = this.props;
+		if (confirm('Are you sure you want to delete this element?')) {
+			deleteElement!(element.args.id);
+			edit!('');
+		}
 	}
 }

@@ -1,6 +1,11 @@
 import actionCreatorFactory from 'redux-typescript-actions';
 import { INote, INotepad, IRenameNotepadObjectAction, NoteElement } from './types/NotepadTypes';
-import { IInsertElementAction, INewNotepadObjectAction, IUpdateElementAction } from './types/ActionTypes';
+import {
+	IDeleteElementAction,
+	IInsertElementAction,
+	INewNotepadObjectAction,
+	IUpdateElementAction
+} from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
 
 const actionCreator = actionCreatorFactory();
@@ -43,5 +48,6 @@ export const actions = {
 	trackAsset: actionCreator<string>('TRACK_ASSET'),
 	reloadNote: actionCreator<void>('RELOAD_NOTE'),
 	insertElement: actionCreator<IInsertElementAction>('INSERT_ELEMENT'),
-	toggleInsertMenu: actionCreator<Partial<IInsertElementState>>('TOGGLE_INSERT_MENU')
+	toggleInsertMenu: actionCreator<Partial<IInsertElementState>>('TOGGLE_INSERT_MENU'),
+	deleteElement: actionCreator<IDeleteElementAction>('DELETE_ELEMENT')
 };

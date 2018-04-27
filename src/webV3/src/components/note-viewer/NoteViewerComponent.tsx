@@ -19,6 +19,7 @@ export interface INoteViewerComponentProps {
 	downloadAsset?: (filename: string, uuid: string) => void;
 	updateElement?: (id: string, changes: NoteElement, newAsset?: Blob) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
+	deleteElement?: (id: string) => void;
 }
 
 export default class NoteViewerComponent extends React.Component<INoteViewerComponentProps> {
@@ -37,7 +38,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	render() {
-		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
+		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement, deleteElement } = this.props;
 
 		const classes: string = (!note || note.elements.length === 0) ? 'empty' : '';
 		let styles = {};
@@ -60,6 +61,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				element={element}
 				noteAssets={noteAssets}
 				edit={edit!}
+				deleteElement={deleteElement!}
 				search={search!}
 				updateElement={updateElement}
 				downloadAsset={downloadAsset}

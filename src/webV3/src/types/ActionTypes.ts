@@ -16,3 +16,8 @@ export interface IInsertElementAction {
 	noteRef: string;
 	element: NoteElement;
 }
+
+export interface IDeleteElementAction {
+	noteRef: string;
+	elementId: string;
+}
