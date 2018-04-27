@@ -1,3 +1,5 @@
+import * as Materialize from 'materialize-css/dist/js/materialize.js';
+
 // tslint:disable:no-console
 // In production, we register a service worker to serve assets from local cache.
 
@@ -62,6 +64,7 @@ function registerValidSW(swUrl: string) {
 								// It's the perfect time to display a 'New content is
 								// available; please refresh.' message in your web app.
 								console.log('New content is available; please refresh.');
+								Materialize.toast('An update is available <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="location.reload();">refresh</a>', 8000);
 							} else {
 								// At this point, everything has been precached.
 								// It's the perfect time to display a
