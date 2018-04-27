@@ -50,5 +50,6 @@ export const actions = {
 	reloadNote: actionCreator<void>('RELOAD_NOTE'),
 	insertElement: actionCreator<IInsertElementAction>('INSERT_ELEMENT'),
 	toggleInsertMenu: actionCreator<Partial<IInsertElementState>>('TOGGLE_INSERT_MENU'),
-	deleteElement: actionCreator<IDeleteElementAction>('DELETE_ELEMENT')
+	deleteElement: actionCreator<IDeleteElementAction>('DELETE_ELEMENT'),
+	queueParseNpx: actionCreator<string>('QUEUE_PARSE_NPX')
 };

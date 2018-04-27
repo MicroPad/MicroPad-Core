@@ -23,6 +23,8 @@ import { isAction } from '../util';
 import { ajax } from 'rxjs/observable/dom/ajax';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 
+const parseQueue: string[] = [];
+
 const parseNpx$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.parseNpx.started)),
@@ -247,6 +249,27 @@ const downloadExternalNotepad$ = action$ =>
 		)
 	);
 
+const queueParseNpx$ = action$ =>
+	action$.pipe(
+		isAction(actions.queueParseNpx),
+		map((action: Action<string>) => action.payload),
+		tap((xml: string) => {
+			if (parseQueue.length > 0) parseQueue.push(xml);
+		}),
+		filter(() => parseQueue.length === 0),
+		tap(() => parseQueue.push('')),
+		map((xml: string) => actions.parseNpx.started(xml))
+	);
+
+const getNextParse$ = action$ =>
+	action$.pipe(
+		isAction(actions.parseNpx.done),
+		filter(() => parseQueue.length > 0),
+		tap(() => parseQueue.shift()),
+		filter((xml: string) => xml.length > 0),
+		map(() => actions.parseNpx.started(parseQueue[0]))
+	);
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	restoreJsonNotepad$,
@@ -255,7 +278,9 @@ export const notepadEpics$ = combineEpics(
 	renameNotepad$,
 	saveNotepadOnRenameOrNew$,
 	exportAllToMarkdown$,
-	downloadExternalNotepad$
+	downloadExternalNotepad$,
+	queueParseNpx$,
+	getNextParse$
 );
 
 interface IExportedNotepad {
