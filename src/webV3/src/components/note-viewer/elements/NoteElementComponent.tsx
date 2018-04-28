@@ -140,8 +140,6 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				y: data.y + 'px'
 			}
 		});
-
-		// this.element.style.transform = '';
 	}
 
 	private delete = () => {
