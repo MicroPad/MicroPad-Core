@@ -15,6 +15,7 @@
 		"mathjax": "^2.7.3",
 		"md5": "^2.2.1",
 		"mousetrap": "^1.6.1",
+		"opus-recorder": "^4.1.0",
 		"query-string": "^6.0.0",
 		"re-resizable": "^4.4.8",
 		"react": "^16.2.0",

@@ -109,8 +109,8 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				onStop={this.handleDrag}
 				defaultPosition={{ x: parseInt(element.args.x, 10), y: parseInt(element.args.y, 10) }}
 				handle=".handle">
-				<div className="noteElement" style={containerStyles} ref={e => this.element = e!}>
-					<div className="z-depth-2 hoverable" style={elementStyles}>
+				<div className="noteElement" style={containerStyles}>
+					<div className="z-depth-2 hoverable" style={elementStyles} ref={e => this.element = e!} onClick={this.openEditor}>
 						<p className="handle">::::</p>
 						{!!elementComponent && elementComponent}
 
@@ -148,5 +148,12 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 			deleteElement!(element.args.id);
 			edit!('');
 		}
+	}
+
+	private openEditor = event => {
+		const { element, edit } = this.props;
+		if (event.target !== this.element) return;
+
+		edit(element.args.id);
 	}
 }
