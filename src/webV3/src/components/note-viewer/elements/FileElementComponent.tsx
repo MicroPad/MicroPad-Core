@@ -17,12 +17,13 @@ export default class FileElementComponent extends React.Component<IFileElementCo
 			<div style={{padding: '5px', width: 'max-content'}} onClick={this.openEditor}>
 				<em>
 					{!isEditing && element.args.filename}
-					{isEditing && `Upload a file...`}
+					{(isEditing || !element.args.filename) && `Upload a file...`}
 				</em>
 
 				<Row>
 					{
 						!isEditing &&
+						!!element.args.filename &&
 						<Button className="blue" waves="light" onClick={() => downloadAsset(element.args.filename!, element.args.ext!)}>
 							Download/Open File
 						</Button>
