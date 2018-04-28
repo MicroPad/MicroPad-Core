@@ -16,6 +16,7 @@
 		"md5": "^2.2.1",
 		"mousetrap": "^1.6.1",
 		"query-string": "^6.0.0",
+		"re-resizable": "^4.4.8",
 		"react": "^16.2.0",
 		"react-dom": "^16.2.0",
 		"react-draggable": "^3.0.5",

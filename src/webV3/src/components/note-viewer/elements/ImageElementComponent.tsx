@@ -4,6 +4,7 @@ import { SyntheticEvent } from 'react';
 import { dataURItoBlob } from '../../../util';
 import { Row, Input, Col } from 'react-materialize';
 import { NoteElement } from '../../../types/NotepadTypes';
+import Resizable from 're-resizable';
 
 export default class ImageElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {
@@ -11,8 +12,22 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 		const isEditing = elementEditing === element.args.id;
 
 		return (
-			<div style={{overflow: 'hidden', height: element.args.height, minHeight: '130px'}} onClick={this.openEditor}>
-				{!isEditing && <img style={{height: element.args.height, width: element.args.width }} src={noteAssets[element.args.ext!]} />}
+			<div style={{overflow: 'hidden', height: (isEditing) ? element.args.height! : 'auto', width: (isEditing) ? element.args.width : 'auto', minHeight: '130px'}} onClick={this.openEditor}>
+				{
+					!isEditing &&
+					<Resizable
+						style={{ overflow: 'hidden' }}
+						size={{ width: element.args.width!, height: element.args.height! }}
+						minWidth={170}
+						minHeight={130}
+						lockAspectRatio={true}
+						onResizeStop={(e, d, ref) => {
+							this.onSizeEdit('width', ref.style.width!);
+							this.onSizeEdit('height', ref.style.height!);
+						}}>
+						<img style={{height: '100%', width: '100%' }} src={noteAssets[element.args.ext!]} />
+					</Resizable>
+				}
 				{
 					isEditing &&
 					<div style={{height: '100%'}}>
