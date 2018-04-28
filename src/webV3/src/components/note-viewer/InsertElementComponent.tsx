@@ -28,6 +28,9 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 			display: (enabled) ? undefined : 'none'
 		};
 
+		const insertX = Math.abs(Math.floor(document.getElementById('note-container')!.getBoundingClientRect().left)) + x;
+		const insertY = (Math.abs(Math.floor(document.getElementById('note-container')!.getBoundingClientRect().top)) + y) - 128;
+
 		return (
 			<div className="noteElement" style={containerStyles}>
 				<div id="insert-element" className="z-depth-2 hoverable">
@@ -38,8 +41,8 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 							args: {
 								id: '',
 								fontSize: fontSize,
-								x: x + 'px',
-								y: y + 'px',
+								x: insertX + 'px',
+								y: insertY + 'px',
 								width: 'auto',
 								height: 'auto'
 							},
@@ -50,8 +53,8 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 							type: 'image',
 							args: {
 								id: '',
-								x: x + 'px',
-								y: y + 'px',
+								x: insertX + 'px',
+								y: insertY + 'px',
 								width: 'auto',
 								height: 'auto',
 								ext: generateGuid()
@@ -63,8 +66,8 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 							type: 'drawing',
 							args: {
 								id: '',
-								x: x + 'px',
-								y: y + 'px',
+								x: insertX + 'px',
+								y: insertY + 'px',
 								width: 'auto',
 								height: 'auto',
 								ext: generateGuid()
@@ -76,8 +79,8 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 							type: 'file',
 							args: {
 								id: '',
-								x: x + 'px',
-								y: y + 'px',
+								x: insertX + 'px',
+								y: insertY + 'px',
 								width: 'auto',
 								height: 'auto',
 								ext: generateGuid(),
@@ -90,8 +93,8 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 							type: 'recording',
 							args: {
 								id: '',
-								x: x + 'px',
-								y: y + 'px',
+								x: insertX + 'px',
+								y: insertY + 'px',
 								width: 'auto',
 								height: 'auto',
 								ext: generateGuid(),
