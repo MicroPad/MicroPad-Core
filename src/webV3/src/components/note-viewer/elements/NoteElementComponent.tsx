@@ -33,7 +33,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 		};
 
 		const elementStyles = {
-			width: (element.type !== 'image') ? element.args.width : 'auto',
+			width: (element.type !== 'image' && element.type !== 'markdown') ? element.args.width : 'auto',
 			backgroundColor: (isEditing) ? 'white' : undefined
 		};
 

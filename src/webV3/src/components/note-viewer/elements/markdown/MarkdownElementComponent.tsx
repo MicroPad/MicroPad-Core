@@ -9,6 +9,7 @@ import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
 import { Input, Row, Col } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
+import Resizable from 're-resizable';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -60,7 +61,24 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		const isEditing = elementEditing === element.args.id;
 
 		return (
-			<div>
+			<Resizable
+				style={{overflow: 'hidden'}}
+				size={{ width: element.args.width!, height: element.args.height! }}
+				minWidth={(isEditing) ? 300 : 170}
+				minHeight={130}
+				enable={{
+					top: false,
+					bottom: false,
+					left: false,
+					topRight: false,
+					bottomRight: false,
+					bottomLeft: false,
+					topLeft: false,
+					right: !isEditing
+				}}
+				onResizeStop={(e, d, ref) => {
+					this.onSizeEdit('width', ref.style.width!);
+				}}>
 				<TodoListComponent html={this.generateHtml(element)} toggle={() => this.sendMessage({
 					id: element.args.id,
 					type: 'toggle',
@@ -118,7 +136,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 							onChange={this.onElementEdit} />
 					}
 				</div>
-			</div>
+			</Resizable>
 		);
 	}
 
@@ -182,7 +200,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	}
 
 	private onSizeEdit = (type: 'width' | 'height', value: string) => {
-		const { element } = this.props;
+		const { element, updateElement } = this.props;
 
 		const newElement: NoteElement = {
 			...element,
@@ -192,7 +210,19 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			}
 		};
 
-		this.updateWithDebounce(newElement);
+		updateElement!(element.args.id, newElement);
+
+		this.generateHtml(newElement)
+			.then(html => {
+				this.sendMessage({
+					type: 'render',
+					id: element.args.id,
+					payload: {
+						...newElement,
+						content: html
+					}
+				});
+			});
 	}
 
 	private generateHtml = (element: NoteElement): Promise<string> => {
