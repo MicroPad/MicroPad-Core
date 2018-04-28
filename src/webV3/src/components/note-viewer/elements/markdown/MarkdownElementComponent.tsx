@@ -7,7 +7,7 @@ import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
-import { Input } from 'react-materialize';
+import { Input, Row, Col } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
@@ -69,13 +69,24 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 				{
 					isEditing &&
-					<div style={{paddingLeft: '5px', paddingRight: '5px'}}>
-						<Input
-							label="Font Size"
-							defaultValue={element.args.fontSize}
-							onChange={this.onFontSizeEdit}
-						/>
-					</div>
+					<Row>
+						<Col s={6}>
+							<Input
+								label="Font Size"
+								defaultValue={element.args.fontSize}
+								onChange={this.onFontSizeEdit}
+							/>
+						</Col>
+
+						<Col s={6}>
+							<Input
+								style={{width: '100%'}}
+								label="Width"
+								defaultValue={element.args.width}
+								onChange={(e, v) => this.onSizeEdit('width', v)}
+							/>
+						</Col>
+					</Row>
 				}
 
 				{isEditing && <MarkdownHelpComponent />}
@@ -164,6 +175,20 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			args: {
 				...element.args,
 				fontSize: event.target.value
+			}
+		};
+
+		this.updateWithDebounce(newElement);
+	}
+
+	private onSizeEdit = (type: 'width' | 'height', value: string) => {
+		const { element } = this.props;
+
+		const newElement: NoteElement = {
+			...element,
+			args: {
+				...element.args,
+				[type]: value
 			}
 		};
 

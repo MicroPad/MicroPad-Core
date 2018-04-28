@@ -47,3 +47,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	border-color: #ffb300 !important;
 	box-shadow: 0 1px 0 0 #ffb300 !important;
 }
+
+div.col.input-field {
+	width: 100%;
+}

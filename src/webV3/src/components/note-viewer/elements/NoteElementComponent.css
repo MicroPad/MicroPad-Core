@@ -11,6 +11,12 @@
 	word-wrap: break-word;
 	overflow: auto;
 	pointer-events: auto;
+	min-width: 170px;
+}
+
+.noteElement > * > div > img {
+	min-width: 170px;
+	min-height: 130px;
 }
 
 .handle {
