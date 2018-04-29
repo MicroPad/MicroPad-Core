@@ -2,16 +2,12 @@ import { INoteElementComponentProps } from '../NoteElementComponent';
 import * as React from 'react';
 import { dataURItoBlob } from '../../../../util';
 import { trim } from './trim-canvas';
-
-type Offset = {
-	top: number;
-	left: number;
-};
+import Resizable from 're-resizable';
 
 type Touch = {
 	identifier: number;
-	pageX: number;
-	pageY: number;
+	x: number;
+	y: number;
 };
 
 type Position = {
@@ -24,9 +20,9 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 	private hasTrimmed: boolean;
 
 	private canvasElement: HTMLCanvasElement;
-	private canvasOffset: Offset;
 	private ctx: CanvasRenderingContext2D;
 	private ongoingTouches: Touch[] = [];
+	private canvasImage: Blob | null;
 
 	render() {
 		const { element, noteAssets, elementEditing } = this.props;
@@ -36,28 +32,71 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 
 		if (isEditing) {
 			return (
-				<div style={{padding: '5px'}}>
+				<Resizable
+					style={{padding: '5px', overflow: 'hidden'}}
+					minWidth={410}
+					minHeight={130}
+					lockAspectRatio={true}
+					onResizeStart={() => {
+						this.canvasElement.toBlob(result => this.canvasImage = result);
+					}}
+					onResize={(e, d, ref) => {
+						this.canvasElement.width = parseInt(ref.style.width!, 10) - 10;
+						this.canvasElement.height = parseInt(ref.style.height!, 10) - 10;
+
+						if (!!this.canvasImage) {
+							const img = new Image();
+							img.onload = () => this.ctx.drawImage(img, 0, 0);
+							img.src = URL.createObjectURL(this.canvasImage);
+						}
+					}}
+					onResizeStop={() => {
+						if (!!this.canvasImage) {
+							const img = new Image();
+							img.onload = () => this.ctx.drawImage(img, 0, 0);
+							img.src = URL.createObjectURL(this.canvasImage);
+							this.canvasImage = null;
+						}
+					}}
+					>
 					<canvas
 						ref={e => this.canvasElement = e!}
-
-						width="800"
-						height="600"
+						width="600"
+						height="500"
 						style={{border: 'solid black 1px', touchAction: 'none'}} />
-				</div>
+				</Resizable>
 			);
 		}
 
 		return (
-			<div style={{overflow: 'hidden', height: element.args.height}} onClick={this.openEditor}>
-				<img ref={elm => this.imageElement = elm!} style={{height: element.args.height, width: element.args.width }} src={noteAssets[element.args.ext!]} />
+			<div style={{overflow: 'hidden', height: 'auto'}} onClick={this.openEditor}>
+				<img ref={elm => this.imageElement = elm!} style={{height: 'auto', width: 'auto' }} src={noteAssets[element.args.ext!]} />
 			</div>
 		);
 	}
 
-	componentDidUpdate() {
-		if (this.canvasElement) this.initCanvas();
+	componentDidMount() {
+		this.componentDidUpdate();
+	}
 
-		if (!this.imageElement) return;
+	componentDidUpdate() {
+		const { element, noteAssets } = this.props;
+
+		this.ongoingTouches = [];
+		if (!!this.canvasElement) {
+			this.initCanvas();
+
+			// Restore saved image to canvas
+			const img = new Image();
+			img.onload = () => {
+				this.canvasElement.width = img.naturalWidth;
+				this.canvasElement.height = img.naturalHeight;
+				this.ctx.drawImage(img, 0, 0);
+			};
+			img.src = noteAssets[element.args.ext!];
+			return;
+		}
+
 		this.imageElement.onload = () => {
 			if (this.hasTrimmed) return;
 
@@ -74,22 +113,21 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 		};
 	}
 
-	componentWillUnmount() {
-		window.onresize = () => { return; };
-		this.initCanvas();
+	componentWillUpdate() {
+		const { element, updateElement } = this.props;
+		if (!this.canvasElement) return;
+
+		// Update element with canvas contents
+		updateElement!(element.args.id, element, dataURItoBlob(this.canvasElement.toDataURL()));
 	}
 
 	private initCanvas = () => {
-		window.onresize = () => this.resizeCanvas();
-
 		this.ctx = this.canvasElement.getContext('2d')!;
 		let ongoingPos: Position;
-		this.resizeCanvas();
 
 		this.ctx.strokeStyle = '#000000';
 
 		this.canvasElement.onpointerdown = event => {
-			console.log(event);
 			this.ongoingTouches.push(this.copyTouch(event));
 			this.ctx.beginPath();
 		};
@@ -137,24 +175,24 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 	private copyTouch = (event: PointerEvent): Touch => {
 		return {
 			identifier: event.pointerId,
-			pageX: event.pageX,
-			pageY: event.pageY
+			x: event.clientX,
+			y: event.clientY
 		};
 	}
 
 	private getRealPosition = (touch: Touch): Position => {
-		if (!touch.pageX) debugger;
-		return {
-			x: touch.pageX - this.canvasOffset.left,
-			y: touch.pageY - this.canvasOffset.top
-		};
-	}
+		const { element } = this.props;
 
-	private resizeCanvas = () => {
-		const boundingBox = this.canvasElement.getBoundingClientRect();
-		this.canvasOffset = {
-			top: boundingBox.top + document.body.scrollTop,
-			left: boundingBox.left + document.body.scrollLeft
+		const noteViewer = document.getElementById('note-viewer')!;
+
+		const canvasOffset = {
+			left: parseInt(element.args.x, 10) - noteViewer.scrollLeft,
+			top: (parseInt(element.args.y, 10) + (128 + 24)) - noteViewer.scrollTop
+		};
+
+		return {
+			x: touch.x - canvasOffset.left,
+			y: touch.y - canvasOffset.top
 		};
 	}
 
