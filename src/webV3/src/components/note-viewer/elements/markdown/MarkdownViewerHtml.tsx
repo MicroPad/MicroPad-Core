@@ -118,7 +118,8 @@ export namespace MarkDownViewer {
 	
 	document.body.onclick = function(event) {
 		var path = event.path || (event.composedPath && event.composedPath()) || [event.target];
-		if (path[0].tagName.toLowerCase() === 'a') return;
+		if (path.some(p => p.tagName.toLowerCase() === 'a')) return;
+		console.log('edit');
 		
 		parent.postMessage({
 			id,
@@ -217,10 +218,13 @@ export namespace MarkDownViewer {
 	}
 	
 	function redirectLinkClick(event) {
+		var path = event.path || (event.composedPath && event.composedPath()) || [event.target];
+		const link = path.find(p => p.tagName.toLowerCase() === 'a')
+		
 	    parent.postMessage({
 	    	id,
 	    	type: 'link',
-	    	payload: event.target.getAttribute('href')
+	    	payload: link.getAttribute('href')
 	    }, '*');
 	    
 	    event.preventDefault();

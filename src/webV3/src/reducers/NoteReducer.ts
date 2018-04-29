@@ -55,7 +55,11 @@ export class NoteReducer implements IReducer<ICurrentNoteState> {
 		} else if (isType(action, actions.openEditor)) {
 			return {
 				...state,
-				elementEditing: action.payload
+				elementEditing: action.payload,
+				insertElement: {
+					...state.insertElement,
+					enabled: false
+				}
 			};
 		} else if (isType(action, actions.toggleInsertMenu)) {
 			return {
