@@ -3,7 +3,7 @@ import * as React from 'react';
 import { dataURItoBlob } from '../../../../util';
 import { trim } from './trim-canvas';
 import Resizable from 're-resizable';
-import { Input } from 'react-materialize';
+import { Input, Row } from 'react-materialize';
 
 type Touch = {
 	identifier: number;
@@ -26,6 +26,7 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 	private canvasImage: Blob | null;
 
 	private isErasing = false;
+	private isRainbow = false;
 
 	render() {
 		const { element, noteAssets, elementEditing } = this.props;
@@ -70,14 +71,17 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 							style={{border: 'solid black 1px', touchAction: 'none'}} />
 					</Resizable>
 
-					<div style={{padding: '5px'}}><Input label="Erase Mode" type="checkbox" className="filled-in" onChange={(e, v) => this.isErasing = v} /></div>
+					<Row style={{padding: '5px'}}>
+						<Input label="Erase Mode" type="checkbox" className="filled-in" onChange={(e, v) => this.isErasing = v} />
+						<Input label={<a target="_blank" rel="nofollow noreferrer" href="https://pride.codes">Rainbow Mode</a>} type="checkbox" className="filled-in" onChange={(e, v) => this.isRainbow = v} />
+					</Row>
 				</div>
 			);
 		}
 
 		return (
-			<div style={{overflow: 'hidden', height: 'auto'}} onClick={this.openEditor}>
-				<img ref={elm => this.imageElement = elm!} style={{height: 'auto', width: 'auto' }} src={noteAssets[element.args.ext!]} />
+			<div style={{overflow: 'hidden', height: 'auto', minWidth: '170px', minHeight: '130px'}} onClick={this.openEditor}>
+				<img ref={elm => this.imageElement = elm!} style={{height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px'}} src={noteAssets[element.args.ext!]} />
 			</div>
 		);
 	}
@@ -91,6 +95,7 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 
 		this.ongoingTouches = [];
 		this.isErasing = false;
+		this.isRainbow = false;
 		if (!!this.canvasElement) {
 			this.initCanvas();
 
@@ -142,10 +147,15 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 			const pos = this.getRealPosition(this.copyTouch(event));
 			if (event.pressure < 0) return;
 
-			this.ctx.strokeStyle = (this.shouldErase(event)) ? '#ffffff' : '#000000';
+			this.ctx.strokeStyle = this.getLineStyle(event);
 
 			const idx = this.ongoingTouchIndexById(event.pointerId);
 			if (idx < 0) return;
+
+			if (this.shouldErase(event)) {
+				this.ctx.clearRect(pos.x - 10, pos.y - 10, 20, 20);
+				return;
+			}
 
 			this.ctx.beginPath();
 			ongoingPos = this.getRealPosition(this.ongoingTouches[idx]);
@@ -161,10 +171,10 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 		this.canvasElement.onpointerup = event => {
 			const pos = this.getRealPosition(this.copyTouch(event));
 			const idx = this.ongoingTouchIndexById(event.pointerId);
-			if (idx < 0) return;
+			if (idx < 0 && !this.shouldErase(event)) return;
 
 			this.ctx.lineWidth = (this.shouldErase(event)) ? 20 : event.pressure * 10;
-			this.ctx.fillStyle = (this.shouldErase(event)) ? '#ffffff' : '#000000';
+			this.ctx.fillStyle = this.getLineStyle(event);
 			this.ctx.beginPath();
 			ongoingPos = this.getRealPosition(this.ongoingTouches[idx]);
 
@@ -214,6 +224,13 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 
 	private shouldErase = (event: PointerEvent): boolean => {
 		return this.isErasing || event.buttons === 32;
+	}
+
+	private getLineStyle = (event: PointerEvent): string => {
+		if (this.shouldErase(event)) return '#ffffff';
+		if (this.isRainbow) return '#' + Math.random().toString(16).substr(-6);
+
+		return '#000000';
 	}
 
 	private openEditor = () => {
