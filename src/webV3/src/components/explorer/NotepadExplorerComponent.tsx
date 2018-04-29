@@ -130,7 +130,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 				key={generateGuid()}
 				onClick={() => this.sectionArrowClick(section.internalRef)}
 				nodeLabel={
-					<span style={nodeLabelStyle}>
+					<span style={nodeLabelStyle} onClick={() => this.sectionArrowClick(section.internalRef)}>
 						<Icon>book</Icon> {section.title}
 						<ExplorerOptionsComponent
 							objToEdit={section}
