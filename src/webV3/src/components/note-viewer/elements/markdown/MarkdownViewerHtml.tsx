@@ -119,7 +119,6 @@ export namespace MarkDownViewer {
 	document.body.onclick = function(event) {
 		var path = event.path || (event.composedPath && event.composedPath()) || [event.target];
 		if (path.some(p => !!p.tagName && p.tagName.toLowerCase() === 'a')) return;
-		console.log('edit');
 		
 		parent.postMessage({
 			id,
