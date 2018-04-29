@@ -3,6 +3,7 @@ import * as React from 'react';
 import { dataURItoBlob } from '../../../../util';
 import { trim } from './trim-canvas';
 import Resizable from 're-resizable';
+import { Input } from 'react-materialize';
 
 type Touch = {
 	identifier: number;
@@ -24,6 +25,8 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 	private ongoingTouches: Touch[] = [];
 	private canvasImage: Blob | null;
 
+	private isErasing = false;
+
 	render() {
 		const { element, noteAssets, elementEditing } = this.props;
 		const isEditing = element.args.id === elementEditing;
@@ -32,39 +35,43 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 
 		if (isEditing) {
 			return (
-				<Resizable
-					style={{padding: '5px', overflow: 'hidden'}}
-					minWidth={410}
-					minHeight={130}
-					lockAspectRatio={true}
-					onResizeStart={() => {
-						this.canvasElement.toBlob(result => this.canvasImage = result);
-					}}
-					onResize={(e, d, ref) => {
-						this.canvasElement.width = parseInt(ref.style.width!, 10) - 10;
-						this.canvasElement.height = parseInt(ref.style.height!, 10) - 10;
+				<div>
+					<Resizable
+						style={{padding: '5px', overflow: 'hidden'}}
+						minWidth={410}
+						minHeight={130}
+						lockAspectRatio={true}
+						onResizeStart={() => {
+							this.canvasElement.toBlob(result => this.canvasImage = result);
+						}}
+						onResize={(e, d, ref) => {
+							this.canvasElement.width = parseInt(ref.style.width!, 10) - 10;
+							this.canvasElement.height = parseInt(ref.style.height!, 10) - 10;
 
-						if (!!this.canvasImage) {
-							const img = new Image();
-							img.onload = () => this.ctx.drawImage(img, 0, 0);
-							img.src = URL.createObjectURL(this.canvasImage);
-						}
-					}}
-					onResizeStop={() => {
-						if (!!this.canvasImage) {
-							const img = new Image();
-							img.onload = () => this.ctx.drawImage(img, 0, 0);
-							img.src = URL.createObjectURL(this.canvasImage);
-							this.canvasImage = null;
-						}
-					}}
-					>
-					<canvas
-						ref={e => this.canvasElement = e!}
-						width="600"
-						height="500"
-						style={{border: 'solid black 1px', touchAction: 'none'}} />
-				</Resizable>
+							if (!!this.canvasImage) {
+								const img = new Image();
+								img.onload = () => this.ctx.drawImage(img, 0, 0);
+								img.src = URL.createObjectURL(this.canvasImage);
+							}
+						}}
+						onResizeStop={() => {
+							if (!!this.canvasImage) {
+								const img = new Image();
+								img.onload = () => this.ctx.drawImage(img, 0, 0);
+								img.src = URL.createObjectURL(this.canvasImage);
+								this.canvasImage = null;
+							}
+						}}
+						>
+						<canvas
+							ref={e => this.canvasElement = e!}
+							width="600"
+							height="500"
+							style={{border: 'solid black 1px', touchAction: 'none'}} />
+					</Resizable>
+
+					<div style={{padding: '5px'}}><Input label="Erase Mode" type="checkbox" className="filled-in" onChange={(e, v) => this.isErasing = v} /></div>
+				</div>
 			);
 		}
 
@@ -83,6 +90,7 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 		const { element, noteAssets } = this.props;
 
 		this.ongoingTouches = [];
+		this.isErasing = false;
 		if (!!this.canvasElement) {
 			this.initCanvas();
 
@@ -125,8 +133,6 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 		this.ctx = this.canvasElement.getContext('2d')!;
 		let ongoingPos: Position;
 
-		this.ctx.strokeStyle = '#000000';
-
 		this.canvasElement.onpointerdown = event => {
 			this.ongoingTouches.push(this.copyTouch(event));
 			this.ctx.beginPath();
@@ -134,16 +140,18 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 
 		this.canvasElement.onpointermove = event => {
 			const pos = this.getRealPosition(this.copyTouch(event));
+			if (event.pressure < 0) return;
+
+			this.ctx.strokeStyle = (this.shouldErase(event)) ? '#ffffff' : '#000000';
+
 			const idx = this.ongoingTouchIndexById(event.pointerId);
 			if (idx < 0) return;
-
-			if (event.pressure < 0) return;
 
 			this.ctx.beginPath();
 			ongoingPos = this.getRealPosition(this.ongoingTouches[idx]);
 			this.ctx.moveTo(ongoingPos.x, ongoingPos.y);
 			this.ctx.lineTo(pos.x, pos.y);
-			this.ctx.lineWidth = event.pressure * 10;
+			this.ctx.lineWidth = (this.shouldErase(event)) ? 20 : event.pressure * 10;
 			this.ctx.lineCap = 'round';
 			this.ctx.stroke();
 
@@ -155,8 +163,8 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 			const idx = this.ongoingTouchIndexById(event.pointerId);
 			if (idx < 0) return;
 
-			this.ctx.lineWidth = (event.pressure > 0) ? event.pressure * 10 : 1;
-			this.ctx.fillStyle = '#000000';
+			this.ctx.lineWidth = (this.shouldErase(event)) ? 20 : event.pressure * 10;
+			this.ctx.fillStyle = (this.shouldErase(event)) ? '#ffffff' : '#000000';
 			this.ctx.beginPath();
 			ongoingPos = this.getRealPosition(this.ongoingTouches[idx]);
 
@@ -187,7 +195,7 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 
 		const canvasOffset = {
 			left: parseInt(element.args.x, 10) - noteViewer.scrollLeft,
-			top: (parseInt(element.args.y, 10) + (128 + 24)) - noteViewer.scrollTop
+			top: (parseInt(element.args.y, 10) + 128) - noteViewer.scrollTop
 		};
 
 		return {
@@ -202,6 +210,10 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 		}
 
 		return -1;
+	}
+
+	private shouldErase = (event: PointerEvent): boolean => {
+		return this.isErasing || event.buttons === 32;
 	}
 
 	private openEditor = () => {

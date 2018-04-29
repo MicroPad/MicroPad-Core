@@ -111,7 +111,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				handle=".handle">
 				<div className="noteElement" style={containerStyles}>
 					<div className="z-depth-2 hoverable" style={elementStyles} ref={e => this.element = e!} onClick={this.openEditor}>
-						<p className="handle">::::</p>
+						{!(isEditing && element.type === 'drawing') && <p className="handle">::::</p>}
 						{!!elementComponent && elementComponent}
 
 						{
