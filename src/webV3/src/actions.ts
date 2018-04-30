@@ -3,7 +3,8 @@ import { INote, INotepad, IRenameNotepadObjectAction, NoteElement } from './type
 import {
 	IDeleteElementAction,
 	IInsertElementAction,
-	INewNotepadObjectAction, IUpdateBibliographyAction,
+	INewNotepadObjectAction,
+	IUpdateBibliographyAction,
 	IUpdateElementAction
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';

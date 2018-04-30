@@ -9,7 +9,7 @@ import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import * as stringify from 'json-stringify-safe';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
-import { getNotepadObjectByRef, isAction } from '../util';
+import { getNotepadObjectByRef } from '../util';
 import * as localforage from 'localforage';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 

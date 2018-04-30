@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { INoteElementComponentProps } from './NoteElementComponent';
 import { SyntheticEvent } from 'react';
+import { INoteElementComponentProps } from './NoteElementComponent';
 import { dataURItoBlob } from '../../../util';
-import { Row, Input, Col } from 'react-materialize';
+import { Col, Input, Row } from 'react-materialize';
 import { NoteElement } from '../../../types/NotepadTypes';
 import Resizable from 're-resizable';
 

@@ -7,7 +7,7 @@ import FileElementComponent from './FileElementComponent';
 import RecordingElement from './RecordingElementComponent';
 import DrawingElementComponent from './drawing/DrawingElementComponent';
 import { INoteViewerComponentProps } from '../NoteViewerComponent';
-import { Button, Row, Icon } from 'react-materialize';
+import { Button, Icon, Row } from 'react-materialize';
 import Draggable, { DraggableData } from 'react-draggable';
 import SourcesComponent from '../../../containers/SourcesContainer';
 
