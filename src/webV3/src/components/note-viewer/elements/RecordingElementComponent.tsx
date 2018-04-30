@@ -65,6 +65,9 @@ export default class RecordingElementComponent extends React.Component<IFileElem
 		};
 
 		this.recorder.ondataavailable = (buffer: ArrayBuffer) => {
+			this.buttonContainer.classList.add('recording-inactive');
+			this.buttonContainer.classList.remove('recording-active');
+
 			const data = new Blob([buffer], { type: 'audio/ogg' });
 			updateElement!(element.args.id, {
 				...element,
@@ -79,6 +82,11 @@ export default class RecordingElementComponent extends React.Component<IFileElem
 
 	componentWillUpdate() {
 		this.recorder.stop();
+	}
+
+	shouldComponentUpdate() {
+		const { element, elementEditing } = this.props;
+		return !this.buttonContainer || !this.buttonContainer.classList.contains('recording-active');
 	}
 
 	private openEditor = event => {
