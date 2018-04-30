@@ -146,7 +146,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 							type="section"
 							deleteNotepadObject={deleteNotepadObject}
 							renameNotepadObject={renameNotepadObject}/>
-					</span>}
+					</span>}>
 				collapsed={!this.openSections.has(section.internalRef)}>
 				<div className="explorer-note add-button" key={generateGuid()}>
 					<a href="#!" style={{ color: 'white', paddingRight: '3px' }} onClick={() => this.newNotepadObject('note', section)}><Icon>add</Icon> Note </a>
