@@ -60,6 +60,10 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 			};
 		} else if (isType(action, actions.newNotepad)) {
 			const notepad: INotepad = action.payload;
+			if (state.savedNotepadTitles
+				&& state.savedNotepadTitles.some(title => title.toLowerCase() === notepad.title.toLowerCase()))
+				notepad.title += ' (DUPLICATE)';
+
 			notepad.notepadAssets = [];
 
 			return {
