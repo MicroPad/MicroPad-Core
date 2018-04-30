@@ -27,7 +27,7 @@ const expandAll$ = (action$, store) =>
 		map((allRefs: string[]) => actions.expandAllExplorer.done({ params: undefined, result: allRefs }))
 	);
 
-const createSection$ = (action$, store) =>
+const autoLoadNewSection$ = (action$, store) =>
 	action$.pipe(
 		isAction(actions.newSection),
 		map((action: Action<INewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
@@ -47,5 +47,5 @@ const createSection$ = (action$, store) =>
 
 export const explorerEpics$ = combineEpics(
 	expandAll$,
-	createSection$
+	autoLoadNewSection$
 );
