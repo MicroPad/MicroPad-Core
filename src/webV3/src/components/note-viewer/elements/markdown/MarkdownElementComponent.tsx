@@ -65,7 +65,6 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				style={{overflow: 'hidden'}}
 				size={{ width: element.args.width!, height: element.args.height! }}
 				minWidth={(isEditing) ? 300 : 170}
-				minHeight={130}
 				enable={{
 					top: false,
 					bottom: false,
