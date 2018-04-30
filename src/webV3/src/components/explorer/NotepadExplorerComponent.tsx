@@ -43,7 +43,8 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		this.openSections = new Set<string>(this.props.openSections);
 
 		const notepadExplorerStyle = {
-			display: 'initial'
+			display: 'initial',
+			transition: 'background-color .3s'
 		};
 		if (isFullScreen) notepadExplorerStyle.display = 'none';
 
@@ -146,8 +147,8 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 							type="section"
 							deleteNotepadObject={deleteNotepadObject}
 							renameNotepadObject={renameNotepadObject}/>
-					</span>}>
-				collapsed={!this.openSections.has(section.internalRef)}>
+					</span>}
+					collapsed={!this.openSections.has(section.internalRef)}>
 				<div className="explorer-note add-button" key={generateGuid()}>
 					<a href="#!" style={{ color: 'white', paddingRight: '3px' }} onClick={() => this.newNotepadObject('note', section)}><Icon>add</Icon> Note </a>
 					<a href="#!" style={{ color: 'white', paddingLeft: '3px' }} onClick={() => this.newNotepadObject('section', section)}> <Icon>add</Icon> Section</a>

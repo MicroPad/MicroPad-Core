@@ -14,6 +14,7 @@ export interface INoteViewerComponentProps {
 	note?: INote;
 	elementEditing: string;
 	noteAssets: object;
+	isNotepadOpen: boolean;
 	edit?: (id: string) => void;
 	search?: (query: string) => void;
 	downloadAsset?: (filename: string, uuid: string) => void;
@@ -87,8 +88,24 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	private handleEmptyClick = (event) => {
-		const { note, edit, elementEditing, toggleInsertMenu } = this.props;
-		if (!note || (event.target !== this.viewerDiv && event.target !== this.containerDiv)) return;
+		const { note, edit, elementEditing, toggleInsertMenu, isNotepadOpen } = this.props;
+		if ((event.target !== this.viewerDiv && event.target !== this.containerDiv)) return;
+
+		if (!note) {
+			if (isNotepadOpen) {
+				// Flash the Notepad Explorer amber
+				const explorer = document.getElementById('notepad-explorer')!;
+				explorer.style.backgroundColor = '#ffb300';
+				setTimeout(() => explorer.style.backgroundColor = '#607d8b', 100);
+			} else {
+				// Flash notepads drop-down
+				const explorer = document.getElementById('notepad-dropdown')!;
+				explorer.style.backgroundColor = '#ffb300';
+				setTimeout(() => explorer.style.backgroundColor = '#607d8b', 100);
+			}
+
+			return;
+		}
 
 		if (elementEditing.length === 0) {
 			// Insert a new element

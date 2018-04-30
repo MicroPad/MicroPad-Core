@@ -23,7 +23,8 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 		isFullscreen: meta.isFullScreen,
 		note,
 		noteAssets: currentNote.assetUrls,
-		elementEditing: currentNote.elementEditing
+		elementEditing: currentNote.elementEditing,
+		isNotepadOpen: !!notepads.notepad && !!notepads.notepad.item
 	};
 }
 

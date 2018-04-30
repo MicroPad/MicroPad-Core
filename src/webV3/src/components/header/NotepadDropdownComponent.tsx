@@ -34,7 +34,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 			<li>
 				<Dropdown trigger={
 					<ul>
-						<NavItem>
+						<NavItem id="notepad-dropdown">
 							<Icon left={true}>collections_bookmark</Icon> Notepads <Icon right={true}>arrow_drop_down</Icon>
 						</NavItem>
 					</ul>
