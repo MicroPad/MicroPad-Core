@@ -31,6 +31,10 @@ nav {
 	overflow: auto !important;
 }
 
+.dropdown-content a {
+	color: black !important;
+}
+
 nav .material-icons.left {
 	margin-right: 10px;
 }
