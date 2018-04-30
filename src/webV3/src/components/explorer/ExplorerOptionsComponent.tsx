@@ -36,7 +36,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			<Modal
 				key={`npeo-${objToEdit.title}`}
 				header={`Options for ${objToEdit.title}`}
-				trigger={<a href="#!" style={{ color: 'white' }}><Icon tiny={true}>settings</Icon></a>}>
+				trigger={<a href="#!" style={{ color: 'white' }}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}>
 				<div id="explorer-options-modal">
 					<Row>
 						<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>
