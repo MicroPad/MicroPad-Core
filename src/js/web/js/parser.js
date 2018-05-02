@@ -52,9 +52,14 @@ exports.Asset = function(dataAsBlob, uuid) {
 }
 
 exports.Asset.prototype.toString = function(callback) {
-	blobToDataURL(this.data, b64 => {
-		callback(b64);
-	});
+	try {
+		blobToDataURL(this.data, b64 => {
+			callback(b64);
+		});
+	} catch (e) {
+		console.warn('Corrupted asset');
+		callback('');
+	}
 }
 
 exports.Asset.prototype.getXMLObject = function(callback) {
