@@ -78,7 +78,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 									collapseAll!();
 									expandFromNote!(openNote);
 								}
-							}}>Focus Mode</a> | <a href="#!" onClick={collapseAll}>Collapse All</a>)
+							}}>Focus</a> | <a href="#!" onClick={collapseAll}>Collapse All</a>)
 						</p>
 
 						<div className="explorer-note add-button" key={generateGuid()} style={{margin: 0}}>
