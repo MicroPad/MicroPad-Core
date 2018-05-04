@@ -52,7 +52,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 								fontSize: fontSize
 							},
 							content: ''
-						})}>Text (with markdown formatting)</a></li>
+						})}><Icon left={true}>edit</Icon> Text (with markdown formatting)</a></li>
 
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'image',
@@ -61,7 +61,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 								ext: generateGuid()
 							},
 							content: 'AS'
-						})}>Image</a></li>
+						})}><Icon left={true}>image</Icon> Image</a></li>
 
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'drawing',
@@ -70,7 +70,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 								ext: generateGuid()
 							},
 							content: 'AS'
-						})}>Drawing</a></li>
+						})}><Icon left={true}>gesture</Icon> Drawing</a></li>
 
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'file',
@@ -80,7 +80,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 								filename: ''
 							},
 							content: 'AS'
-						})}>File</a></li>
+						})}><Icon left={true}>insert_drive_file</Icon> File</a></li>
 
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'recording',
@@ -90,7 +90,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 								filename: ''
 							},
 							content: 'AS'
-						})}>Recording</a></li>
+						})}><Icon left={true}>record_voice_over</Icon> Recording</a></li>
 					</ul>
 				</div>
 			</div>

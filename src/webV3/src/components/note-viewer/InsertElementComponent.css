@@ -5,3 +5,7 @@
 	padding: 10px;
 	position: absolute;
 }
+
+#insert-element ul > li {
+	margin-bottom: 10px;
+}
