@@ -87,6 +87,12 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		this.escapeHit$.subscribe(() => edit!(''));
 	}
 
+	componentWillUpdate(newProps: INoteViewerComponentProps) {
+		const { note } = this.props;
+
+		if ((!!newProps.note && !!note) && newProps.note.internalRef !== note.internalRef) this.viewerDiv.scrollTo(0, 0);
+	}
+
 	private handleEmptyClick = (event) => {
 		const { note, edit, elementEditing, toggleInsertMenu, isNotepadOpen } = this.props;
 		if ((event.target !== this.viewerDiv && event.target !== this.containerDiv)) return;
