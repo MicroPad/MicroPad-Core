@@ -130,7 +130,7 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 		const { element, updateElement } = this.props;
 		if (!this.canvasElement) return;
 
-		// Update element with canvas contents
+		// Update element with canvas contents replacing the old asset
 		updateElement!(element.args.id, element, dataURItoBlob(this.canvasElement.toDataURL()));
 	}
 
@@ -147,7 +147,7 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 			const pos = this.getRealPosition(this.copyTouch(event));
 			if (event.pressure < 0) return;
 
-			this.ctx.strokeStyle = this.getLineStyle(event);
+			this.ctx.strokeStyle = this.getLineStyle();
 
 			const idx = this.ongoingTouchIndexById(event.pointerId);
 			if (idx < 0) return;
@@ -161,7 +161,7 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 			ongoingPos = this.getRealPosition(this.ongoingTouches[idx]);
 			this.ctx.moveTo(ongoingPos.x, ongoingPos.y);
 			this.ctx.lineTo(pos.x, pos.y);
-			this.ctx.lineWidth = (this.shouldErase(event)) ? 20 : event.pressure * 10;
+			this.ctx.lineWidth = event.pressure * 10;
 			this.ctx.lineCap = 'round';
 			this.ctx.stroke();
 
@@ -173,8 +173,8 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 			const idx = this.ongoingTouchIndexById(event.pointerId);
 			if (idx < 0 && !this.shouldErase(event)) return;
 
-			this.ctx.lineWidth = (this.shouldErase(event)) ? 20 : event.pressure * 10;
-			this.ctx.fillStyle = this.getLineStyle(event);
+			this.ctx.lineWidth = event.pressure * 10;
+			this.ctx.fillStyle = this.getLineStyle();
 			this.ctx.beginPath();
 			ongoingPos = this.getRealPosition(this.ongoingTouches[idx]);
 
@@ -226,11 +226,8 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 		return this.isErasing || event.buttons === 32;
 	}
 
-	private getLineStyle = (event: PointerEvent): string => {
-		if (this.shouldErase(event)) return '#ffffff';
-		if (this.isRainbow) return '#' + Math.random().toString(16).substr(-6);
-
-		return '#000000';
+	private getLineStyle = (): string => {
+		return (this.isRainbow) ? '#' + Math.random().toString(16).substr(-6) : '#000000';
 	}
 
 	private openEditor = () => {
