@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-04-30T00:56:38.540+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
+<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-05-04T21:20:26.527+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
 µPad, also known as *MicroPad*, is a note taking application that is built upon the principles of power and openness.
 
 µPad acts like a whiteboard to take notes on, rather than a linear metaphor, like a page.
@@ -108,6 +108,20 @@ You can always use an image element, but if you want to do it within markdown it
 
 ![](https://via.placeholder.com/32x32)  
 ![](https://nick.geek.nz/images/coco.jpg =200x*)
+
+### Tables
+You can write out a table like so:  
+```
+| Header 1 | Header 2 |
+|--|--|
+| Hello | World |
+| This is a guide | Guides are good |
+```
+
+| Header 1 | Header 2 |
+|--|--|
+| Hello | World |
+| This is a guide | Guides are good |
 
 ## µPad Specific Formatting
 ### Hashtags
