@@ -11,6 +11,7 @@ export interface INotepadExplorerComponentProps {
 	notepad?: INotepad;
 	openSections: string[];
 	isFullScreen: boolean;
+	openNote?: INote;
 	flipFullScreenState?: () => void;
 	deleteNotepad?: (title: string) => void;
 	exportNotepad?: () => void;
@@ -21,6 +22,7 @@ export interface INotepadExplorerComponentProps {
 	expandSection?: (guid: string) => void;
 	collapseSection?: (guid: string) => void;
 	expandAll?: () => void;
+	expandFromNote?: (note: INote) => void;
 	collapseAll?: () => void;
 	newSection?: (obj: INewNotepadObjectAction) => void;
 	newNote?: (obj: INewNotepadObjectAction) => void;
@@ -33,11 +35,13 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		const {
 			notepad,
 			isFullScreen,
+			openNote,
 			flipFullScreenState,
 			deleteNotepad,
 			exportNotepad,
 			renameNotepad,
 			expandAll,
+			expandFromNote,
 			collapseAll
 		} = this.props;
 		this.openSections = new Set<string>(this.props.openSections);
@@ -69,7 +73,12 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 								renameNotepad={renameNotepad}/>
 						</strong>
 						<p style={{paddingLeft: '10px', marginTop: '0px'}}>
-							(<a href="#!" onClick={expandAll}>Expand All</a> | <a href="#!" onClick={collapseAll}>Collapse All</a>)
+							(<a href="#!" onClick={expandAll}>Expand All</a> | <a href="#!" onClick={() => {
+								if (!!openNote) {
+									collapseAll!();
+									expandFromNote!(openNote);
+								}
+							}}>Focus Mode</a> | <a href="#!" onClick={collapseAll}>Collapse All</a>)
 						</p>
 
 						<div className="explorer-note add-button" key={generateGuid()} style={{margin: 0}}>
