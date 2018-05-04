@@ -90,7 +90,13 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	componentWillUpdate(newProps: INoteViewerComponentProps) {
 		const { note } = this.props;
 
-		if ((!!newProps.note && !!note) && newProps.note.internalRef !== note.internalRef) this.viewerDiv.scrollTo(0, 0);
+		if ((!!newProps.note && !!note) && newProps.note.internalRef !== note.internalRef) {
+			try {
+				this.viewerDiv.scrollTo(0, 0);
+			} catch (e) {
+				console.warn(`This browser doesn't support element.scrollTo`);
+			}
+		}
 	}
 
 	private handleEmptyClick = (event) => {
