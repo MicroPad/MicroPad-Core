@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { INote, NoteElement } from '../../types/NotepadTypes';
+import { IElementArgs, INote, NoteElement } from '../../types/NotepadTypes';
 import { IInsertElementAction } from '../../types/ActionTypes';
 import './elements/NoteElementComponent.css';
 import './InsertElementComponent.css';
 import { IInsertElementState } from '../../reducers/NoteReducer';
 import { generateGuid } from 'src/util';
+import { Icon } from 'react-materialize';
 
 export interface IInsertElementComponentProps {
 	note: INote;
@@ -31,6 +32,14 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 		const insertX = Math.abs(Math.floor(document.getElementById('note-container')!.getBoundingClientRect().left)) + x;
 		const insertY = (Math.abs(Math.floor(document.getElementById('note-container')!.getBoundingClientRect().top)) + y) - 128;
 
+		const defaultArgs: IElementArgs = {
+			id: '',
+			x: insertX + 'px',
+			y: insertY + 'px',
+			width: 'auto',
+			height: 'auto'
+		};
+
 		return (
 			<div className="noteElement" style={containerStyles}>
 				<div id="insert-element" className="z-depth-2 hoverable">
@@ -39,12 +48,8 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'markdown',
 							args: {
-								id: '',
-								fontSize: fontSize,
-								x: insertX + 'px',
-								y: insertY + 'px',
-								width: 'auto',
-								height: 'auto'
+								...defaultArgs,
+								fontSize: fontSize
 							},
 							content: ''
 						})}>Text (with markdown formatting)</a></li>
@@ -52,11 +57,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'image',
 							args: {
-								id: '',
-								x: insertX + 'px',
-								y: insertY + 'px',
-								width: 'auto',
-								height: 'auto',
+								...defaultArgs,
 								ext: generateGuid()
 							},
 							content: 'AS'
@@ -65,11 +66,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'drawing',
 							args: {
-								id: '',
-								x: insertX + 'px',
-								y: insertY + 'px',
-								width: 'auto',
-								height: 'auto',
+								...defaultArgs,
 								ext: generateGuid()
 							},
 							content: 'AS'
@@ -78,11 +75,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'file',
 							args: {
-								id: '',
-								x: insertX + 'px',
-								y: insertY + 'px',
-								width: 'auto',
-								height: 'auto',
+								...defaultArgs,
 								ext: generateGuid(),
 								filename: ''
 							},
@@ -92,11 +85,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'recording',
 							args: {
-								id: '',
-								x: insertX + 'px',
-								y: insertY + 'px',
-								width: 'auto',
-								height: 'auto',
+								...defaultArgs,
 								ext: generateGuid(),
 								filename: ''
 							},
