@@ -16,6 +16,15 @@ type Position = {
 	y: number
 };
 
+const rainbow = [
+	'#E70000',
+	'#FF8C00',
+	'#FFEF00',
+	'#00811F',
+	'#0044FF',
+	'#760089'
+];
+
 export default class DrawingElementComponent extends React.Component<INoteElementComponentProps> {
 	private imageElement: HTMLImageElement;
 	private hasTrimmed: boolean;
@@ -27,6 +36,7 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 
 	private isErasing = false;
 	private isRainbow = false;
+	private rainbowIndex = 0;
 
 	render() {
 		const { element, noteAssets, elementEditing } = this.props;
@@ -227,7 +237,14 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 	}
 
 	private getLineStyle = (): string => {
-		return (this.isRainbow) ? '#' + Math.random().toString(16).substr(-6) : '#000000';
+		// Increment through the colours of the rainbow and reset to the beginning when reaching the last colour
+		const newIndex = (this.isRainbow)
+			? (this.rainbowIndex < rainbow.length - 1)
+				? 1
+				: this.rainbowIndex * -1
+			: this.rainbowIndex;
+
+		return (this.isRainbow) ? rainbow[this.rainbowIndex += newIndex] : '#000000';
 	}
 
 	private openEditor = () => {
