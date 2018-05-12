@@ -57,9 +57,13 @@
 		"@types/showdown": "^1.7.3",
 		"enzyme": "^3.3.0",
 		"enzyme-adapter-react-16": "^1.1.1",
+		"ineeda": "^0.12.0-alpha.0",
+		"jest-marbles": "^1.1.2",
 		"raw-loader": "^0.5.1",
 		"react-addons-test-utils": "^15.6.2",
 		"react-scripts": "^1.1.4",
+		"redux-mock-store": "^1.5.1",
+		"sinon": "^5.0.7",
 		"typescript": "^2.7.1"
 	}
 }
