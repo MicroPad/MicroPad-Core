@@ -1,6 +1,6 @@
 {
 	"name": "upad-parse",
-	"version": "2.7.1",
+	"version": "2.7.2",
 	"description": "This is a parser for the NPX file format that µPad uses",
 	"main": "src/index.js",
 	"scripts": {
@@ -19,7 +19,7 @@
 	"dependencies": {
 		"date-fns": "^1.29.0",
 		"pretty-data": "^0.40.0",
-		"to-markdown": "^3.0.3",
+		"to-markdown": "^3.1.1",
 		"xml2js": "^0.4.17"
 	},
 	"devDependencies": {
