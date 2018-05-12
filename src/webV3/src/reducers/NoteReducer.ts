@@ -10,6 +10,7 @@ export interface IInsertElementState {
 }
 
 export interface ICurrentNoteState {
+	isLoading: boolean;
 	ref: string;
 	assetUrls: object;
 	elementEditing: string;
@@ -19,6 +20,7 @@ export interface ICurrentNoteState {
 export class NoteReducer implements IReducer<ICurrentNoteState> {
 	public readonly key: string = 'currentNote';
 	public readonly initialState: ICurrentNoteState = {
+		isLoading: false,
 		ref: '',
 		assetUrls: {},
 		elementEditing: '',
@@ -39,10 +41,21 @@ export class NoteReducer implements IReducer<ICurrentNoteState> {
 		) {
 			this.cleanUpObjectUrls(state.assetUrls);
 			return this.initialState;
+		} else if (isType(action, actions.loadNote.started)) {
+			return {
+				...state,
+				isLoading: true
+			};
+		} else if (isType(action, actions.loadNote.failed)) {
+			return {
+				...state,
+				isLoading: false
+			};
 		} else if (isType(action, actions.loadNote.done)) {
 			this.cleanUpObjectUrls(state.assetUrls);
 			return {
 				...state,
+				isLoading: false,
 				ref: action.payload.params,
 				assetUrls: action.payload.result,
 				elementEditing: ''

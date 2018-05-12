@@ -24,7 +24,8 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 		note,
 		noteAssets: currentNote.assetUrls,
 		elementEditing: currentNote.elementEditing,
-		isNotepadOpen: !!notepads.notepad && !!notepads.notepad.item
+		isNotepadOpen: !!notepads.notepad && !!notepads.notepad.item,
+		isLoading: currentNote.isLoading || notepads.isLoading || (!!notepads.notepad && notepads.notepad.isLoading)
 	};
 }
 

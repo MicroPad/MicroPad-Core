@@ -10,17 +10,14 @@
 }
 
 #note-viewer.empty {
-	/*animation: slide 85s linear infinite;*/
 	/*noinspection CssUnknownTarget*/
 	background-image: url("/assets/background.png");
 }
 
-/*@keyframes slide {*/
-	/*from {*/
-		/*background-position: 0 0;*/
-	/*}*/
+#progress-bar {
+	position: relative;
+}
 
-	/*to {*/
-		/*background-position: 100vh 0;*/
-	/*}*/
-/*}*/
+#progress-bar > .progress {
+	position: absolute;
+}

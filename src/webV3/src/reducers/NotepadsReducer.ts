@@ -33,7 +33,6 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 		} else if (isType(action, actions.parseNpx.started)) {
 			return {
 				...state,
-				isLoading: true,
 				notepad: {
 					saving: false,
 					isLoading: true

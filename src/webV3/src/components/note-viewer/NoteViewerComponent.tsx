@@ -3,6 +3,7 @@ import './NoteViewerComponent.css';
 import { INote, NoteElement } from '../../types/NotepadTypes';
 import NoteElementComponent from './elements/NoteElementComponent';
 import * as Materialize from 'materialize-css/dist/js/materialize.js';
+import { ProgressBar } from 'react-materialize';
 import { Observable } from 'rxjs/Observable';
 import { filter, map } from 'rxjs/operators';
 import { fromEvent } from 'rxjs/observable/fromEvent';
@@ -10,6 +11,7 @@ import { IInsertElementState } from '../../reducers/NoteReducer';
 import InsertElementComponent from '../../containers/InsertElementContainer';
 
 export interface INoteViewerComponentProps {
+	isLoading: boolean;
 	isFullscreen: boolean;
 	note?: INote;
 	elementEditing: string;
@@ -39,7 +41,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	render() {
-		const { isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement, deleteElement } = this.props;
+		const { isLoading, isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement, deleteElement } = this.props;
 
 		const classes: string = (!note || note.elements.length === 0) ? 'empty' : '';
 		let styles = {};
@@ -73,6 +75,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 
 		return (
 			<div id="note-viewer" className={classes} style={styles} ref={div => this.viewerDiv = div!} onClick={this.handleEmptyClick}>
+				{isLoading && <div id="progress-bar"><ProgressBar className="amber" /></div>}
 				{!!note && <InsertElementComponent />}
 				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}>
 					{elements}
