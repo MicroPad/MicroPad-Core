@@ -3,3 +3,4 @@ node_js:
   - "node"
 before_script:
   - cd src/webV3
+  - npm install
