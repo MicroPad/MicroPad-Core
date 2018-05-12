@@ -84,6 +84,19 @@ export namespace MarkDownViewer {
 		.hidden {
 			display: none;
 		}
+		
+		@media print {
+			html, body, #content {
+				margin: 0;
+				padding: 0;
+				overflow-x: hidden;
+				overflow-y: hidden;
+			}
+			
+			.MathJax_SVG {
+				display: none;
+			}
+		}
 	</style>
 	
 	<script type="text/x-mathjax-config">
@@ -113,6 +126,7 @@ export namespace MarkDownViewer {
 	var element;
 	var showHidden = true;
 	var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+	let isPrinting = false;
 
 	window.addEventListener('message', handleMessage);
 	
@@ -148,6 +162,7 @@ export namespace MarkDownViewer {
 				content.style.width = element.args.width || 'auto';
 				content.style.height = element.args.height || '50px';
 				content.style.fontSize = element.args.fontSize || '16px';
+				isPrinting = element.isPrinting;
 
 				document.getElementById('content').innerHTML = element.content;
 				
@@ -160,6 +175,7 @@ export namespace MarkDownViewer {
 				manageToDoItems();
 				adjustWidth();
 
+				if (isPrinting) break;
 				MathJax.Hub.Queue(['Typeset', MathJax.Hub, content]);
 				MathJax.Hub.Queue(function () {
 					if (!element.args.width || element.args.width === 'auto') {

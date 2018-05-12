@@ -13,9 +13,10 @@ import Resizable from 're-resizable';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
+	isPrinting?: boolean;
 }
 
-interface IMarkdownViewMessage {
+export interface IMarkdownViewMessage {
 	type: string;
 	id: string;
 	payload?: any;
@@ -112,6 +113,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					{
 						!isEditing
 						&& <iframe
+							id={`${element.args.id}-iframe`}
 							style={iframeStyle}
 							ref={iframe => this.iframe = iframe!}
 							srcDoc={MarkDownViewer.getHtml(element.args.id)}
@@ -139,8 +141,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		);
 	}
 
-	componentDidUpdate(props: INoteElementComponentProps) {
-		const { element } = props;
+	componentDidUpdate(props: IMarkdownElementComponentProps) {
+		const { element, isPrinting } = props;
 
 		if (!!this.iframe) {
 			this.iframe.onload = () => {
@@ -151,7 +153,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 							id: element.args.id,
 							payload: {
 								...element,
-								content: html
+								content: html,
+								isPrinting
 							}
 						});
 					});
