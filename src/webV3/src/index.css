@@ -59,6 +59,10 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	box-shadow: 0 1px 0 0 #ffb300 !important;
 }
 
+.btn:hover, .btn-large:hover {
+	background-color: #ffb300;
+}
+
 div.col.input-field {
 	width: 100%;
 }
