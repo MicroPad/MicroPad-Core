@@ -123,7 +123,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 								</Row>
 
 								<Row style={{paddingLeft: '5px'}}>
-									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{marginRight: '5px'}}>Close</Button>
+									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{marginRight: '5px', float: 'right'}}>Close</Button>
 								</Row>
 							</div>
 						}
