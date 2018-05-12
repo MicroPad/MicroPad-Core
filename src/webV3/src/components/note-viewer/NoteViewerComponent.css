@@ -1,0 +1,23 @@
+#note-viewer {
+	order: 0;
+	width: calc(100vw - 300px);
+	overflow: auto;
+}
+
+#note-container {
+	transform-origin: 0 0;
+	transform: scale(1);
+}
+
+#note-viewer.empty {
+	/*noinspection CssUnknownTarget*/
+	background-image: url("/assets/background.png");
+}
+
+#progress-bar {
+	position: relative;
+}
+
+#progress-bar > .progress {
+	position: absolute;
+}

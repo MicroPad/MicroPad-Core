@@ -1,0 +1,9 @@
+#breadcrumb-holder > nav {
+	background-color: #607d8b !important;
+	overflow-x: auto;
+	overflow-y: hidden;
+	white-space: nowrap;
+	height: 64px;
+	line-height: 64px;
+	margin-bottom: 0;
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-8931238-15"></script>
+	<script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-8931238-15');
+	</script>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="theme-color" content="#000000">
+	<!--
+	manifest.json provides metadata used when your web app is added to the
+	homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
+	-->
+	<link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+	<link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+	<link rel="stylesheet" href="%PUBLIC_URL%/assets/please-wait/please-wait.css">
+	<!--
+	Notice the use of %PUBLIC_URL% in the tags above.
+	It will be replaced with the URL of the `public` folder during the build.
+	Only files inside the `public` folder can be referenced from the HTML.
+
+	Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+	work correctly both with client-side routing and a non-root public URL.
+	Learn how to configure a non-root public URL by running `npm run build`.
+	-->
+
+	<title>µPad</title>
+</head>
+<body>
+	<noscript>
+		You need to enable JavaScript to run this app.<br/>
+		Don't worry, it's all <a href="https://github.com/NickGeek/MicroPad">open source (MPLv2)</a>. Your freedoms are safe.
+	</noscript>
+	<div id="root"></div>
+	<script type="text/javascript" src="%PUBLIC_URL%/assets/please-wait/please-wait.min.js"></script>
+	<script type="text/javascript">
+		var loadingScreen = window.pleaseWait({
+			logo: "%PUBLIC_URL%/assets/loading.gif",
+			backgroundColor: "#607d8b",
+			loadingHtml: "<p style='font-size: 2rem; color: white; font-weight: 300;'>We're just loading everything now&hellip;" +
+			"<br /><br />While you're waiting, how about a little riddle?" +
+			"<br />Does <a target='_blank' rel='noopener noreferrer' style='color: white;' href='https://en.wikipedia.org/wiki/P_versus_NP_problem'>" +
+			"<em style='font-family: serif;'>p = np</em></a>?</p>"
+		});
+
+		document.addEventListener('DOMContentLoaded', function () {
+			loadingScreen.finish();
+		}, false);
+
+		if (navigator.storage && navigator.storage.persist) {
+			navigator.storage.persist();
+		}
+	</script>
+</body>
+</html>
