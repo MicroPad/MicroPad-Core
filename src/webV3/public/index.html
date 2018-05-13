@@ -42,7 +42,7 @@
 	<div id="print-mount"></div>
 	<script type="text/javascript" src="%PUBLIC_URL%/assets/please-wait/please-wait.min.js"></script>
 	<script type="text/javascript">
-		var loadingScreen = window.pleaseWait({
+		const loadingScreen = window.pleaseWait({
 			logo: "%PUBLIC_URL%/assets/loading.gif",
 			backgroundColor: "#607d8b",
 			loadingHtml: "<p style='font-size: 2rem; color: white; font-weight: 300;'>We're just loading everything now&hellip;" +
@@ -58,6 +58,11 @@
 		if (navigator.storage && navigator.storage.persist) {
 			navigator.storage.persist();
 		}
+
+		window.addEventListener('beforeinstallprompt', e => {
+			e.preventDefault();
+			e.prompt();
+		});
 	</script>
 </body>
 </html>
