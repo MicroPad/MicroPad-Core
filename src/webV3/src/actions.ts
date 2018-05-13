@@ -52,5 +52,6 @@ export const actions = {
 	deleteElement: actionCreator<IDeleteElementAction>('DELETE_ELEMENT'),
 	queueParseNpx: actionCreator<string>('QUEUE_PARSE_NPX'),
 	parseEnex: actionCreator<string>('PARSE_ENEX'),
-	updateBibliography: actionCreator<IUpdateBibliographyAction>('UPDATE_BIBLIOGRAPHY')
+	updateBibliography: actionCreator<IUpdateBibliographyAction>('UPDATE_BIBLIOGRAPHY'),
+	loadNotepadByIndex: actionCreator<number>('LOAD_NOTEPAD_BY_INDEX')
 };
