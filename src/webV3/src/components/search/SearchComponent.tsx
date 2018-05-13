@@ -91,9 +91,16 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	}
 
 	private loadNoteFromInput = (value: string) => {
-		const { loadNote } = this.props;
+		const { loadNote, search } = this.props;
 		const index: number = parseInt(value.split('.')[0], 10) - 1;
 
+		this.closeModal();
+		setTimeout(() => search!(''), 10);
 		loadNote!(this.mappedNotesToOptions[index].internalRef);
+	}
+
+	private closeModal = () => {
+		const overlay: HTMLElement | null = document.querySelector('.modal-overlay');
+		if (!!overlay) overlay.click();
 	}
 }
