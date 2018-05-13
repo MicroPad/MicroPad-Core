@@ -20,7 +20,8 @@ afterEach(() => {
 });
 
 describe('expandAll$', () => {
-	beforeEach(() => {
+	it('should map to action with list of internalRefs', () => {
+		// Arrange
 		store = mockStore(ineeda<IStoreState>({
 			notepads: {
 				notepad: {
@@ -48,10 +49,6 @@ describe('expandAll$', () => {
 			}
 		}));
 
-	});
-
-	it('should map to action with list of internalRefs', () => {
-		// Arrange
 		const res: Observable<Action<string[]>> = ExplorerEpics.expandAll$(cold('a', {
 			a: actions.expandAllExplorer.started(undefined)
 		}), store);
@@ -63,6 +60,32 @@ describe('expandAll$', () => {
 		expect(res).toBeObservable(cold('a', { a: actions.expandAllExplorer.done({
 				params: undefined,
 				result: ['test1', 'test2', 'test3']
+		})}));
+	});
+
+	it('should map to empty list if no sections in notepad', () => {
+		// Arrange
+		store = mockStore(ineeda<IStoreState>({
+			notepads: {
+				notepad: {
+					item: {
+						sections: []
+					}
+				}
+			}
+		}));
+		
+		const res: Observable<Action<string[]>> = ExplorerEpics.expandAll$(cold('a', {
+			a: actions.expandAllExplorer.started(undefined)
+		}), store);
+
+		// Act
+		res.subscribe();
+
+		// Assert
+		expect(res).toBeObservable(cold('a', { a: actions.expandAllExplorer.done({
+				params: undefined,
+				result: []
 		})}));
 	});
 });
