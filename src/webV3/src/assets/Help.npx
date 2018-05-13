@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-05-13T15:01:03.504+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
+µPad, also known as *MicroPad*, is a note taking application that is built upon the principles of power and openness.
+
+µPad acts like a whiteboard to take notes on, rather than a linear metaphor, like a page.
+
+*Last Updated for µPad v3.0.0-dev (DRAFT)*
+
+[![Build Status](https://travis-ci.com/NickGeek/MicroPad.svg?branch=webv3)](https://travis-ci.com/NickGeek/MicroPad)</markdown></note><note title="Licence" time="2017-05-02T17:17:13.512+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px">The licence for µPad and included works can be found [here](https://github.com/NickGeek/MicroPad/blob/master/LICENSE) and [here for webv3](https://github.com/NickGeek/MicroPad/blob/webv3/src/webV3/LICENCE.md).</markdown></note></section><section title="General Use"><note title="µPad Text Formatting Guide for People in a Hurry" time="2017-05-02T17:15:33.650+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="727px" height="auto" fontSize="16px"><![CDATA[µPad uses *[GitHub Flavoured Markdown](https://guides.github.com/features/mastering-markdown/)* as a base for its formatting, so feel free to read their guide for a more complete tutorial. There is a pretty good chance you have used #Markdown before, it's the formatting system on [Reddit](https://reddit.com), [Discord](https://discordapp.com), and more.
+
+## The Basics
+### Creating a new line
+In Markdown you can hit
+enter at anytime you would like to make the underlying text look prettier. However, this won't insert a new line at all.
+
+You can insert a new line by putting two spaces at the end of a line *before* pressing enter, like so:  
+```
+this·is·a·line··
+and·I·broke·it.
+```
+
+this is a line  
+and I broke it.
+
+### Creating a new paragraph
+Creating a new paragraph is simple! Just hit enter twice :smile:
+
+Like so:  
+paragraph1
+
+paragraph2
+
+### Bold, Italics, and strike-through
+```
+I want to be **bold**, *fast*, and ~~col~~ cool.
+```
+
+I want to be **bold**, *fast*, and ~~col~~ cool.
+
+### Links
+Creating a link is pretty simple:  
+```
+[text for link](https://example.com)
+```
+
+[text for link](https://example.com)
+
+### Headings
+Markdown allows you to create headings super quickly:  
+```
+# Heading
+# Sub-heading
+### Sub-sub-heading
+#### Maybe *too* much organisation
+```
+<hr />
+# Heading
+# Sub-heading
+### Sub-sub-heading
+#### Maybe *too* much organisation
+<hr />
+
+## More Advanced Formatting
+### Lists
+Creating lists in Markdown couldn't  be simpler:  
+```
+- just
+- do
+- this
+* or
+	* this
+		- and stuff
+```
+
+- just
+- do
+- this
+* or
+	* this
+		- and stuff
+
+### Todo Lists
+A todo list is just a list with a little `[ ]` next to it:  
+```
+- [ ] like
+- [] this
+- [x] and I did this one
+```
+
+- [ ] like
+- [] this
+- [x] and I did this one
+
+### Quotes
+Quotes are great for calling out a key bit of information, or you know, a quote :laughing:  
+```
+> This is a quote  
+> - Nick Webster
+```
+
+> This is a quote  
+> - Nick Webster
+
+### Inline Images
+You can always use an image element, but if you want to do it within markdown it is like so:
+```
+![](https://via.placeholder.com/32x32)  
+![](https://nick.geek.nz/coco.jpg =200x*)
+```
+
+![](https://via.placeholder.com/32x32)  
+![](https://nick.geek.nz/images/coco.jpg =200x*)
+
+### Tables
+You can write out a table like so:  
+```
+| Header 1 | Header 2 |
+|--|--|
+| Hello | World |
+| This is a guide | Guides are good |
+```
+
+| Header 1 | Header 2 |
+|--|--|
+| Hello | World |
+| This is a guide | Guides are good |
+
+## µPad Specific Formatting
+### Hashtags
+Hashtags are a great way to unify a bunch of notes together. One example is to put #todo on all your notes that have things you need to get done in them. It's as simple as putting a hashtag in a Markdown element in a note.
+
+### [AsciiMath](http://asciimath.org)
+AsciiMath is a great way to write maths very quickly. The website linked above has a number of the commands you can use with it, but there are many that aren't listed. Generally it supports all the ;;\LaTeX;; commands (just without the `\`) alongside a number of shorter alternatives like `:.` for '':.''.
+
+Using ASCIIMath in your code is simple:
+```
+===a^2 = b^2 + c^2===  
+''a^2 = b^2 + c^2'' (that's two apostrophes ' not a quotation mark ")
+```
+
+===a^2 = b^2 + c^2===  
+''a^2 = b^2 + c^2'' (that's two apostrophes ' not a quotation mark ")
+
+### LaTeX
+For more powerful maths you can always use ;;\LaTeX;; like so:  
+```
+;;a^2 = b^2 + c^2;;
+```
+
+;;a^2 = b^2 + c^2;;]]></markdown></note><note title="Keyboard Shortcuts" time="2017-05-02T17:34:32.349+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="auto" height="auto" fontSize="16px">| Shortcut | Use |
+|--|--|
+| F | Shows/hides the *Notepad Explorer* (side-bar) |
+| Ctrl+F/⌘+F | If a notepad is open, search that notepad for a note. |
+| Ctrl+P/⌘+P | If a note is open, opens the Print/Export to PDF dialog |
+| Ctrl+[1-9]/⌘+[1-9] | Open the notepad in that order from the drop-down |</markdown></note><note title="Notepad Structure" time="2017-10-29T21:43:39.056+13:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="632px" height="auto" fontSize="16px"># Notepad
+Notepads act like the binder that everything else goes in.
+
+Inside a notepad you can have as many sections as you want.
+
+## Section
+Sections are the parents of notes and more sections. You can have as many notes as you like in a section, and as many sub-sections as you would like.
+
+By nesting sections you can create a well organised notepad.
+
+### Note
+Notes are like a whiteboard, you can put an element anywhere on the page. There is no limit to how many elements you can have on a note, or how wide/long a note can be.
+
+#### Element
+- Appear as cards on the note
+- Can be
+	- Text (formatted with #markdown)
+	- Images
+	- Drawings
+	- Recordings
+	- and more
+
+#### Bibliography
+Every element in a note can have URLs attached to it so you can keep track of where you got the information from.
+
+You can have as many sources as you like in your bibliography.</markdown></note></section><section title="Development"><section title="Open Notepad XML (NPX)"><note title="Introduction" time="2017-05-02T18:58:58.581+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="700px" height="auto" fontSize="16px"><![CDATA[Note: *the following guidelines will work but were written before the asset system was introduced.*
+
+The *Open Notepad XML* Format (also known as NPX) is an XML based format with an XSD schema available [here](https://getmicropad.com/schema.xsd). An example notepad using this format (with comments) can be found [here](https://github.com/NickGeek/MicroPad/blob/master/examples/Example%20Notepad.npx).
+
+NPX is designed to  be highly extensible. When you could be adding features to a note that are outside of the core features you can define an `<import>` in the note's addon section. Clients that can read NPX should notify the user when unsupported addons are used.]]></markdown></note><note title="Core Features" time="2017-05-02T19:04:04.555+12:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="700px" height="auto" fontSize="16px">| Feature | Explanation |
+|--|--|
+| Markdown | Markdown text. Making the feature as compatible with GitHub Markdown as possible is a bonus. |
+| Images | Display images stored inside the tag as base64 |
+| Drawings | Display drawings as images and automatically crop out unused space. Allowing editing of drawings is a bonus. |
+| Files | Embed files inside the tag as base64 |
+| Recordings | Recordings should be stored inside the tag as base64. MicroPad uses Opus. |
+
+*N.B. Binary asset handling changed as of µPad v2. More information coming soon.*</markdown></note></section></section></notepad>

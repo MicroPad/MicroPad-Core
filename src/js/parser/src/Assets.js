@@ -34,6 +34,10 @@ exports.Assets.prototype.getBase64Assets = function (callback) {
 	for (let i = 0; i < this.assets.length; i++) {
 		blobToDataURL(this.assets[i].data, b64 => {
 			parsedAssets[this.assets[i].uuid] = b64;
+			
+			// Delete the asset if it couldn't be parsed into base64 properly
+			if (parsedAssets.length === '') delete parsedAssets[this.assets[i].uuid];
+
 			if (i === this.assets.length - 1) callback(parsedAssets);
 		});
 	}
@@ -50,9 +54,14 @@ exports.Asset = function (dataAsBlob, uuid) {
 };
 
 exports.Asset.prototype.toString = function (callback) {
-	blobToDataURL(this.data, b64 => {
-		callback(b64);
-	});
+	try {
+		blobToDataURL(this.data, b64 => {
+			callback(b64);
+		});
+	} catch (e) {
+		console.error(e);
+		callback('');
+	}
 };
 
 exports.Asset.prototype.getXMLObject = function (callback) {
@@ -81,11 +90,16 @@ exports.parse = function (xml, callback) {
 		}
 
 		for (var i = 0; i < assetsXML.asset.length; i++) {
-			var assetXML = assetsXML.asset[i];
+			try {
+				var assetXML = assetsXML.asset[i];
 
-			var asset = new exports.Asset(dataURItoBlob(assetXML._));
-			asset.uuid = assetXML.$.uuid;
-			assets.addAsset(asset);
+				var asset = new exports.Asset(dataURItoBlob(assetXML._));
+				asset.uuid = assetXML.$.uuid;
+				assets.addAsset(asset);
+			} catch (e) {
+				console.warn(`Can't parse the asset ${assetXML.$.uuid}`);
+				continue;
+			}
 		}
 		callback(assets);
 	});
