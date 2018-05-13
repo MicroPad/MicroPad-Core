@@ -16,11 +16,10 @@ export interface IPrintViewComponentProps {
 
 export default class PrintViewComponent extends React.Component<IPrintViewComponentProps> {
 	render() {
-		const { note, noteAssets } = this.props;
-		if (!note) return <div />;
+		const { note } = this.props;
+		if (!note) return <em>Open a note to print it</em>;
 
 		// Generate simplified divs for every element on the page
-
 		return (
 			<PageAsync promise={this.getElements()} then={elements =>
 				<div>

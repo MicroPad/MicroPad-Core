@@ -11,13 +11,14 @@ export interface IExplorerOptionsComponentProps {
 	renameNotepad?: (newTitle: string) => void;
 	deleteNotepadObject?: (internalId: string) => void;
 	renameNotepadObject?: (params: IRenameNotepadObjectAction) => void;
+	loadNote?: () => void;
 }
 
 export default class ExplorerOptionsComponent extends React.Component<IExplorerOptionsComponentProps> {
 	private titleInput: Input;
 
 	render() {
-		const { objToEdit, type, exportNotepad } = this.props;
+		const { objToEdit, type, exportNotepad, loadNote } = this.props;
 
 		const notepadOptions: JSX.Element = (
 			<div>
@@ -28,7 +29,12 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 
 		const noteOptions: JSX.Element = (
 			<div>
-				<Row><Button className="blue" waves="light">Export/Print Note (PDF)</Button></Row>
+				<Row><Button className="blue" waves="light" onClick={() => {
+					if (!!loadNote) loadNote();
+					this.closeModal();
+					setTimeout(() => window.print(), 1300);
+				}}>Export/Print Note (PDF)</Button></Row>
+				<p>If you want to generate a nice PDF using {APP_NAME}-markdown, try out <a target="_blank" rel="nofollow noreferrer" href="https://github.com/NickGeek/abstract">Abstract</a>.</p>
 			</div>
 		);
 
@@ -99,5 +105,10 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			default:
 				break;
 		}
+	}
+
+	private closeModal = () => {
+		const overlay: HTMLElement | null = document.querySelector('.modal-overlay');
+		if (!!overlay) overlay.click();
 	}
 }
