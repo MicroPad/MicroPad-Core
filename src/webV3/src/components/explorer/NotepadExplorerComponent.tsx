@@ -112,8 +112,8 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		const nodeLabelStyle = {
 			display: 'inline-flex',
 			verticalAlign: 'middle',
-			paddingBottom: '5px',
-			paddingTop: '5px'
+			paddingBottom: '10px',
+			paddingTop: '10px'
 		};
 
 		const childSections: JSX.Element[] = [];
