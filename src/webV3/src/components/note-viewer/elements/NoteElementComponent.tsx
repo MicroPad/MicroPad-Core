@@ -23,13 +23,15 @@ export interface INoteElementComponentProps extends Partial<INoteViewerComponent
 
 export default class NoteElementComponent extends React.Component<INoteElementComponentProps> {
 	private element: HTMLDivElement;
+	private container: HTMLDivElement;
+	private oldZIndex: string | null;
 
 	render() {
 		const { element, noteAssets, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
 		const isEditing = element.args.id === elementEditing;
 
 		const containerStyles = {
-			zIndex: (isEditing) ? 5000 : undefined
+			zIndex: (isEditing) ? 5000 : 'auto' as 'auto'
 		};
 
 		const elementStyles = {
@@ -105,11 +107,17 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 			<Draggable
 				onStart={() => {
 					if (navigator.vibrate) navigator.vibrate(100);
+					if (!this.container) return;
+					this.oldZIndex = this.container.style.zIndex;
+					this.container.style.zIndex = '5000';
 				}}
-				onStop={this.handleDrag}
+				onStop={(event, data) => {
+					this.handleDrag(event, data);
+					if (this.container) this.container.style.zIndex = (!!this.oldZIndex) ? this.oldZIndex : 'auto';
+				}}
 				defaultPosition={{ x: parseInt(element.args.x, 10), y: parseInt(element.args.y, 10) }}
 				handle=".handle">
-				<div className="noteElement" style={containerStyles}>
+				<div className="noteElement" style={containerStyles} ref={e => this.container = e!}>
 					<div className="z-depth-2 hoverable" style={elementStyles} ref={e => this.element = e!} onClick={this.openEditor}>
 						{!(isEditing && element.type === 'drawing') && <p className="handle">::::</p>}
 						{!!elementComponent && elementComponent}
@@ -123,7 +131,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 								</Row>
 
 								<Row style={{paddingLeft: '5px'}}>
-									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{marginRight: '5px'}}>Close</Button>
+									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{marginRight: '5px', float: 'right'}}>Close</Button>
 								</Row>
 							</div>
 						}

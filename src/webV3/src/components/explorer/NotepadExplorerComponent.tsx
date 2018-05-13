@@ -107,13 +107,13 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 	}
 
 	private generateSectionTreeView(section: ISection): JSX.Element {
-		const { loadNote, deleteNotepadObject, renameNotepadObject } = this.props;
+		const { loadNote, deleteNotepadObject, renameNotepadObject, openNote } = this.props;
 
 		const nodeLabelStyle = {
 			display: 'inline-flex',
 			verticalAlign: 'middle',
-			paddingBottom: '5px',
-			paddingTop: '5px'
+			paddingBottom: '10px',
+			paddingTop: '10px'
 		};
 
 		const childSections: JSX.Element[] = [];
@@ -129,6 +129,9 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						<ExplorerOptionsComponent
 							objToEdit={child}
 							type="note"
+							loadNote={() => {
+								if (!openNote || openNote.internalRef !== child.internalRef) loadNote!(child.internalRef);
+							}}
 							deleteNotepadObject={deleteNotepadObject}
 							renameNotepadObject={renameNotepadObject}/>
 					</span>

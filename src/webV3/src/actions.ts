@@ -12,8 +12,6 @@ import { IInsertElementState } from './reducers/NoteReducer';
 const actionCreator = actionCreatorFactory();
 
 export const actions = {
-	empty: actionCreator<void>('...'),
-
 	parseNpx: actionCreator.async<string, INotepad, any>('PARSE_NPX'),
 	saveNotepad: actionCreator.async<INotepad, void, any>('SAVE_NOTEPAD'),
 	getNotepadList: actionCreator.async<void, string[], any>('GET_NOTEPAD_LIST'),
@@ -54,5 +52,6 @@ export const actions = {
 	deleteElement: actionCreator<IDeleteElementAction>('DELETE_ELEMENT'),
 	queueParseNpx: actionCreator<string>('QUEUE_PARSE_NPX'),
 	parseEnex: actionCreator<string>('PARSE_ENEX'),
-	updateBibliography: actionCreator<IUpdateBibliographyAction>('UPDATE_BIBLIOGRAPHY')
+	updateBibliography: actionCreator<IUpdateBibliographyAction>('UPDATE_BIBLIOGRAPHY'),
+	loadNotepadByIndex: actionCreator<number>('LOAD_NOTEPAD_BY_INDEX')
 };

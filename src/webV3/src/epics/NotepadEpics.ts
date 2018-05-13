@@ -128,7 +128,7 @@ const exportNotepad$ = (action$, store) =>
 			const blob = new Blob([exportedNotepad.content], { type: 'text/xml;charset=utf-8' });
 			saveAs(blob, `${exportedNotepad.title}.npx`);
 		}),
-		map(() => actions.empty(undefined))
+		filter(() => false)
 	);
 
 const exportAll$ = (action$, store) =>
@@ -172,7 +172,7 @@ const exportAll$ = (action$, store) =>
 				saveAs(blob, `notepads.zip`);
 			});
 		}),
-		map(() => actions.empty(undefined))
+		filter(() => false)
 	);
 
 const exportAllToMarkdown$ = (action$, store) =>
@@ -220,7 +220,7 @@ const exportAllToMarkdown$ = (action$, store) =>
 				saveAs(blob, `notepads.zip`);
 			});
 		}),
-		map(() => actions.empty(undefined))
+		filter(() => false)
 	);
 
 const renameNotepad$ = (action$, store) =>
@@ -292,6 +292,15 @@ const getNextParse$ = action$ =>
 		map(() => actions.parseNpx.started(parseQueue[0]))
 	);
 
+const loadNotepadByIndex$ = (action$, store) =>
+	action$.pipe(
+		isAction(actions.loadNotepadByIndex),
+		map((action: Action<number>) => action.payload),
+		filter(index => !!(<IStoreState> store.getState()).notepads && (<IStoreState> store.getState()).notepads.savedNotepadTitles!.length >= index),
+		map((index: number) => (<IStoreState> store.getState()).notepads.savedNotepadTitles![index - 1]),
+		map((title: string) => actions.openNotepadFromStorage.started(title))
+	);
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	restoreJsonNotepad$,
@@ -303,7 +312,8 @@ export const notepadEpics$ = combineEpics(
 	downloadExternalNotepad$,
 	queueParseNpx$,
 	getNextParse$,
-	parseEnex$
+	parseEnex$,
+	loadNotepadByIndex$
 );
 
 interface IExportedNotepad {

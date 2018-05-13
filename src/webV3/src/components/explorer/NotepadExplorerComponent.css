@@ -53,8 +53,8 @@
 	display: flex;
 	white-space: nowrap;
 	margin-left: 16px;
-	padding-bottom: 5px;
-	padding-top: 5px
+	padding-bottom: 10px;
+	padding-top: 10px;
 }
 
 .explorer-note > span > .material-icons {

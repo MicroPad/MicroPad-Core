@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-05-12T21:29:59.812+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
+<notepad xsi:noNamespaceSchemaLocation="https://getmicropad.com/schema.xsd" title="Help" lastModified="2018-05-13T15:01:03.504+12:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><assets/><section title="About"><note title="About µPad" time="2017-05-02T17:05:17.327+12:00"><addons><import>asciimath</import></addons><bibliography><source id="1" item="markdown1">https://getmicropad.com/</source></bibliography><markdown id="markdown1" x="10px" y="10px" width="668px" height="auto" fontSize="16px"># What is µPad?
 µPad, also known as *MicroPad*, is a note taking application that is built upon the principles of power and openness.
 
 µPad acts like a whiteboard to take notes on, rather than a linear metaphor, like a page.
@@ -151,7 +151,8 @@ For more powerful maths you can always use ;;\LaTeX;; like so:
 |--|--|
 | F | Shows/hides the *Notepad Explorer* (side-bar) |
 | Ctrl+F/⌘+F | If a notepad is open, search that notepad for a note. |
-| Ctrl+P/⌘+P | If a note is open, opens the Print/Export to PDF dialog |</markdown></note><note title="Notepad Structure" time="2017-10-29T21:43:39.056+13:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="632px" height="auto" fontSize="16px"># Notepad
+| Ctrl+P/⌘+P | If a note is open, opens the Print/Export to PDF dialog |
+| Ctrl+[1-9]/⌘+[1-9] | Open the notepad in that order from the drop-down |</markdown></note><note title="Notepad Structure" time="2017-10-29T21:43:39.056+13:00"><addons><import>asciimath</import></addons><bibliography/><markdown id="markdown1" x="10px" y="10px" width="632px" height="auto" fontSize="16px"># Notepad
 Notepads act like the binder that everything else goes in.
 
 Inside a notepad you can have as many sections as you want.
