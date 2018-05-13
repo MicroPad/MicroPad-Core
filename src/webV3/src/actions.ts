@@ -12,8 +12,6 @@ import { IInsertElementState } from './reducers/NoteReducer';
 const actionCreator = actionCreatorFactory();
 
 export const actions = {
-	empty: actionCreator<void>('...'),
-
 	parseNpx: actionCreator.async<string, INotepad, any>('PARSE_NPX'),
 	saveNotepad: actionCreator.async<INotepad, void, any>('SAVE_NOTEPAD'),
 	getNotepadList: actionCreator.async<void, string[], any>('GET_NOTEPAD_LIST'),

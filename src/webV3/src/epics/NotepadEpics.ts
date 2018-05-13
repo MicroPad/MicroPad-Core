@@ -128,7 +128,7 @@ const exportNotepad$ = (action$, store) =>
 			const blob = new Blob([exportedNotepad.content], { type: 'text/xml;charset=utf-8' });
 			saveAs(blob, `${exportedNotepad.title}.npx`);
 		}),
-		map(() => actions.empty(undefined))
+		filter(() => false)
 	);
 
 const exportAll$ = (action$, store) =>
@@ -172,7 +172,7 @@ const exportAll$ = (action$, store) =>
 				saveAs(blob, `notepads.zip`);
 			});
 		}),
-		map(() => actions.empty(undefined))
+		filter(() => false)
 	);
 
 const exportAllToMarkdown$ = (action$, store) =>
@@ -220,7 +220,7 @@ const exportAllToMarkdown$ = (action$, store) =>
 				saveAs(blob, `notepads.zip`);
 			});
 		}),
-		map(() => actions.empty(undefined))
+		filter(() => false)
 	);
 
 const renameNotepad$ = (action$, store) =>

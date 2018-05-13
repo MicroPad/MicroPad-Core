@@ -105,9 +105,9 @@ const cleanUnusedAssets$ = (action$, store) =>
 				return fromPromise(Promise.all(unusedAssets.map(guid => ASSET_STORAGE.removeItem(guid))).then(() => unusedAssets));
 			}),
 			mergeMap((unusedAssets: string[]) => [
-				...unusedAssets.map(guid => actions.untrackAsset(guid)),
-				actions.empty(undefined)
-			])
+				...unusedAssets.map(guid => actions.untrackAsset(guid))
+			]),
+			filter((res: Action<any>[]) => res.length > 0)
 		);
 
 const deleteNotepad$ = action$ =>
@@ -115,7 +115,7 @@ const deleteNotepad$ = action$ =>
 		filter((action: Action<string>) => isType(action, actions.deleteNotepad)),
 		map((action: Action<string>) => action.payload),
 		tap((notepadTitle: string) => Observable.fromPromise(NOTEPAD_STORAGE.removeItem(notepadTitle))),
-		map(() => actions.empty(undefined))
+		map(() => filter(() => false))
 	);
 
 export const storageEpics$ = combineEpics(
