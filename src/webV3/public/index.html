@@ -58,11 +58,6 @@
 		if (navigator.storage && navigator.storage.persist) {
 			navigator.storage.persist();
 		}
-
-		window.addEventListener('beforeinstallprompt', e => {
-			e.preventDefault();
-			e.prompt();
-		});
 	</script>
 </body>
 </html>

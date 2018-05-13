@@ -11,7 +11,7 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 			major: 3,
 			minor: 0,
 			patch: 0,
-			status: 'dev'
+			status: 'alpha'
 		},
 		isFullScreen: false,
 		defaultFontSize: '16px'
