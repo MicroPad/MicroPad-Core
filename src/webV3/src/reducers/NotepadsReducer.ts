@@ -222,6 +222,8 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				const newElements = section.notes[index].elements.map(element =>
 					(element.args.id === action.payload.elementId) ? action.payload.element : element
 				);
+				// const newElements = section.notes[index].elements.filter(element => element.args.id !== action.payload.elementId);
+				// newElements.unshift(action.payload.element);
 
 				section.notes[index] = restoreObject<INote>({
 					...section.notes[index],
