@@ -115,7 +115,7 @@ const deleteNotepad$ = action$ =>
 		filter((action: Action<string>) => isType(action, actions.deleteNotepad)),
 		map((action: Action<string>) => action.payload),
 		tap((notepadTitle: string) => Observable.fromPromise(NOTEPAD_STORAGE.removeItem(notepadTitle))),
-		map(() => filter(() => false))
+		filter(() => false)
 	);
 
 export const storageEpics$ = combineEpics(
