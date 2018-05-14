@@ -1,6 +1,6 @@
 {
 	"name": "micropad",
-	"version": "0.1.0",
+	"version": "3.0.0",
 	"private": true,
 	"dependencies": {
 		"date-fns": "^1.29.0",
