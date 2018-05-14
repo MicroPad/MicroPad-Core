@@ -1,0 +1,31 @@
+.noteElement {
+	position: absolute;
+	padding-right: 1000px;
+	padding-bottom: 1000px;
+	min-width: 170px;
+	min-height: 50px;
+	pointer-events:none;
+}
+
+.noteElement > * {
+	word-wrap: break-word;
+	overflow: auto;
+	pointer-events: auto;
+	min-width: 170px;
+}
+
+.noteElement > * > div > img {
+	min-width: 170px;
+	min-height: 130px;
+}
+
+.handle {
+	text-align: center;
+	user-select: none;
+	width: 3ch;
+	left: 0;
+	right: 0;
+	margin: auto;
+	cursor: move;
+	font-size: 16px;
+}
