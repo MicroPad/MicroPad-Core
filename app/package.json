@@ -1,7 +1,22 @@
 {
 	"name": "micropad",
 	"version": "3.0.0",
-	"private": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/MicroPad/Web.git"
+	},
+	"author": "Nick Webster",
+	"license": "MPL-2.0",
+	"bugs": {
+		"url": "https://github.com/MicroPad/Web/issues"
+	},
+	"homepage": "https://web.getmicropad.com",
+	"scripts": {
+		"start": "react-scripts-ts start",
+		"build": "react-scripts-ts build",
+		"test": "react-scripts-ts test --env=jsdom",
+		"eject": "react-scripts-ts eject"
+	},
 	"dependencies": {
 		"date-fns": "^1.29.0",
 		"deep-equal": "^1.0.1",
@@ -36,12 +51,6 @@
 		"showdown": "^1.8.6",
 		"upad-parse": "^2.7.2"
 	},
-	"scripts": {
-		"start": "react-scripts-ts start",
-		"build": "react-scripts-ts build",
-		"test": "react-scripts-ts test --env=jsdom",
-		"eject": "react-scripts-ts eject"
-	},
 	"devDependencies": {
 		"@types/date-fns": "^2.6.0",
 		"@types/enzyme": "^3.1.8",
@@ -66,5 +75,12 @@
 		"redux-mock-store": "^1.5.1",
 		"sinon": "^5.0.7",
 		"typescript": "^2.7.1"
-	}
+	},
+	"keywords": [
+		"uPad",
+		"MicroPad",
+		"µPad",
+		"notepad",
+		"notebook"
+	]
 }
