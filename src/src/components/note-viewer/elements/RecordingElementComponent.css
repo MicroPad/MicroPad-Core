@@ -1,7 +1,0 @@
-.recording-active > button:first-of-type {
-	display: none;
-}
-
-.recording-inactive > button:nth-of-type(2) {
-	display: none;
-}
