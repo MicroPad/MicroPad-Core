@@ -271,7 +271,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 	private sendMessage = (message: IMarkdownViewMessage) => {
 		if (!this.iframe) return;
-		this.iframe.contentWindow.postMessage(message, '*');
+		this.iframe.contentWindow!.postMessage(message, '*');
 	}
 
 	private createUpdateWithDebounce = () => {
