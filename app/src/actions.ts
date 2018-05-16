@@ -53,5 +53,6 @@ export const actions = {
 	queueParseNpx: actionCreator<string>('QUEUE_PARSE_NPX'),
 	parseEnex: actionCreator<string>('PARSE_ENEX'),
 	updateBibliography: actionCreator<IUpdateBibliographyAction>('UPDATE_BIBLIOGRAPHY'),
-	loadNotepadByIndex: actionCreator<number>('LOAD_NOTEPAD_BY_INDEX')
+	loadNotepadByIndex: actionCreator<number>('LOAD_NOTEPAD_BY_INDEX'),
+	updateZoomLevel: actionCreator<number>('UPDATE_ZOOM_LEVEL')
 };

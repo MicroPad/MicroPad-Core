@@ -37,6 +37,10 @@ export function isDev(): boolean {
 	return (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
 }
 
+export function isMobile(): boolean {
+	return window.screen.width < 600;
+}
+
 // Thanks to https://stackoverflow.com/a/105074
 export function generateGuid(): string {
 	function s4() {

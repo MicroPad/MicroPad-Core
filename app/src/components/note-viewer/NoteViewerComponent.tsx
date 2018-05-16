@@ -9,10 +9,12 @@ import { filter, map } from 'rxjs/operators';
 import { fromEvent } from 'rxjs/observable/fromEvent';
 import { IInsertElementState } from '../../reducers/NoteReducer';
 import InsertElementComponent from '../../containers/InsertElementContainer';
+import ZoomComponent from '../../containers/ZoomContainer';
 
 export interface INoteViewerComponentProps {
 	isLoading: boolean;
 	isFullscreen: boolean;
+	zoom: number;
 	note?: INote;
 	elementEditing: string;
 	noteAssets: object;
@@ -41,7 +43,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	render() {
-		const { isLoading, isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement, deleteElement } = this.props;
+		const { isLoading, zoom, isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement, deleteElement } = this.props;
 
 		const classes: string = (!note || note.elements.length === 0) ? 'empty' : '';
 		let styles = {};
@@ -54,7 +56,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		const containerStyles = {
 			minWidth: '100%',
 			minHeight: '100%',
-			position: 'relative' as 'relative'
+			position: 'relative' as 'relative',
+			transform: `scale(${zoom})`
 		};
 
 		const elements: JSX.Element[] = [];
@@ -80,6 +83,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}>
 					{elements}
 				</div>
+				{!!note && isFullscreen && <ZoomComponent />}
 			</div>
 		);
 	}

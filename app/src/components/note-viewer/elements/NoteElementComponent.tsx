@@ -25,6 +25,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 	private element: HTMLDivElement;
 	private container: HTMLDivElement;
 	private oldZIndex: string | null;
+	private isDragging = false;
 
 	render() {
 		const { element, noteAssets, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
@@ -106,6 +107,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 		return (
 			<Draggable
 				onStart={() => {
+					this.isDragging = true;
 					if (navigator.vibrate) navigator.vibrate(100);
 					if (!this.container) return;
 					this.oldZIndex = this.container.style.zIndex;
@@ -113,6 +115,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				}}
 				onStop={(event, data) => {
 					this.handleDrag(event, data);
+					this.isDragging = false;
 					if (this.container) this.container.style.zIndex = (!!this.oldZIndex) ? this.oldZIndex : 'auto';
 				}}
 				defaultPosition={{ x: parseInt(element.args.x, 10), y: parseInt(element.args.y, 10) }}
@@ -139,6 +142,20 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				</div>
 			</Draggable>
 		);
+	}
+
+	componentDidMount() {
+		window.document.body.addEventListener('touchmove', this.stopScrollIfDragging, {
+			passive: false
+		});
+	}
+
+	componentWillUnmount() {
+		window.document.body.removeEventListener('touchmove', this.stopScrollIfDragging);
+	}
+
+	private stopScrollIfDragging = (event: Event) => {
+		if (this.isDragging) event.preventDefault();
 	}
 
 	private handleDrag = (event: Event, data: DraggableData) => {

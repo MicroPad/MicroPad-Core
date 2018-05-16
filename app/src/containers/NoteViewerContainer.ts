@@ -21,6 +21,7 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 
 	return {
 		isFullscreen: meta.isFullScreen,
+		zoom: meta.zoom,
 		note,
 		noteAssets: currentNote.assetUrls,
 		elementEditing: currentNote.elementEditing,

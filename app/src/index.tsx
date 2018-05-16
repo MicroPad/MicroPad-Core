@@ -22,6 +22,7 @@ import { OldSyncHandler } from './old-sync/OldSyncHandler';
 import * as QueryString from 'querystring';
 import * as PrintTemplate from 'react-print';
 import PrintViewComponent from './containers/PrintViewContainer';
+import { isDev } from './util';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -33,7 +34,8 @@ const baseReducer: BaseReducer = new BaseReducer();
 const store = createStore<IStoreState>(
 	baseReducer.reducer,
 	baseReducer.initialState,
-	composeWithDevTools(applyMiddleware(epicMiddleware)));
+	(isDev()) ? composeWithDevTools(applyMiddleware(epicMiddleware)) : applyMiddleware(epicMiddleware)
+);
 
 export const NOTEPAD_STORAGE = localforage.createInstance({
 	name: 'MicroPad',

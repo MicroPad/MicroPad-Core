@@ -9,12 +9,13 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 	public readonly initialState: IMetaStoreState = {
 		version: {
 			major: 3,
-			minor: 0,
-			patch: 2,
+			minor: 1,
+			patch: 0,
 			status: 'alpha'
 		},
 		isFullScreen: false,
-		defaultFontSize: '16px'
+		defaultFontSize: '16px',
+		zoom: 1
 	};
 
 	public reducer(state: IMetaStoreState, action: Action): IMetaStoreState {
@@ -27,6 +28,15 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 			return {
 				...state,
 				defaultFontSize: action.payload
+			};
+		} else if (isType(action, actions.updateZoomLevel)) {
+			let zoom = state.zoom + action.payload;
+			if (zoom > 1.5) zoom = 1.51;
+			if (zoom <= 0) zoom = 0.09;
+
+			return {
+				...state,
+				zoom
 			};
 		}
 
