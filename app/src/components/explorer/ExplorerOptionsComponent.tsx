@@ -46,7 +46,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 				<div id="explorer-options-modal">
 					<Row>
 						<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>
-						<Col s={6}><Button waves="light" onClick={this.rename}>Rename {type}</Button></Col>
+						<Col s={6}><Button className="blue" waves="light" onClick={this.rename}>Rename {type}</Button></Col>
 					</Row>
 					<Row><Button className="red" waves="light" onClick={this.delete}><Icon
 						left={true}>delete_forever</Icon> Delete {type}</Button></Row>
