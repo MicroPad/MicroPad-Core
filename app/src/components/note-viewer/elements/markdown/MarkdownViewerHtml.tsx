@@ -28,6 +28,11 @@ export namespace MarkDownViewer {
 		#content > :first-child {
 			margin-top: 0;
 		}
+		
+		#content > pre {
+			white-space: pre-wrap;
+			word-wrap: break-word;
+		}
 
 		a {
 			color: #039be5;

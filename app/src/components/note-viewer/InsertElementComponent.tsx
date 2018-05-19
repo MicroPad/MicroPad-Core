@@ -6,6 +6,7 @@ import './InsertElementComponent.css';
 import { IInsertElementState } from '../../reducers/NoteReducer';
 import { generateGuid } from 'src/util';
 import { Icon } from 'react-materialize';
+import JupyterInserterComponent from './elements/JupyterInserterComponent';
 
 export interface IInsertElementComponentProps {
 	note: INote;
@@ -91,6 +92,14 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 							},
 							content: 'AS'
 						})}><Icon left={true}>record_voice_over</Icon> Recording</a></li>
+
+						<li><JupyterInserterComponent insertElement={element => this.doInsert({
+							...element,
+							args: {
+								...defaultArgs,
+								width: '500px'
+							}
+						})} /></li>
 					</ul>
 				</div>
 			</div>

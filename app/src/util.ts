@@ -1,6 +1,7 @@
 import { INote, INotepad, ISection } from './types/NotepadTypes';
 import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
+import { SyntheticEvent } from 'react';
 
 export const isAction = (typeOfAction: ActionCreator<any>) =>
 	filter((action: Action<any>) => isType(action, typeOfAction));
@@ -39,6 +40,17 @@ export function isDev(): boolean {
 
 export function isMobile(): boolean {
 	return window.screen.width < 600;
+}
+
+export function readFileInputEventAsText(event: SyntheticEvent<HTMLInputElement>): Promise<string> {
+	return new Promise(resolve => {
+		const file = event.currentTarget.files![0];
+		const reader = new FileReader();
+
+		reader.onload = () => resolve(reader.result);
+
+		reader.readAsText(file);
+	});
 }
 
 // Thanks to https://stackoverflow.com/a/105074
