@@ -4,22 +4,20 @@ import { isMobile } from '../util';
 
 export interface IHelpMessageComponent {
 	message: string;
-	right: number;
-	top: number;
 	video?: any;
 }
 
 export default class HelpMessageComponent extends React.Component<IHelpMessageComponent> {
 	render() {
 		if (isMobile()) return <div />;
-		const { message, right, top, video } = this.props;
+		const { message, video } = this.props;
 
 		const containerStyle: CSSProperties = {
 			position: 'fixed',
 			backgroundColor: '#607d8b',
 			borderRadius: '10px',
-			right: right,
-			top: top,
+			right: 310,
+			top: 140,
 			padding: '5px',
 			width: '400px',
 			minHeight: '100px'

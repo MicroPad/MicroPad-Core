@@ -96,9 +96,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 							) &&
 							<HelpMessageComponent
 								message="Create/open a section and a note to insert elements:"
-								video={require('../../assets/instructions/new-section.mp4')}
-								right={310}
-								top={300} />
+								video={require('../../assets/instructions/new-section.mp4')} />
 						}
 						{
 							(
@@ -108,9 +106,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 							) &&
 							<HelpMessageComponent
 								message="Open a note to insert elements:"
-								video={require('../../assets/instructions/open-note.mp4')}
-								right={310}
-								top={300} />
+								video={require('../../assets/instructions/open-note.mp4')} />
 						}
 					</div>
 				}
@@ -119,9 +115,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 					!notepad &&
 					<HelpMessageComponent
 						message="Open/create a notepad to start:"
-						video={require('../../assets/instructions/open-notepad.mp4')}
-						right={310}
-						top={300} />
+						video={require('../../assets/instructions/open-notepad.mp4')} />
 				}
 			</div>
 		);
