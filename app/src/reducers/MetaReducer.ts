@@ -9,7 +9,7 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 	public readonly initialState: IMetaStoreState = {
 		version: {
 			major: 3,
-			minor: 2,
+			minor: 3,
 			patch: 0,
 			status: 'alpha'
 		},
@@ -37,6 +37,13 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 			return {
 				...state,
 				zoom
+			};
+		} else if (isType(action, actions.openEditor)) {
+			if (!action.payload.includes('drawing')) return state;
+
+			return {
+				...state,
+				zoom: this.initialState.zoom
 			};
 		}
 

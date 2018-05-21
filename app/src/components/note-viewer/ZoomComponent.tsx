@@ -17,8 +17,8 @@ export default class ZoomComponent extends React.Component<IZoomComponentProps> 
 				bottom: 5,
 				right: 5
 			}}>
-				<Button className="blue-grey" waves="light" onClick={() => update(0.09)}><Icon>zoom_in</Icon></Button>
 				<Button className="blue-grey" waves="light" onClick={() => update(-0.09)}><Icon>zoom_out</Icon></Button>
+				<Button className="blue-grey" waves="light" onClick={() => update(0.09)}><Icon>zoom_in</Icon></Button>
 			</div>
 		);
 	}

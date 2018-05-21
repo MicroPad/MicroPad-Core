@@ -6,6 +6,7 @@ import TreeView from 'react-treeview';
 import { generateGuid } from '../../util';
 import ExplorerOptionsComponent from './ExplorerOptionsComponent';
 import { INewNotepadObjectAction } from '../../types/ActionTypes';
+import HelpMessageComponent from '../HelpMessageComponent';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: INotepad;
@@ -86,7 +87,35 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						</div>
 
 						{treeViews}
+
+						{/* Help messages */}
+						{
+							(
+								notepad.sections.length === 0 ||
+								notepad.sections.some(s => s.notes.length === 0 && s.sections.length === 0)
+							) &&
+							<HelpMessageComponent
+								message="Create/open a section and a note to insert elements:"
+								video={require('../../assets/instructions/new-section.mp4')} />
+						}
+						{
+							(
+								!openNote &&
+								notepad.sections.length > 0 &&
+								notepad.sections.every(s => (s.notes.length > 0 || s.sections.length > 0))
+							) &&
+							<HelpMessageComponent
+								message="Open a note to insert elements:"
+								video={require('../../assets/instructions/open-note.mp4')} />
+						}
 					</div>
+				}
+
+				{
+					!notepad &&
+					<HelpMessageComponent
+						message="Open/create a notepad to start:"
+						video={require('../../assets/instructions/open-notepad.mp4')} />
 				}
 			</div>
 		);
