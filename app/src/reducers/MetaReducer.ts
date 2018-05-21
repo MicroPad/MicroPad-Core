@@ -38,6 +38,13 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 				...state,
 				zoom
 			};
+		} else if (isType(action, actions.openEditor)) {
+			if (!action.payload.includes('drawing')) return state;
+
+			return {
+				...state,
+				zoom: this.initialState.zoom
+			};
 		}
 
 		return state;

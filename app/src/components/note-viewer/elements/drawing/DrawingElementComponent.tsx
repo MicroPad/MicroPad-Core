@@ -218,11 +218,10 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 			top: (parseInt(element.args.y, 10) + 128) - noteViewer.scrollTop
 		};
 
-		const scale = parseInt(document.getElementById('note-container')!.style.transform!.split('(')[1].slice(0, -1), 10);
-
+		const scale = parseFloat(document.getElementById('note-container')!.style.transform!.split('(')[1].slice(0, -1));
 		return {
-			x: touch.x - (canvasOffset.left * scale),
-			y: touch.y - (canvasOffset.top * scale)
+			x: (touch.x - canvasOffset.left) * scale,
+			y: (touch.y - canvasOffset.top) * scale
 		};
 	}
 
