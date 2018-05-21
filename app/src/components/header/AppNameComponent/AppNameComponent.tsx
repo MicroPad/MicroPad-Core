@@ -15,11 +15,10 @@ export default class AppNameComponent extends React.Component<IVersion> {
 		const { major, minor, patch, status } = this.props;
 
 		return (
-			<span>
+			<span title={`${APP_NAME} v${major}.${minor}.${patch}-${status}`}>
 				{APP_NAME}
 				<em
-					className="AppNameComponent__version"
-					title={`v${major}.${minor}.${patch}-${status}`}>
+					className="AppNameComponent__version">
 					{this.statusToSymbol[status]}
 				</em>
 			</span>
