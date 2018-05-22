@@ -88,25 +88,29 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 
 						{treeViews}
 
-						{/* Help messages */}
 						{
-							(
-								notepad.sections.length === 0 ||
-								notepad.sections.some(s => s.notes.length === 0 && s.sections.length === 0)
-							) &&
-							<HelpMessageComponent
-								message="Create/open a section and a note to insert elements:"
-								video={require('../../assets/instructions/new-section.mp4')} />
-						}
-						{
-							(
-								!openNote &&
-								notepad.sections.length > 0 &&
-								notepad.sections.every(s => (s.notes.length > 0 || s.sections.length > 0))
-							) &&
-							<HelpMessageComponent
-								message="Open a note to insert elements:"
-								video={require('../../assets/instructions/open-note.mp4')} />
+							/* Help messages */
+							!openNote &&
+							<React.Fragment>
+								{
+									(
+										notepad.sections.length === 0 ||
+										notepad.sections.some(s => s.notes.length === 0 && s.sections.length === 0)
+									) &&
+									<HelpMessageComponent
+										message="Create/open a section and a note to insert elements:"
+										video={require('../../assets/instructions/new-section.mp4')} />
+								}
+								{
+									(
+										notepad.sections.length > 0 &&
+										notepad.sections.every(s => (s.notes.length > 0 || s.sections.length > 0))
+									) &&
+									<HelpMessageComponent
+										message="Open a note to insert elements:"
+										video={require('../../assets/instructions/open-note.mp4')} />
+								}
+							</React.Fragment>
 						}
 					</div>
 				}
