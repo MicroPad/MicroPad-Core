@@ -6,8 +6,9 @@ export interface IHelpMessageComponent {
 	message: string;
 	video?: any;
 }
-
-/*Help Videos Showing How To Do Basic Tasks, Very Good UX!*/
+/**
+*Loads inline help videos demonstrating the process of creating a new note to the user
+*/
 
 export default class HelpMessageComponent extends React.Component<IHelpMessageComponent> {
 	render() {
