@@ -7,6 +7,8 @@ export interface IHelpMessageComponent {
 	video?: any;
 }
 
+/*Help Videos Showing How To Do Basic Tasks, Very Good UX!*/
+
 export default class HelpMessageComponent extends React.Component<IHelpMessageComponent> {
 	render() {
 		if (isMobile()) return <div />;
