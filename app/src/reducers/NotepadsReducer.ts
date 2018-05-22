@@ -364,6 +364,8 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				}
 			};
 		} else if (isType(action, actions.deleteElement)) {
+			let assetGuid: string | undefined;
+
 			const newNotepad = getNotepadObjectByRef({
 				...state.notepad!.item!,
 				lastModified: format(new Date(), 'YYYY-MM-DDTHH:mm:ss.SSSZ')
@@ -371,7 +373,12 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				const section = <ISection> obj.parent;
 				const index = section.notes.indexOf(<INote> obj);
 
-				const newElements = section.notes[index].elements.filter(e => e.args.id !== action.payload.elementId);
+				const newElements = section.notes[index].elements.filter(e => {
+					if (e.args.id !== action.payload.elementId) return true;
+
+					assetGuid = e.args.ext;
+					return false;
+				});
 
 				section.notes[index] = restoreObject<INote>({
 					...section.notes[index],
@@ -383,6 +390,7 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 			});
 
 			const notepad = <INotepad> restoreObject({ ...newNotepad }, Parser.createNotepad(newNotepad.title));
+			if (!!assetGuid) notepad.notepadAssets = notepad.notepadAssets.filter(guid => guid !== assetGuid);
 
 			return {
 				...state,
