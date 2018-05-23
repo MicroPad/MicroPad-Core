@@ -76,8 +76,8 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 						>
 						<canvas
 							ref={e => this.canvasElement = e!}
-							width="600"
-							height="500"
+							width="500"
+							height="450"
 							style={{border: 'solid black 1px', touchAction: 'none'}} />
 					</Resizable>
 
