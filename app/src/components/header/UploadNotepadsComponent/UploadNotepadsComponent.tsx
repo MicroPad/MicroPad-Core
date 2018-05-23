@@ -17,7 +17,7 @@ export default class UploadNotepadsComponent extends React.Component<IUploadNote
 		return (
 			<NavItem href="#!" onClick={this.triggerUpload}>
 				<Icon left={true}>file_upload</Icon> Import (npx/zip/enex)
-				<input ref={input => this.uploadInput = input!} onChange={this.onUploadChanged} style={{ display: 'none' }} type="file" />
+				<input id="upload-notepad-input" ref={input => this.uploadInput = input!} onChange={this.onUploadChanged} style={{ display: 'none' }} type="file" />
 			</NavItem>
 		);
 	}

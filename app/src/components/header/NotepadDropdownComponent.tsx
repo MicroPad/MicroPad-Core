@@ -40,12 +40,12 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 					</ul>
 				}>
 					<NavItem href="#!" onClick={this.createNotepad}><Icon left={true}>add</Icon> New</NavItem>
-					<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Open ({SYNC_NAME})</NavItem>
+					{/*<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Open ({SYNC_NAME})</NavItem>*/}
 					<UploadNotepadsComponent />
 
 					<Modal
 						header="Export All Notepads"
-						trigger={<NavItem href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}>
+						trigger={<NavItem id="export-all-notepads-trigger" href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}>
 						<Row>
 							<Col s={12} m={6} style={{cursor: 'pointer'}} onClick={exportAll}>
 								<img src={NPX_ICON} style={iconStyles} title="Export notepads as a zip archive of NPX files" />
