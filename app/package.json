@@ -49,7 +49,9 @@
 		"rxjs": "^5.5.6",
 		"save-as": "^0.1.8",
 		"showdown": "^1.8.6",
-		"upad-parse": "^2.8.1"
+		"upad-parse": "^2.8.1",
+		"vex-dialog": "^1.1.0",
+		"vex-js": "^4.1.0"
 	},
 	"devDependencies": {
 		"@types/date-fns": "^2.6.0",

@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { SYNC_NAME } from '../../types';
 import { Col, Dropdown, Icon, Modal, NavItem, Row } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
 import * as Parser from 'upad-parse/dist/index.js';
 import { INotepad } from '../../types/NotepadTypes';
 import { generateGuid } from '../../util';
+import { Dialog } from '../../dialogs';
 
 const NPX_ICON = require('../../assets/npx.png');
 const MD_ICON = require('../../assets/md.svg');
@@ -73,8 +73,8 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 		openNotepadFromStorage!(title);
 	}
 
-	private createNotepad = () => {
-		const title = prompt('Notepad Title:');
+	private createNotepad = async () => {
+		const title = await Dialog.prompt('Notepad Title:');
 
 		if (title) this.props.newNotepad!(Parser.createNotepad(title));
 	}

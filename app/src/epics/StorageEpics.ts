@@ -12,6 +12,7 @@ import { ICurrentNoteState } from '../reducers/NoteReducer';
 import { getNotepadObjectByRef } from '../util';
 import * as localforage from 'localforage';
 import { fromPromise } from 'rxjs/observable/fromPromise';
+import { Dialog } from '../dialogs';
 
 let currentNotepadTitle = '';
 
@@ -81,7 +82,7 @@ const openNotepadFromStorage$ = action$ =>
 		map((action: Action<string>) => action.payload),
 		switchMap((notepadTitle: string) => Observable.fromPromise(NOTEPAD_STORAGE.getItem(notepadTitle))),
 		catchError(err => {
-			alert(`Error opening notepad`);
+			Dialog.alert(`Error opening notepad`);
 			return Observable.of(actions.openNotepadFromStorage.failed(err));
 		}),
 		mergeMap((json: string) => [

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Autocomplete, Button, Icon, Modal } from 'react-materialize';
 import { INote, NoteElement, Source } from '../../types/NotepadTypes';
+import { Dialog } from '../../dialogs';
 
 export interface ISourcesComponent {
 	element: NoteElement;
@@ -52,10 +53,10 @@ export default class SourcesComponent extends React.Component<ISourcesComponent>
 		);
 	}
 
-	private addSource = () => {
+	private addSource = async () => {
 		const { updateBibliography, element, note } = this.props;
 
-		const url = prompt('Source URL:');
+		const url = await Dialog.prompt('Source URL:');
 		if (!url || url.length === 0) return;
 
 		updateBibliography!([

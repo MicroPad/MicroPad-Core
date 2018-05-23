@@ -7,6 +7,7 @@ import { generateGuid } from '../../util';
 import ExplorerOptionsComponent from './ExplorerOptionsComponent';
 import { INewNotepadObjectAction } from '../../types/ActionTypes';
 import HelpMessageComponent from '../HelpMessageComponent';
+import { Dialog } from '../../dialogs';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: INotepad;
@@ -125,9 +126,9 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		);
 	}
 
-	private newNotepadObject = (type: 'note' | 'section', parent: IParent) => {
+	private newNotepadObject = async (type: 'note' | 'section', parent: IParent) => {
 		const { newNote, newSection } = this.props;
-		const title = prompt('Title:');
+		const title = await Dialog.prompt('Title:');
 
 		if (title) {
 			const action: INewNotepadObjectAction = {

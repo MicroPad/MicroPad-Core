@@ -2,6 +2,7 @@ import * as React from 'react';
 import { INote, INPXObject, IRenameNotepadObjectAction, ISection } from '../../types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL } from '../../types';
+import { Dialog } from 'src/dialogs';
 
 export interface IExplorerOptionsComponentProps {
 	objToEdit: INPXObject;
@@ -86,9 +87,9 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 		}
 	}
 
-	private delete = () => {
+	private delete = async () => {
 		const { objToEdit, type, deleteNotepad, deleteNotepadObject } = this.props;
-		if (!confirm(`Are you sure you want to delete '${objToEdit.title}'?`)) return;
+		if (!await Dialog.confirm(`Are you sure you want to delete '${objToEdit.title}'?`)) return;
 
 		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
 

@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { Icon } from 'react-materialize';
 import { SyntheticEvent } from 'react';
+import { Icon } from 'react-materialize';
 import { readFileInputEventAsText } from '../../../util';
 import * as Parser from 'upad-parse/dist/index';
 import { INotepad, NoteElement } from '../../../types/NotepadTypes';
+import { Dialog } from '../../../dialogs';
 
 export interface IJupyterInserterComponentProps {
 	insertElement: (element: NoteElement) => void;
@@ -30,7 +31,7 @@ export default class JupyterInserterComponent extends React.Component<IJupyterIn
 			insertElement(tmpNotepad.sections[0].notes[0].elements[0]);
 		}).catch(err => {
 			console.error(err);
-			alert('Error parsing Jupyter Notebook');
+			Dialog.alert('Error parsing Jupyter Notebook');
 		});
 	}
 }

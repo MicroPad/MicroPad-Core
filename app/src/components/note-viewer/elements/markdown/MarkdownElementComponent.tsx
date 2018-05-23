@@ -10,6 +10,7 @@ import { debounce } from '../../../../util';
 import { Col, Input, Row } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
 import Resizable from 're-resizable';
+import { Dialog } from '../../../../dialogs';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -256,7 +257,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					newWindow.opener = null;
 					newWindow.focus();
 				} else {
-					alert('Your browser blocked opening the link');
+					Dialog.alert('Your browser blocked opening the link');
 				}
 				break;
 
