@@ -3,7 +3,6 @@ import * as VexDialog from 'vex-dialog';
 import 'vex-js/dist/css/vex.css';
 import 'vex-js/dist/css/vex-theme-top.css';
 
-// I'm casting because the DT types don't have this method and I don't want to add it right now
 Vex.registerPlugin(VexDialog);
 Vex.defaultOptions!.className = 'vex-theme-top';
 
