@@ -1,20 +1,22 @@
 import { IReducer } from '../types/ReducerType';
 import { IStoreState } from '../types';
-import { MetaReducer } from './MetaReducer';
 import { Action } from 'redux';
+import * as deepFreeze from 'deep-freeze';
+import { isDev } from '../util';
+import { MetaReducer } from './MetaReducer';
 import { NotepadsReducer } from './NotepadsReducer';
 import { NoteReducer } from './NoteReducer';
 import { ExplorerReducer } from './ExplorerReducer';
 import { SearchReducer } from './SearchReducer';
-import * as deepFreeze from 'deep-freeze';
-import { isDev } from '../util';
+import { PrintReducer } from './PrintReducer';
 
 export const REDUCERS: Array<IReducer<any>> = [
 	new MetaReducer(),
 	new NotepadsReducer(),
 	new NoteReducer(),
 	new ExplorerReducer(),
-	new SearchReducer()
+	new SearchReducer(),
+	new PrintReducer()
 ];
 
 export class BaseReducer implements IReducer<IStoreState> {

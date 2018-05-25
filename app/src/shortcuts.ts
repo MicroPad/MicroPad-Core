@@ -43,4 +43,9 @@ export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 		e.preventDefault();
 		document.getElementById('upload-notepad-input')!.click();
 	});
+
+	mousetrap.bind('mod+p', e => {
+		e.preventDefault();
+		store.dispatch(actions.print.started(undefined));
+	});
 }

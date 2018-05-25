@@ -22,6 +22,7 @@ export const actions = {
 	loadNote: actionCreator.async<string, object, any>('LOAD_NOTE'),
 	downloadAsset: actionCreator.async<{ filename: string, uuid: string }, void, any>('DOWNLOAD_ASSET'),
 	expandAllExplorer: actionCreator.async<void, string[], any>('EXPAND_ALL_EXPLORER'),
+	print: actionCreator.async<void, string, void>('PRINT'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),
