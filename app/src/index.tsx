@@ -20,8 +20,7 @@ import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './shortcuts';
 import { OldSyncHandler } from './old-sync/OldSyncHandler';
 import * as QueryString from 'querystring';
-import * as PrintTemplate from 'react-print';
-import PrintViewComponent from './containers/PrintViewContainer';
+import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import { isDev } from './util';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 
@@ -59,26 +58,16 @@ export const ASSET_STORAGE = localforage.createInstance({
 	// Render the main UI
 	ReactDOM.render(
 		<Provider store={store}>
-			<div>
+			<PrintViewOrAppContainerComponent>
 				<HeaderComponent />
 				<div id="body">
 					<NoteViewerComponent />
 					<NotepadExplorerComponent />
 					<WhatsNewModalComponent />
 				</div>
-			</div>
+			</PrintViewOrAppContainerComponent>
 		</Provider>,
-		document.getElementById('react-no-print') as HTMLElement
-	);
-
-	// Render the print UI
-	ReactDOM.render(
-		<PrintTemplate>
-			<Provider store={store}>
-				<PrintViewComponent />
-			</Provider>
-		</PrintTemplate>,
-		document.getElementById('print-mount') as HTMLElement
+		document.getElementById('app') as HTMLElement
 	);
 
 	if (!await localforage.getItem('hasRunBefore')) store.dispatch(actions.getHelp(undefined));

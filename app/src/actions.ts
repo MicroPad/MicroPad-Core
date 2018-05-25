@@ -22,7 +22,7 @@ export const actions = {
 	loadNote: actionCreator.async<string, object, any>('LOAD_NOTE'),
 	downloadAsset: actionCreator.async<{ filename: string, uuid: string }, void, any>('DOWNLOAD_ASSET'),
 	expandAllExplorer: actionCreator.async<void, string[], any>('EXPAND_ALL_EXPLORER'),
-	print: actionCreator.async<void, string, void>('PRINT'),
+	print: actionCreator.async<void, NoteElement, void>('PRINT'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),
@@ -55,5 +55,6 @@ export const actions = {
 	parseEnex: actionCreator<string>('PARSE_ENEX'),
 	updateBibliography: actionCreator<IUpdateBibliographyAction>('UPDATE_BIBLIOGRAPHY'),
 	loadNotepadByIndex: actionCreator<number>('LOAD_NOTEPAD_BY_INDEX'),
-	updateZoomLevel: actionCreator<number>('UPDATE_ZOOM_LEVEL')
+	updateZoomLevel: actionCreator<number>('UPDATE_ZOOM_LEVEL'),
+	clearPrintView: actionCreator<void>('CLEAR_PRINT')
 };

@@ -35,7 +35,8 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepad
 		collapseAll: () => dispatch(actions.collapseAllExplorer(undefined)),
 		newSection: obj => dispatch(actions.newSection(obj)),
 		newNote: obj => dispatch(actions.newNote(obj)),
-		expandFromNote: note => dispatch(actions.expandFromNote(note))
+		expandFromNote: note => dispatch(actions.expandFromNote(note)),
+		print: () => dispatch(actions.print.started(undefined))
 	};
 }
 

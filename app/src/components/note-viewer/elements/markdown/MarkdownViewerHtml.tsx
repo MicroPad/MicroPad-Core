@@ -232,9 +232,20 @@ export namespace MarkDownViewer {
 					width: computedWidth
 				}
 			}, '*');
+			
+			parent.postMessage({
+				id,
+				type: 'ready',
+				payload: {}
+			}, '*');
 		}
 
 		handleMessage({ data: { type: 'resize', id } });
+		parent.postMessage({
+			id,
+			type: 'ready',
+			payload: {}
+		}, '*');
 	}
 	
 	function redirectLinkClick(event) {

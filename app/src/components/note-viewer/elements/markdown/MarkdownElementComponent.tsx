@@ -15,6 +15,7 @@ import { Dialog } from '../../../../dialogs';
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
 	isPrinting?: boolean;
+	onReady?: () => void;
 }
 
 export interface IMarkdownViewMessage {
@@ -236,7 +237,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	}
 
 	private handleMessages = event => {
-		const { element, search, edit } = this.props;
+		const { element, search, edit, onReady } = this.props;
 		const message: IMarkdownViewMessage = event.data;
 		if (message.id !== element.args.id) return;
 
@@ -263,6 +264,11 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 			case 'edit':
 				edit(element.args.id);
+				break;
+
+			case 'ready':
+				console.log('hi?');
+				if (!!onReady) onReady();
 				break;
 
 			default:
