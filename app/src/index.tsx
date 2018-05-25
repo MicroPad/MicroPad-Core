@@ -130,7 +130,7 @@ async function displayWhatsNew() {
 	if (minorVersion === oldMinorVersion) return;
 
 	// Open "What's New"
-	if (oldMinorVersion != null) document.getElementById('whats-new-modal-trigger')!.click();
+	document.getElementById('whats-new-modal-trigger')!.click();
 	await localforage.setItem('oldMinorVersion', minorVersion);
 }
 
