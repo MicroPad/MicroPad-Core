@@ -33,6 +33,10 @@ export namespace MarkDownViewer {
 			white-space: pre-wrap;
 			word-wrap: break-word;
 		}
+		
+		#content img {
+			max-width: 100%;
+		}
 
 		a {
 			color: #039be5;

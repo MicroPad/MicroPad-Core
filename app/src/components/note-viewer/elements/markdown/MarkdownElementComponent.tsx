@@ -267,7 +267,6 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				break;
 
 			case 'ready':
-				console.log('hi?');
 				if (!!onReady) onReady();
 				break;
 
