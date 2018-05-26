@@ -3,6 +3,7 @@ import { SyntheticEvent } from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
 import { Button, Row } from 'react-materialize';
 import { dataURItoBlob } from '../../../util';
+import { Dialog } from '../../../dialogs';
 
 export interface IFileElementComponent extends INoteElementComponentProps {
 	downloadAsset: (filename: string, uuid: string) => void;
@@ -53,7 +54,7 @@ export default class FileElementComponent extends React.Component<IFileElementCo
 				edit('');
 			})
 			.catch((err) => {
-				alert('Error uploading file');
+				Dialog.alert('Error uploading file');
 				console.error(err);
 			});
 	}

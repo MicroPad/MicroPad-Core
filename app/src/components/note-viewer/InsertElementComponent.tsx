@@ -30,8 +30,11 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 			display: (enabled) ? undefined : 'none'
 		};
 
-		const insertX = Math.abs(Math.floor(document.getElementById('note-container')!.getBoundingClientRect().left)) + x;
-		const insertY = (Math.abs(Math.floor(document.getElementById('note-container')!.getBoundingClientRect().top)) + y) - 128;
+		const noteContainer = document.getElementById('note-container');
+		if (!noteContainer) return null;
+
+		const insertX = Math.abs(Math.floor(noteContainer.getBoundingClientRect().left)) + x;
+		const insertY = (Math.abs(Math.floor(noteContainer.getBoundingClientRect().top)) + y) - 128;
 
 		const defaultArgs: IElementArgs = {
 			id: '',

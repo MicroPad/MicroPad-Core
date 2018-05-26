@@ -3,6 +3,7 @@ import { INotepadsStoreState } from './NotepadTypes';
 import { IExplorerState } from '../reducers/ExplorerReducer';
 import { ISearchState } from '../reducers/SearchReducer';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
+import { IPrintStoreState } from '../reducers/PrintReducer';
 
 export interface IStoreState {
 	readonly meta: IMetaStoreState;
@@ -10,6 +11,7 @@ export interface IStoreState {
 	readonly currentNote: ICurrentNoteState;
 	readonly explorer: IExplorerState;
 	readonly search: ISearchState;
+	readonly print: IPrintStoreState;
 }
 
 export const APP_NAME = 'µPad';

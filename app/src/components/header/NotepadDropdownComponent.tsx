@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { SYNC_NAME } from '../../types';
 import { Col, Dropdown, Icon, Modal, NavItem, Row } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
 import * as Parser from 'upad-parse/dist/index.js';
 import { INotepad } from '../../types/NotepadTypes';
 import { generateGuid } from '../../util';
+import { Dialog } from '../../dialogs';
 
 const NPX_ICON = require('../../assets/npx.png');
 const MD_ICON = require('../../assets/md.svg');
@@ -40,12 +40,12 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 					</ul>
 				}>
 					<NavItem href="#!" onClick={this.createNotepad}><Icon left={true}>add</Icon> New</NavItem>
-					<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Open ({SYNC_NAME})</NavItem>
+					{/*<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Open ({SYNC_NAME})</NavItem>*/}
 					<UploadNotepadsComponent />
 
 					<Modal
 						header="Export All Notepads"
-						trigger={<NavItem href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}>
+						trigger={<NavItem id="export-all-notepads-trigger" href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}>
 						<Row>
 							<Col s={12} m={6} style={{cursor: 'pointer'}} onClick={exportAll}>
 								<img src={NPX_ICON} style={iconStyles} title="Export notepads as a zip archive of NPX files" />
@@ -73,8 +73,8 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 		openNotepadFromStorage!(title);
 	}
 
-	private createNotepad = () => {
-		const title = prompt('Notepad Title:');
+	private createNotepad = async () => {
+		const title = await Dialog.prompt('Notepad Title:');
 
 		if (title) this.props.newNotepad!(Parser.createNotepad(title));
 	}

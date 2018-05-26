@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Modal } from 'react-materialize';
 import { INotepad } from '../../../../types/NotepadTypes';
-import * as Parser from 'upad-parse';
+import * as Parser from 'upad-parse/dist/index';
 // @ts-ignore
 import helpNpx from '!raw-loader!../../../../assets/Help.npx';
 import { Converter, extension } from 'showdown';

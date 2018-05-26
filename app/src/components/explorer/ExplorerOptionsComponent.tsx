@@ -2,6 +2,7 @@ import * as React from 'react';
 import { INote, INPXObject, IRenameNotepadObjectAction, ISection } from '../../types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL } from '../../types';
+import { Dialog } from 'src/dialogs';
 
 export interface IExplorerOptionsComponentProps {
 	objToEdit: INPXObject;
@@ -12,13 +13,14 @@ export interface IExplorerOptionsComponentProps {
 	deleteNotepadObject?: (internalId: string) => void;
 	renameNotepadObject?: (params: IRenameNotepadObjectAction) => void;
 	loadNote?: () => void;
+	print?: () => void;
 }
 
 export default class ExplorerOptionsComponent extends React.Component<IExplorerOptionsComponentProps> {
 	private titleInput: Input;
 
 	render() {
-		const { objToEdit, type, exportNotepad, loadNote } = this.props;
+		const { objToEdit, type, exportNotepad, loadNote, print } = this.props;
 
 		const notepadOptions: JSX.Element = (
 			<div>
@@ -32,7 +34,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 				<Row><Button className="blue" waves="light" onClick={() => {
 					if (!!loadNote) loadNote();
 					this.closeModal();
-					setTimeout(() => window.print(), 1300);
+					setTimeout(() => print!(), 500);
 				}}>Export/Print Note (PDF)</Button></Row>
 				<p>If you want to generate a nice PDF using {APP_NAME}-markdown, try out <a target="_blank" rel="nofollow noreferrer" href="https://github.com/NickGeek/abstract">Abstract</a>.</p>
 			</div>
@@ -86,9 +88,9 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 		}
 	}
 
-	private delete = () => {
+	private delete = async () => {
 		const { objToEdit, type, deleteNotepad, deleteNotepadObject } = this.props;
-		if (!confirm(`Are you sure you want to delete '${objToEdit.title}'?`)) return;
+		if (!await Dialog.confirm(`Are you sure you want to delete '${objToEdit.title}'?`)) return;
 
 		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
 

@@ -5,6 +5,7 @@ import { dataURItoBlob } from '../../../util';
 import { Col, Input, Row } from 'react-materialize';
 import { NoteElement } from '../../../types/NotepadTypes';
 import Resizable from 're-resizable';
+import { Dialog } from '../../../dialogs';
 
 export default class ImageElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {
@@ -66,7 +67,7 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 				edit('');
 			})
 			.catch((err) => {
-				alert('Error uploading file');
+				Dialog.alert('Error uploading file');
 				console.error(err);
 			});
 	}

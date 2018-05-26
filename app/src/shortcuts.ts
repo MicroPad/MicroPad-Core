@@ -2,6 +2,7 @@ import { Store } from 'redux';
 import { IStoreState } from './types';
 import * as mousetrap from 'mousetrap';
 import { actions } from './actions';
+import { INotepadStoreState } from './types/NotepadTypes';
 
 export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 	// Fullscreen
@@ -22,5 +23,29 @@ export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 
 			store.dispatch(actions.loadNotepadByIndex(n));
 		});
+	});
+
+	// Export Notepad
+	mousetrap.bind('mod+s', e => {
+		e.preventDefault();
+
+		if (!!(store.getState().notepads.notepad || <INotepadStoreState> {}).item) store.dispatch(actions.exportNotepad(undefined));
+	});
+
+	// Export All Notepads
+	mousetrap.bind('mod+shift+s', e => {
+		e.preventDefault();
+		document.getElementById('export-all-notepads-trigger')!.click();
+	});
+
+	// Import Notepad(s)
+	mousetrap.bind('mod+o', e => {
+		e.preventDefault();
+		document.getElementById('upload-notepad-input')!.click();
+	});
+
+	mousetrap.bind('mod+p', e => {
+		e.preventDefault();
+		store.dispatch(actions.print.started(undefined));
 	});
 }

@@ -20,9 +20,9 @@ import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './shortcuts';
 import { OldSyncHandler } from './old-sync/OldSyncHandler';
 import * as QueryString from 'querystring';
-import * as PrintTemplate from 'react-print';
-import PrintViewComponent from './containers/PrintViewContainer';
+import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import { isDev } from './util';
+import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -47,65 +47,83 @@ export const ASSET_STORAGE = localforage.createInstance({
 		storeName: 'assets'
 });
 
-Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), localforage.getItem('font size')])
-	.then(([r, r2, fs]: [void, void, string]) => !!fs && store.dispatch(actions.updateDefaultFontSize(fs)))
-	.then(() => new Promise((resolve, reject) => {
-		if (doesSupportSrcDoc()) {
-			resolve();
-		} else {
-			reject();
-		}
-	}))
-	.then(() => store.dispatch(actions.getNotepadList.started(undefined)))
-	.then(() => ReactDOM.render(
+(async function init() {
+	if (!await compatibilityCheck()) return;
+	await hydrateStoreFromLocalforage();
+
+	new OldSyncHandler(store);
+	enableKeyboardShortcuts(store);
+	registerServiceWorker();
+
+	// Render the main UI
+	ReactDOM.render(
 		<Provider store={store}>
-			<div>
+			<PrintViewOrAppContainerComponent>
 				<HeaderComponent />
 				<div id="body">
 					<NoteViewerComponent />
 					<NotepadExplorerComponent />
+					<WhatsNewModalComponent />
 				</div>
-			</div>
+			</PrintViewOrAppContainerComponent>
 		</Provider>,
-		document.getElementById('react-no-print') as HTMLElement
-	))
-	.then(() => ReactDOM.render(
-		<PrintTemplate>
-			<Provider store={store}>
-				<PrintViewComponent />
-			</Provider>
-		</PrintTemplate>,
-		document.getElementById('print-mount') as HTMLElement
-	))
-	.then(() => localforage.getItem('hasRunBefore'))
-	.then(async (hasRunBefore: boolean) => {
-		if (!hasRunBefore) store.dispatch(actions.getHelp(undefined));
-		await localforage.setItem('hasRunBefore', true);
-	})
-	.then(() => {
-		const downloadNotepadUrl = QueryString.parse(location.search.slice(1)).download;
-		if (!!downloadNotepadUrl && typeof downloadNotepadUrl === 'string') store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
-	})
-	.catch(() => ReactDOM.render(
-		<div style={{ margin: '10px' }}>
-			<h1>Bad news 😢</h1>
-			<p>
-				Your web-browser doesn't support important security features required for {APP_NAME} v{store.getState().meta.version.major} to function.<br />
-				Try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noreferrer">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="nofollow noreferrer">Mozilla Firefox</a>.
-			</p>
-			<p>
-				You can always use the old {APP_NAME} <a href="https://getmicropad.com/web">here</a>.
-			</p>
-		</div>,
-		document.getElementById('react-no-print') as HTMLElement
-	));
+		document.getElementById('app') as HTMLElement
+	);
 
-new OldSyncHandler(store);
-enableKeyboardShortcuts(store);
-registerServiceWorker();
+	if (!await localforage.getItem('hasRunBefore')) store.dispatch(actions.getHelp(undefined));
+	await localforage.setItem('hasRunBefore', true);
 
-function doesSupportSrcDoc(): boolean {
-	const testIframe = document.createElement('iframe');
-	testIframe.srcdoc = 'test';
-	return testIframe.getAttribute('srcdoc') === 'test';
+	await displayWhatsNew();
+
+	notepadDownloadHandler();
+})();
+
+async function hydrateStoreFromLocalforage() {
+	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()]);
+	const fontSize = await localforage.getItem<string>('font size');
+	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
+
+	store.dispatch(actions.getNotepadList.started(undefined));
+}
+
+async function compatibilityCheck(): Promise<boolean> {
+	function doesSupportSrcDoc(): boolean {
+		const testIframe = document.createElement('iframe');
+		testIframe.srcdoc = 'test';
+		return testIframe.getAttribute('srcdoc') === 'test';
+	}
+
+	if (!doesSupportSrcDoc()) {
+		ReactDOM.render(
+			<div style={{ margin: '10px' }}>
+				<h1>Bad news 😢</h1>
+				<p>
+					Your web-browser doesn't support important security features required for {APP_NAME} v{store.getState().meta.version.major} to function.<br />
+					Try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noreferrer">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="nofollow noreferrer">Mozilla Firefox</a>.
+				</p>
+				<p>
+					You can always use the old {APP_NAME} <a href="https://getmicropad.com/web">here</a>.
+				</p>
+			</div>,
+			document.getElementById('react-no-print') as HTMLElement
+		);
+		return false;
+	}
+
+	return true;
+}
+
+async function displayWhatsNew() {
+	const minorVersion = store.getState().meta.version.minor;
+	const oldMinorVersion = await localforage.getItem('oldMinorVersion');
+	if (minorVersion === oldMinorVersion) return;
+
+	// Open "What's New"
+	document.getElementById('whats-new-modal-trigger')!.click();
+	await localforage.setItem('oldMinorVersion', minorVersion);
+}
+
+function notepadDownloadHandler() {
+	const downloadNotepadUrl = QueryString.parse(location.search.slice(1)).download;
+	if (!!downloadNotepadUrl && typeof downloadNotepadUrl === 'string') store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
 }
