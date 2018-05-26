@@ -258,7 +258,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					newWindow.opener = null;
 					newWindow.focus();
 				} else {
-					Dialog.alert('Your browser blocked opening the link');
+					if (!(window as any).isElectron) Dialog.alert('Your browser blocked opening the link');
 				}
 				break;
 
