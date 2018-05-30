@@ -47,6 +47,11 @@ export const ASSET_STORAGE = localforage.createInstance({
 		storeName: 'assets'
 });
 
+export const SYNC_STORAGE = localforage.createInstance({
+	name: 'MicroPad',
+	storeName: 'sync'
+});
+
 (async function init() {
 	if (!await compatibilityCheck()) return;
 	await hydrateStoreFromLocalforage();
@@ -79,7 +84,7 @@ export const ASSET_STORAGE = localforage.createInstance({
 })();
 
 async function hydrateStoreFromLocalforage() {
-	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()]);
+	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), SYNC_STORAGE.ready()]);
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
 
