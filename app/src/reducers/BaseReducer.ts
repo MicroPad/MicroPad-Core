@@ -9,6 +9,7 @@ import { NoteReducer } from './NoteReducer';
 import { ExplorerReducer } from './ExplorerReducer';
 import { SearchReducer } from './SearchReducer';
 import { PrintReducer } from './PrintReducer';
+import { SyncReducer } from './SyncReducer';
 
 export const REDUCERS: Array<IReducer<any>> = [
 	new MetaReducer(),
@@ -16,7 +17,8 @@ export const REDUCERS: Array<IReducer<any>> = [
 	new NoteReducer(),
 	new ExplorerReducer(),
 	new SearchReducer(),
-	new PrintReducer()
+	new PrintReducer(),
+	new SyncReducer()
 ];
 
 export class BaseReducer implements IReducer<IStoreState> {

@@ -23,6 +23,7 @@ import * as QueryString from 'querystring';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import { isDev } from './util';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
+import { SyncUser } from './types/SyncTypes';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -87,6 +88,9 @@ async function hydrateStoreFromLocalforage() {
 	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), SYNC_STORAGE.ready()]);
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
+
+	const syncUser: SyncUser = await SYNC_STORAGE.getItem<SyncUser>('sync user');
+	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: undefined, result: syncUser }));
 
 	store.dispatch(actions.getNotepadList.started(undefined));
 }
