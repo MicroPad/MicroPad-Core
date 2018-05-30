@@ -8,7 +8,7 @@ import {
 	IUpdateElementAction
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
-import { SyncUser } from './types/SyncTypes';
+import { SyncLoginRequest, SyncUser } from './types/SyncTypes';
 
 const actionCreator = actionCreatorFactory();
 
@@ -24,7 +24,7 @@ export const actions = {
 	downloadAsset: actionCreator.async<{ filename: string, uuid: string }, void, any>('DOWNLOAD_ASSET'),
 	expandAllExplorer: actionCreator.async<void, string[], any>('EXPAND_ALL_EXPLORER'),
 	print: actionCreator.async<void, NoteElement, void>('PRINT'),
-	syncLogin: actionCreator.async<void, SyncUser, any>('SYNC_LOGIN'),
+	syncLogin: actionCreator.async<SyncLoginRequest, SyncUser, any>('SYNC_LOGIN'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),

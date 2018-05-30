@@ -1,5 +1,10 @@
 import { INotepad } from './NotepadTypes';
 
+export type SyncLoginRequest = {
+	username: string;
+	password: string;
+};
+
 export type SyncUser = { username: string; token: string; };
 
 export type AssetList = { [uuid: string]: string };
