@@ -60,5 +60,6 @@ export const actions = {
 	loadNotepadByIndex: actionCreator<number>('LOAD_NOTEPAD_BY_INDEX'),
 	updateZoomLevel: actionCreator<number>('UPDATE_ZOOM_LEVEL'),
 	clearPrintView: actionCreator<void>('CLEAR_PRINT'),
-	syncLogout: actionCreator<void>('SYNC_LOGOUT')
+	syncLogout: actionCreator<void>('SYNC_LOGOUT'),
+	syncRegister: actionCreator<SyncLoginRequest>('SYNC_REGISTER')
 };

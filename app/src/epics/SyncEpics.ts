@@ -33,7 +33,7 @@ export namespace SyncEpics {
 							})
 						),
 						catchError(error => {
-							Dialog.alert(error);
+							Dialog.alert('There was an error logging in. Make sure your username/password is correct and that you\'re online');
 							return of(actions.syncLogin.failed({ params: <SyncLoginRequest> {}, error }));
 						})
 					)
@@ -47,7 +47,7 @@ export namespace SyncEpics {
 			map((user: SyncUser) => actions.getSyncedNotepadList.started(user))
 		);
 
-	export const getNoteapadList$ = action$ =>
+	export const getNotepadList$ = action$ =>
 		action$.pipe(
 			isAction(actions.getSyncedNotepadList.started),
 			map((action: Action<SyncUser>) => action.payload),
@@ -55,7 +55,8 @@ export namespace SyncEpics {
 				SyncService.NotepadService.listNotepads(user.username, user.token)
 					.pipe(
 						map(res => actions.getSyncedNotepadList.done({ params: user, result: res })),
-						catchError(() => of(actions.syncLogout(undefined)))
+						// TODO: Handle offline state (or token expiration) here
+						catchError(error => of(actions.getSyncedNotepadList.failed({ params: user, error })))
 					)
 			)
 		);
@@ -64,6 +65,6 @@ export namespace SyncEpics {
 		persistOnLogin$,
 		login$,
 		getNotepadListOnLogin$,
-		getNoteapadList$
+		getNotepadList$
 	);
 }

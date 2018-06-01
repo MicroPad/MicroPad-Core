@@ -32,6 +32,23 @@ export class SyncReducer implements IReducer<ISyncState> {
 				...state,
 				isLoading: false
 			};
+		} else if (isType(action, actions.getSyncedNotepadList.started)) {
+			return {
+				...state,
+				notepadList: undefined,
+				isLoading: true
+			};
+		} else if (isType(action, actions.getSyncedNotepadList.failed)) {
+			return {
+				...state,
+				isLoading: false
+			};
+		} else if (isType(action, actions.getSyncedNotepadList.done)) {
+			return {
+				...state,
+				notepadList: action.payload.result,
+				isLoading: false
+			};
 		} else if (isType(action, actions.syncLogout)) {
 			return { ...this.initialState };
 		}

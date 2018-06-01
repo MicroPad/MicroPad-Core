@@ -14,9 +14,10 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 	};
 }
 
-export function mapStateToProps({ notepads }: IStoreState) {
+export function mapStateToProps({ notepads, sync }: IStoreState) {
 	return {
-		notepadTitles: notepads.savedNotepadTitles
+		notepadTitles: notepads.savedNotepadTitles,
+		syncedNotepadTitles: sync.notepadList
 	};
 }
 

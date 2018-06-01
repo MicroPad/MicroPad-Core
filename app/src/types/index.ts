@@ -4,6 +4,7 @@ import { IExplorerState } from '../reducers/ExplorerReducer';
 import { ISearchState } from '../reducers/SearchReducer';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
 import { IPrintStoreState } from '../reducers/PrintReducer';
+import { ISyncState } from '../reducers/SyncReducer';
 
 export interface IStoreState {
 	readonly meta: IMetaStoreState;
@@ -12,6 +13,7 @@ export interface IStoreState {
 	readonly explorer: IExplorerState;
 	readonly search: ISearchState;
 	readonly print: IPrintStoreState;
+	readonly sync: ISyncState;
 }
 
 export const APP_NAME = 'µPad';
