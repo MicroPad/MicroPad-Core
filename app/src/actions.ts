@@ -8,7 +8,7 @@ import {
 	IUpdateElementAction
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
-import { SyncLoginRequest, SyncUser } from './types/SyncTypes';
+import { SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
 
 const actionCreator = actionCreatorFactory();
 
@@ -25,6 +25,7 @@ export const actions = {
 	expandAllExplorer: actionCreator.async<void, string[], any>('EXPAND_ALL_EXPLORER'),
 	print: actionCreator.async<void, NoteElement, void>('PRINT'),
 	syncLogin: actionCreator.async<SyncLoginRequest, SyncUser, any>('SYNC_LOGIN'),
+	getSyncedNotepadList: actionCreator.async<SyncUser, SyncedNotepadList, any>('SYNC_GET_NOTEPAD_LIST'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),
@@ -58,5 +59,6 @@ export const actions = {
 	updateBibliography: actionCreator<IUpdateBibliographyAction>('UPDATE_BIBLIOGRAPHY'),
 	loadNotepadByIndex: actionCreator<number>('LOAD_NOTEPAD_BY_INDEX'),
 	updateZoomLevel: actionCreator<number>('UPDATE_ZOOM_LEVEL'),
-	clearPrintView: actionCreator<void>('CLEAR_PRINT')
+	clearPrintView: actionCreator<void>('CLEAR_PRINT'),
+	syncLogout: actionCreator<void>('SYNC_LOGOUT')
 };
