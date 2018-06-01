@@ -7,14 +7,14 @@ import { generateGuid } from '../../util';
 import { Dialog } from '../../dialogs';
 import { SYNC_NAME } from '../../types';
 import LoginComponent from '../../containers/LoginContainer';
-import { SyncedNotepadList } from '../../types/SyncTypes';
+import { ISyncState } from '../../reducers/SyncReducer';
 
 const NPX_ICON = require('../../assets/npx.png');
 const MD_ICON = require('../../assets/md.svg');
 
 export interface INotepadDropdownProps {
 	notepadTitles?: string[];
-	syncedNotepadTitles?: SyncedNotepadList;
+	syncState: ISyncState;
 	openNotepadFromStorage?: (title: string) => void;
 	newNotepad?: (notepad: INotepad) => void;
 	exportAll?: () => void;
@@ -23,7 +23,7 @@ export interface INotepadDropdownProps {
 
 export default class NotepadDropdownComponent extends React.Component<INotepadDropdownProps> {
 	render() {
-		const { notepadTitles, syncedNotepadTitles, exportAll, exportToMarkdown } = this.props;
+		const { notepadTitles, syncState, exportAll, exportToMarkdown } = this.props;
 
 		const notepadNavItems: JSX.Element[] = [];
 		(notepadTitles || []).forEach((title: string) => notepadNavItems.push(<NavItem key={generateGuid()} href="#!" onClick={this.openNotepad}>{title}</NavItem>));
@@ -71,9 +71,10 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 					{notepadNavItems}
 
 					<NavItem divider={true} />
-					{!!syncedNotepadTitles &&  Object.keys(syncedNotepadTitles).map(title =>
+					{syncState.isLoading && <NavItem href="#!">Loading...</NavItem>}
+					{!!syncState.notepadList &&  Object.keys(syncState.notepadList).map(title =>
 						<NavItem key={generateGuid()} href="#!" onClick={() => {
-							console.log(syncedNotepadTitles![title]);
+							console.log(syncState.notepadList![title]);
 						}}>
 							{title} ({SYNC_NAME})
 						</NavItem>

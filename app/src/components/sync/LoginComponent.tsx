@@ -81,7 +81,7 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 					<div>
 						<p>
 							Make sure to remember your password or use a password manger.<br />
-							Because of our privacy measures it may be difficult for a
+							Because of our privacy measures, it may be difficult for a
 							password reset to be done for you.
 						</p>
 					</div>

@@ -17,7 +17,7 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 export function mapStateToProps({ notepads, sync }: IStoreState) {
 	return {
 		notepadTitles: notepads.savedNotepadTitles,
-		syncedNotepadTitles: sync.notepadList
+		syncState: sync
 	};
 }
 

@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../actions';
-import { catchError, filter, map, switchMap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { SyncLoginRequest, SyncUser } from '../types/SyncTypes';
 import { SYNC_STORAGE } from '../index';
@@ -26,6 +26,7 @@ export namespace SyncEpics {
 			switchMap((req: SyncLoginRequest) =>
 				SyncService.AccountService.login(req.username, req.password)
 					.pipe(
+						tap(() => Dialog.alert(`Logged in successfully. Open your synced notepads using the notepads drop-down.`)),
 						map(res =>
 							actions.syncLogin.done({
 								params: <SyncLoginRequest> {},
@@ -33,7 +34,8 @@ export namespace SyncEpics {
 							})
 						),
 						catchError(error => {
-							Dialog.alert('There was an error logging in. Make sure your username/password is correct and that you\'re online');
+							const message = (!!error.response) ? error.response : 'There was an error logging in. Make sure your username/password is correct and that you\'re online.';
+							Dialog.alert(message);
 							return of(actions.syncLogin.failed({ params: <SyncLoginRequest> {}, error }));
 						})
 					)
