@@ -8,6 +8,7 @@ import { SYNC_STORAGE } from '../index';
 import { SyncService } from '../SyncService';
 import { of } from 'rxjs/observable/of';
 import { Dialog } from '../dialogs';
+import { IStoreState } from '../types';
 
 export namespace SyncEpics {
 	export const persistOnLogin$ = action$ =>
@@ -49,6 +50,15 @@ export namespace SyncEpics {
 			map((user: SyncUser) => actions.getSyncedNotepadList.started(user))
 		);
 
+	export const getNotepadListOnNotepadLoad$ = (action$, store) =>
+		action$.pipe(
+			isAction(actions.parseNpx.done),
+			map(() => store.getState()),
+			map((state:  IStoreState) => state.sync.user),
+			filter(Boolean),
+			map((user: SyncUser) => actions.getSyncedNotepadList.started(user))
+		);
+
 	export const getNotepadList$ = action$ =>
 		action$.pipe(
 			isAction(actions.getSyncedNotepadList.started),
@@ -67,6 +77,7 @@ export namespace SyncEpics {
 		persistOnLogin$,
 		login$,
 		getNotepadListOnLogin$,
-		getNotepadList$
+		getNotepadList$,
+		getNotepadListOnNotepadLoad$
 	);
 }

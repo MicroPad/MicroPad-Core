@@ -36,6 +36,7 @@ export interface INotepadsStoreState {
 export interface INotepadStoreState {
 	isLoading: boolean;
 	saving: boolean;
+	activeSyncId?: string;
 	item?: INotepad;
 }
 

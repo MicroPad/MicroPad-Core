@@ -24,6 +24,7 @@ import { ajax } from 'rxjs/observable/dom/ajax';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 import { Dialog } from '../dialogs';
 import { of } from 'rxjs/observable/of';
+import { SyncedNotepadList, SyncUser } from '../types/SyncTypes';
 
 const parseQueue: string[] = [];
 
@@ -305,6 +306,12 @@ const loadNotepadByIndex$ = (action$, store) =>
 		map((title: string) => actions.openNotepadFromStorage.started(title))
 	);
 
+const updateSyncedNotepadIdOnSyncListLoad$ = action$ =>
+	action$.pipe(
+		isAction(actions.getSyncedNotepadList.done),
+		map((action: Action<Success<SyncUser, SyncedNotepadList>>) => actions.updateCurrentSyncId(action.payload.result))
+	);
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	restoreJsonNotepad$,
@@ -317,7 +324,8 @@ export const notepadEpics$ = combineEpics(
 	queueParseNpx$,
 	getNextParse$,
 	parseEnex$,
-	loadNotepadByIndex$
+	loadNotepadByIndex$,
+	updateSyncedNotepadIdOnSyncListLoad$
 );
 
 interface IExportedNotepad {

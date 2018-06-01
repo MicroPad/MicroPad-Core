@@ -3,8 +3,8 @@ import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 
-export const isAction = (typeOfAction: ActionCreator<any>) =>
-	filter((action: Action<any>) => isType(action, typeOfAction));
+export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
+	filter((action: Action<any>) => typesOfAction.every(type => isType(action, type)));
 
 export function restoreObject<T>(objectToRestore: T, template: T): T {
 	objectToRestore['__proto__'] = { ...template['__proto__'] };

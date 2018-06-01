@@ -1,6 +1,6 @@
 import { IReducer } from '../types/ReducerType';
 import { Action } from 'redux';
-import { INote, INotepad, INotepadsStoreState, IParent, ISection } from '../types/NotepadTypes';
+import { INote, INotepad, INotepadsStoreState, INotepadStoreState, IParent, ISection } from '../types/NotepadTypes';
 import { actions } from '../actions';
 import { isType } from 'redux-typescript-actions';
 import { getNotepadObjectByRef, restoreObject } from '../util';
@@ -431,6 +431,20 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				notepad: {
 					...state.notepad!,
 					item: notepad
+				}
+			};
+		} else if (isType(action, actions.updateCurrentSyncId)) {
+			if (!(state.notepad || <INotepadStoreState> {}).item) return state;
+			const title = state.notepad!.item!.title;
+
+			const id = action.payload[title];
+			if (!id) return state;
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad!,
+					activeSyncId: id
 				}
 			};
 		}
