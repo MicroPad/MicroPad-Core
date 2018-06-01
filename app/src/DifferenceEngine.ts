@@ -5,8 +5,9 @@ import { map, retry } from 'rxjs/operators';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 import { SyncedNotepadList } from './types/SyncTypes';
 import { isDev } from './util';
+import { parse } from 'date-fns'
 
-export namespace SyncService {
+export namespace DifferenceEngine {
 	export namespace AccountService {
 		const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);
 
@@ -26,6 +27,13 @@ export namespace SyncService {
 
 		export const listNotepads = (username: string, token: string): Observable<SyncedNotepadList> =>
 			call<{ notepads: SyncedNotepadList }>('list_notepads', username, { token }).pipe(map(res => res.notepads));
+	}
+
+	export namespace SyncService {
+		const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('sync', endpoint, resource, payload);
+
+		export const getLastModified = (syncId: string): Observable<Date> =>
+			call<{ title: string, lastModified: string }>('info', syncId).pipe(map(res => parse(res.lastModified)));
 	}
 
 	function callApi<T>(parent: string, endpoint: string, resource: string, payload?: object, method?: string): Observable<T> {

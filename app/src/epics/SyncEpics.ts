@@ -5,7 +5,7 @@ import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { SyncLoginRequest, SyncUser } from '../types/SyncTypes';
 import { SYNC_STORAGE } from '../index';
-import { SyncService } from '../SyncService';
+import { DifferenceEngine } from '../DifferenceEngine';
 import { of } from 'rxjs/observable/of';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
@@ -25,7 +25,7 @@ export namespace SyncEpics {
 			isAction(actions.syncLogin.started),
 			map((action: Action<SyncLoginRequest>) => action.payload),
 			switchMap((req: SyncLoginRequest) =>
-				SyncService.AccountService.login(req.username, req.password)
+				DifferenceEngine.AccountService.login(req.username, req.password)
 					.pipe(
 						tap(() => Dialog.alert(`Logged in successfully. Open your synced notepads using the notepads drop-down.`)),
 						map(res =>
@@ -48,7 +48,7 @@ export namespace SyncEpics {
 			isAction(actions.syncRegister),
 			map((action: Action<SyncLoginRequest>) => action.payload),
 			switchMap((req: SyncLoginRequest) =>
-				SyncService.AccountService.register(req.username, req.password)
+				DifferenceEngine.AccountService.register(req.username, req.password)
 					.pipe(
 						tap(() => Dialog.alert(`Logged in successfully. You can add a notepad to ${SYNC_NAME} using the side-bar.`)),
 						map(res =>
@@ -64,6 +64,11 @@ export namespace SyncEpics {
 						})
 					)
 			)
+		);
+
+	export const sync$ = action$ =>
+		action$.pipe(
+
 		);
 
 	export const getNotepadListOnLogin$ = action$ =>
@@ -87,7 +92,7 @@ export namespace SyncEpics {
 			isAction(actions.getSyncedNotepadList.started),
 			map((action: Action<SyncUser>) => action.payload),
 			switchMap((user: SyncUser) =>
-				SyncService.NotepadService.listNotepads(user.username, user.token)
+				DifferenceEngine.NotepadService.listNotepads(user.username, user.token)
 					.pipe(
 						map(res => actions.getSyncedNotepadList.done({ params: user, result: res })),
 						// TODO: Handle offline state (or token expiration) here
