@@ -3,9 +3,10 @@ import { ajax } from 'rxjs/observable/dom/ajax';
 import { MICROPAD_URL } from './types';
 import { map, retry } from 'rxjs/operators';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
-import { ISyncedNotepad, SyncedNotepadList } from './types/SyncTypes';
+import { AssetList, ISyncedNotepad, SyncedNotepadList } from './types/SyncTypes';
 import { isDev } from './util';
 import { parse } from 'date-fns';
+import { INotepad } from './types/NotepadTypes';
 
 export namespace DifferenceEngine {
 	export namespace AccountService {
@@ -37,6 +38,37 @@ export namespace DifferenceEngine {
 
 		export const downloadNotepad = (syncId: string): Observable<ISyncedNotepad> =>
 			call<{ notepad: string }>('download', syncId).pipe(map(res => JSON.parse(res.notepad)));
+
+		export const getAssetDownloadLinks = (syncId: string, assets: string[]): Observable<AssetList> =>
+			call<{ urlList: AssetList }>('download_assets', syncId, { assets: JSON.stringify(assets) }).pipe(map(res => res.urlList));
+
+		export async function notepadToSyncedNotepad(notepad: INotepad): Promise<ISyncedNotepad> {
+			const syncedNotepad: ISyncedNotepad = <ISyncedNotepad> { ...notepad };
+
+			if (!syncedNotepad.assetHashList) {
+				// TODO: Properly resolve this with a WebWorker to get real hashes
+				const tmp = {};
+				(syncedNotepad.notepadAssets || []).forEach(uuid => tmp[uuid] = '');
+				syncedNotepad.assetHashList = tmp;
+			}
+
+			return syncedNotepad;
+		}
+	}
+
+	export function downloadAsset<T>(url: string): Observable<Blob> {
+		return ajax({
+			url,
+			method: 'GET',
+			crossDomain: true,
+			headers: {
+				'Content-Type': 'text/plain; charset=UTF-8'
+			},
+			responseType: 'blob'
+		}).pipe(
+			map((res: AjaxResponse) => res.response),
+			retry(2)
+		);
 	}
 
 	function callApi<T>(parent: string, endpoint: string, resource: string, payload?: object, method?: string): Observable<T> {

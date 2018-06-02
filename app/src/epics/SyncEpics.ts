@@ -1,10 +1,10 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../actions';
-import { catchError, filter, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, filter, map, mergeMap, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
-import { ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
-import { SYNC_STORAGE } from '../index';
+import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
+import { ASSET_STORAGE, SYNC_STORAGE } from '../index';
 import { DifferenceEngine } from '../DifferenceEngine';
 import { of } from 'rxjs/observable/of';
 import { Dialog } from '../dialogs';
@@ -12,6 +12,9 @@ import { IStoreState, SYNC_NAME } from '../types';
 import { ISyncAction } from '../types/ActionTypes';
 import { empty } from 'rxjs/observable/empty';
 import { parse } from 'date-fns';
+import { INotepad, INotepadStoreState } from '../types/NotepadTypes';
+import { fromPromise } from 'rxjs/observable/fromPromise';
+import * as Parser from 'upad-parse/dist/index';
 
 export namespace SyncEpics {
 	export const persistOnLogin$ = action$ =>
@@ -89,17 +92,47 @@ export namespace SyncEpics {
 			)
 		);
 
-	export const download$ = action$ =>
+	export const download$ = (action$, store) =>
 		action$.pipe(
 			isAction(actions.syncDownload.started),
 			map((action: Action<string>) => action.payload),
 			switchMap((syncId: string) =>
 				DifferenceEngine.SyncService.downloadNotepad(syncId)
 					.pipe(
-						tap((np: ISyncedNotepad) => console.log(np)),
-						filter(() => false), // TODO: remove this by adding in proper asset downloading with hash comparisons
+						switchMap((remoteNotepad: ISyncedNotepad) => {
+							let localNotepad = (((<IStoreState> store).notepads || <INotepadStoreState> {}).notepad || <INotepadStoreState> {}).item;
+							if (!localNotepad) localNotepad = <INotepad> Parser.createNotepad('');
+
+							return fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad)).pipe(
+								switchMap((local: ISyncedNotepad) => {
+									const diffAssets = Object.keys(remoteNotepad.assetHashList)
+										.filter(uuid =>
+											local.assetHashList[uuid] !== remoteNotepad.assetHashList[uuid]
+										);
+
+									// Download the different assets
+									return DifferenceEngine.SyncService.getAssetDownloadLinks(syncId, diffAssets).pipe(
+										mergeMap((urlList: AssetList) =>
+											Object.keys(urlList)
+												.map(uuid =>
+													DifferenceEngine.downloadAsset(urlList[uuid])
+														.pipe(
+															switchMap((asset: Blob) => fromPromise(
+																ASSET_STORAGE.setItem(uuid, asset)
+															))
+														)
+												)
+										),
+										switchMap(assetDownloads => assetDownloads),
+										map(() => remoteNotepad)
+									);
+								})
+							);
+						}),
+						map((remoteNotepad: ISyncedNotepad) => actions.restoreJsonNotepad(JSON.stringify(remoteNotepad))),
 						catchError(error => {
-							const message = (!!error.response) ? error.response : 'There was an error creating your account';
+							console.error(error);
+							const message = (!!error.response) ? error.response : 'There was an error syncing';
 							Dialog.alert(message);
 							return of(actions.syncDownload.failed({ params: '', error }));
 						})
