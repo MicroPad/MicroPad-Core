@@ -4,11 +4,13 @@ import {
 	IDeleteElementAction,
 	IInsertElementAction,
 	INewNotepadObjectAction,
+	ISyncAction,
 	IUpdateBibliographyAction,
-	IUpdateElementAction
+	IUpdateElementAction,
+	IUploadAssetAction
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
-import { SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
+import { AssetList, SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
 
 const actionCreator = actionCreatorFactory();
 
@@ -26,6 +28,9 @@ export const actions = {
 	print: actionCreator.async<void, NoteElement, void>('PRINT'),
 	syncLogin: actionCreator.async<SyncLoginRequest, SyncUser, any>('SYNC_LOGIN'),
 	getSyncedNotepadList: actionCreator.async<SyncUser, SyncedNotepadList, any>('SYNC_GET_NOTEPAD_LIST'),
+	syncDownload: actionCreator.async<string, INotepad, any>('SYNC_DOWNLOAD'),
+	syncUpload: actionCreator.async<ISyncAction, AssetList, any>('SYNC_UPLOAD'),
+	syncUploadAsset: actionCreator.async<IUploadAssetAction, void, any>('SYNC_UPLOAD_ASSET'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),
@@ -62,5 +67,6 @@ export const actions = {
 	clearPrintView: actionCreator<void>('CLEAR_PRINT'),
 	syncLogout: actionCreator<void>('SYNC_LOGOUT'),
 	syncRegister: actionCreator<SyncLoginRequest>('SYNC_REGISTER'),
-	updateCurrentSyncId: actionCreator<SyncedNotepadList>('UPDATE_SYNC_ID')
+	updateCurrentSyncId: actionCreator<SyncedNotepadList>('UPDATE_SYNC_ID'),
+	sync: actionCreator<ISyncAction>('SYNC')
 };

@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../actions';
-import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { SyncLoginRequest, SyncUser } from '../types/SyncTypes';
 import { SYNC_STORAGE } from '../index';
@@ -9,6 +9,9 @@ import { DifferenceEngine } from '../DifferenceEngine';
 import { of } from 'rxjs/observable/of';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
+import { ISyncAction } from '../types/ActionTypes';
+import { empty } from 'rxjs/observable/empty';
+import { parse } from 'date-fns';
 
 export namespace SyncEpics {
 	export const persistOnLogin$ = action$ =>
@@ -68,7 +71,22 @@ export namespace SyncEpics {
 
 	export const sync$ = action$ =>
 		action$.pipe(
-
+			isAction(actions.sync),
+			map((action: Action<ISyncAction>) => action.payload),
+			switchMap((syncAction: ISyncAction) =>
+				of(syncAction).pipe(
+					withLatestFrom(
+						DifferenceEngine.SyncService.getLastModified(syncAction.syncId)
+							.pipe(catchError(empty))
+					)
+				)
+			),
+			filter(([syncAction, lastModified]: [ISyncAction, Date]) => !!syncAction && !!lastModified),
+			map(([syncAction, lastModified]: [ISyncAction, Date]) =>
+				(parse(syncAction.notepad.lastModified).getTime() < lastModified.getTime())
+					? actions.syncDownload.started(syncAction.syncId) // Local notepad is older than remote
+					: actions.syncUpload.started(syncAction) // Local notepad is newer than remote
+			)
 		);
 
 	export const getNotepadListOnLogin$ = action$ =>
@@ -105,6 +123,7 @@ export namespace SyncEpics {
 		persistOnLogin$,
 		login$,
 		register$,
+		sync$,
 		getNotepadListOnLogin$,
 		getNotepadList$,
 		getNotepadListOnNotepadLoad$

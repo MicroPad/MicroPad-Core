@@ -1,4 +1,5 @@
 import { IParent, NoteElement, Source } from './NotepadTypes';
+import { ISyncedNotepad } from './SyncTypes';
 
 export interface IUpdateElementAction {
 	noteRef: string;
@@ -25,4 +26,14 @@ export interface IDeleteElementAction {
 export interface IUpdateBibliographyAction {
 	noteRef: string;
 	sources: Source[];
+}
+
+export interface ISyncAction {
+	syncId: string;
+	notepad: ISyncedNotepad;
+}
+
+export interface IUploadAssetAction {
+	syncId: string;
+	assetId: string;
 }

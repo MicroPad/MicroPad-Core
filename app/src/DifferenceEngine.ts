@@ -5,7 +5,7 @@ import { map, retry } from 'rxjs/operators';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 import { SyncedNotepadList } from './types/SyncTypes';
 import { isDev } from './util';
-import { parse } from 'date-fns'
+import { parse } from 'date-fns';
 
 export namespace DifferenceEngine {
 	export namespace AccountService {
