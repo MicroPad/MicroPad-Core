@@ -3,7 +3,7 @@ import { ajax } from 'rxjs/observable/dom/ajax';
 import { MICROPAD_URL } from './types';
 import { map, retry } from 'rxjs/operators';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
-import { SyncedNotepadList } from './types/SyncTypes';
+import { ISyncedNotepad, SyncedNotepadList } from './types/SyncTypes';
 import { isDev } from './util';
 import { parse } from 'date-fns';
 
@@ -34,6 +34,9 @@ export namespace DifferenceEngine {
 
 		export const getLastModified = (syncId: string): Observable<Date> =>
 			call<{ title: string, lastModified: string }>('info', syncId).pipe(map(res => parse(res.lastModified)));
+
+		export const downloadNotepad = (syncId: string): Observable<ISyncedNotepad> =>
+			call<{ notepad: string }>('download', syncId).pipe(map(res => JSON.parse(res.notepad)));
 	}
 
 	function callApi<T>(parent: string, endpoint: string, resource: string, payload?: object, method?: string): Observable<T> {

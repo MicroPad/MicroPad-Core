@@ -3,7 +3,7 @@ import { isAction } from '../util';
 import { actions } from '../actions';
 import { catchError, filter, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
-import { SyncLoginRequest, SyncUser } from '../types/SyncTypes';
+import { ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
 import { SYNC_STORAGE } from '../index';
 import { DifferenceEngine } from '../DifferenceEngine';
 import { of } from 'rxjs/observable/of';
@@ -89,6 +89,24 @@ export namespace SyncEpics {
 			)
 		);
 
+	export const download$ = action$ =>
+		action$.pipe(
+			isAction(actions.syncDownload.started),
+			map((action: Action<string>) => action.payload),
+			switchMap((syncId: string) =>
+				DifferenceEngine.SyncService.downloadNotepad(syncId)
+					.pipe(
+						tap((np: ISyncedNotepad) => console.log(np)),
+						filter(() => false), // TODO: remove this by adding in proper asset downloading with hash comparisons
+						catchError(error => {
+							const message = (!!error.response) ? error.response : 'There was an error creating your account';
+							Dialog.alert(message);
+							return of(actions.syncDownload.failed({ params: '', error }));
+						})
+					)
+			)
+		);
+
 	export const getNotepadListOnLogin$ = action$ =>
 		action$.pipe(
 			isAction(actions.syncLogin.done),
@@ -124,6 +142,7 @@ export namespace SyncEpics {
 		login$,
 		register$,
 		sync$,
+		download$,
 		getNotepadListOnLogin$,
 		getNotepadList$,
 		getNotepadListOnNotepadLoad$
