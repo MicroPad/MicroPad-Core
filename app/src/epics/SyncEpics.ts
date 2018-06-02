@@ -86,7 +86,7 @@ export namespace SyncEpics {
 			),
 			filter(([syncAction, lastModified]: [ISyncAction, Date]) => !!syncAction && !!lastModified),
 			map(([syncAction, lastModified]: [ISyncAction, Date]) =>
-				(parse(syncAction.notepad.lastModified).getTime() < lastModified.getTime())
+				parse(syncAction.notepad.lastModified).getTime() < lastModified.getTime()
 					? actions.syncDownload.started(syncAction.syncId) // Local notepad is older than remote
 					: actions.syncUpload.started(syncAction) // Local notepad is newer than remote
 			)
