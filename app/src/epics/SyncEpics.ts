@@ -31,21 +31,20 @@ export namespace SyncEpics {
 			isAction(actions.syncLogin.started),
 			map((action: Action<SyncLoginRequest>) => action.payload),
 			switchMap((req: SyncLoginRequest) =>
-				DifferenceEngine.AccountService.login(req.username, req.password)
-					.pipe(
-						tap(() => Dialog.alert(`Logged in successfully. Open your synced notepads using the notepads drop-down.`)),
-						map(res =>
-							actions.syncLogin.done({
-								params: <SyncLoginRequest> {},
-								result: { username: res.username, token: res.token }
-							})
-						),
-						catchError(error => {
-							const message = (!!error.response) ? error.response.error : 'There was an error logging in. Make sure your username/password is correct and that you\'re online.';
-							Dialog.alert(message);
-							return of(actions.syncLogin.failed({ params: <SyncLoginRequest> {}, error: error.response }));
+				DifferenceEngine.AccountService.login(req.username, req.password).pipe(
+					tap(() => Dialog.alert(`Logged in successfully. Open your synced notepads using the notepads drop-down.`)),
+					map(res =>
+						actions.syncLogin.done({
+							params: <SyncLoginRequest> {},
+							result: { username: res.username, token: res.token }
 						})
-					)
+					),
+					catchError(error => {
+						const message = (!!error.response) ? error.response.error : 'There was an error logging in. Make sure your username/password is correct and that you\'re online.';
+						Dialog.alert(message);
+						return of(actions.syncLogin.failed({ params: <SyncLoginRequest> {}, error: error.response }));
+					})
+				)
 			)
 		);
 
@@ -54,21 +53,20 @@ export namespace SyncEpics {
 			isAction(actions.syncRegister),
 			map((action: Action<SyncLoginRequest>) => action.payload),
 			switchMap((req: SyncLoginRequest) =>
-				DifferenceEngine.AccountService.register(req.username, req.password)
-					.pipe(
-						tap(() => Dialog.alert(`Logged in successfully. You can add a notepad to ${SYNC_NAME} using the side-bar.`)),
-						map(res =>
-							actions.syncLogin.done({
-								params: <SyncLoginRequest> {},
-								result: { username: res.username, token: res.token }
-							})
-						),
-						catchError(error => {
-							const message = (!!error.response) ? error.response : 'There was an error creating your account';
-							Dialog.alert(message);
-							return of(actions.syncLogin.failed({ params: <SyncLoginRequest> {}, error }));
+				DifferenceEngine.AccountService.register(req.username, req.password).pipe(
+					tap(() => Dialog.alert(`Logged in successfully. You can add a notepad to ${SYNC_NAME} using the side-bar.`)),
+					map(res =>
+						actions.syncLogin.done({
+							params: <SyncLoginRequest> {},
+							result: { username: res.username, token: res.token }
 						})
-					)
+					),
+					catchError(error => {
+						const message = (!!error.response) ? error.response : 'There was an error creating your account';
+						Dialog.alert(message);
+						return of(actions.syncLogin.failed({ params: <SyncLoginRequest> {}, error }));
+					})
+				)
 			)
 		);
 
@@ -97,46 +95,44 @@ export namespace SyncEpics {
 			isAction(actions.syncDownload.started),
 			map((action: Action<string>) => action.payload),
 			switchMap((syncId: string) =>
-				DifferenceEngine.SyncService.downloadNotepad(syncId)
-					.pipe(
-						switchMap((remoteNotepad: ISyncedNotepad) => {
-							let localNotepad = (((<IStoreState> store).notepads || <INotepadStoreState> {}).notepad || <INotepadStoreState> {}).item;
-							if (!localNotepad) localNotepad = <INotepad> Parser.createNotepad('');
+				DifferenceEngine.SyncService.downloadNotepad(syncId).pipe(
+					switchMap((remoteNotepad: ISyncedNotepad) => {
+						let localNotepad = (((<IStoreState> store).notepads || <INotepadStoreState> {}).notepad || <INotepadStoreState> {}).item;
+						if (!localNotepad) localNotepad = <INotepad> Parser.createNotepad('');
 
-							return fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad)).pipe(
-								switchMap((local: ISyncedNotepad) => {
-									const diffAssets = Object.keys(remoteNotepad.assetHashList)
-										.filter(uuid =>
-											local.assetHashList[uuid] !== remoteNotepad.assetHashList[uuid]
-										);
-
-									// Download the different assets
-									return DifferenceEngine.SyncService.getAssetDownloadLinks(syncId, diffAssets).pipe(
-										mergeMap((urlList: AssetList) =>
-											Object.keys(urlList)
-												.map(uuid =>
-													DifferenceEngine.downloadAsset(urlList[uuid])
-														.pipe(
-															switchMap((asset: Blob) => fromPromise(
-																ASSET_STORAGE.setItem(uuid, asset)
-															))
-														)
-												)
-										),
-										switchMap(assetDownloads => assetDownloads),
-										map(() => remoteNotepad)
+						return fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad)).pipe(
+							switchMap((local: ISyncedNotepad) => {
+								const diffAssets = Object.keys(remoteNotepad.assetHashList)
+									.filter(uuid =>
+										local.assetHashList[uuid] !== remoteNotepad.assetHashList[uuid]
 									);
-								})
-							);
-						}),
-						map((remoteNotepad: ISyncedNotepad) => actions.restoreJsonNotepad(JSON.stringify(remoteNotepad))),
-						catchError(error => {
-							console.error(error);
-							const message = (!!error.response) ? error.response : 'There was an error syncing';
-							Dialog.alert(message);
-							return of(actions.syncDownload.failed({ params: '', error }));
-						})
-					)
+
+								// Download the different assets
+								return DifferenceEngine.SyncService.getAssetDownloadLinks(syncId, diffAssets).pipe(
+									mergeMap((urlList: AssetList) =>
+										Object.keys(urlList)
+											.map(uuid =>
+												DifferenceEngine.downloadAsset(urlList[uuid]).pipe(
+													switchMap((asset: Blob) => fromPromise(
+														ASSET_STORAGE.setItem(uuid, asset)
+													))
+												)
+											)
+									),
+									switchMap(assetDownloads => assetDownloads),
+									map(() => remoteNotepad)
+								);
+							})
+						);
+					}),
+					map((remoteNotepad: ISyncedNotepad) => actions.restoreJsonNotepad(JSON.stringify(remoteNotepad))),
+					catchError(error => {
+						console.error(error);
+						const message = (!!error.response) ? error.response : 'There was an error syncing';
+						Dialog.alert(message);
+						return of(actions.syncDownload.failed({ params: '', error }));
+					})
+				)
 			)
 		);
 
