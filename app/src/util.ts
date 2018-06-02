@@ -2,6 +2,7 @@ import { INote, INotepad, ISection } from './types/NotepadTypes';
 import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
+import * as QueryString from 'querystring';
 
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.every(type => isType(action, type)));
@@ -35,7 +36,10 @@ export function getNotepadObjectByRef(notepad: INotepad, ref: string, actionOnOb
 }
 
 export function isDev(): boolean {
-	return (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+	return (
+		!QueryString.parse(location.search.slice(1)).prod
+		&& (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+	);
 }
 
 export function isMobile(): boolean {
