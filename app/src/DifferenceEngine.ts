@@ -1,14 +1,19 @@
+// @ts-ignore
+import SyncWorker from '!workerize-loader!./SyncWorker.js';
+
 import { Observable } from 'rxjs/Observable';
 import { ajax } from 'rxjs/observable/dom/ajax';
 import { MICROPAD_URL } from './types';
 import { map, retry } from 'rxjs/operators';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
-import { AssetList, ISyncedNotepad, SyncedNotepadList } from './types/SyncTypes';
+import { AssetList, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from './types/SyncTypes';
 import { isDev } from './util';
 import { parse } from 'date-fns';
 import { INotepad } from './types/NotepadTypes';
 
 export namespace DifferenceEngine {
+	const SyncThread = new SyncWorker() as ISyncWorker;
+
 	export namespace AccountService {
 		const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);
 
@@ -43,16 +48,7 @@ export namespace DifferenceEngine {
 			call<{ urlList: AssetList }>('download_assets', syncId, { assets: JSON.stringify(assets) }).pipe(map(res => res.urlList));
 
 		export async function notepadToSyncedNotepad(notepad: INotepad): Promise<ISyncedNotepad> {
-			const syncedNotepad: ISyncedNotepad = <ISyncedNotepad> { ...notepad };
-
-			if (!syncedNotepad.assetHashList) {
-				// TODO: Properly resolve this with a WebWorker to get real hashes
-				const tmp = {};
-				(syncedNotepad.notepadAssets || []).forEach(uuid => tmp[uuid] = '');
-				syncedNotepad.assetHashList = tmp;
-			}
-
-			return syncedNotepad;
+			return await SyncThread.toSyncedNotepad(notepad);
 		}
 	}
 

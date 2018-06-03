@@ -1,7 +1,7 @@
 import { INotepad } from './NotepadTypes';
 
 export interface ISyncWorker {
-	// getSyncedNotepad()
+	toSyncedNotepad: (notepad: INotepad) => Promise<ISyncedNotepad>;
 }
 
 export type SyncLoginRequest = {

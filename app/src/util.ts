@@ -65,6 +65,19 @@ export function generateGuid(): string {
 	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 
+export function getAsBase64(blob: Blob): Promise<string> {
+	return new Promise<string>(resolve => {
+		try {
+			const reader = new FileReader();
+			reader.onload = event => resolve(event.target!.result);
+			reader.readAsDataURL(blob);
+		} catch (e) {
+			console.error(e);
+			resolve('');
+		}
+	});
+}
+
 // Thanks to http://stackoverflow.com/a/12300351/998467
 export function dataURItoBlob(dataURI: string) {
 	// convert base64 to raw binary data held in a string

@@ -120,6 +120,10 @@ export namespace SyncEpics {
 											)
 									),
 									switchMap(assetDownloads => assetDownloads),
+									catchError(err => {
+										console.error(err);
+										return of(remoteNotepad);
+									}),
 									map(() => remoteNotepad)
 								);
 							})
