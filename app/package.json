@@ -73,7 +73,8 @@
 		"react-addons-test-utils": "^15.6.2",
 		"redux-mock-store": "^1.5.1",
 		"sinon": "^5.0.7",
-		"typescript": "^2.8.3"
+		"typescript": "^2.8.3",
+		"workerize-loader": "^1.0.3"
 	},
 	"keywords": [
 		"uPad",

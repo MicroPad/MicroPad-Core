@@ -24,6 +24,8 @@ import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import { isDev } from './util';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 import { SyncUser } from './types/SyncTypes';
+// @ts-ignore
+import SyncWorker from '!workerize-loader!./SyncWorker';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -52,6 +54,9 @@ export const SYNC_STORAGE = localforage.createInstance({
 	name: 'MicroPad',
 	storeName: 'sync'
 });
+
+const i = SyncWorker();
+i.test().then(a => console.log(a));
 
 (async function init() {
 	if (!await compatibilityCheck()) return;
