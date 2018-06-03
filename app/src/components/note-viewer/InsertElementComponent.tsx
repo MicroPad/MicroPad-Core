@@ -113,7 +113,9 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 		const { note, insert, toggleInsertMenu, edit } = this.props;
 		toggleInsertMenu!({ enabled: false });
 
-		const id = `${element.type}${note.elements.filter(e => e.type === element.type).length + 1}`;
+		let count = note.elements.filter(e => e.type === element.type).length + 1;
+		let id = `${element.type}${count}`;
+		while (note.elements.some(e => e.args.id === id)) id = `${element.type}${++count}`;
 		insert!({
 			element: {
 				...element,
