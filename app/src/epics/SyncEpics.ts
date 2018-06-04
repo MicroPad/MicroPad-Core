@@ -17,6 +17,7 @@ import { fromPromise } from 'rxjs/observable/fromPromise';
 import * as Parser from 'upad-parse/dist/index';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { defer } from 'rxjs/observable/defer';
+import { Observable } from 'rxjs/Observable';
 
 export namespace SyncEpics {
 	export const persistOnLogin$ = action$ =>
@@ -250,7 +251,18 @@ export namespace SyncEpics {
 					.pipe(
 						map(res => actions.getSyncedNotepadList.done({ params: user, result: res })),
 						// TODO: Handle offline state (or token expiration) here
-						catchError(error => of(actions.getSyncedNotepadList.failed({ params: user, error })))
+						catchError((error): Observable<any> => {
+							if (!!error.response && error.response.error) {
+								const message: string = error.response.error;
+								if (message === 'Invalid token') {
+									Dialog.alert('Your sync token has expired. Please login again.');
+									return of(actions.syncLogout(undefined));
+								}
+								Dialog.alert(message);
+							}
+
+							return of(actions.getSyncedNotepadList.failed({ params: user, error }));
+						})
 					)
 			)
 		);
