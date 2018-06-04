@@ -24,6 +24,7 @@ import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import { isDev } from './util';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 import { SyncUser } from './types/SyncTypes';
+import * as Materialize from 'materialize-css/dist/js/materialize';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -82,6 +83,12 @@ export const SYNC_STORAGE = localforage.createInstance({
 	await displayWhatsNew();
 
 	notepadDownloadHandler();
+
+	// Handle sync download toast
+	window['syncDownload'] = (syncId: string) => {
+		Materialize.Toast.removeAll();
+		store.dispatch(actions.syncDownload.started(syncId));
+	};
 })();
 
 async function hydrateStoreFromLocalforage() {

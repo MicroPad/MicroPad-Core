@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../actions';
-import { catchError, filter, map, mergeMap, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, combineLatest, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
 import { ASSET_STORAGE, SYNC_STORAGE } from '../index';
@@ -9,12 +9,13 @@ import { DifferenceEngine } from '../DifferenceEngine';
 import { of } from 'rxjs/observable/of';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
-import { ISyncAction } from '../types/ActionTypes';
+import { INotepadToSyncNotepadAction, ISyncAction } from '../types/ActionTypes';
 import { empty } from 'rxjs/observable/empty';
 import { parse } from 'date-fns';
 import { INotepad, INotepadStoreState } from '../types/NotepadTypes';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import * as Parser from 'upad-parse/dist/index';
+import * as Materialize from 'materialize-css/dist/js/materialize';
 
 export namespace SyncEpics {
 	export const persistOnLogin$ = action$ =>
@@ -70,13 +71,26 @@ export namespace SyncEpics {
 			)
 		);
 
+	export const actWithSyncNotepad$ = action$ =>
+		action$.pipe(
+			isAction(actions.actWithSyncNotepad),
+			map((action: Action<INotepadToSyncNotepadAction>) => action.payload),
+			switchMap((payload: INotepadToSyncNotepadAction) =>
+				fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(payload.notepad)).pipe(
+					map((syncedNotepad: ISyncedNotepad) => {
+						return payload.action(syncedNotepad);
+					})
+				)
+			)
+		);
+
 	export const sync$ = action$ =>
 		action$.pipe(
 			isAction(actions.sync),
 			map((action: Action<ISyncAction>) => action.payload),
 			switchMap((syncAction: ISyncAction) =>
 				of(syncAction).pipe(
-					withLatestFrom(
+					combineLatest(
 						DifferenceEngine.SyncService.getLastModified(syncAction.syncId)
 							.pipe(catchError(empty))
 					)
@@ -85,9 +99,17 @@ export namespace SyncEpics {
 			filter(([syncAction, lastModified]: [ISyncAction, Date]) => !!syncAction && !!lastModified),
 			map(([syncAction, lastModified]: [ISyncAction, Date]) =>
 				parse(syncAction.notepad.lastModified).getTime() < lastModified.getTime()
-					? actions.syncDownload.started(syncAction.syncId) // Local notepad is older than remote
+					? actions.requestSyncDownload(syncAction.syncId) // Local notepad is older than remote
 					: actions.syncUpload.started(syncAction) // Local notepad is newer than remote
 			)
+		);
+
+	export const requestDownload$ = action$ =>
+		action$.pipe(
+			isAction(actions.requestSyncDownload),
+			tap((action: Action<string>) =>
+				Materialize.toast(`A newer copy of your notepad is online <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.syncDownload('${action.payload}');">DOWNLOAD</a>`)),
+			filter(() => false)
 		);
 
 	export const download$ = (action$, store) =>
@@ -124,7 +146,10 @@ export namespace SyncEpics {
 										console.error(err);
 										return of(remoteNotepad);
 									}),
-									map(() => remoteNotepad)
+									map(() => {
+										remoteNotepad.notepadAssets = Object.keys(remoteNotepad.assetHashList);
+										return remoteNotepad;
+									})
 								);
 							})
 						);
@@ -174,7 +199,9 @@ export namespace SyncEpics {
 		persistOnLogin$,
 		login$,
 		register$,
+		actWithSyncNotepad$,
 		sync$,
+		requestDownload$,
 		download$,
 		getNotepadListOnLogin$,
 		getNotepadList$,

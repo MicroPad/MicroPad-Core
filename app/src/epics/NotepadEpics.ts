@@ -24,7 +24,7 @@ import { ajax } from 'rxjs/observable/dom/ajax';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 import { Dialog } from '../dialogs';
 import { of } from 'rxjs/observable/of';
-import { SyncedNotepadList, SyncUser } from '../types/SyncTypes';
+import { ISyncedNotepad, SyncedNotepadList, SyncUser } from '../types/SyncTypes';
 
 const parseQueue: string[] = [];
 
@@ -67,6 +67,15 @@ const parseNpx$ = action$ =>
 					catchError(err => Observable.of(actions.parseNpx.failed({ params: '', error: err })))
 				);
 		})
+	);
+
+const syncOnNotepadParsed$ = (action$, store) =>
+	action$.pipe(
+		isAction(actions.updateCurrentSyncId),
+		map(() => store.getState()),
+		map((state: IStoreState) => state.notepads.notepad),
+		filter((npState: INotepadStoreState) => !!npState && !!npState.item),
+		map((npState: INotepadStoreState) => actions.actWithSyncNotepad({ notepad: npState.item!, action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId: npState.activeSyncId! }) }))
 	);
 
 const parseEnex$ = action$ =>
@@ -314,6 +323,7 @@ const updateSyncedNotepadIdOnSyncListLoad$ = action$ =>
 
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
+	syncOnNotepadParsed$,
 	restoreJsonNotepad$,
 	exportNotepad$,
 	exportAll$,

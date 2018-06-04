@@ -4,6 +4,7 @@ import {
 	IDeleteElementAction,
 	IInsertElementAction,
 	INewNotepadObjectAction,
+	INotepadToSyncNotepadAction,
 	ISyncAction,
 	IUpdateBibliographyAction,
 	IUpdateElementAction,
@@ -68,5 +69,7 @@ export const actions = {
 	syncLogout: actionCreator<void>('SYNC_LOGOUT'),
 	syncRegister: actionCreator<SyncLoginRequest>('SYNC_REGISTER'),
 	updateCurrentSyncId: actionCreator<SyncedNotepadList>('UPDATE_SYNC_ID'),
-	sync: actionCreator<ISyncAction>('SYNC')
+	sync: actionCreator<ISyncAction>('SYNC'),
+	actWithSyncNotepad: actionCreator<INotepadToSyncNotepadAction>('ACT_WITH_SYNC_NOTEPAD'),
+	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD')
 };
