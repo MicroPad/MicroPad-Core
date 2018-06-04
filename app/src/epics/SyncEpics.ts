@@ -151,7 +151,7 @@ export namespace SyncEpics {
 												)
 											)
 									),
-									switchMap(assetDownloads => assetDownloads),
+									concatMap(assetDownloads => assetDownloads),
 									catchError(err => {
 										console.error(err);
 										return of(remoteNotepad);
