@@ -66,12 +66,24 @@ export namespace DifferenceEngine {
 			url,
 			method: 'GET',
 			crossDomain: true,
-			headers: {
-				'Content-Type': 'text/plain; charset=UTF-8'
-			},
 			responseType: 'blob'
 		}).pipe(
 			map((res: AjaxResponse) => res.response),
+			retry(2)
+		);
+	}
+
+	export function uploadAsset(url: string, asset: Blob): Observable<void> {
+		return ajax({
+			url,
+			method: 'PUT',
+			body: asset,
+			crossDomain: true,
+			headers: {
+				'Content-Type': 'application/octet-stream'
+			}
+		}).pipe(
+			map(() => undefined),
 			retry(2)
 		);
 	}

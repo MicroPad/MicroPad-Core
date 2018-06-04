@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../actions';
-import { catchError, combineLatest, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { catchError, combineLatest, concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
 import { ASSET_STORAGE, SYNC_STORAGE } from '../index';
@@ -9,13 +9,14 @@ import { DifferenceEngine } from '../DifferenceEngine';
 import { of } from 'rxjs/observable/of';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
-import { INotepadToSyncNotepadAction, ISyncAction } from '../types/ActionTypes';
+import { INotepadToSyncNotepadAction, ISyncAction, IUploadAssetAction } from '../types/ActionTypes';
 import { empty } from 'rxjs/observable/empty';
 import { parse } from 'date-fns';
 import { INotepad, INotepadStoreState } from '../types/NotepadTypes';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import * as Parser from 'upad-parse/dist/index';
 import * as Materialize from 'materialize-css/dist/js/materialize';
+import { defer } from 'rxjs/observable/defer';
 
 export namespace SyncEpics {
 	export const persistOnLogin$ = action$ =>
@@ -201,6 +202,29 @@ export namespace SyncEpics {
 			})
 		);
 
+	export const uploadAssets$ = action$ =>
+		action$.pipe(
+			isAction(actions.syncUpload.done),
+			map((action: Action<Success<ISyncAction, AssetList>>) => action.payload.result),
+			switchMap((assetList: AssetList) => fromPromise((async () => {
+				const requests: IUploadAssetAction[] = [];
+
+				const blobs: Blob[] = await Promise.all(Object.keys(assetList).map(uuid => ASSET_STORAGE.getItem<Blob>(uuid)));
+				Object.values(assetList).forEach((url, i) => requests.push({ url, asset: blobs[i] }));
+
+				return requests;
+			})())),
+			mergeMap((requests: IUploadAssetAction[]) => requests.map(req => actions.syncUploadAsset.started(req)))
+		);
+
+	export const uploadAsset$ = action$ =>
+		action$.pipe(
+			isAction(actions.syncUploadAsset.started),
+			map((action: Action<IUploadAssetAction>) => action.payload),
+			concatMap((payload: IUploadAssetAction) => defer(() => DifferenceEngine.uploadAsset(payload.url, payload.asset))),
+			map(() => actions.syncUploadAsset.done({ params: {} as IUploadAssetAction, result: undefined }))
+		);
+
 	export const getNotepadListOnLogin$ = action$ =>
 		action$.pipe(
 			isAction(actions.syncLogin.done),
@@ -240,6 +264,8 @@ export namespace SyncEpics {
 		requestDownload$,
 		download$,
 		upload$,
+		uploadAssets$,
+		uploadAsset$,
 		getNotepadListOnLogin$,
 		getNotepadList$,
 		getNotepadListOnNotepadLoad$

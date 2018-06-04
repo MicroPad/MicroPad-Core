@@ -35,8 +35,8 @@ export interface ISyncAction {
 }
 
 export interface IUploadAssetAction {
-	syncId: string;
-	assetId: string;
+	asset: Blob;
+	url: string;
 }
 
 export interface INotepadToSyncNotepadAction {

@@ -25,6 +25,7 @@ import { isDev } from './util';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 import { SyncUser } from './types/SyncTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
+import { INotepadStoreState } from './types/NotepadTypes';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -89,6 +90,13 @@ export const SYNC_STORAGE = localforage.createInstance({
 		Materialize.Toast.removeAll();
 		store.dispatch(actions.syncDownload.started(syncId));
 	};
+
+	// Show a warning when closing before notepad save or sync is complete
+	store.subscribe(() => {
+		const isSaving = store.getState().notepads.isLoading || (store.getState().notepads.notepad || {} as INotepadStoreState).isLoading;
+		const isSyncing = store.getState().sync.isLoading;
+		window.onbeforeunload = (isSyncing || isSaving) ? () => true : null;
+	});
 })();
 
 async function hydrateStoreFromLocalforage() {

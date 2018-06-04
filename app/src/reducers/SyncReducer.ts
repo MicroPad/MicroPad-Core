@@ -17,20 +17,39 @@ export class SyncReducer implements IReducer<ISyncState> {
 	};
 
 	public reducer(state: ISyncState, action: Action): ISyncState {
-		if (isType(action, actions.syncLogin.started)) {
+		if (
+			isType(action, actions.syncLogin.started)
+			|| isType(action, actions.syncDownload.started)
+			|| isType(action, actions.syncUpload.started)
+			|| isType(action, actions.syncUploadAsset.started)
+		) {
 			return {
 				...state,
 				isLoading: true
+			};
+		} else if (
+			isType(action, actions.syncLogin.failed)
+			|| isType(action, actions.syncDownload.failed)
+			|| isType(action, actions.syncUpload.failed)
+			|| isType(action, actions.syncUploadAsset.failed)
+		) {
+			return {
+				...state,
+				isLoading: false
+			};
+		} else if (
+			isType(action, actions.syncDownload.done)
+			|| isType(action, actions.syncUpload.done)
+			|| isType(action, actions.syncUploadAsset.done)
+		) {
+			return {
+				...state,
+				isLoading: false
 			};
 		} else if (isType(action, actions.syncLogin.done)) {
 			return {
 				...this.initialState,
 				user: { ...action.payload.result }
-			};
-		} else if (isType(action, actions.syncLogin.failed)) {
-			return {
-				...state,
-				isLoading: false
 			};
 		} else if (isType(action, actions.getSyncedNotepadList.started)) {
 			return {
