@@ -33,7 +33,7 @@ try {
 }
 
 const baseReducer: BaseReducer = new BaseReducer();
-const store = createStore<IStoreState>(
+export const store = createStore<IStoreState>(
 	baseReducer.reducer,
 	baseReducer.initialState,
 	(isDev()) ? composeWithDevTools(applyMiddleware(epicMiddleware)) : applyMiddleware(epicMiddleware)

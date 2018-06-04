@@ -97,11 +97,18 @@ export namespace SyncEpics {
 				)
 			),
 			filter(([syncAction, lastModified]: [ISyncAction, Date]) => !!syncAction && !!lastModified),
-			map(([syncAction, lastModified]: [ISyncAction, Date]) =>
-				parse(syncAction.notepad.lastModified).getTime() < lastModified.getTime()
-					? actions.requestSyncDownload(syncAction.syncId) // Local notepad is older than remote
-					: actions.syncUpload.started(syncAction) // Local notepad is newer than remote
-			)
+			map(([syncAction, lastModified]: [ISyncAction, Date]) => {
+				if (parse(syncAction.notepad.lastModified).getTime() < lastModified.getTime()) {
+					// Local notepad is older than remote
+					return actions.requestSyncDownload(syncAction.syncId);
+				} else if (parse(syncAction.notepad.lastModified).getTime() > lastModified.getTime()) {
+					// Local notepad is newer than remote
+					return actions.syncUpload.started(syncAction);
+				}
+
+				return false;
+			}),
+			filter(Boolean)
 		);
 
 	export const requestDownload$ = action$ =>
@@ -165,6 +172,33 @@ export namespace SyncEpics {
 			)
 		);
 
+	export const upload$ = (action$, store) =>
+		action$.pipe(
+			isAction(actions.syncUpload.started),
+			map((action: Action<ISyncAction>) => action.payload),
+			map((payload: ISyncAction) => [payload, (<IStoreState> store.getState()).sync.user]),
+			filter(([payload, user]: [ISyncAction, SyncUser]) => !!payload && !!user),
+			switchMap(([payload, user]: [ISyncAction, SyncUser]) =>
+				DifferenceEngine.AccountService.isPro(user.username, user.token).pipe(
+					map((isPro: boolean) => [payload, isPro])
+				)
+			),
+			filter(([payload, isPro]: [ISyncAction, boolean]) => {
+				if (payload.notepad.notepadAssets.length < 10 || isPro) return true;
+
+				// TODO: show warning about why we can't continue
+				return false;
+			}),
+			switchMap(([payload]: [ISyncAction, boolean]) => DifferenceEngine.SyncService.uploadNotepad(payload.syncId, payload.notepad)),
+			map((assetList: AssetList) => actions.syncUpload.done({ params: {} as ISyncAction, result: assetList })),
+			catchError(error => {
+				console.error(error);
+				const message = (!!error.response) ? error.response.error : 'There was an error syncing';
+				Dialog.alert(message);
+				return of(actions.syncUpload.failed({ params: {} as ISyncAction, error }));
+			})
+		);
+
 	export const getNotepadListOnLogin$ = action$ =>
 		action$.pipe(
 			isAction(actions.syncLogin.done),
@@ -203,6 +237,7 @@ export namespace SyncEpics {
 		sync$,
 		requestDownload$,
 		download$,
+		upload$,
 		getNotepadListOnLogin$,
 		getNotepadList$,
 		getNotepadListOnNotepadLoad$

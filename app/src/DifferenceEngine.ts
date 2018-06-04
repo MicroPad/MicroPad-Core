@@ -10,6 +10,7 @@ import { AssetList, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from './typ
 import { isDev } from './util';
 import { parse } from 'date-fns';
 import { INotepad } from './types/NotepadTypes';
+import * as stringify from 'json-stringify-safe';
 
 export namespace DifferenceEngine {
 	const SyncThread = new SyncWorker() as ISyncWorker;
@@ -25,6 +26,11 @@ export namespace DifferenceEngine {
 		export const register = (username: string, password: string): Observable<{ username: string, token: string }> => {
 			return call<{ token: string }>('create', username, { password })
 				.pipe(map(res => { return { username, token: res.token }; }));
+		};
+
+		export const isPro = (username: string, token: string): Observable<boolean> => {
+			return call<{ isPro: boolean }>('is_pro', username, { token })
+				.pipe(map(res => res.isPro));
 		};
 	}
 
@@ -47,12 +53,15 @@ export namespace DifferenceEngine {
 		export const getAssetDownloadLinks = (syncId: string, assets: string[]): Observable<AssetList> =>
 			call<{ urlList: AssetList }>('download_assets', syncId, { assets: JSON.stringify(assets) }).pipe(map(res => res.urlList));
 
+		export const uploadNotepad = (syncId: string, notepad: ISyncedNotepad): Observable<AssetList> =>
+			call<{ assetsToUpload: AssetList }>('upload', syncId, { notepad: stringify(notepad) }).pipe(map(res => res.assetsToUpload));
+
 		export async function notepadToSyncedNotepad(notepad: INotepad): Promise<ISyncedNotepad> {
 			return await SyncThread.toSyncedNotepad(notepad);
 		}
 	}
 
-	export function downloadAsset<T>(url: string): Observable<Blob> {
+	export function downloadAsset(url: string): Observable<Blob> {
 		return ajax({
 			url,
 			method: 'GET',
