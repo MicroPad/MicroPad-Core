@@ -250,7 +250,6 @@ export namespace SyncEpics {
 				DifferenceEngine.NotepadService.listNotepads(user.username, user.token)
 					.pipe(
 						map(res => actions.getSyncedNotepadList.done({ params: user, result: res })),
-						// TODO: Handle offline state (or token expiration) here
 						catchError((error): Observable<any> => {
 							if (!!error.response && error.response.error) {
 								const message: string = error.response.error;
