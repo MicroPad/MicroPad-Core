@@ -113,6 +113,7 @@ const cleanUnusedAssets$ = (action$, store) =>
 			map((notepadState: INotepadStoreState) => notepadState.item),
 			filter(Boolean),
 			map((notepad: INotepad) => [notepad.getUsedAssets(), notepad.notepadAssets]),
+			filter(([usedAssets, npAssets]: [Set<string>, string[]]) => !!usedAssets && !!npAssets),
 			switchMap(([usedAssets, npAssets]: [Set<string>, string[]]) => {
 				const unusedAssets = npAssets.filter(guid => !usedAssets.has(guid));
 				return fromPromise(Promise.all(unusedAssets.map(guid => ASSET_STORAGE.removeItem(guid))).then(() => unusedAssets));
