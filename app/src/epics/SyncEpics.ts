@@ -87,7 +87,9 @@ export namespace SyncEpics {
 	export const sync$ = action$ =>
 		action$.pipe(
 			isAction(actions.sync),
+			tap(() => Materialize.Toast.removeAll()),
 			map((action: Action<ISyncAction>) => action.payload),
+			filter((syncAction: ISyncAction) => !!syncAction && !!syncAction.syncId && !!syncAction.notepad),
 			switchMap((syncAction: ISyncAction) =>
 				of(syncAction).pipe(
 					combineLatest(
