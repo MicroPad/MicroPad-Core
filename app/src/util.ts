@@ -5,7 +5,7 @@ import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
 
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
-	filter((action: Action<any>) => typesOfAction.every(type => isType(action, type)));
+	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
 
 export function restoreObject<T>(objectToRestore: T, template: T): T {
 	objectToRestore['__proto__'] = { ...template['__proto__'] };

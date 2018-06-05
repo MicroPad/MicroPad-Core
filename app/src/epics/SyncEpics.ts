@@ -142,16 +142,19 @@ export namespace SyncEpics {
 
 								// Download the different assets
 								return DifferenceEngine.SyncService.getAssetDownloadLinks(syncId, diffAssets).pipe(
-									mergeMap((urlList: AssetList) =>
-										Object.keys(urlList)
+									mergeMap((urlList: AssetList): Observable<any>[] => {
+										const downloads$ = Object.keys(urlList)
 											.map(uuid =>
 												DifferenceEngine.downloadAsset(urlList[uuid]).pipe(
 													switchMap((asset: Blob) => fromPromise(
 														ASSET_STORAGE.setItem(uuid, asset)
 													))
 												)
-											)
-									),
+											);
+
+										if (downloads$.length > 0) return downloads$;
+										return [of(remoteNotepad)];
+									}),
 									concatMap(assetDownloads => assetDownloads),
 									catchError(err => {
 										console.error(err);
@@ -188,7 +191,8 @@ export namespace SyncEpics {
 				)
 			),
 			filter(([payload, isPro]: [ISyncAction, boolean]) => {
-				if (payload.notepad.notepadAssets.length < 10 || isPro) return true;
+				if (Object.keys(payload.notepad.assetHashList).length < 10 || isPro) return true;
+				console.error(`too many assets`);
 
 				// TODO: show warning about why we can't continue
 				return false;
@@ -251,7 +255,7 @@ export namespace SyncEpics {
 					.pipe(
 						map(res => actions.getSyncedNotepadList.done({ params: user, result: res })),
 						catchError((error): Observable<any> => {
-							if (!!error.response && error.response.error) {
+							if (!!error.response && !!error.response.error) {
 								const message: string = error.response.error;
 								if (message === 'Invalid token') {
 									Dialog.alert('Your sync token has expired. Please login again.');
@@ -264,6 +268,45 @@ export namespace SyncEpics {
 						})
 					)
 			)
+		);
+
+	export const deleteNotepad$ = action$ =>
+		action$.pipe(
+			isAction(actions.deleteFromSync.started),
+			switchMap((action: Action<string>) =>
+				DifferenceEngine.SyncService.deleteNotepad(action.payload).pipe(
+					map(() => actions.deleteFromSync.done({ params: '', result: undefined })),
+					catchError(error => {
+						console.error(error);
+						if (!!error.response && !!error.response.error) Dialog.alert(error.response.error);
+						return of(actions.deleteFromSync.failed({ params: '', error }));
+					})
+				)
+			)
+		);
+
+	export const addNotepad$ = action$ =>
+		action$.pipe(
+			isAction(actions.addToSync.started),
+			switchMap((action: Action<SyncUser>) =>
+				DifferenceEngine.NotepadService.create(action.payload.username, action.payload.token).pipe(
+					map((syncId: string) => actions.addToSync.done({ params: <SyncUser> {}, result: syncId })),
+					catchError(error => {
+						console.error(error);
+						if (!!error.response && !!error.response.error) Dialog.alert(error.response.error);
+						return of(actions.addToSync.failed({ params: <SyncUser> {}, error }));
+					})
+				)
+			)
+		);
+
+	export const refreshNotepadListOnAction$ = (action$, store) =>
+		action$.pipe(
+			isAction(actions.deleteFromSync.done),
+			map(() => store.getState()),
+			map((state: IStoreState) => state.sync.user),
+			filter(Boolean),
+			map((user: SyncUser) => actions.getSyncedNotepadList.started(user))
 		);
 
 	export const syncEpics$ = combineEpics(
@@ -279,6 +322,9 @@ export namespace SyncEpics {
 		uploadAsset$,
 		getNotepadListOnLogin$,
 		getNotepadList$,
-		getNotepadListOnNotepadLoad$
+		getNotepadListOnNotepadLoad$,
+		deleteNotepad$,
+		addNotepad$,
+		refreshNotepadListOnAction$
 	);
 }

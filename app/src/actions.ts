@@ -32,6 +32,8 @@ export const actions = {
 	syncDownload: actionCreator.async<string, INotepad, any>('SYNC_DOWNLOAD'),
 	syncUpload: actionCreator.async<ISyncAction, AssetList, any>('SYNC_UPLOAD'),
 	syncUploadAsset: actionCreator.async<IUploadAssetAction, void, any>('SYNC_UPLOAD_ASSET'),
+	deleteFromSync: actionCreator.async<string, void, any>('SYNC_DELETE'),
+	addToSync: actionCreator.async<SyncUser, string, any>('SYNC_CREATE'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),

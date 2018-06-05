@@ -21,7 +21,6 @@ import { enableKeyboardShortcuts } from './shortcuts';
 import { OldSyncHandler } from './old-sync/OldSyncHandler';
 import * as QueryString from 'querystring';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
-import { isDev } from './util';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 import { SyncUser } from './types/SyncTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
@@ -37,7 +36,7 @@ const baseReducer: BaseReducer = new BaseReducer();
 export const store = createStore<IStoreState>(
 	baseReducer.reducer,
 	baseReducer.initialState,
-	(isDev()) ? composeWithDevTools(applyMiddleware(epicMiddleware)) : applyMiddleware(epicMiddleware)
+	(true) ? composeWithDevTools(applyMiddleware(epicMiddleware)) : applyMiddleware(epicMiddleware)
 );
 
 export const NOTEPAD_STORAGE = localforage.createInstance({

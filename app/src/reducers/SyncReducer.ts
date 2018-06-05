@@ -22,6 +22,7 @@ export class SyncReducer implements IReducer<ISyncState> {
 			|| isType(action, actions.syncDownload.started)
 			|| isType(action, actions.syncUpload.started)
 			|| isType(action, actions.syncUploadAsset.started)
+			|| isType(action, actions.deleteFromSync.started)
 		) {
 			return {
 				...state,
@@ -32,6 +33,7 @@ export class SyncReducer implements IReducer<ISyncState> {
 			|| isType(action, actions.syncDownload.failed)
 			|| isType(action, actions.syncUpload.failed)
 			|| isType(action, actions.syncUploadAsset.failed)
+			|| isType(action, actions.deleteFromSync.failed)
 		) {
 			return {
 				...state,

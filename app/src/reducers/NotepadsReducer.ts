@@ -447,6 +447,24 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 					activeSyncId: id
 				}
 			};
+		} else if (isType(action, actions.addToSync.done)) {
+			if (!state.notepad) return state;
+			return {
+				...state,
+				notepad: {
+					...state.notepad,
+					activeSyncId: action.payload.result
+				}
+			};
+		} else if (isType(action, actions.deleteFromSync.done)) {
+			if (!state.notepad) return state;
+			return {
+				...state,
+				notepad: {
+					...state.notepad,
+					activeSyncId: undefined
+				}
+			};
 		}
 
 		return Object.freeze(state);

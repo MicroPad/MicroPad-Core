@@ -11,6 +11,7 @@ import { isDev } from './util';
 import { parse } from 'date-fns';
 import { INotepad } from './types/NotepadTypes';
 import * as stringify from 'json-stringify-safe';
+import { Base64 } from 'js-base64';
 
 export namespace DifferenceEngine {
 	const SyncThread = new SyncWorker() as ISyncWorker;
@@ -39,6 +40,9 @@ export namespace DifferenceEngine {
 
 		export const listNotepads = (username: string, token: string): Observable<SyncedNotepadList> =>
 			call<{ notepads: SyncedNotepadList }>('list_notepads', username, { token }).pipe(map(res => res.notepads));
+
+		export const create = (username: string, token: string): Observable<string> =>
+			call<{ notepad: string }>('create', username, { token }).pipe(map(res => res.notepad));
 	}
 
 	export namespace SyncService {
@@ -54,7 +58,9 @@ export namespace DifferenceEngine {
 			call<{ urlList: AssetList }>('download_assets', syncId, { assets: JSON.stringify(assets) }).pipe(map(res => res.urlList));
 
 		export const uploadNotepad = (syncId: string, notepad: ISyncedNotepad): Observable<AssetList> =>
-			call<{ assetsToUpload: AssetList }>('upload', syncId, { notepad: stringify(notepad) }).pipe(map(res => res.assetsToUpload));
+			call<{ assetsToUpload: AssetList }>('upload', syncId, { notepad: encodeURIComponent(stringify(notepad)) }).pipe(map(res => res.assetsToUpload));
+
+		export const deleteNotepad = (syncId: string): Observable<void> => call<void>('delete', syncId);
 
 		export async function notepadToSyncedNotepad(notepad: INotepad): Promise<ISyncedNotepad> {
 			return await SyncThread.toSyncedNotepad(notepad);
