@@ -25,6 +25,7 @@ import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 import { SyncUser } from './types/SyncTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { INotepadStoreState } from './types/NotepadTypes';
+import { cleanHangingAssets } from './util';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -100,6 +101,9 @@ export const SYNC_STORAGE = localforage.createInstance({
 
 async function hydrateStoreFromLocalforage() {
 	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), SYNC_STORAGE.ready()]);
+
+	await cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE);
+
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
 

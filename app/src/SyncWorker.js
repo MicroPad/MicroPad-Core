@@ -15,10 +15,17 @@ export async function toSyncedNotepad(notepad) {
 
 	// Get assets from storage as base64
 	const base64Assets = await Promise.all((await Promise.all(notepad.notepadAssets.map(uuid => ASSET_STORAGE.getItem(uuid))))
-		.map((blob) => getAsBase64(blob)));
+		.map((blob) => {
+			try {
+				return getAsBase64(blob);
+			} catch (e) {
+				return null;
+			}
+		}));
 
 	// Build up the asset list
 	base64Assets.map(base64 => md5(base64))
+		.filter(hash => !!hash && hash.length > 0)
 		.forEach((hash, i) => assetHashes[notepad.notepadAssets[i]] = hash);
 
 	return Object.assign({}, notepad, { assetHashList: assetHashes });

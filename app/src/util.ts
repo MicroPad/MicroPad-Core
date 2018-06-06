@@ -3,6 +3,7 @@ import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
+import * as Parser from 'upad-parse/dist/index';
 
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
@@ -72,10 +73,45 @@ export function getAsBase64(blob: Blob): Promise<string> {
 			reader.onload = event => resolve(event.target!.result);
 			reader.readAsDataURL(blob);
 		} catch (e) {
-			console.error(e);
+			console.warn(e);
 			resolve('');
 		}
 	});
+}
+
+/**
+ * Clean up all the assets that aren't in any notepads yet
+ */
+export async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage): Promise<void> {
+	const notepads: INotepad[] = [];
+	await notepadStorage.iterate((value: string) => {
+		notepads.push(Parser.restoreNotepad(JSON.parse(value)));
+		return;
+	});
+
+	const allUsedAssets: Set<string> = new Set<string>();
+
+	// Handle deletion of unused assets, same as what's done in the epic
+	for (const notepad of notepads) {
+		const assets = notepad.notepadAssets || [];
+		const usedAssets = notepad.getUsedAssets();
+		const unusedAssets = assets.filter(uuid => !usedAssets.has(uuid));
+		usedAssets.forEach(uuid => allUsedAssets.add(uuid));
+
+		await Promise.all(unusedAssets.map(uuid => assetStorage.removeItem(uuid)));
+	}
+
+	// Handle the deletion of assets we've lost track of and aren't in any notepad
+	let lostAssets: string[] = [];
+	await assetStorage.iterate((value, key) => {
+		lostAssets.push(key);
+		return;
+	});
+	lostAssets = lostAssets.filter(uuid => !allUsedAssets.has(uuid));
+
+	for (const uuid of lostAssets) {
+		await assetStorage.removeItem(uuid);
+	}
 }
 
 // Thanks to http://stackoverflow.com/a/12300351/998467
