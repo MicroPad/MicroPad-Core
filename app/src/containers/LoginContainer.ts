@@ -19,7 +19,7 @@ export function mapStateToProps({ sync }: IStoreState, { trigger, manageTrigger 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<ILoginComponentProps> {
 	return {
 		login: (username, password) => dispatch(actions.syncLogin.started({ username, password })),
-		register: (username, password) => dispatch(actions.syncRegister({ username, password }))
+		register: (username, password, captcha) => dispatch(actions.syncRegister({ username, password, captcha }))
 	};
 }
 

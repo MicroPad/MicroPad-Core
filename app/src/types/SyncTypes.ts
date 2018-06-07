@@ -7,6 +7,7 @@ export interface ISyncWorker {
 export type SyncLoginRequest = {
 	username: string;
 	password: string;
+	captcha?: string;
 };
 
 export type SyncUser = {

@@ -24,8 +24,8 @@ export namespace DifferenceEngine {
 				.pipe(map(res => { return { username, token: res.token }; }));
 		};
 
-		export const register = (username: string, password: string): Observable<{ username: string, token: string }> => {
-			return call<{ token: string }>('create', username, { password })
+		export const register = (username: string, password: string, captcha?: string): Observable<{ username: string, token: string }> => {
+			return call<{ token: string }>('create', username, { password, captcha })
 				.pipe(map(res => { return { username, token: res.token }; }));
 		};
 

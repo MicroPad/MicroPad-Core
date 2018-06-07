@@ -8,7 +8,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 export interface ILoginComponentProps {
 	syncUser?: SyncUser;
 	login?: (username: string, password: string) => void;
-	register?: (username: string, password: string) => void;
+	register?: (username: string, password: string, captcha: string) => void;
 }
 
 export interface ILoginComponentLocalProps {
@@ -19,6 +19,8 @@ export interface ILoginComponentLocalProps {
 export default class LoginComponent extends React.Component<ILoginComponentProps & ILoginComponentLocalProps> {
 	private username: string;
 	private password: string;
+	private captcha: string;
+	private captchaComponent: ReCAPTCHA;
 
 	render() {
 		const { trigger, manageTrigger, syncUser, login, register } = this.props;
@@ -45,7 +47,7 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 								Dialog.alert(`Username and password are both required`);
 								return;
 							}
-							register!(this.username, this.password);
+							register!(this.username, this.password, this.captcha);
 							this.closeModal();
 						}}>
 							Create Account
@@ -79,8 +81,9 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 						<Input s={12} label="Password" type="password" onChange={(e, v) => this.password = v} />
 
 						<ReCAPTCHA
+							ref={e => this.captchaComponent = e!}
 							sitekey="6LcNvV0UAAAAAGiRakxvLN5TAxO7Le120ARrhZ3H"
-							onChange={(token) => console.log(token)}
+							onChange={token => this.captcha = token!}
 						/>
 					</div>
 
@@ -97,6 +100,8 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 	}
 
 	private closeModal = () => {
+		if (!!this.captchaComponent) this.captchaComponent.reset();
+
 		const overlay: HTMLElement | null = document.querySelector('.modal-overlay');
 		if (!!overlay) overlay.click();
 	}

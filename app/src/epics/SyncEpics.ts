@@ -56,7 +56,7 @@ export namespace SyncEpics {
 			isAction(actions.syncRegister),
 			map((action: Action<SyncLoginRequest>) => action.payload),
 			switchMap((req: SyncLoginRequest) =>
-				DifferenceEngine.AccountService.register(req.username, req.password).pipe(
+				DifferenceEngine.AccountService.register(req.username, req.password, req.captcha).pipe(
 					tap(() => Dialog.alert(`Logged in successfully. You can add a notepad to ${SYNC_NAME} using the side-bar.`)),
 					map(res =>
 						actions.syncLogin.done({
@@ -65,7 +65,7 @@ export namespace SyncEpics {
 						})
 					),
 					catchError(error => {
-						const message = (!!error.response) ? error.response : 'There was an error creating your account';
+						const message = (!!error.response) ? error.response.error : 'There was an error creating your account';
 						Dialog.alert(message);
 						return of(actions.syncLogin.failed({ params: <SyncLoginRequest> {}, error }));
 					})
