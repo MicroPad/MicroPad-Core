@@ -8,6 +8,7 @@ import { Dialog } from '../../dialogs';
 import { SYNC_NAME } from '../../types';
 import LoginComponent from '../../containers/LoginContainer';
 import { ISyncState } from '../../reducers/SyncReducer';
+import ManageSyncComponent from '../../containers/ManageSyncContainer';
 
 const NPX_ICON = require('../../assets/npx.png');
 const MD_ICON = require('../../assets/md.svg');
@@ -64,7 +65,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 
 					<LoginComponent
 						trigger={<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Connect to {SYNC_NAME}</NavItem>}
-						manageTrigger={<NavItem href="#!">Manage {SYNC_NAME}</NavItem>}
+						manageTrigger={<ManageSyncComponent />}
 					/>
 
 					{/* User's notepads from here */}

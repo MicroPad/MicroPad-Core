@@ -309,6 +309,14 @@ export namespace SyncEpics {
 			map((user: SyncUser) => actions.getSyncedNotepadList.started(user))
 		);
 
+	export const clearStorageOnLogout$ = action$ =>
+		action$.pipe(
+			isAction(actions.syncLogout),
+			switchMap(() => fromPromise(SYNC_STORAGE.removeItem('sync user'))),
+			tap(() => Dialog.alert(`You have been logged out of ${SYNC_NAME}`)),
+			filter(() => false)
+		);
+
 	export const syncEpics$ = combineEpics(
 		persistOnLogin$,
 		login$,
@@ -325,6 +333,7 @@ export namespace SyncEpics {
 		getNotepadListOnNotepadLoad$,
 		deleteNotepad$,
 		addNotepad$,
-		refreshNotepadListOnAction$
+		refreshNotepadListOnAction$,
+		clearStorageOnLogout$
 	);
 }

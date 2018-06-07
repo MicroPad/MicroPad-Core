@@ -80,6 +80,11 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 						<Input s={12} label="Username" onChange={(e, v) => this.username = v} />
 						<Input s={12} label="Password" type="password" onChange={(e, v) => this.password = v} />
 
+						<p>
+							By creating an account you are agreeing to the <a target="_blank" href={`${MICROPAD_URL}/policy.php#terms`}>Terms and Conditions</a> and the <a target="_blank" href={`${MICROPAD_URL}/policy.php#privacy`}>Privacy Policy</a>
+						</p>
+
+						Fill this out if you're creating an account:<br />
 						<ReCAPTCHA
 							ref={e => this.captchaComponent = e!}
 							sitekey="6LcNvV0UAAAAAGiRakxvLN5TAxO7Le120ARrhZ3H"
