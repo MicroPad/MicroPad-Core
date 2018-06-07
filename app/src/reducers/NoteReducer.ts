@@ -34,6 +34,7 @@ export class NoteReducer implements IReducer<ICurrentNoteState> {
 	public reducer(state: ICurrentNoteState, action: Action): ICurrentNoteState {
 		if (
 			isType(action, actions.parseNpx.started)
+			|| isType(action, actions.syncDownload.started)
 			|| isType(action, actions.newNotepad)
 			|| isType(action, actions.openNotepadFromStorage.started)
 			|| isType(action, actions.deleteNotepad)
