@@ -11,7 +11,7 @@ import { actions } from '../actions';
 
 let noteRef: string = '';
 
-export function mapStateToProps({ notepads, currentNote, meta, sync }: IStoreState) {
+export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 	noteRef = currentNote.ref;
 
 	let note;
@@ -26,7 +26,7 @@ export function mapStateToProps({ notepads, currentNote, meta, sync }: IStoreSta
 		noteAssets: currentNote.assetUrls,
 		elementEditing: currentNote.elementEditing,
 		isNotepadOpen: !!notepads.notepad && !!notepads.notepad.item,
-		isLoading: currentNote.isLoading || notepads.isLoading || (!!notepads.notepad && notepads.notepad.isLoading) || sync.isLoading
+		isLoading: currentNote.isLoading || notepads.isLoading || (!!notepads.notepad && notepads.notepad.isLoading)
 	};
 }
 
