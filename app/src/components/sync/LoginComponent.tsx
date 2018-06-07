@@ -13,7 +13,7 @@ export interface ILoginComponentProps {
 
 export interface ILoginComponentLocalProps {
 	trigger: JSX.Element;
-	manageTrigger: JSX.Element;
+	manageTrigger?: JSX.Element;
 }
 
 export default class LoginComponent extends React.Component<ILoginComponentProps & ILoginComponentLocalProps> {

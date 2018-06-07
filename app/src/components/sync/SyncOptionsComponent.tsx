@@ -5,6 +5,7 @@ import { ISyncedNotepad, SyncUser } from '../../types/SyncTypes';
 import { INotepad } from '../../types/NotepadTypes';
 import { DifferenceEngine } from '../../DifferenceEngine';
 import { Dialog } from '../../dialogs';
+import LoginComponent from '../../containers/LoginContainer';
 
 export interface ISyncOptionsComponentProps {
 	syncState: ISyncState;
@@ -18,7 +19,17 @@ export interface ISyncOptionsComponentProps {
 export default class SyncOptionsComponent extends React.Component<ISyncOptionsComponentProps> {
 	render() {
 		const { syncState, syncId, notepad, addNotepad } = this.props;
-		if (!notepad || !syncState.notepadList || !syncState.user) return null;
+		if (!notepad || (!syncState.notepadList && syncState.user)) return null;
+
+		if (!syncState.user) {
+			return (
+				<LoginComponent trigger={
+					<strong><a href="#!" style={{
+						textDecoration: 'underline'
+					}}>Connect to {SYNC_NAME} to have this notepad on all of your devices</a></strong>
+				} />
+			);
+		}
 
 		return (
 			<React.Fragment>
