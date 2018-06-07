@@ -4,6 +4,7 @@ import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
 import * as Parser from 'upad-parse/dist/index';
+import * as stringify from 'json-stringify-safe';
 
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
@@ -99,6 +100,10 @@ export async function cleanHangingAssets(notepadStorage: LocalForage, assetStora
 		usedAssets.forEach(uuid => allUsedAssets.add(uuid));
 
 		await Promise.all(unusedAssets.map(uuid => assetStorage.removeItem(uuid)));
+
+		// Update notepadAssets
+		notepad.notepadAssets = Array.from(usedAssets);
+		await notepadStorage.setItem(notepad.title, stringify(notepad));
 	}
 
 	// Handle the deletion of assets we've lost track of and aren't in any notepad
