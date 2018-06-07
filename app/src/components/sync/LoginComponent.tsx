@@ -3,6 +3,7 @@ import { Button, Input, Modal, NavItem } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL, SYNC_NAME } from '../../types';
 import { SyncUser } from '../../types/SyncTypes';
 import { Dialog } from '../../dialogs';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export interface ILoginComponentProps {
 	syncUser?: SyncUser;
@@ -76,6 +77,11 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 						<h5>Login/Create Account</h5>
 						<Input s={12} label="Username" onChange={(e, v) => this.username = v} />
 						<Input s={12} label="Password" type="password" onChange={(e, v) => this.password = v} />
+
+						<ReCAPTCHA
+							sitekey="6LcNvV0UAAAAAGiRakxvLN5TAxO7Le120ARrhZ3H"
+							onChange={(token) => console.log(token)}
+						/>
 					</div>
 
 					<div>
