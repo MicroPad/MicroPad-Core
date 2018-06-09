@@ -12,9 +12,9 @@
 	},
 	"homepage": "https://web.getmicropad.com",
 	"scripts": {
-		"start": "react-scripts-ts start",
-		"build": "react-scripts-ts build",
-		"test": "react-scripts-ts test --env=jsdom",
+		"start": "react-app-rewired start --scripts-version react-scripts-ts",
+		"build": "react-app-rewired build --scripts-version react-scripts-ts",
+		"test": "react-app-rewired test --scripts-version react-scripts-ts --env=jsdom",
 		"eject": "react-scripts-ts eject"
 	},
 	"dependencies": {
@@ -74,6 +74,7 @@
 		"jest-marbles": "^1.1.2",
 		"raw-loader": "^0.5.1",
 		"react-addons-test-utils": "^15.6.2",
+		"react-app-rewired": "^1.5.2",
 		"redux-mock-store": "^1.5.1",
 		"sinon": "^5.0.7",
 		"typescript": "^2.8.3",
