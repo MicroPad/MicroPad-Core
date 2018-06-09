@@ -75,29 +75,11 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 						</p>
 					</div>
 
-					<div className="login-component__form">
-						<h5>Login/Create Account</h5>
+					<p><a target="_blank" href={`${MICROPAD_URL}/sync/manage`}>Sign up here</a> or login below:</p>
+
+					<div className="login-component__form" style={{ marginTop: '20px' }}>
 						<Input s={12} label="Username" onChange={(e, v) => this.username = v} />
 						<Input s={12} label="Password" type="password" onChange={(e, v) => this.password = v} />
-
-						<p>
-							By creating an account you are agreeing to the <a target="_blank" href={`${MICROPAD_URL}/policy.php#terms`}>Terms and Conditions</a> and the <a target="_blank" href={`${MICROPAD_URL}/policy.php#privacy`}>Privacy Policy</a>
-						</p>
-
-						Fill this out if you're creating an account:<br />
-						<ReCAPTCHA
-							ref={e => this.captchaComponent = e!}
-							sitekey="6LcNvV0UAAAAAGiRakxvLN5TAxO7Le120ARrhZ3H"
-							onChange={token => this.captcha = token!}
-						/>
-					</div>
-
-					<div>
-						<p>
-							Make sure to remember your password or use a password manger.<br />
-							Because of our privacy measures, it may be difficult for a
-							password reset to be done for you.
-						</p>
 					</div>
 				</React.Fragment>
 			</Modal>

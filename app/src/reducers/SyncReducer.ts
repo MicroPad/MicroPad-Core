@@ -34,6 +34,7 @@ export class SyncReducer implements IReducer<ISyncState> {
 			|| isType(action, actions.syncUpload.failed)
 			|| isType(action, actions.syncUploadAsset.failed)
 			|| isType(action, actions.deleteFromSync.failed)
+			|| isType(action, actions.syncProError)
 		) {
 			return {
 				...state,

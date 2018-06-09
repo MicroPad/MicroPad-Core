@@ -196,16 +196,17 @@ export namespace SyncEpics {
 					map((isPro: boolean) => [payload, isPro])
 				)
 			),
-			filter(([payload, isPro]: [ISyncAction, boolean]) => {
-				if (Object.keys(payload.notepad.assetHashList).length < 10 || isPro) return true;
-				console.error(`too many assets`);
-
-				// TODO: show warning about why we can't continue
-				return false;
+			tap(([payload, isPro]: [ISyncAction, boolean]) => {
+				if (Object.keys(payload.notepad.assetHashList).length < 10 || isPro) return;
+				throw 'too many assets';
 			}),
 			switchMap(([payload]: [ISyncAction, boolean]) => DifferenceEngine.SyncService.uploadNotepad(payload.syncId, payload.notepad)),
 			map((assetList: AssetList) => actions.syncUpload.done({ params: {} as ISyncAction, result: assetList })),
 			catchError((error): Observable<Action<any>> => {
+				if (error === 'too many assets') {
+					return of(actions.syncProError(undefined));
+				}
+
 				console.error(error);
 				const message = (!!error.response) ? error.response.error : 'There was an error syncing';
 				if (message === 'Invalid token') {
@@ -319,6 +320,19 @@ export namespace SyncEpics {
 			)
 		);
 
+	export const syncOnAdded$ = (action$, store) =>
+		action$.pipe(
+			isAction(actions.addToSync.done),
+			map(() => store.getState()),
+			map((state: IStoreState) => state.notepads.notepad),
+			filter(Boolean),
+			filter((notepadState: INotepadStoreState) => !!notepadState.item && !!notepadState.activeSyncId),
+			map((notepadState: INotepadStoreState) => actions.actWithSyncNotepad({
+				notepad: notepadState.item!,
+				action: notepad => actions.sync({ notepad, syncId: notepadState.activeSyncId! })
+			}))
+		);
+
 	export const refreshNotepadListOnAction$ = (action$, store) =>
 		action$.pipe(
 			isAction(actions.deleteFromSync.done),
@@ -333,6 +347,15 @@ export namespace SyncEpics {
 			isAction(actions.syncLogout),
 			switchMap(() => fromPromise(SYNC_STORAGE.removeItem('sync user'))),
 			tap(() => Dialog.alert(`You have been logged out of ${SYNC_NAME}`)),
+			filter(() => false)
+		);
+
+	export const openSyncProErrorModal$ = action$ =>
+		action$.pipe(
+			isAction(actions.syncProError),
+			map(() => document.getElementById('sync-pro-error-trigger')),
+			filter(Boolean),
+			tap((trigger: HTMLAnchorElement) => trigger.click()),
 			filter(() => false)
 		);
 
@@ -352,7 +375,9 @@ export namespace SyncEpics {
 		getNotepadListOnNotepadLoad$,
 		deleteNotepad$,
 		addNotepad$,
+		syncOnAdded$,
 		refreshNotepadListOnAction$,
-		clearStorageOnLogout$
+		clearStorageOnLogout$,
+		openSyncProErrorModal$
 	);
 }

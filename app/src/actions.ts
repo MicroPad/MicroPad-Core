@@ -73,5 +73,6 @@ export const actions = {
 	updateCurrentSyncId: actionCreator<SyncedNotepadList>('UPDATE_SYNC_ID'),
 	sync: actionCreator<ISyncAction>('SYNC'),
 	actWithSyncNotepad: actionCreator<INotepadToSyncNotepadAction>('ACT_WITH_SYNC_NOTEPAD'),
-	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD')
+	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD'),
+	syncProError: actionCreator<void>('SYNC_PRO_ERROR')
 };
