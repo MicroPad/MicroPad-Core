@@ -96,7 +96,7 @@ export namespace SyncEpics {
 				of(syncAction).pipe(
 					combineLatest(
 						DifferenceEngine.SyncService.getLastModified(syncAction.syncId)
-							.pipe(catchError(empty))
+							.pipe(catchError(() => empty()))
 					)
 				)
 			),

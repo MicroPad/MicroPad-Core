@@ -37,7 +37,7 @@ const baseReducer: BaseReducer = new BaseReducer();
 export const store = createStore<IStoreState>(
 	baseReducer.reducer,
 	baseReducer.initialState,
-	(true) ? composeWithDevTools(applyMiddleware(epicMiddleware)) : applyMiddleware(epicMiddleware)
+	composeWithDevTools(applyMiddleware(epicMiddleware))
 );
 
 export const NOTEPAD_STORAGE = localforage.createInstance({

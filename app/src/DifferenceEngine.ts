@@ -7,11 +7,11 @@ import { MICROPAD_URL } from './types';
 import { map, retry } from 'rxjs/operators';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 import { AssetList, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from './types/SyncTypes';
-import { isDev } from './util';
 import { parse } from 'date-fns';
 import { INotepad } from './types/NotepadTypes';
 import * as stringify from 'json-stringify-safe';
 import { Base64 } from 'js-base64';
+import * as QueryString from 'querystring';
 
 export namespace DifferenceEngine {
 	const SyncThread = new SyncWorker() as ISyncWorker;
@@ -96,7 +96,7 @@ export namespace DifferenceEngine {
 
 	function callApi<T>(parent: string, endpoint: string, resource: string, payload?: object, method?: string): Observable<T> {
 		return ajax({
-			url: `${isDev() ? 'http://localhost:48025' : MICROPAD_URL}/diffeng/${parent}/${endpoint}/${resource}`,
+			url: `${devServer() ? 'http://localhost:48025' : MICROPAD_URL}/diffeng/${parent}/${endpoint}/${resource}`,
 			method: method || (!payload) ? 'GET' : 'POST',
 			body: payload,
 			crossDomain: true,
@@ -108,5 +108,9 @@ export namespace DifferenceEngine {
 			map((res: AjaxResponse) => res.response),
 			retry(2)
 		);
+	}
+
+	function devServer(): boolean {
+		return !!QueryString.parse(location.search.slice(1)).local;
 	}
 }
