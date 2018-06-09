@@ -18,7 +18,7 @@ export default class ManageSyncComponent extends React.Component<IManageSyncComp
 				header={`Manage ${SYNC_NAME}`}
 				trigger={<NavItem href="#!">Manage {SYNC_NAME}</NavItem>}>
 				<ul>
-					<li><a target="_blank" href={`${MICROPAD_URL}/sync`}><h5>Account Options</h5></a></li>
+					<li><a target="_blank" href={`${MICROPAD_URL}/sync/manage`}><h5>Account Options</h5></a></li>
 					<li><a href="#!" onClick={() => {
 						logout();
 						this.closeModal();
