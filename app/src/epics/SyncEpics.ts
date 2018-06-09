@@ -1,7 +1,17 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../actions';
-import { catchError, combineLatest, concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import {
+	catchError,
+	combineLatest,
+	concatMap,
+	debounceTime,
+	filter,
+	map,
+	mergeMap,
+	switchMap,
+	tap
+} from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
 import { ASSET_STORAGE, SYNC_STORAGE } from '../index';
@@ -242,6 +252,13 @@ export namespace SyncEpics {
 			map(() => actions.syncUploadAsset.done({ params: {} as IUploadAssetAction, result: undefined }))
 		);
 
+	export const syncAssetsAllDone$ = action$ =>
+		action$.pipe(
+			isAction(actions.syncUploadAsset.done, actions.syncUploadAsset.failed),
+			debounceTime(1300),
+			map(() => actions.syncAssetsAllDone(undefined))
+		);
+
 	export const getNotepadListOnLogin$ = action$ =>
 		action$.pipe(
 			isAction(actions.syncLogin.done),
@@ -370,6 +387,7 @@ export namespace SyncEpics {
 		upload$,
 		uploadAssets$,
 		uploadAsset$,
+		syncAssetsAllDone$,
 		getNotepadListOnLogin$,
 		getNotepadList$,
 		getNotepadListOnNotepadLoad$,

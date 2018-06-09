@@ -32,7 +32,6 @@ export class SyncReducer implements IReducer<ISyncState> {
 			isType(action, actions.syncLogin.failed)
 			|| isType(action, actions.syncDownload.failed)
 			|| isType(action, actions.syncUpload.failed)
-			|| isType(action, actions.syncUploadAsset.failed)
 			|| isType(action, actions.deleteFromSync.failed)
 			|| isType(action, actions.syncProError)
 		) {
@@ -43,7 +42,7 @@ export class SyncReducer implements IReducer<ISyncState> {
 		} else if (
 			isType(action, actions.syncDownload.done)
 			|| isType(action, actions.syncUpload.done)
-			|| isType(action, actions.syncUploadAsset.done)
+			|| isType(action, actions.syncAssetsAllDone)
 		) {
 			return {
 				...state,
