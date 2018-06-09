@@ -18,7 +18,6 @@ import HeaderComponent from './containers/header/HeaderContainer';
 import NotepadExplorerComponent from './containers/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './shortcuts';
-import { OldSyncHandler } from './old-sync/OldSyncHandler';
 import * as QueryString from 'querystring';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
@@ -60,7 +59,6 @@ export const SYNC_STORAGE = localforage.createInstance({
 	if (!await compatibilityCheck()) return;
 	await hydrateStoreFromLocalforage();
 
-	new OldSyncHandler(store);
 	enableKeyboardShortcuts(store);
 	registerServiceWorker();
 
