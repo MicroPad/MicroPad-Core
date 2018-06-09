@@ -13,6 +13,7 @@ import { getNotepadObjectByRef } from '../util';
 import * as localforage from 'localforage';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { Dialog } from '../dialogs';
+import { ISyncedNotepad } from '../types/SyncTypes';
 
 let currentNotepadTitle = '';
 
@@ -40,8 +41,19 @@ const saveOnChanges$ = (action$, store) =>
 
 			return condition;
 		}),
-		map((notepad: INotepad) => {
-			return actions.saveNotepad.started(notepad);
+		mergeMap((notepad: INotepad) => {
+			const actionsToReturn: Action<any>[] = [];
+
+			const syncId = (<IStoreState> store.getState()).notepads.notepad!.activeSyncId;
+			if (syncId) actionsToReturn.push(actions.actWithSyncNotepad({
+				notepad,
+				action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId })
+			}));
+
+			return [
+				...actionsToReturn,
+				actions.saveNotepad.started(notepad)
+			];
 		})
 	);
 
@@ -101,6 +113,7 @@ const cleanUnusedAssets$ = (action$, store) =>
 			map((notepadState: INotepadStoreState) => notepadState.item),
 			filter(Boolean),
 			map((notepad: INotepad) => [notepad.getUsedAssets(), notepad.notepadAssets]),
+			filter(([usedAssets, npAssets]: [Set<string>, string[]]) => !!usedAssets && !!npAssets),
 			switchMap(([usedAssets, npAssets]: [Set<string>, string[]]) => {
 				const unusedAssets = npAssets.filter(guid => !usedAssets.has(guid));
 				return fromPromise(Promise.all(unusedAssets.map(guid => ASSET_STORAGE.removeItem(guid))).then(() => unusedAssets));

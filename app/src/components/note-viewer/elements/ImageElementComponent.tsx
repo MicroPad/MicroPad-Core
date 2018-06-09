@@ -26,7 +26,7 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 							this.onSizeEdit('width', ref.style.width!);
 							this.onSizeEdit('height', ref.style.height!);
 						}}>
-						<img style={{height: '100%', width: '100%' }} src={noteAssets[element.args.ext!]} />
+						<img style={{height: (element.args.height !== 'auto') ? '100%' : undefined, width: (element.args.width !== 'auto') ? '100%' : undefined }} src={noteAssets[element.args.ext!]} />
 					</Resizable>
 				}
 				{

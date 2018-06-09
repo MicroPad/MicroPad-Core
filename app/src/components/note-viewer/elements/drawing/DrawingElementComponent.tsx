@@ -4,6 +4,7 @@ import { dataURItoBlob } from '../../../../util';
 import { trim } from './trim-canvas';
 import Resizable from 're-resizable';
 import { Input, Row } from 'react-materialize';
+import * as stringify from 'json-stringify-safe';
 
 type Touch = {
 	identifier: number;
@@ -134,6 +135,10 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 			this.hasTrimmed = true;
 			this.imageElement.src = URL.createObjectURL(dataURItoBlob(trim(tmpCanvas).toDataURL()));
 		};
+	}
+
+	shouldComponentUpdate(nextProps: INoteElementComponentProps) {
+		return stringify(nextProps) !== stringify(this.props);
 	}
 
 	componentWillUpdate() {

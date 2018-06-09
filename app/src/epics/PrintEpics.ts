@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { getNotepadObjectByRef, isAction } from '../util';
+import { getAsBase64, getNotepadObjectByRef, isAction } from '../util';
 import { actions } from '../actions';
 import { filter, map, switchMap } from 'rxjs/operators';
 import { IMarkdownNote, INote, INotepad, INotepadStoreState, NoteElement } from '../types/NotepadTypes';
@@ -61,19 +61,6 @@ export namespace PrintEpics {
 	export const printEpics$ = combineEpics(
 		generateMarkdownForPrint$
 	);
-
-	function getAsBase64(blob: Blob): Promise<string> {
-		return new Promise<string>(resolve => {
-			try {
-				const reader = new FileReader();
-				reader.onload = event => resolve(event.target!.result);
-				reader.readAsDataURL(blob);
-			} catch (e) {
-				console.error(e);
-				resolve('');
-			}
-		});
-	}
 
 	function getTrimmedDrawing(blob: Blob): Promise<string> {
 		return new Promise<string>(resolve => {

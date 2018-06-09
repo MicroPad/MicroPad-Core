@@ -6,8 +6,9 @@ import TreeView from 'react-treeview';
 import { generateGuid } from '../../util';
 import ExplorerOptionsComponent from './ExplorerOptionsComponent';
 import { INewNotepadObjectAction } from '../../types/ActionTypes';
-import HelpMessageComponent from '../HelpMessageComponent';
+import HelpMessageComponent from '../../containers/HelpMessageContainer';
 import { Dialog } from '../../dialogs';
+import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: INotepad;
@@ -75,6 +76,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 								exportNotepad={exportNotepad}
 								renameNotepad={renameNotepad}/>
 						</strong>
+
 						<p style={{paddingLeft: '10px', marginTop: '0px'}}>
 							(<a href="#!" onClick={expandAll}>Expand All</a> | <a href="#!" onClick={() => {
 								if (!!openNote) {
@@ -89,6 +91,10 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						</div>
 
 						{treeViews}
+
+						<div style={{ paddingLeft: '10px', marginTop: '10px' }}>
+							<SyncOptionsComponent />
+						</div>
 
 						{
 							/* Help messages */

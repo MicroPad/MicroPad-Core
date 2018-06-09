@@ -7,9 +7,10 @@ import NotepadBreadcrumbs from '../../containers/header/NotepadBreadcrumbsContai
 import SearchComponent from '../../containers/SearchContainer';
 
 export interface IHeaderComponentProps {
+	isFullScreen: boolean;
+	isSyncing: boolean;
 	getHelp?: () => void;
 	notepad?: INotepadStoreState;
-	isFullScreen: boolean;
 	flipFullScreenState?: () => void;
 }
 
@@ -22,13 +23,15 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 	};
 
 	render() {
-		const { getHelp, notepad, isFullScreen, flipFullScreenState } = this.props;
+		const { getHelp, notepad, isFullScreen, isSyncing, flipFullScreenState } = this.props;
 
-		const saveText: string = (!!notepad && !!notepad.item)
+		let saveText: string = (!!notepad && !!notepad.item)
 			? (notepad.saving)
 				? 'Saving...'
 				: 'All changes saved'
 			: '';
+
+		if (isSyncing) saveText = 'Syncing...';
 
 		return (
 			<header style={{position: 'fixed', zIndex: 1000}}>

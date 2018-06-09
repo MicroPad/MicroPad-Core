@@ -59,7 +59,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 						<p>
 							Changing the path of a {type} isn't supported in the new {APP_NAME}.<br/>
 							If you want to do that, you can import your notepad
-							into <a href={`${MICROPAD_URL}/web`}>{APP_NAME} classic</a> and change the path there.
+							into <a target="_blank" href={`${MICROPAD_URL}/web`}>{APP_NAME} classic</a> and change the path there.
 						</p>
 					}
 				</div>

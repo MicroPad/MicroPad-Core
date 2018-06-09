@@ -18,11 +18,14 @@ import HeaderComponent from './containers/header/HeaderContainer';
 import NotepadExplorerComponent from './containers/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './shortcuts';
-import { OldSyncHandler } from './old-sync/OldSyncHandler';
 import * as QueryString from 'querystring';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
-import { isDev } from './util';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
+import { SyncUser } from './types/SyncTypes';
+import * as Materialize from 'materialize-css/dist/js/materialize';
+import { INotepadStoreState } from './types/NotepadTypes';
+import { cleanHangingAssets } from './util';
+import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -31,10 +34,10 @@ try {
 }
 
 const baseReducer: BaseReducer = new BaseReducer();
-const store = createStore<IStoreState>(
+export const store = createStore<IStoreState>(
 	baseReducer.reducer,
 	baseReducer.initialState,
-	(isDev()) ? composeWithDevTools(applyMiddleware(epicMiddleware)) : applyMiddleware(epicMiddleware)
+	composeWithDevTools(applyMiddleware(epicMiddleware))
 );
 
 export const NOTEPAD_STORAGE = localforage.createInstance({
@@ -47,11 +50,15 @@ export const ASSET_STORAGE = localforage.createInstance({
 		storeName: 'assets'
 });
 
+export const SYNC_STORAGE = localforage.createInstance({
+	name: 'MicroPad',
+	storeName: 'sync'
+});
+
 (async function init() {
 	if (!await compatibilityCheck()) return;
 	await hydrateStoreFromLocalforage();
 
-	new OldSyncHandler(store);
 	enableKeyboardShortcuts(store);
 	registerServiceWorker();
 
@@ -64,6 +71,7 @@ export const ASSET_STORAGE = localforage.createInstance({
 					<NoteViewerComponent />
 					<NotepadExplorerComponent />
 					<WhatsNewModalComponent />
+					<SyncProErrorComponent />
 				</div>
 			</PrintViewOrAppContainerComponent>
 		</Provider>,
@@ -76,12 +84,34 @@ export const ASSET_STORAGE = localforage.createInstance({
 	await displayWhatsNew();
 
 	notepadDownloadHandler();
+
+	// Handle sync download toast
+	window['syncDownload'] = (syncId: string) => {
+		Materialize.Toast.removeAll();
+		store.dispatch(actions.syncDownload.started(syncId));
+	};
+
+	// Show a warning when closing before notepad save or sync is complete
+	store.subscribe(() => {
+		const isSaving = store.getState().notepads.isLoading || (store.getState().notepads.notepad || {} as INotepadStoreState).isLoading;
+		const isSyncing = store.getState().sync.isLoading;
+		window.onbeforeunload = (isSyncing || isSaving) ? () => true : null;
+	});
 })();
 
 async function hydrateStoreFromLocalforage() {
-	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready()]);
+	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), SYNC_STORAGE.ready()]);
+
+	await cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE);
+
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
+
+	const helpPref: boolean | null = await localforage.getItem<boolean>('show help');
+	if (helpPref !== null) store.dispatch(actions.setHelpPref(helpPref));
+
+	const syncUser: SyncUser = await SYNC_STORAGE.getItem<SyncUser>('sync user');
+	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
 
 	store.dispatch(actions.getNotepadList.started(undefined));
 }

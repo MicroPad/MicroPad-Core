@@ -4,9 +4,10 @@ import { actions } from '../../actions';
 import HeaderComponent, { IHeaderComponentProps } from '../../components/header/HeaderComponent';
 import { IStoreState } from '../../types';
 
-export function mapStateToProps({ notepads, meta }: IStoreState) {
+export function mapStateToProps({ notepads, meta, sync }: IStoreState) {
 	return {
 		notepad: notepads.notepad,
+		isSyncing: sync.isLoading,
 		isFullScreen: meta.isFullScreen
 	};
 }
