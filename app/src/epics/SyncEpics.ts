@@ -169,10 +169,16 @@ export namespace SyncEpics {
 						);
 					}),
 					map((remoteNotepad: ISyncedNotepad) => actions.restoreJsonNotepad(JSON.stringify(remoteNotepad))),
-					catchError(error => {
+					catchError((error): Observable<Action<any>> => {
 						console.error(error);
 						const message = (!!error.response) ? error.response : 'There was an error syncing';
+						if (message === 'Invalid token') {
+							Dialog.alert('Your token has expired. Please login again.');
+							return of(actions.syncLogout(undefined));
+						}
+
 						Dialog.alert(message);
+
 						return of(actions.syncDownload.failed({ params: '', error }));
 					})
 				)
@@ -199,9 +205,14 @@ export namespace SyncEpics {
 			}),
 			switchMap(([payload]: [ISyncAction, boolean]) => DifferenceEngine.SyncService.uploadNotepad(payload.syncId, payload.notepad)),
 			map((assetList: AssetList) => actions.syncUpload.done({ params: {} as ISyncAction, result: assetList })),
-			catchError(error => {
+			catchError((error): Observable<Action<any>> => {
 				console.error(error);
 				const message = (!!error.response) ? error.response.error : 'There was an error syncing';
+				if (message === 'Invalid token') {
+					Dialog.alert('Your token has expired. Please login again.');
+					return of(actions.syncLogout(undefined));
+				}
+
 				Dialog.alert(message);
 				return of(actions.syncUpload.failed({ params: {} as ISyncAction, error }));
 			})
@@ -291,9 +302,17 @@ export namespace SyncEpics {
 			switchMap((action: Action<SyncUser>) =>
 				DifferenceEngine.NotepadService.create(action.payload.username, action.payload.token).pipe(
 					map((syncId: string) => actions.addToSync.done({ params: <SyncUser> {}, result: syncId })),
-					catchError(error => {
+					catchError((error): Observable<Action<any>> => {
 						console.error(error);
-						if (!!error.response && !!error.response.error) Dialog.alert(error.response.error);
+						if (!!error.response && !!error.response.error) {
+							if (error.response.error === 'Invalid token') {
+								Dialog.alert('Your token has expired. Please login again.');
+								return of(actions.syncLogout(undefined));
+							}
+
+							Dialog.alert(error.response.error);
+						}
+
 						return of(actions.addToSync.failed({ params: <SyncUser> {}, error }));
 					})
 				)
