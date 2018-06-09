@@ -15,7 +15,8 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 		},
 		isFullScreen: false,
 		defaultFontSize: '16px',
-		zoom: 1
+		zoom: 1,
+		showHelp: true
 	};
 
 	public reducer(state: IMetaStoreState, action: Action): IMetaStoreState {
@@ -44,6 +45,11 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 			return {
 				...state,
 				zoom: this.initialState.zoom
+			};
+		} else if (isType(action, actions.setHelpPref)) {
+			return {
+				...state,
+				showHelp: action.payload
 			};
 		}
 

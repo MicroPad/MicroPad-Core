@@ -74,5 +74,6 @@ export const actions = {
 	sync: actionCreator<ISyncAction>('SYNC'),
 	actWithSyncNotepad: actionCreator<INotepadToSyncNotepadAction>('ACT_WITH_SYNC_NOTEPAD'),
 	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD'),
-	syncProError: actionCreator<void>('SYNC_PRO_ERROR')
+	syncProError: actionCreator<void>('SYNC_PRO_ERROR'),
+	setHelpPref: actionCreator<boolean>('SET_HELP_PREF')
 };

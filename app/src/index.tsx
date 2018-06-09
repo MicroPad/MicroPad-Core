@@ -107,6 +107,9 @@ async function hydrateStoreFromLocalforage() {
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
 
+	const helpPref: boolean | null = await localforage.getItem<boolean>('show help');
+	if (helpPref !== null) store.dispatch(actions.setHelpPref(helpPref));
+
 	const syncUser: SyncUser = await SYNC_STORAGE.getItem<SyncUser>('sync user');
 	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
 

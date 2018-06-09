@@ -6,7 +6,7 @@ import TreeView from 'react-treeview';
 import { generateGuid } from '../../util';
 import ExplorerOptionsComponent from './ExplorerOptionsComponent';
 import { INewNotepadObjectAction } from '../../types/ActionTypes';
-import HelpMessageComponent from '../HelpMessageComponent';
+import HelpMessageComponent from '../../containers/HelpMessageContainer';
 import { Dialog } from '../../dialogs';
 import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
 
