@@ -3,7 +3,6 @@ import { Button, Input, Modal, NavItem } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL, SYNC_NAME } from '../../types';
 import { SyncUser } from '../../types/SyncTypes';
 import { Dialog } from '../../dialogs';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 export interface ILoginComponentProps {
 	syncUser?: SyncUser;
@@ -19,11 +18,9 @@ export interface ILoginComponentLocalProps {
 export default class LoginComponent extends React.Component<ILoginComponentProps & ILoginComponentLocalProps> {
 	private username: string;
 	private password: string;
-	private captcha: string;
-	private captchaComponent: ReCAPTCHA;
 
 	render() {
-		const { trigger, manageTrigger, syncUser, login, register } = this.props;
+		const { trigger, manageTrigger, syncUser, login } = this.props;
 		if (!!syncUser) return (!!manageTrigger) ? manageTrigger : null;
 
 		return (
@@ -41,16 +38,6 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 							this.closeModal();
 						}}>
 							Login
-						</Button>
-						<Button className="btn-flat modal-action" onClick={() => {
-							if (!this.username || !this.password) {
-								Dialog.alert(`Username and password are both required`);
-								return;
-							}
-							register!(this.username, this.password, this.captcha);
-							this.closeModal();
-						}}>
-							Create Account
 						</Button>
 						<Button className="btn-flat modal-action modal-close">Close</Button>
 					</React.Fragment>
@@ -87,8 +74,6 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 	}
 
 	private closeModal = () => {
-		if (!!this.captchaComponent) this.captchaComponent.reset();
-
 		const overlay: HTMLElement | null = document.querySelector('.modal-overlay');
 		if (!!overlay) overlay.click();
 	}
