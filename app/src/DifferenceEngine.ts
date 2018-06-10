@@ -20,12 +20,11 @@ export namespace DifferenceEngine {
 		const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);
 
 		export const login = (username: string, password: string): Observable<{ username: string, token: string }> => {
-			return call<{ token: string }>('login', username, { password })
-				.pipe(map(res => { return { username, token: res.token }; }));
-		};
+			// TODO: Remove this and send the object natively when https://github.com/ReactiveX/rxjs/issues/3824 is fixed
+			const data = new URLSearchParams();
+			data.append('password', password);
 
-		export const register = (username: string, password: string, captcha?: string): Observable<{ username: string, token: string }> => {
-			return call<{ token: string }>('create', username, { password, captcha })
+			return call<{ token: string }>('login', username, data.toString() as any)
 				.pipe(map(res => { return { username, token: res.token }; }));
 		};
 

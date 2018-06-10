@@ -7,7 +7,6 @@ import { Dialog } from '../../dialogs';
 export interface ILoginComponentProps {
 	syncUser?: SyncUser;
 	login?: (username: string, password: string) => void;
-	register?: (username: string, password: string, captcha: string) => void;
 }
 
 export interface ILoginComponentLocalProps {
