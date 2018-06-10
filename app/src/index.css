@@ -30,6 +30,10 @@ nav {
 	user-select: none;
 }
 
+.brand-logo {
+	cursor: default;
+}
+
 .side-nav li {
 	color: rgba(0,0,0,0.87);
 }
