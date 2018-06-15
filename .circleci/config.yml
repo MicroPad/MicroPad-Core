@@ -19,9 +19,7 @@ jobs:
     steps:
       - checkout
 
-      - run: cd app && npm install
-
-      - run: cd app && npm install
+      - run: cd app && npm ci
         
       # run tests!
       - run: cd app && npm run test
