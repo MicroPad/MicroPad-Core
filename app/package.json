@@ -37,7 +37,7 @@
 		"react-dom": "^16.3.2",
 		"react-draggable": "^3.0.5",
 		"react-google-recaptcha": "^0.11.1",
-		"react-materialize": "^1.1.2",
+		"react-materialize": "^2.1.2",
 		"react-promise": "^2.0.2",
 		"react-redux": "^5.0.6",
 		"react-scripts-ts": "^2.16.0",
