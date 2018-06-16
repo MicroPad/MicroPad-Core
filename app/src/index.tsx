@@ -26,6 +26,7 @@ import * as Materialize from 'materialize-css/dist/js/materialize';
 import { INotepadStoreState } from './types/NotepadTypes';
 import { cleanHangingAssets } from './util';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
+import InsertElementComponent from './containers/InsertElementContainer';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -72,6 +73,7 @@ export const SYNC_STORAGE = localforage.createInstance({
 					<NotepadExplorerComponent />
 					<WhatsNewModalComponent />
 					<SyncProErrorComponent />
+					<InsertElementComponent />
 				</div>
 			</PrintViewOrAppContainerComponent>
 		</Provider>,
@@ -112,6 +114,8 @@ async function hydrateStoreFromLocalforage() {
 
 	const syncUser: SyncUser = await SYNC_STORAGE.getItem<SyncUser>('sync user');
 	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
+
+	if ((window as any).isElectron) store.dispatch(actions.checkVersion(undefined));
 
 	store.dispatch(actions.getNotepadList.started(undefined));
 }

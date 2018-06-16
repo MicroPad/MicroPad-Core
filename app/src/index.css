@@ -50,6 +50,11 @@ nav .material-icons.left {
 	margin-right: 10px;
 }
 
+nav .menu-items > div {
+	float: left;
+	padding: 0;
+}
+
 .material-icons {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;

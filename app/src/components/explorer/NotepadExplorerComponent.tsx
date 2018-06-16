@@ -68,7 +68,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 					<div style={{ paddingBottom: '200px' }}>
 						<a href="#!" onClick={flipFullScreenState} style={{ paddingRight: '5px', fontSize: '24px' }}>»</a>
 						<strong style={{ display: 'inline-flex' }}>
-							{notepad.title}
+							<span style={{ paddingRight: '5px' }}>{notepad.title}</span>
 							<ExplorerOptionsComponent
 								objToEdit={notepad}
 								type="notepad"

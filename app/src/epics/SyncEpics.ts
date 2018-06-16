@@ -118,15 +118,15 @@ export namespace SyncEpics {
 			switchMap((syncId: string) =>
 				DifferenceEngine.SyncService.downloadNotepad(syncId).pipe(
 					switchMap((remoteNotepad: ISyncedNotepad) => {
-						let localNotepad = (((<IStoreState> store).notepads || <INotepadStoreState> {}).notepad || <INotepadStoreState> {}).item;
+						let localNotepad = (((<IStoreState> store.getState()).notepads || <INotepadStoreState> {}).notepad || <INotepadStoreState> {}).item;
 						if (!localNotepad) localNotepad = <INotepad> Parser.createNotepad('');
 
 						return fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad)).pipe(
 							switchMap((local: ISyncedNotepad) => {
 								const diffAssets = Object.keys(remoteNotepad.assetHashList)
-									.filter(uuid =>
-										local.assetHashList[uuid] !== remoteNotepad.assetHashList[uuid]
-									);
+									.filter(uuid => local.assetHashList[uuid] !== remoteNotepad.assetHashList[uuid]);
+
+								if (diffAssets.length === 0) return of(remoteNotepad);
 
 								// Download the different assets
 								return DifferenceEngine.SyncService.getAssetDownloadLinks(syncId, diffAssets).pipe(

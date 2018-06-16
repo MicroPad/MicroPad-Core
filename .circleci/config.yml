@@ -23,3 +23,26 @@ jobs:
         
       # run tests!
       - run: cd app && npm run test
+
+  deploy:
+    machine:
+      enabled: true
+
+    steps:
+      - run: cd app && npm run build
+
+      - run: sudo apt install rsync
+
+      - run: rsync -aue "ssh -p 1276 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" app/build/* $SSH_PATH
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
