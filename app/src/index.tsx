@@ -115,6 +115,8 @@ async function hydrateStoreFromLocalforage() {
 	const syncUser: SyncUser = await SYNC_STORAGE.getItem<SyncUser>('sync user');
 	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
 
+	if ((window as any).isElectron) store.dispatch(actions.checkVersion(undefined));
+
 	store.dispatch(actions.getNotepadList.started(undefined));
 }
 

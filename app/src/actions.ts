@@ -75,5 +75,6 @@ export const actions = {
 	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD'),
 	syncProError: actionCreator<void>('SYNC_PRO_ERROR'),
 	setHelpPref: actionCreator<boolean>('SET_HELP_PREF'),
-	syncAssetsAllDone: actionCreator<void>('SYNC_ASSETS_ALL_DONE')
+	syncAssetsAllDone: actionCreator<void>('SYNC_ASSETS_ALL_DONE'),
+	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON')
 };
