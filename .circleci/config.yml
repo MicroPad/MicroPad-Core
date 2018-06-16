@@ -28,6 +28,8 @@ jobs:
     machine:
       enabled: true
 
+    working_directory: ~/repo
+
     steps:
       - run: cd app && npm run build
 
