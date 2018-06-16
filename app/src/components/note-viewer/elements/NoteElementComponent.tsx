@@ -131,7 +131,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 							<div>
 								<Row style={{paddingLeft: '5px'}}>
 									<Button className="red" waves="light" onClick={this.delete} style={{marginRight: '5px'}}><Icon left={true}>delete_forever</Icon> Delete</Button>
-									<span style={{marginRight: '5px'}}><SourcesComponent /></span>
+									<span className="bib-container" style={{marginRight: '5px'}}><SourcesComponent /></span>
 								</Row>
 
 								<Row style={{paddingLeft: '5px'}}>

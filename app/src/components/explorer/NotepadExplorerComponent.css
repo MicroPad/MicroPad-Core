@@ -78,6 +78,11 @@
 	padding-left: 5px;
 }
 
+.tree-view_item > span > div, .explorer-note > span > div {
+	padding-left: 5px;
+	display: inline-block;
+}
+
 #explorer-options-modal button {
 	width: 260px;
 }

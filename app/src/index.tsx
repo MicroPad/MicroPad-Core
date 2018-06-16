@@ -26,6 +26,7 @@ import * as Materialize from 'materialize-css/dist/js/materialize';
 import { INotepadStoreState } from './types/NotepadTypes';
 import { cleanHangingAssets } from './util';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
+import InsertElementComponent from './containers/InsertElementContainer';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -72,6 +73,7 @@ export const SYNC_STORAGE = localforage.createInstance({
 					<NotepadExplorerComponent />
 					<WhatsNewModalComponent />
 					<SyncProErrorComponent />
+					<InsertElementComponent />
 				</div>
 			</PrintViewOrAppContainerComponent>
 		</Provider>,

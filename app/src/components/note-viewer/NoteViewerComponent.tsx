@@ -8,7 +8,6 @@ import { Observable } from 'rxjs/Observable';
 import { filter, map } from 'rxjs/operators';
 import { fromEvent } from 'rxjs/observable/fromEvent';
 import { IInsertElementState } from '../../reducers/NoteReducer';
-import InsertElementComponent from '../../containers/InsertElementContainer';
 import ZoomComponent from '../../containers/ZoomContainer';
 
 export interface INoteViewerComponentProps {
@@ -43,7 +42,20 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	render() {
-		const { isLoading, zoom, isFullscreen, note, noteAssets, search, downloadAsset, elementEditing, edit, updateElement, deleteElement } = this.props;
+		const {
+			isLoading,
+			zoom,
+			isFullscreen,
+			note,
+			noteAssets,
+			search,
+			downloadAsset,
+			elementEditing,
+			edit,
+			updateElement,
+			deleteElement,
+			toggleInsertMenu
+		} = this.props;
 
 		const classes: string = (!note || note.elements.length === 0) ? 'empty' : '';
 		let styles = {};
@@ -79,9 +91,15 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		if (!!note && elements.length === 0) Materialize.toast('Welcome to your note! Press anywhere on here to insert an element.', 8000);
 
 		return (
-			<div id="note-viewer" className={classes} style={styles} ref={div => this.viewerDiv = div!} onClick={this.handleEmptyClick}>
+			<div
+				id="note-viewer"
+				className={classes}
+				style={styles}
+				ref={div => this.viewerDiv = div!}
+				onClick={this.handleEmptyClick}
+				onScroll={() => toggleInsertMenu!({ enabled: false })}>
+
 				{isLoading && <div id="progress-bar"><ProgressBar className="amber" /></div>}
-				{!!note && <InsertElementComponent />}
 				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}>
 					{elements}
 				</div>

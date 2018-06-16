@@ -21,11 +21,15 @@ export interface IInsertElementComponentProps {
 
 export default class InsertElementComponent extends React.Component<IInsertElementComponentProps> {
 	render() {
-		const { x, y, enabled, fontSize } = this.props;
+		const { note, x, y, enabled, fontSize } = this.props;
+		if (!note) return null;
 
+		const elementHeight = 260;
 		const containerStyles = {
+			padding: 0,
+			height: elementHeight + 'px',
 			left: x,
-			top: y,
+			top: (y < window.innerHeight - elementHeight - 200) ? y : y - elementHeight,
 			zIndex: 5000,
 			display: (enabled) ? undefined : 'none'
 		};
