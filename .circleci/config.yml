@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  build:
+  test:
     docker:
       # specify the version you desire here
       - image: circleci/node:10.4
@@ -23,3 +23,26 @@ jobs:
         
       # run tests!
       - run: cd app && npm run test
+
+  deploy:
+    machine:
+      enabled: true
+
+    steps:
+      - run: cd app && npm run build
+
+      - run: sudo apt install rsync
+
+      - run: rsync -aue "ssh -p 1276 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" app/build/* $SSH_PATH
+
+workflows:
+  version: 2
+  test-and-deploy:
+    jobs:
+      - test
+      - deploy:
+        requires:
+          - test
+        filters:
+          branches:
+            only: master
