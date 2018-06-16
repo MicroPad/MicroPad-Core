@@ -25,14 +25,14 @@ jobs:
       - run: cd app && npm run test
 
   deploy:
-    machine:
-      enabled: true
+    docker:
+      - image: circleci/node:10.4
 
     working_directory: ~/repo
 
     steps:
       - checkout
-      
+
       - run: cd app && npm ci
 
       - run: cd app && npm run build
