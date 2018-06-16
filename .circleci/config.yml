@@ -31,6 +31,10 @@ jobs:
     working_directory: ~/repo
 
     steps:
+      - checkout
+      
+      - run: cd app && npm ci
+
       - run: cd app && npm run build
 
       - run: sudo apt install rsync
