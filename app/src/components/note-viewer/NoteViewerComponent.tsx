@@ -88,7 +88,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				elementEditing={elementEditing} />
 		));
 
-		if (!!note && elements.length === 0) Materialize.toast('Welcome to your note! Press anywhere on here to insert an element.', 8000);
+		if (!isLoading && !!note && elements.length === 0) Materialize.toast('Welcome to your note! Press anywhere on the white area to insert an element.', 8000);
 
 		return (
 			<div
