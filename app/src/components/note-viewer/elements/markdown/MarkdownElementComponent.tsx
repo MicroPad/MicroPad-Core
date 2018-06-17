@@ -249,7 +249,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 			case 'hashtag':
 				search(message.payload);
-				document.getElementById(`search-button`)!.click();
+				(document.querySelector(`#search-button > a`)! as HTMLAnchorElement).click();
 				break;
 
 			case 'link':
