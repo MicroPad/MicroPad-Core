@@ -10,7 +10,7 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 		version: {
 			major: 3,
 			minor: 5,
-			patch: 5,
+			patch: 6,
 			status: 'alpha'
 		},
 		isFullScreen: false,

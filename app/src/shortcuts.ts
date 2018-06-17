@@ -12,7 +12,7 @@ export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 	mousetrap.bind('mod+f', e => {
 		e.preventDefault();
 
-		const searchButton = document.getElementById(`search-button`);
+		const searchButton = document.querySelector(`#search-button > a`) as HTMLAnchorElement;
 		if (!!searchButton) searchButton.click();
 	});
 

@@ -65,7 +65,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	}
 
 	componentDidUpdate() {
-		const searchTrigger = document.getElementById('search-button');
+		const searchTrigger = document.querySelector(`#search-button > a`);
 		if (!searchTrigger) return;
 
 		if (!!this.triggerClickedSub) this.triggerClickedSub.unsubscribe();
