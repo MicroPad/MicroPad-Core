@@ -191,6 +191,10 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 							path
 								.map((element: HTMLElement) => element.classList)
 								.some((classes: DOMTokenList) => classes.contains('exp-options-trigger'))
+							|| path
+								.map((element: HTMLElement) => element.children.item(0))
+								.map((element: HTMLElement) => element.classList)
+								.some((classes: DOMTokenList) => classes.contains('exp-options-trigger'))
 						) return;
 
 						this.sectionArrowClick(section.internalRef);
@@ -216,6 +220,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 
 	private sectionArrowClick = (guid: string) => {
 		const { expandSection, collapseSection } = this.props;
+		debugger;
 
 		if (this.openSections.has(guid)) {
 			collapseSection!(guid);

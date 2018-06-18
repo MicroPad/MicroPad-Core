@@ -61,6 +61,7 @@ export default class MarkdownHelpComponent extends React.Component {
 					__html: html
 						.split('<ul>').join('<ul class="browser-default">')
 						.split('<li>').join('<li class="browser-default">')
+						.split('<a').join('<a target="_blank" rel="nofollow noreferrer"')
 				}} />
 			</Modal>
 		);
