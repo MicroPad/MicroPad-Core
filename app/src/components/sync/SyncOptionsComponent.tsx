@@ -13,7 +13,7 @@ export interface ISyncOptionsComponentProps {
 	notepad?: INotepad;
 	sync?: (syncId: string, notepad: ISyncedNotepad) => void;
 	deleteNotepad?: (syncId: string) => void;
-	addNotepad?: (user: SyncUser) => void;
+	addNotepad?: (user: SyncUser, title: string) => void;
 }
 
 export default class SyncOptionsComponent extends React.Component<ISyncOptionsComponentProps> {
@@ -34,7 +34,7 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 		return (
 			<React.Fragment>
 				<strong>{SYNC_NAME} Options for <em>{notepad.title}</em></strong>
-				{!syncId && <span><a href="#!" onClick={() => addNotepad!(syncState.user!)}><br /> Start syncing this notepad</a></span>}
+				{!syncId && <span><a href="#!" onClick={() => addNotepad!(syncState.user!, notepad.title)}><br /> Start syncing this notepad</a></span>}
 
 				{
 					!!syncId &&

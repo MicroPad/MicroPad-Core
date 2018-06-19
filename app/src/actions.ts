@@ -1,6 +1,7 @@
 import actionCreatorFactory from 'redux-typescript-actions';
 import { INote, INotepad, IRenameNotepadObjectAction, NoteElement } from './types/NotepadTypes';
 import {
+	IAddToSyncAction,
 	IDeleteElementAction,
 	IInsertElementAction,
 	INewNotepadObjectAction,
@@ -33,7 +34,7 @@ export const actions = {
 	syncUpload: actionCreator.async<ISyncAction, AssetList, any>('SYNC_UPLOAD'),
 	syncUploadAsset: actionCreator.async<IUploadAssetAction, void, any>('SYNC_UPLOAD_ASSET'),
 	deleteFromSync: actionCreator.async<string, void, any>('SYNC_DELETE'),
-	addToSync: actionCreator.async<SyncUser, string, any>('SYNC_CREATE'),
+	addToSync: actionCreator.async<IAddToSyncAction, string, any>('SYNC_CREATE'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	newNotepad: actionCreator<INotepad>('NEW_NOTEPAD'),

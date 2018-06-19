@@ -17,7 +17,7 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<ISyncOpt
 	return {
 		sync: (syncId, notepad) => dispatch(actions.sync({ syncId, notepad })),
 		deleteNotepad: syncId => dispatch(actions.deleteFromSync.started(syncId)),
-		addNotepad: user => dispatch(actions.addToSync.started(user))
+		addNotepad: (user, title) => dispatch(actions.addToSync.started({ user, notepadTitle: title }))
 	};
 }
 

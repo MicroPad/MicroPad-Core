@@ -40,8 +40,14 @@ export namespace DifferenceEngine {
 		export const listNotepads = (username: string, token: string): Observable<SyncedNotepadList> =>
 			call<{ notepads: SyncedNotepadList }>('list_notepads', username, { token }).pipe(map(res => res.notepads));
 
-		export const create = (username: string, token: string): Observable<string> =>
-			call<{ notepad: string }>('create', username, { token }).pipe(map(res => res.notepad));
+		export const create = (username: string, token: string, notepadTitle: string): Observable<string> => {
+			// TODO: Remove this and send the object natively when https://github.com/ReactiveX/rxjs/issues/3824 is fixed
+			const data = new URLSearchParams();
+			data.append('token', token);
+			data.append('notepadTitle', notepadTitle);
+
+			return call<{ notepad: string }>('create', username, data.toString() as any).pipe(map(res => res.notepad));
+		};
 	}
 
 	export namespace SyncService {

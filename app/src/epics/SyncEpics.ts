@@ -19,7 +19,7 @@ import { DifferenceEngine } from '../DifferenceEngine';
 import { of } from 'rxjs/observable/of';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
-import { INotepadToSyncNotepadAction, ISyncAction, IUploadAssetAction } from '../types/ActionTypes';
+import { IAddToSyncAction, INotepadToSyncNotepadAction, ISyncAction, IUploadAssetAction } from '../types/ActionTypes';
 import { empty } from 'rxjs/observable/empty';
 import { parse } from 'date-fns';
 import { INotepad, INotepadStoreState } from '../types/NotepadTypes';
@@ -295,9 +295,9 @@ export namespace SyncEpics {
 	export const addNotepad$ = action$ =>
 		action$.pipe(
 			isAction(actions.addToSync.started),
-			switchMap((action: Action<SyncUser>) =>
-				DifferenceEngine.NotepadService.create(action.payload.username, action.payload.token).pipe(
-					map((syncId: string) => actions.addToSync.done({ params: <SyncUser> {}, result: syncId })),
+			switchMap((action: Action<IAddToSyncAction>) =>
+				DifferenceEngine.NotepadService.create(action.payload.user.username, action.payload.user.token, action.payload.notepadTitle).pipe(
+					map((syncId: string) => actions.addToSync.done({ params: <IAddToSyncAction> {}, result: syncId })),
 					catchError((error): Observable<Action<any>> => {
 						console.error(error);
 						if (!!error.response && !!error.response.error) {
@@ -309,7 +309,7 @@ export namespace SyncEpics {
 							Dialog.alert(error.response.error);
 						}
 
-						return of(actions.addToSync.failed({ params: <SyncUser> {}, error }));
+						return of(actions.addToSync.failed({ params: <IAddToSyncAction> {}, error }));
 					})
 				)
 			)
