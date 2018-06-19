@@ -220,7 +220,6 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 
 	private sectionArrowClick = (guid: string) => {
 		const { expandSection, collapseSection } = this.props;
-		debugger;
 
 		if (this.openSections.has(guid)) {
 			collapseSection!(guid);
