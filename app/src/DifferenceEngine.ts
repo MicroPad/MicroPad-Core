@@ -108,7 +108,8 @@ export namespace DifferenceEngine {
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
 			},
-			responseType: 'json'
+			responseType: 'json',
+			timeout: 10000 // 10 seconds
 		}).pipe(
 			map((res: AjaxResponse) => res.response),
 			retry(2)
