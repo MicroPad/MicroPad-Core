@@ -186,9 +186,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 				onClick={() => this.sectionArrowClick(section.internalRef)}
 				nodeLabel={
 					<span>
-						<span style={nodeLabelStyle} onClick={(event: any) => {
-							this.sectionArrowClick(section.internalRef);
-						}}>
+						<span style={nodeLabelStyle} onClick={() => this.sectionArrowClick(section.internalRef)}>
 							<Icon>book</Icon> {section.title}
 						</span>
 
