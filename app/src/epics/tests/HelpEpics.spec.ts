@@ -9,7 +9,7 @@ describe('getHelp$', () => {
 		const helpNpx = 'this is the help notepad for realsies';
 
 		// Act
-		const res = HelpEpics.getHelp$(ActionsObservable.of(actions.getHelp), null, { helpNpx });
+		const res = HelpEpics.getHelp$(ActionsObservable.of(actions.getHelp(undefined)), null, { helpNpx });
 
 		// Assert
 		expect(res).toBeObservable(cold('(a|)', {
