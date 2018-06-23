@@ -193,6 +193,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 								.some((classes: DOMTokenList) => classes.contains('exp-options-trigger'))
 							|| path
 								.map((element: HTMLElement) => element.children.item(0))
+								.filter(Boolean)
 								.map((element: HTMLElement) => element.classList)
 								.some((classes: DOMTokenList) => classes.contains('exp-options-trigger'))
 						) return;

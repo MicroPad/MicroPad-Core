@@ -28,6 +28,7 @@ import * as Parser from 'upad-parse/dist/index';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { defer } from 'rxjs/observable/defer';
 import { Observable } from 'rxjs/Observable';
+import { Store } from 'redux';
 
 export namespace SyncEpics {
 	export const persistOnLogin$ = action$ =>
@@ -61,9 +62,10 @@ export namespace SyncEpics {
 			)
 		);
 
-	export const actWithSyncNotepad$ = action$ =>
+	export const actWithSyncNotepad$ = (action$, store) =>
 		action$.pipe(
 			isAction(actions.actWithSyncNotepad),
+			filter(() => !!(store as Store<IStoreState>).getState().sync.user),
 			map((action: Action<INotepadToSyncNotepadAction>) => action.payload),
 			switchMap((payload: INotepadToSyncNotepadAction) =>
 				fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(payload.notepad)).pipe(
