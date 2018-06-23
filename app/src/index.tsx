@@ -60,6 +60,9 @@ export const SYNC_STORAGE = localforage.createInstance({
 	if (!await compatibilityCheck()) return;
 	await hydrateStoreFromLocalforage();
 
+	if ((window as any).isElectron) store.dispatch(actions.checkVersion(undefined));
+	store.dispatch(actions.getNotepadList.started(undefined));
+
 	enableKeyboardShortcuts(store);
 	registerServiceWorker();
 
@@ -114,10 +117,6 @@ async function hydrateStoreFromLocalforage() {
 
 	const syncUser: SyncUser = await SYNC_STORAGE.getItem<SyncUser>('sync user');
 	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
-
-	if ((window as any).isElectron) store.dispatch(actions.checkVersion(undefined));
-
-	store.dispatch(actions.getNotepadList.started(undefined));
 }
 
 async function compatibilityCheck(): Promise<boolean> {
@@ -139,7 +138,7 @@ async function compatibilityCheck(): Promise<boolean> {
 					You can always use the old {APP_NAME} <a href="https://getmicropad.com/web">here</a>.
 				</p>
 			</div>,
-			document.getElementById('react-no-print') as HTMLElement
+			document.getElementById('app') as HTMLElement
 		);
 		return false;
 	}
