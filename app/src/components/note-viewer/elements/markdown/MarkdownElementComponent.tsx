@@ -89,7 +89,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 				{
 					isEditing &&
-					<Row>
+					<Row style={{ marginBottom: 0 }}>
 						<Col s={6}>
 							<Input
 								label="Font Size"

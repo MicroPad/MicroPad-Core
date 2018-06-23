@@ -19,7 +19,7 @@ import { DifferenceEngine } from '../DifferenceEngine';
 import { of } from 'rxjs/observable/of';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
-import { INotepadToSyncNotepadAction, ISyncAction, IUploadAssetAction } from '../types/ActionTypes';
+import { IAddToSyncAction, INotepadToSyncNotepadAction, ISyncAction, IUploadAssetAction } from '../types/ActionTypes';
 import { empty } from 'rxjs/observable/empty';
 import { parse } from 'date-fns';
 import { INotepad, INotepadStoreState } from '../types/NotepadTypes';
@@ -28,6 +28,7 @@ import * as Parser from 'upad-parse/dist/index';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { defer } from 'rxjs/observable/defer';
 import { Observable } from 'rxjs/Observable';
+import { Store } from 'redux';
 
 export namespace SyncEpics {
 	export const persistOnLogin$ = action$ =>
@@ -61,9 +62,10 @@ export namespace SyncEpics {
 			)
 		);
 
-	export const actWithSyncNotepad$ = action$ =>
+	export const actWithSyncNotepad$ = (action$, store) =>
 		action$.pipe(
 			isAction(actions.actWithSyncNotepad),
+			filter(() => !!(store as Store<IStoreState>).getState().sync.user),
 			map((action: Action<INotepadToSyncNotepadAction>) => action.payload),
 			switchMap((payload: INotepadToSyncNotepadAction) =>
 				fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(payload.notepad)).pipe(
@@ -295,9 +297,9 @@ export namespace SyncEpics {
 	export const addNotepad$ = action$ =>
 		action$.pipe(
 			isAction(actions.addToSync.started),
-			switchMap((action: Action<SyncUser>) =>
-				DifferenceEngine.NotepadService.create(action.payload.username, action.payload.token).pipe(
-					map((syncId: string) => actions.addToSync.done({ params: <SyncUser> {}, result: syncId })),
+			switchMap((action: Action<IAddToSyncAction>) =>
+				DifferenceEngine.NotepadService.create(action.payload.user.username, action.payload.user.token, action.payload.notepadTitle).pipe(
+					map((syncId: string) => actions.addToSync.done({ params: <IAddToSyncAction> {}, result: syncId })),
 					catchError((error): Observable<Action<any>> => {
 						console.error(error);
 						if (!!error.response && !!error.response.error) {
@@ -309,7 +311,7 @@ export namespace SyncEpics {
 							Dialog.alert(error.response.error);
 						}
 
-						return of(actions.addToSync.failed({ params: <SyncUser> {}, error }));
+						return of(actions.addToSync.failed({ params: <IAddToSyncAction> {}, error }));
 					})
 				)
 			)

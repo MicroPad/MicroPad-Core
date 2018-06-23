@@ -1,5 +1,5 @@
 import { INotepad, IParent, NoteElement, Source } from './NotepadTypes';
-import { ISyncedNotepad } from './SyncTypes';
+import { ISyncedNotepad, SyncUser } from './SyncTypes';
 import { Action } from 'redux-typescript-actions';
 
 export interface IUpdateElementAction {
@@ -32,6 +32,11 @@ export interface IUpdateBibliographyAction {
 export interface ISyncAction {
 	syncId: string;
 	notepad: ISyncedNotepad;
+}
+
+export interface IAddToSyncAction {
+	user: SyncUser;
+	notepadTitle: string;
 }
 
 export interface IUploadAssetAction {

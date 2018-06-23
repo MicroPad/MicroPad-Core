@@ -48,7 +48,8 @@ export namespace MetaEpics {
 					headers: {
 						'Content-Type': 'text/plain; charset=UTF-8'
 					},
-					responseType: 'text'
+					responseType: 'text',
+					timeout: 10000 // 10 seconds
 				}).pipe(
 					map((res: AjaxResponse) => res.response.trim()),
 					filter(latestVersion => latestVersion !== version),

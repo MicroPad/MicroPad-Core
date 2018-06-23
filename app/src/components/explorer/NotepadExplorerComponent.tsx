@@ -185,28 +185,19 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 				key={generateGuid()}
 				onClick={() => this.sectionArrowClick(section.internalRef)}
 				nodeLabel={
-					<span style={nodeLabelStyle} onClick={(event: any) => {
-						const path = event.path || (event.composedPath && event.composedPath()) || [event.target];
-						if (
-							path
-								.map((element: HTMLElement) => element.classList)
-								.some((classes: DOMTokenList) => classes.contains('exp-options-trigger'))
-							|| path
-								.map((element: HTMLElement) => element.children.item(0))
-								.map((element: HTMLElement) => element.classList)
-								.some((classes: DOMTokenList) => classes.contains('exp-options-trigger'))
-						) return;
+					<span>
+						<span style={nodeLabelStyle} onClick={() => this.sectionArrowClick(section.internalRef)}>
+							<Icon>book</Icon> {section.title}
+						</span>
 
-						this.sectionArrowClick(section.internalRef);
-					}}>
-						<Icon>book</Icon> {section.title}
 						<ExplorerOptionsComponent
 							objToEdit={section}
 							type="section"
 							deleteNotepadObject={deleteNotepadObject}
 							renameNotepadObject={renameNotepadObject}/>
-					</span>}
-					collapsed={!this.openSections.has(section.internalRef)}>
+					</span>
+				}
+				collapsed={!this.openSections.has(section.internalRef)}>
 				<div className="explorer-note add-button" key={generateGuid()}>
 					<a href="#!" style={{ color: 'white', paddingRight: '3px' }} onClick={() => this.newNotepadObject('note', section)}><Icon>add</Icon> Note </a>
 					<a href="#!" style={{ color: 'white', paddingLeft: '3px' }} onClick={() => this.newNotepadObject('section', section)}> <Icon>add</Icon> Section</a>
@@ -220,7 +211,6 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 
 	private sectionArrowClick = (guid: string) => {
 		const { expandSection, collapseSection } = this.props;
-		debugger;
 
 		if (this.openSections.has(guid)) {
 			collapseSection!(guid);
