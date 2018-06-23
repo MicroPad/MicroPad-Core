@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../actions';
-import { filter, map, switchMap, tap } from 'rxjs/operators';
+import { filter, map, switchMap, tap, catchError } from 'rxjs/operators';
 import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
 import * as localforage from 'localforage';
 import { Action, Success } from 'redux-typescript-actions';
@@ -9,6 +9,7 @@ import { INotepad } from '../types/NotepadTypes';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { IVersion } from '../types/MetaTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
+import { empty } from 'rxjs/observable/empty';
 
 export namespace MetaEpics {
 	export const closeDrawingEditorOnZoom$ = (action$, store) =>
@@ -55,7 +56,11 @@ export namespace MetaEpics {
 					filter(latestVersion => latestVersion !== version),
 					tap((latestVersion: string) =>
 						Materialize.toast(`v${latestVersion} of ${APP_NAME} is out now <a target="_blank" class="btn-flat amber-text" style="font-weight: 500;" href="${MICROPAD_URL}/#download">UPDATE</a>`)
-					)
+					),
+					catchError(err => {
+						console.error(err);
+						return empty();
+					})
 				)
 			),
 			filter(() => false)
