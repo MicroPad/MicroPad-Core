@@ -183,30 +183,29 @@ export namespace SyncEpics {
 			filter(([payload, user]: [ISyncAction, SyncUser]) => !!payload && !!user),
 			switchMap(([payload, user]: [ISyncAction, SyncUser]) =>
 				DifferenceEngine.AccountService.isPro(user.username, user.token).pipe(
-					map((isPro: boolean) => [payload, isPro])
+					tap((isPro: boolean) => {
+						if (Object.keys(payload.notepad.assetHashList).length < 10 || isPro) return;
+						throw 'too many assets';
+					}),
+					switchMap(() => DifferenceEngine.SyncService.uploadNotepad(payload.syncId, payload.notepad)),
+					map((assetList: AssetList) => actions.syncUpload.done({ params: {} as ISyncAction, result: assetList })),
+					catchError((error): Observable<Action<any>> => {
+						if (error === 'too many assets') {
+							return of(actions.syncProError(undefined));
+						}
+
+						console.error(error);
+						const message = (!!error.response) ? error.response.error : 'There was an error syncing';
+						if (message === 'Invalid token') {
+							Dialog.alert('Your token has expired. Please login again.');
+							return of(actions.syncLogout(undefined));
+						}
+
+						Dialog.alert(message);
+						return of(actions.syncUpload.failed({ params: {} as ISyncAction, error }));
+					})
 				)
-			),
-			tap(([payload, isPro]: [ISyncAction, boolean]) => {
-				if (Object.keys(payload.notepad.assetHashList).length < 10 || isPro) return;
-				throw 'too many assets';
-			}),
-			switchMap(([payload]: [ISyncAction, boolean]) => DifferenceEngine.SyncService.uploadNotepad(payload.syncId, payload.notepad)),
-			map((assetList: AssetList) => actions.syncUpload.done({ params: {} as ISyncAction, result: assetList })),
-			catchError((error): Observable<Action<any>> => {
-				if (error === 'too many assets') {
-					return of(actions.syncProError(undefined));
-				}
-
-				console.error(error);
-				const message = (!!error.response) ? error.response.error : 'There was an error syncing';
-				if (message === 'Invalid token') {
-					Dialog.alert('Your token has expired. Please login again.');
-					return of(actions.syncLogout(undefined));
-				}
-
-				Dialog.alert(message);
-				return of(actions.syncUpload.failed({ params: {} as ISyncAction, error }));
-			})
+			)
 		);
 
 	export const uploadAssets$ = action$ =>
