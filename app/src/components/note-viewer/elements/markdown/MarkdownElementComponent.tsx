@@ -11,6 +11,7 @@ import { Col, Input, Row } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
 import Resizable from 're-resizable';
 import { Dialog } from '../../../../dialogs';
+import Stackedit from 'stackedit-js';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -33,6 +34,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private editBox: HTMLTextAreaElement;
 	private converter: Converter;
 	private readonly updateWithDebounce: (element: NoteElement) => void;
+	private stackEditContent: string;
+	private stackedit = new Stackedit();
 
 	constructor(props: IMarkdownElementComponentProps, state: object) {
 		super(props, state);
@@ -109,6 +112,15 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					</Row>
 				}
 
+				{
+					isEditing && <a href="#!" onClick={() =>
+						this.stackedit.openFile({
+							content: {
+								text: element.content
+							}
+						})
+					}>Edit with StackEdit</a>
+				}
 				{isEditing && <MarkdownHelpComponent />}
 
 				<div>
@@ -169,6 +181,12 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	componentDidMount() {
 		this.componentDidUpdate(this.props);
 		window.addEventListener('message', this.handleMessages);
+
+		this.stackedit.on('fileChange', file => this.stackEditContent = file.content.text);
+		this.stackedit.on('close', () => {
+			this.editBox.value = this.stackEditContent;
+			this.onElementEdit({ target: { value: this.stackEditContent } });
+		});
 	}
 
 	componentWillUnmount() {
