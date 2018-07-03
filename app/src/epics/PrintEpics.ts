@@ -1,12 +1,14 @@
 import { combineEpics } from 'redux-observable';
-import { getAsBase64, getNotepadObjectByRef, isAction } from '../util';
+import { dataURItoBlob, isAction } from '../util';
 import { actions } from '../actions';
 import { filter, map, switchMap } from 'rxjs/operators';
-import { IMarkdownNote, INote, INotepad, INotepadStoreState, NoteElement } from '../types/NotepadTypes';
+import { INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';
 import { ASSET_STORAGE } from '../index';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { trim } from '../components/note-viewer/elements/drawing/trim-canvas';
+import { Asset, FlatNotepad, Note } from 'upad-parse/dist';
+import { MarkdownNote, NoteElement } from 'upad-parse/dist/Note';
 
 export namespace PrintEpics {
 	export const generateMarkdownForPrint$ = (action$, store) =>
@@ -14,36 +16,30 @@ export namespace PrintEpics {
 			isAction(actions.print.started),
 			map(() => store.getState()),
 			map((state: IStoreState) => [(state.notepads.notepad || <INotepadStoreState> {}).item, state.currentNote.ref]),
-			filter(([notepad, noteRef]: [INotepad, string]) => !!notepad && !!noteRef),
-			map(([notepad, noteRef]: [INotepad, string]) => {
-				let note: INote | undefined = undefined;
-				getNotepadObjectByRef(notepad, noteRef, obj => note = <INote> obj);
-
-				return note;
-			}),
-			filter((note: INote) => !!note),
-			switchMap((note: INote) =>
+			filter(([notepad, noteRef]: [FlatNotepad, string]) => !!notepad && !!noteRef),
+			map(([notepad, noteRef]: [FlatNotepad, string]) => notepad.notes[noteRef]),
+			filter(Boolean),
+			switchMap((note: Note) =>
 				fromPromise((async () => {
 					const resolvedAssets = await Promise.all(note.elements
 						.filter(e => e.type === 'drawing' || e.type === 'image')
 						.filter(e => !!e.args.ext)
 						.map(async e => {
 							const blob: Blob = <Blob> await ASSET_STORAGE.getItem(e.args.ext!);
-							const b64 = (e.type === 'drawing') ? await getTrimmedDrawing(blob) : await getAsBase64(blob);
-							return { uuid: e.args.ext!, b64 };
+							const data = (e.type === 'drawing') ? dataURItoBlob(await getTrimmedDrawing(blob)) : blob;
+							return { uuid: e.args.ext!, data };
 						}));
 
-					const assetsObj = {};
-					resolvedAssets.forEach(a => assetsObj[a.uuid] = a.b64);
+					const assets: Asset[] = resolvedAssets.map(res => new Asset(res.data, res.uuid));
 
 					return [
 						note,
-						assetsObj
+						assets
 					];
 				})())
 			),
-			map(([note, assets]: [INote, object]) => (<INote> note).toMarkdown(assets)),
-			map((mdNote: IMarkdownNote) => <NoteElement> {
+			switchMap(([note, assets]: [Note, Asset[]]) => fromPromise((note as Note).toMarkdown(assets))),
+			map((mdNote: MarkdownNote) => <NoteElement> {
 				content: mdNote.md,
 				args: {
 					id: 'markdown1_print',
