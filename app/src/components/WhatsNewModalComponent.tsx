@@ -6,7 +6,7 @@ import { Converter } from 'showdown';
 import { IShowdownOpts } from './note-viewer/elements/markdown/MarkdownElementComponent';
 import { Modal } from 'react-materialize';
 import Async, { Props as AsyncProps } from 'react-promise';
-import { Translators } from 'upad-parse/dist';
+import { Translators } from 'upad-parse';
 
 const ModalAsync = Async as { new (props: AsyncProps<WhatsNewNote>): Async<WhatsNewNote> };
 
