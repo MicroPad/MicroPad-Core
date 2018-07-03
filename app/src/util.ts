@@ -1,4 +1,3 @@
-import { INote, INotepad, ISection } from './types/NotepadTypes';
 import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
@@ -11,29 +10,6 @@ export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 export function restoreObject<T>(objectToRestore: T, template: T): T {
 	objectToRestore['__proto__'] = { ...template['__proto__'] };
 	return objectToRestore;
-}
-
-export function getNotepadObjectByRef(notepad: INotepad, ref: string, actionOnObj: (obj: ISection | INote) => ISection | INote): INotepad {
-	for (let section of notepad.sections) {
-		let res = findInSection(section);
-		if (!!res) {
-			res = actionOnObj(res);
-			return notepad;
-		}
-	}
-
-	function findInSection(section: ISection): ISection | INote | false {
-		if (section.internalRef === ref) return section;
-		for (let note of section.notes) if (note.internalRef === ref) return note;
-		for (let subSection of section.sections) {
-			const res = findInSection(subSection);
-			if (!!res) return res;
-		}
-
-		return false;
-	}
-
-	return notepad;
 }
 
 export function isDev(): boolean {
