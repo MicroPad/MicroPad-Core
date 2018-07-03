@@ -3,8 +3,7 @@ import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
-import * as Parser from 'upad-parse/dist/index';
-import * as stringify from 'json-stringify-safe';
+import { Notepad, Translators } from 'upad-parse/dist';
 
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
@@ -84,17 +83,17 @@ export function getAsBase64(blob: Blob): Promise<string> {
  * Clean up all the assets that aren't in any notepads yet
  */
 export async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage): Promise<void> {
-	const notepads: INotepad[] = [];
-	await notepadStorage.iterate((value: string) => {
-		notepads.push(Parser.restoreNotepad(JSON.parse(value)));
+	const notepads: Notepad[] = [];
+	await notepadStorage.iterate((json: string) => {
+		notepads.push(Translators.Json.toNotepadFromNotepad(json));
 		return;
 	});
 
 	const allUsedAssets: Set<string> = new Set<string>();
 
 	// Handle deletion of unused assets, same as what's done in the epic
-	for (const notepad of notepads) {
-		const assets = notepad.notepadAssets || [];
+	for (let notepad of notepads) {
+		const assets = notepad.notepadAssets;
 		const usedAssets = notepad.getUsedAssets();
 		const unusedAssets = assets.filter(uuid => !usedAssets.has(uuid));
 		usedAssets.forEach(uuid => allUsedAssets.add(uuid));
@@ -102,8 +101,9 @@ export async function cleanHangingAssets(notepadStorage: LocalForage, assetStora
 		await Promise.all(unusedAssets.map(uuid => assetStorage.removeItem(uuid)));
 
 		// Update notepadAssets
-		notepad.notepadAssets = Array.from(usedAssets);
-		await notepadStorage.setItem(notepad.title, stringify(notepad));
+		notepad = notepad.clone({ notepadAssets: Array.from(usedAssets) });
+
+		await notepadStorage.setItem(notepad.title, notepad.toJson());
 	}
 
 	// Handle the deletion of assets we've lost track of and aren't in any notepad

@@ -49,7 +49,7 @@
 		"rxjs": "^5.6.0-forward-compat.5",
 		"save-as": "^0.1.8",
 		"showdown": "^1.8.6",
-		"upad-parse": "^2.8.1",
+		"upad-parse": "^3.0.4",
 		"vex-dialog": "^1.1.0",
 		"vex-js": "^4.1.0"
 	},

@@ -3,16 +3,35 @@ import helpNpx from '!raw-loader!../assets/Help.npx';
 
 import * as React from 'react';
 import { Converter } from 'showdown';
-import * as Parser from 'upad-parse/dist/index';
-import { INotepad } from '../types/NotepadTypes';
 import { IShowdownOpts } from './note-viewer/elements/markdown/MarkdownElementComponent';
 import { Modal } from 'react-materialize';
+import Async, { Props as AsyncProps } from 'react-promise';
+import { Translators } from 'upad-parse/dist';
+
+const ModalAsync = Async as { new (props: AsyncProps<WhatsNewNote>): Async<WhatsNewNote> };
+
+type WhatsNewNote = {
+	title: string;
+	html: string;
+};
 
 export default class WhatsNewModalComponent extends React.Component {
 	render() {
-		Parser.parse(helpNpx, ['asciimath']);
-		const help: INotepad = Parser.notepad;
-		const whatsNewNote = help.sections[0].notes[2];
+		return (
+			<ModalAsync promise={this.getHtml()} then={note =>
+				<Modal
+					trigger={<a id="whats-new-modal-trigger" href="#!" />}
+					header={note.title}>
+					<div id="markdown-help" dangerouslySetInnerHTML={{
+						__html: note.html
+					}} />
+				</Modal>
+			} />
+		);
+	}
+
+	private getHtml: () => Promise<WhatsNewNote> = async () => {
+		const whatsNewNote = (await Translators.Xml.toNotepadFromNpx(helpNpx)).sections[0].notes[2];
 
 		const html = new Converter({
 			parseImgDimensions: true,
@@ -22,19 +41,15 @@ export default class WhatsNewModalComponent extends React.Component {
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			emoji: true
-		} as IShowdownOpts).makeHtml(whatsNewNote.elements[0].content);
+		} as IShowdownOpts)
+			.makeHtml(whatsNewNote.elements[0].content)
+			.split('<ul>').join('<ul class="browser-default">')
+			.split('<li>').join('<li class="browser-default">')
+			.split('<a').join('<a target="_blank" rel="nofollow noreferrer"');
 
-		return (
-			<Modal
-				trigger={<a id="whats-new-modal-trigger" href="#!" />}
-				header={whatsNewNote.title}>
-				<div id="markdown-help" dangerouslySetInnerHTML={{
-					__html: html
-						.split('<ul>').join('<ul class="browser-default">')
-						.split('<li>').join('<li class="browser-default">')
-						.split('<a').join('<a target="_blank" rel="nofollow noreferrer"')
-				}} />
-			</Modal>
-		);
+		return {
+			title: whatsNewNote.title,
+			html: html
+		};
 	}
 }
