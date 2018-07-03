@@ -4,26 +4,26 @@ import { Action, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/fromPromise';
-import { INote, INotepad, INotepadStoreState, NoteElement } from '../types/NotepadTypes';
+import { INotepadStoreState } from '../types/NotepadTypes';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import * as stringify from 'json-stringify-safe';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
-import { getNotepadObjectByRef } from '../util';
 import * as localforage from 'localforage';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { Dialog } from '../dialogs';
 import { ISyncedNotepad } from '../types/SyncTypes';
+import { Notepad } from 'upad-parse/dist';
 
 let currentNotepadTitle = '';
 
 const saveNotepad$ = action$ =>
 	action$.pipe(
-		filter((action: Action<INotepad>) => isType(action, actions.saveNotepad.started)),
-		map((action: Action<INotepad>) => action.payload),
-		switchMap((notepad: INotepad) => Observable.fromPromise(NOTEPAD_STORAGE.setItem(notepad.title, stringify(notepad)))),
-		catchError(err => Observable.of(actions.saveNotepad.failed({ params: <INotepad> {}, error: err }))),
-		map(() => actions.saveNotepad.done({ params: <INotepad> {}, result: undefined }))
+		filter((action: Action<Notepad>) => isType(action, actions.saveNotepad.started)),
+		map((action: Action<Notepad>) => action.payload),
+		switchMap((notepad: Notepad) => Observable.fromPromise(NOTEPAD_STORAGE.setItem(notepad.title, stringify(notepad)))),
+		catchError(err => Observable.of(actions.saveNotepad.failed({ params: <Notepad> {}, error: err }))),
+		map(() => actions.saveNotepad.done({ params: <Notepad> {}, result: undefined }))
 	);
 
 const saveOnChanges$ = (action$, store) =>
@@ -35,13 +35,13 @@ const saveOnChanges$ = (action$, store) =>
 		filter(Boolean),
 		debounceTime(1000),
 		distinctUntilChanged(),
-		filter((notepad: INotepad) => {
+		filter((notepad: Notepad) => {
 			const condition = notepad.title === currentNotepadTitle;
 			currentNotepadTitle = notepad.title;
 
 			return condition;
 		}),
-		mergeMap((notepad: INotepad) => {
+		mergeMap((notepad: Notepad) => {
 			const actionsToReturn: Action<any>[] = [];
 
 			const syncId = (<IStoreState> store.getState()).notepads.notepad!.activeSyncId;
