@@ -5,21 +5,26 @@ import { cold } from 'jest-marbles';
 import * as configureStore from 'redux-mock-store';
 import { IStoreState } from '../../types';
 import { ineeda } from 'ineeda';
-import * as Parser from 'upad-parse';
-import { IElementArgs, INote, INotepad } from '../../types/NotepadTypes';
 import { Action } from 'redux-typescript-actions';
+import { ElementArgs } from 'upad-parse/dist/Note';
+import { FlatNotepad, Note } from 'upad-parse/dist';
 
 describe('search$', () => {
-	let toFind: INote;
+	let toFind: Note;
 	let store;
 
 	beforeEach(() => {
-		toFind = Parser.createNote('Found it!', []);
-		toFind.addElement('markdown', ineeda<IElementArgs>(), '#test');
+		toFind = new Note('Found it!');
+		toFind = toFind.addElement({
+			type: 'markdown',
+			args: ineeda<ElementArgs>(),
+			content: '#test'
+		});
+		toFind.parent = 'abc';
 
-		const mockNotepad: INotepad = Parser.createNotepad('Test Notepad');
-		mockNotepad.addSection(Parser.createSection('Test'));
-		mockNotepad.sections[0].addNote(toFind);
+		let mockNotepad: FlatNotepad = new FlatNotepad('Test Notepad');
+		mockNotepad = mockNotepad.addSection({ title: 'Test', internalRef: 'abc' });
+		mockNotepad = mockNotepad.addNote(toFind);
 
 		store = configureStore()({
 			notepads: {
@@ -37,7 +42,7 @@ describe('search$', () => {
 		const res = SearchEpics.search$(ActionsObservable.of(actions.search('#test')), store);
 
 		// Assert
-		res.subscribe((action: Action<INote[]>) => expect(action.payload[0].title).toEqual(toFind.title));
+		res.subscribe((action: Action<Note[]>) => expect(action.payload[0].title).toEqual(toFind.title));
 	});
 
 	[
