@@ -48,4 +48,10 @@ export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 		e.preventDefault();
 		store.dispatch(actions.print.started(undefined));
 	});
+
+	// Help
+	mousetrap.bind('f1', e => {
+		e.preventDefault();
+		store.dispatch(actions.getHelp(undefined));
+	});
 }
