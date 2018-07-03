@@ -13,7 +13,9 @@ import * as localforage from 'localforage';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { Dialog } from '../dialogs';
 import { ISyncedNotepad } from '../types/SyncTypes';
-import { Notepad } from 'upad-parse/dist';
+import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
+import { NoteElement } from 'upad-parse/dist/Note';
+import { getUsedAssets } from '../util';
 
 let currentNotepadTitle = '';
 
@@ -62,14 +64,9 @@ const saveDefaultFontSize$ = (action$, store) =>
 		map(() => store.getState()),
 		map((state: IStoreState) => [state.notepads.notepad, state.currentNote]),
 		filter(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => !!notepad && !!notepad.item && !!current && current.ref.length > 0),
-		map(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => {
-			let note: INote | false = false;
-			getNotepadObjectByRef(notepad.item!, current.ref, obj => note = <INote> obj);
-
-			return [note, current.elementEditing];
-		}),
-		filter(([note, id]: [INote, string]) => !!note && id.length > 0),
-		map(([note, id]: [INote, string]) => note.elements.filter((element: NoteElement) => element.args.id === id)[0]),
+		map(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => [notepad.item!.notes[current.ref], current.elementEditing]),
+		filter(([note, id]: [Note, string]) => !!note && id.length > 0),
+		map(([note, id]: [Note, string]) => note.elements.filter((element: NoteElement) => element.args.id === id)[0]),
 		filter(Boolean),
 		map((element: NoteElement) => element.args.fontSize),
 		filter(Boolean),
@@ -112,7 +109,7 @@ const cleanUnusedAssets$ = (action$, store) =>
 			filter(Boolean),
 			map((notepadState: INotepadStoreState) => notepadState.item),
 			filter(Boolean),
-			map((notepad: INotepad) => [notepad.getUsedAssets(), notepad.notepadAssets]),
+			map((notepad: FlatNotepad) => [getUsedAssets(notepad), notepad.notepadAssets]),
 			filter(([usedAssets, npAssets]: [Set<string>, string[]]) => !!usedAssets && !!npAssets),
 			switchMap(([usedAssets, npAssets]: [Set<string>, string[]]) => {
 				const unusedAssets = npAssets.filter(guid => !usedAssets.has(guid));
