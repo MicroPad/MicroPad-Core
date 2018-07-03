@@ -2,9 +2,9 @@ import * as React from 'react';
 import { SyntheticEvent } from 'react';
 import { Icon } from 'react-materialize';
 import { readFileInputEventAsText } from '../../../util';
-import { IElementArgs, NoteElement } from '../../../types/NotepadTypes';
 import { Dialog } from '../../../dialogs';
 import { Translators } from 'upad-parse/dist';
+import { ElementArgs, NoteElement } from 'upad-parse/dist/Note';
 
 export interface IJupyterInserterComponentProps {
 	insertElement: (element: NoteElement) => void;
@@ -28,7 +28,7 @@ export default class JupyterInserterComponent extends React.Component<IJupyterIn
 		readFileInputEventAsText(event).then(json => {
 			insertElement({
 				type: 'markdown',
-				args: {} as IElementArgs,
+				args: {} as ElementArgs,
 				content: Translators.Json.toMarkdownFromJupyter(json)
 			});
 		}).catch(err => {
