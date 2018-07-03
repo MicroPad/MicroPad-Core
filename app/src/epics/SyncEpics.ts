@@ -22,13 +22,14 @@ import { IStoreState, SYNC_NAME } from '../types';
 import { IAddToSyncAction, INotepadToSyncNotepadAction, ISyncAction, IUploadAssetAction } from '../types/ActionTypes';
 import { empty } from 'rxjs/observable/empty';
 import { parse } from 'date-fns';
-import { INotepad, INotepadStoreState } from '../types/NotepadTypes';
+import { INotepadStoreState } from '../types/NotepadTypes';
 import { fromPromise } from 'rxjs/observable/fromPromise';
-import * as Parser from 'upad-parse/dist/index';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { defer } from 'rxjs/observable/defer';
 import { Observable } from 'rxjs/Observable';
 import { Store } from 'redux';
+import { FlatNotepad } from 'upad-parse/dist';
+import * as stringify from 'json-stringify-safe';
 
 export namespace SyncEpics {
 	export const persistOnLogin$ = action$ =>
@@ -121,7 +122,7 @@ export namespace SyncEpics {
 				DifferenceEngine.SyncService.downloadNotepad(syncId).pipe(
 					switchMap((remoteNotepad: ISyncedNotepad) => {
 						let localNotepad = (((<IStoreState> store.getState()).notepads || <INotepadStoreState> {}).notepad || <INotepadStoreState> {}).item;
-						if (!localNotepad) localNotepad = <INotepad> Parser.createNotepad('');
+						if (!localNotepad) localNotepad = new FlatNotepad('');
 
 						return fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad)).pipe(
 							switchMap((local: ISyncedNotepad) => {
@@ -151,14 +152,13 @@ export namespace SyncEpics {
 										return of(remoteNotepad);
 									}),
 									map(() => {
-										remoteNotepad.notepadAssets = Object.keys(remoteNotepad.assetHashList);
-										return remoteNotepad;
+										return { ...remoteNotepad, notepadAssets: Object.keys(remoteNotepad.assetHashList) };
 									})
 								);
 							})
 						);
 					}),
-					map((remoteNotepad: ISyncedNotepad) => actions.restoreJsonNotepad(JSON.stringify(remoteNotepad))),
+					map((remoteNotepad: ISyncedNotepad) => actions.restoreJsonNotepad(stringify(remoteNotepad))),
 					catchError((error): Observable<Action<any>> => {
 						console.error(error);
 						const message = (!!error.response) ? error.response : 'There was an error syncing';
@@ -324,7 +324,7 @@ export namespace SyncEpics {
 			filter(Boolean),
 			filter((notepadState: INotepadStoreState) => !!notepadState.item && !!notepadState.activeSyncId),
 			map((notepadState: INotepadStoreState) => actions.actWithSyncNotepad({
-				notepad: notepadState.item!,
+				notepad: notepadState.item!.toNotepad(),
 				action: notepad => actions.sync({ notepad, syncId: notepadState.activeSyncId! })
 			}))
 		);

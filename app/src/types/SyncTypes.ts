@@ -1,7 +1,7 @@
-import { INotepad } from './NotepadTypes';
+import { Notepad } from 'upad-parse/dist';
 
 export interface ISyncWorker {
-	toSyncedNotepad: (notepad: INotepad) => Promise<ISyncedNotepad>;
+	toSyncedNotepad: (notepad: Notepad) => Promise<ISyncedNotepad>;
 }
 
 export type SyncLoginRequest = {
@@ -19,6 +19,6 @@ export type AssetList = { [uuid: string]: string };
 
 export type SyncedNotepadList = { [title: string]: string }; // title -> uuid
 
-export interface ISyncedNotepad extends INotepad {
+export interface ISyncedNotepad extends Notepad {
 	assetHashList: AssetList;
 }
