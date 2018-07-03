@@ -1,7 +1,7 @@
 import { ISyncedNotepad, SyncUser } from './SyncTypes';
 import { Action } from 'redux-typescript-actions';
 import { NoteElement, Source } from 'upad-parse/dist/Note';
-import { Notepad, Parent } from 'upad-parse/dist';
+import { Notepad } from 'upad-parse/dist';
 
 export interface IUpdateElementAction {
 	noteRef: string;
@@ -12,7 +12,7 @@ export interface IUpdateElementAction {
 
 export interface INewNotepadObjectAction {
 	title: string;
-	parent: Parent;
+	parent: string;
 }
 
 export interface IInsertElementAction {

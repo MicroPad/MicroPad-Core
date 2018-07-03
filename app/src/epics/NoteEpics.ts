@@ -2,28 +2,24 @@ import { combineEpics } from 'redux-observable';
 import { filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { IAsset, INote, INotepad, INotepadStoreState, ISection, NoteElement } from '../types/NotepadTypes';
-import { dataURItoBlob, generateGuid, getNotepadObjectByRef, isAction } from '../util';
-import * as Parser from 'upad-parse/dist/index.js';
+import { INotepadStoreState } from '../types/NotepadTypes';
+import { dataURItoBlob, generateGuid, isAction } from '../util';
 import saveAs from 'save-as';
 import { ASSET_STORAGE } from '../index';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { INewNotepadObjectAction, IUpdateElementAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
+import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
+import { NoteElement } from 'upad-parse/dist/Note';
 
 const loadNote$ = (action$, store) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.loadNote.started)),
 		map((action: Action<string>) => [action.payload, { ...(store.getState().notepads.notepad || <INotepadStoreState> {}).item }]),
-		filter(([ref, notepad]: [string, INotepad]) => !!ref && !!notepad),
-		map(([ref, notepad]: [string, INotepad]) => {
-			let note: INote | false = false;
-			getNotepadObjectByRef(notepad, ref, obj => note = <INote> obj);
-
-			return note;
-		}),
+		filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
+		map(([ref, notepad]: [string, FlatNotepad]) => notepad.notes[ref]),
 		filter(Boolean),
-		mergeMap((note: INote) => [actions.expandFromNote(note), actions.checkNoteAssets.started([note.internalRef, note.elements])])
+		mergeMap((note: Note) => [actions.expandFromNote(note), actions.checkNoteAssets.started([note.internalRef, note.elements])])
 	);
 
 const checkNoteAssets$ = (action$, store) =>
@@ -36,10 +32,12 @@ const checkNoteAssets$ = (action$, store) =>
 		),
 		map(([ref, elements, blobUrls]) => [ref, elements, blobUrls, (store.getState().notepads.notepad || <INotepadStoreState> {}).item]),
 		filter(([ref, elements, blobUrls, notepad]) => !!notepad),
-		mergeMap(([ref, elements, blobUrls, notepad]: [string, NoteElement[], object, INotepad]) => {
-			const newNotepad = getNotepadObjectByRef(notepad, ref, obj => {
-				(<INote> obj).elements = elements;
-				return obj;
+		mergeMap(([ref, elements, blobUrls, notepad]: [string, NoteElement[], object, FlatNotepad]) => {
+			let newNotepad = notepad.clone({
+				notes: {
+					...notepad.notes,
+					[ref]: notepad.notes[ref].clone({ elements })
+				}
 			});
 
 			const notepadAssets: Set<string> = new Set(notepad.notepadAssets);
@@ -48,7 +46,7 @@ const checkNoteAssets$ = (action$, store) =>
 					notepadAssets.add(element.args.ext!);
 				}
 			});
-			newNotepad.notepadAssets = Array.from(notepadAssets);
+			newNotepad.clone({ notepadAssets: Array.from(notepadAssets) });
 
 			return [
 				actions.checkNoteAssets.done({ params: <any> [], result: newNotepad }),
@@ -115,18 +113,13 @@ const autoLoadNewNote$ = (action$, store) =>
 	action$.pipe(
 		isAction(actions.newNote),
 		map((action: Action<INewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
-		filter(([insertAction, notepad]: [INewNotepadObjectAction, INotepad]) => !!insertAction && !!insertAction.parent.internalRef && !!notepad),
-		map(([insertAction, notepad]: [INewNotepadObjectAction, INotepad]) => {
-			// Find the new section
-			let parent: ISection | false = false;
-			getNotepadObjectByRef(notepad, insertAction.parent.internalRef!, obj => parent = <ISection> obj);
-
-			return [insertAction, parent];
-		}),
-		filter(([insertAction, parent]: [INewNotepadObjectAction, ISection]) => !!parent),
-		map(([insertAction, parent]: [INewNotepadObjectAction, ISection]) => parent.notes.find(n => n.title === insertAction.title)),
+		filter(([insertAction, notepad]: [INewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!insertAction.parent && !!notepad),
+		map(([insertAction, notepad]: [INewNotepadObjectAction, FlatNotepad]) =>
+			// Get a note with the new title that is in the expected parent
+			Object.values((notepad as FlatNotepad).notes).find(n => n.parent === insertAction.parent && n.title === insertAction.title)
+		),
 		filter(Boolean),
-		map((newNote: INote) => actions.loadNote.started(newNote.internalRef))
+		map((newNote: Note) => actions.loadNote.started(newNote.internalRef))
 	);
 
 export const noteEpics$ = combineEpics(
@@ -144,13 +137,14 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 
 	elements.map(element => {
 		if (element.type !== 'markdown' && element.content !== 'AS') {
-			const asset: IAsset = new Parser.Asset(dataURItoBlob(element.content));
-			element.args.ext = asset.uuid;
-			element.content = 'AS';
-
+			const asset = new Asset(dataURItoBlob(element.content));
 			storageRequests.push(ASSET_STORAGE.setItem(asset.uuid, asset.data));
 			blobRefs.push(asset.uuid);
-		} else if (!!element.args.ext) {
+
+			return { ...element, args: { ...element.args, ext: asset.uuid }, content: 'AS' };
+		}
+
+		if (!!element.args.ext) {
 			storageRequests.push(ASSET_STORAGE.getItem(element.args.ext));
 			blobRefs.push(element.args.ext);
 		}
