@@ -2,19 +2,11 @@ import { actions } from '../actions';
 import { catchError, combineLatest, filter, map, mergeMap, retry, switchMap, tap } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
-import * as Parser from 'upad-parse/dist/index.js';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/empty';
 import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
-import {
-	IAsset,
-	IAssets,
-	IMarkdownNote,
-	INotepad,
-	INotepadsStoreState,
-	INotepadStoreState
-} from '../types/NotepadTypes';
+import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
@@ -25,48 +17,34 @@ import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 import { Dialog } from '../dialogs';
 import { of } from 'rxjs/observable/of';
 import { ISyncedNotepad, SyncedNotepadList, SyncUser } from '../types/SyncTypes';
+import { FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 
 const parseQueue: string[] = [];
 
 const parseNpx$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.parseNpx.started)),
-		switchMap((action: Action<string>) => {
-			return fromPromise(new Promise((resolve, reject) => {
+		switchMap((action: Action<string>) =>
+			fromPromise((async () => {
+				let notepad: Notepad;
 				try {
-					Parser.parse(action.payload, ['asciimath']);
+					notepad = await Translators.Xml.toNotepadFromNpx(action.payload);
 				} catch (err) {
 					Dialog.alert(`Error reading file`);
 					console.error(err);
-					reject(err);
-					return;
+					throw err;
 				}
 
-				const notepad: INotepad = Parser.notepad;
+				// Save assets to localforage
+				await Promise.all(notepad.assets.map(async asset => ASSET_STORAGE.setItem(asset.uuid, asset.data)));
 
-				// Sort out assets
-				try {
-					Parser.parseAssets(action.payload, async (assets: IAssets) => {
-						const notepadAssets = new Set((notepad.notepadAssets || []));
-						for (let i = 0; i < assets.assets.length; i++) {
-							if (!notepadAssets.has(assets.assets[i].uuid)) notepadAssets.add(assets.assets[i].uuid);
-							await ASSET_STORAGE.setItem(assets.assets[i].uuid, assets.assets[i].data);
-						}
-
-						notepad.notepadAssets = Array.from(notepadAssets);
-						resolve(notepad);
-					});
-				} catch (err) {
-					Dialog.alert(`Error reading file`);
-					console.error(err);
-					reject(err);
-				}
-			}))
+				return notepad.flatten();
+			})())
 				.pipe(
-					map((notepad: INotepad) => actions.parseNpx.done({ params: '', result: notepad })),
+					map((notepad: FlatNotepad) => actions.parseNpx.done({ params: '', result: notepad })),
 					catchError(err => Observable.of(actions.parseNpx.failed({ params: '', error: err })))
-				);
-		})
+				)
+		)
 	);
 
 const syncOnNotepadParsed$ = (action$, store) =>

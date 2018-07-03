@@ -19,7 +19,7 @@ import { NoteElement } from 'upad-parse/dist/Note';
 const actionCreator = actionCreatorFactory();
 
 export const actions = {
-	parseNpx: actionCreator.async<string, Notepad, any>('PARSE_NPX'),
+	parseNpx: actionCreator.async<string, FlatNotepad, any>('PARSE_NPX'),
 	saveNotepad: actionCreator.async<Notepad, void, any>('SAVE_NOTEPAD'),
 	getNotepadList: actionCreator.async<void, string[], any>('GET_NOTEPAD_LIST'),
 	downloadNotepad: actionCreator.async<string, string, any>('DOWNLOAD_NOTEPAD'),
