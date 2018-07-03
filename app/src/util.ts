@@ -3,7 +3,7 @@ import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
-import { Notepad, Translators } from 'upad-parse/dist';
+import { FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
@@ -94,7 +94,7 @@ export async function cleanHangingAssets(notepadStorage: LocalForage, assetStora
 	// Handle deletion of unused assets, same as what's done in the epic
 	for (let notepad of notepads) {
 		const assets = notepad.notepadAssets;
-		const usedAssets = notepad.getUsedAssets();
+		const usedAssets = getUsedAssets(notepad.flatten());
 		const unusedAssets = assets.filter(uuid => !usedAssets.has(uuid));
 		usedAssets.forEach(uuid => allUsedAssets.add(uuid));
 
@@ -117,6 +117,18 @@ export async function cleanHangingAssets(notepadStorage: LocalForage, assetStora
 	for (const uuid of lostAssets) {
 		await assetStorage.removeItem(uuid);
 	}
+}
+
+export function getUsedAssets(notepad: FlatNotepad): Set<string> {
+	return new Set(
+		Object.values(notepad.notes)
+		.map(
+			n => n.elements
+				.map(e => e.args.ext!)
+				.filter(Boolean)
+		)
+		.reduce((used, cur) => used.concat(cur), [])
+	);
 }
 
 // Thanks to http://stackoverflow.com/a/12300351/998467
