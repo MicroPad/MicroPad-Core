@@ -12,7 +12,7 @@ export interface IUpdateElementAction {
 
 export interface INewNotepadObjectAction {
 	title: string;
-	parent: string;
+	parent?: string;
 }
 
 export interface IInsertElementAction {
