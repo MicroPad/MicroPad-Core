@@ -1,15 +1,15 @@
 import { IStoreState } from '../types';
 import { connect, Dispatch } from 'react-redux';
 import NotepadExplorerComponent, { INotepadExplorerComponentProps } from '../components/explorer/NotepadExplorerComponent';
-import { INote, INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
+import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { Action } from 'redux';
 import { actions } from '../actions';
-import { getNotepadObjectByRef } from '../util';
+import { Note } from 'upad-parse/dist';
 
 export function mapStateToProps({ notepads, explorer, meta, currentNote }: IStoreState) {
-	let note: INote | undefined = undefined;
+	let note: Note | undefined = undefined;
 	if (currentNote.ref.length !== 0) {
-		getNotepadObjectByRef(notepads.notepad!.item!, currentNote.ref, obj => note = <INote> obj);
+		note = notepads.notepad!.item!.notes[currentNote.ref];
 	}
 
 	return {

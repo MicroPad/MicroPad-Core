@@ -124,7 +124,7 @@ export namespace SyncEpics {
 						let localNotepad = (((<IStoreState> store.getState()).notepads || <INotepadStoreState> {}).notepad || <INotepadStoreState> {}).item;
 						if (!localNotepad) localNotepad = new FlatNotepad('');
 
-						return fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad)).pipe(
+						return fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad.toNotepad())).pipe(
 							switchMap((local: ISyncedNotepad) => {
 								const diffAssets = Object.keys(remoteNotepad.assetHashList)
 									.filter(uuid => local.assetHashList[uuid] !== remoteNotepad.assetHashList[uuid]);
