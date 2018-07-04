@@ -5,7 +5,7 @@ import { Icon } from 'react-materialize';
 import TreeView from 'react-treeview';
 import { generateGuid } from '../../util';
 import ExplorerOptionsComponent from './ExplorerOptionsComponent';
-import { INewNotepadObjectAction } from '../../types/ActionTypes';
+import { NewNotepadObjectAction } from '../../types/ActionTypes';
 import HelpMessageComponent from '../../containers/HelpMessageContainer';
 import { Dialog } from '../../dialogs';
 import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
@@ -27,8 +27,8 @@ export interface INotepadExplorerComponentProps {
 	expandAll?: () => void;
 	expandFromNote?: (note: INote) => void;
 	collapseAll?: () => void;
-	newSection?: (obj: INewNotepadObjectAction) => void;
-	newNote?: (obj: INewNotepadObjectAction) => void;
+	newSection?: (obj: NewNotepadObjectAction) => void;
+	newNote?: (obj: NewNotepadObjectAction) => void;
 	print?: () => void;
 }
 
@@ -138,7 +138,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		const title = await Dialog.prompt('Title:');
 
 		if (title) {
-			const action: INewNotepadObjectAction = {
+			const action: NewNotepadObjectAction = {
 				title,
 				parent
 			};

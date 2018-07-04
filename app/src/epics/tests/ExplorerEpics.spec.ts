@@ -5,7 +5,7 @@ import { actions } from '../../actions';
 import { cold } from 'jest-marbles';
 import { IStoreState } from '../../types';
 import { ineeda } from 'ineeda';
-import { INewNotepadObjectAction } from '../../types/ActionTypes';
+import { NewNotepadObjectAction } from '../../types/ActionTypes';
 import { FlatNotepad } from 'upad-parse/dist';
 
 const epic = createEpicMiddleware(ExplorerEpics.explorerEpics$);
@@ -70,7 +70,7 @@ describe('autoLoadNewSection$', () => {
 		const testNotepad = new FlatNotepad('test')
 			.addSection({ title: 'test', internalRef: 'expand me pls' });
 
-		const params: INewNotepadObjectAction = {
+		const params: NewNotepadObjectAction = {
 			title: 'test'
 		};
 
@@ -95,7 +95,7 @@ describe('autoLoadNewSection$', () => {
 			.addSection({ title: 'test', internalRef: 'parent' })
 			.addSection({ title: 'child', internalRef: 'expand me pls', parentRef: 'parent'});
 
-		const params: INewNotepadObjectAction = {
+		const params: NewNotepadObjectAction = {
 			title: 'child',
 			parent: 'parent'
 		};

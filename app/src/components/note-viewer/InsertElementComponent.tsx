@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IElementArgs, INote, NoteElement } from '../../types/NotepadTypes';
-import { IInsertElementAction } from '../../types/ActionTypes';
+import { InsertElementAction } from '../../types/ActionTypes';
 import './elements/NoteElementComponent.css';
 import './InsertElementComponent.css';
 import { IInsertElementState } from '../../reducers/NoteReducer';
@@ -14,7 +14,7 @@ export interface IInsertElementComponentProps {
 	y: number;
 	enabled: boolean;
 	fontSize: string;
-	insert?: (action: IInsertElementAction) => void;
+	insert?: (action: InsertElementAction) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
 	edit?: (id: string) => void;
 }

@@ -7,7 +7,7 @@ import { dataURItoBlob, generateGuid, isAction } from '../util';
 import saveAs from 'save-as';
 import { ASSET_STORAGE } from '../index';
 import { fromPromise } from 'rxjs/observable/fromPromise';
-import { INewNotepadObjectAction, IUpdateElementAction } from '../types/ActionTypes';
+import { NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
@@ -73,15 +73,15 @@ const downloadAsset$ = action$ =>
 const binaryElementUpdate$ = action$ =>
 	action$.pipe(
 		isAction(actions.updateElement),
-		map((action: Action<IUpdateElementAction>) => action.payload),
-		filter((params: IUpdateElementAction) => !!params.newAsset),
-		switchMap((params: IUpdateElementAction) =>
+		map((action: Action<UpdateElementAction>) => action.payload),
+		filter((params: UpdateElementAction) => !!params.newAsset),
+		switchMap((params: UpdateElementAction) =>
 			fromPromise(
 				ASSET_STORAGE.setItem(params.element.args.ext || generateGuid(), params.newAsset)
 					.then(() => [params, params.element.args.ext || generateGuid()])
 			)
 		),
-		mergeMap(([params, guid]: [IUpdateElementAction, string]) => [
+		mergeMap(([params, guid]: [UpdateElementAction, string]) => [
 			actions.trackAsset(guid),
 			actions.updateElement({
 				elementId: params.elementId,
@@ -112,9 +112,9 @@ const reloadNote$ = (action$, store) =>
 const autoLoadNewNote$ = (action$, store) =>
 	action$.pipe(
 		isAction(actions.newNote),
-		map((action: Action<INewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
-		filter(([insertAction, notepad]: [INewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!insertAction.parent && !!notepad),
-		map(([insertAction, notepad]: [INewNotepadObjectAction, FlatNotepad]) =>
+		map((action: Action<NewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
+		filter(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!insertAction.parent && !!notepad),
+		map(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) =>
 			// Get a note with the new title that is in the expected parent
 			Object.values((notepad as FlatNotepad).notes).find(n => n.parent === insertAction.parent && n.title === insertAction.title)
 		),

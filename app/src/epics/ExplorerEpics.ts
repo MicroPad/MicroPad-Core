@@ -4,7 +4,7 @@ import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { isAction } from '../util';
-import { INewNotepadObjectAction } from '../types/ActionTypes';
+import { NewNotepadObjectAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { FlatNotepad } from 'upad-parse/dist';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
@@ -25,9 +25,9 @@ export namespace ExplorerEpics {
 	export const autoLoadNewSection$ = (action$, store) =>
 		action$.pipe(
 			isAction(actions.newSection),
-			map((action: Action<INewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
-			filter(([insertAction, notepad]: [INewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!notepad),
-			map(([insertAction, notepad]: [INewNotepadObjectAction, FlatNotepad]) => {
+			map((action: Action<NewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
+			filter(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!notepad),
+			map(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => {
 				const parentRef = insertAction.parent || undefined;
 
 				return Object.values((notepad as FlatNotepad).sections).find(s => s.title === insertAction.title && s.parentRef === parentRef);
