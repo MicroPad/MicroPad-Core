@@ -8,10 +8,10 @@ import { map, retry } from 'rxjs/operators';
 import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 import { AssetList, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from './types/SyncTypes';
 import { parse } from 'date-fns';
-import { INotepad } from './types/NotepadTypes';
 import * as stringify from 'json-stringify-safe';
 import { Base64 } from 'js-base64';
 import * as QueryString from 'querystring';
+import { Notepad } from 'upad-parse/dist';
 
 export namespace DifferenceEngine {
 	const SyncThread = new SyncWorker() as ISyncWorker;
@@ -67,7 +67,7 @@ export namespace DifferenceEngine {
 
 		export const deleteNotepad = (syncId: string): Observable<void> => call<void>('delete', syncId);
 
-		export async function notepadToSyncedNotepad(notepad: INotepad): Promise<ISyncedNotepad> {
+		export async function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
 			return await SyncThread.toSyncedNotepad(notepad);
 		}
 	}
