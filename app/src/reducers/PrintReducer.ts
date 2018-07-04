@@ -2,7 +2,7 @@ import { IReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { NoteElement } from '../types/NotepadTypes';
+import { NoteElement } from 'upad-parse/dist/Note';
 
 export interface IPrintStoreState {
 	elementToPrint?: NoteElement;
