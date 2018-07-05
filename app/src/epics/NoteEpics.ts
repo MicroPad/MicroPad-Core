@@ -19,7 +19,10 @@ const loadNote$ = (action$, store) =>
 		filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
 		map(([ref, notepad]: [string, FlatNotepad]) => notepad.notes[ref]),
 		filter(Boolean),
-		mergeMap((note: Note) => [actions.expandFromNote(note), actions.checkNoteAssets.started([note.internalRef, note.elements])])
+		mergeMap((note: Note) => [actions.expandFromNote({
+			note,
+			notepad: (store.getState() as IStoreState).notepads.notepad!.item!
+		}), actions.checkNoteAssets.started([note.internalRef, note.elements])])
 	);
 
 const checkNoteAssets$ = (action$, store) =>

@@ -8,49 +8,49 @@ export type UpdateElementAction = {
 	elementId: string;
 	element: NoteElement;
 	newAsset?: Blob;
-}
+};
 
 export type NewNotepadObjectAction = {
 	title: string;
 	parent?: string;
-}
+};
 
 export type InsertElementAction = {
 	noteRef: string;
 	element: NoteElement;
-}
+};
 
 export type DeleteElementAction = {
 	noteRef: string;
 	elementId: string;
-}
+};
 
 export type UpdateBibliographyAction = {
 	noteRef: string;
 	sources: Source[];
-}
+};
 
 export type SyncAction = {
 	syncId: string;
 	notepad: ISyncedNotepad;
-}
+};
 
 export type AddToSyncAction = {
 	user: SyncUser;
 	notepadTitle: string;
-}
+};
 
 export type UploadAssetAction = {
 	asset: Blob;
 	url: string;
-}
+};
 
 export type NotepadToSyncNotepadAction = {
 	notepad: Notepad;
 	action: (notepad: ISyncedNotepad) => Action<any>;
-}
+};
 
 export type ExpandFromNoteAction = {
 	note: Note;
 	notepad: FlatNotepad;
-}
+};

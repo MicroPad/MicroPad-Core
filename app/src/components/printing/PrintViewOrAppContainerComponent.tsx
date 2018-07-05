@@ -3,7 +3,7 @@ import './PrintViewComponent.css';
 import MarkdownElementComponent from '../note-viewer/elements/markdown/MarkdownElementComponent';
 import { noop } from 'rxjs/util/noop';
 import { Note } from 'upad-parse/dist';
-import { NoteElement } from 'upad-parse/dist/Note'
+import { NoteElement } from 'upad-parse/dist/Note';
 
 export interface IPrintViewComponentProps {
 	note?: Note;

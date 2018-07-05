@@ -3,8 +3,8 @@ import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL } from '../../types';
 import { Dialog } from 'src/dialogs';
-import { NPXObject } from 'upad-parse/dist/NPXObject'
 import { Notepad } from 'upad-parse/dist';
+import { NPXObject } from 'upad-parse/dist/NPXObject';
 
 export interface IExplorerOptionsComponentProps {
 	objToEdit: NPXObject | Notepad;
