@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { IElementArgs, INote, NoteElement } from '../../types/NotepadTypes';
 import { InsertElementAction } from '../../types/ActionTypes';
 import './elements/NoteElementComponent.css';
 import './InsertElementComponent.css';
@@ -7,9 +6,11 @@ import { IInsertElementState } from '../../reducers/NoteReducer';
 import { generateGuid } from 'src/util';
 import { Icon } from 'react-materialize';
 import JupyterInserterComponent from './elements/JupyterInserterComponent';
+import { Note } from 'upad-parse/dist';
+import { ElementArgs, NoteElement } from 'upad-parse/dist/Note';
 
 export interface IInsertElementComponentProps {
-	note: INote;
+	note: Note;
 	x: number;
 	y: number;
 	enabled: boolean;
@@ -40,7 +41,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 		const insertX = Math.abs(Math.floor(noteContainer.getBoundingClientRect().left)) + x;
 		const insertY = (Math.abs(Math.floor(noteContainer.getBoundingClientRect().top)) + y) - 128;
 
-		const defaultArgs: IElementArgs = {
+		const defaultArgs: ElementArgs = {
 			id: '',
 			x: insertX + 'px',
 			y: insertY + 'px',

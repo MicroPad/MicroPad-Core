@@ -1,6 +1,5 @@
 import * as React from 'react';
 import './NoteViewerComponent.css';
-import { INote, NoteElement } from '../../types/NotepadTypes';
 import NoteElementComponent from './elements/NoteElementComponent';
 import * as Materialize from 'materialize-css/dist/js/materialize.js';
 import { ProgressBar } from 'react-materialize';
@@ -9,12 +8,14 @@ import { filter, map } from 'rxjs/operators';
 import { fromEvent } from 'rxjs/observable/fromEvent';
 import { IInsertElementState } from '../../reducers/NoteReducer';
 import ZoomComponent from '../../containers/ZoomContainer';
+import { Note } from 'upad-parse/dist';
+import { NoteElement } from 'upad-parse/dist/Note';
 
 export interface INoteViewerComponentProps {
 	isLoading: boolean;
 	isFullscreen: boolean;
 	zoom: number;
-	note?: INote;
+	note?: Note;
 	elementEditing: string;
 	noteAssets: object;
 	isNotepadOpen: boolean;

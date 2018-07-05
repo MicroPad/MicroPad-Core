@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { Autocomplete, Button, Icon, Modal } from 'react-materialize';
-import { INote, NoteElement, Source } from '../../types/NotepadTypes';
 import { Dialog } from '../../dialogs';
+import { NoteElement, Source } from 'upad-parse/dist/Note';
+import { Note } from 'upad-parse/dist';
 
 export interface ISourcesComponent {
 	element: NoteElement;
-	note: INote;
+	note: Note;
 	updateBibliography?: (bibliography: Source[]) => void;
 }
 
@@ -34,7 +35,7 @@ export default class SourcesComponent extends React.Component<ISourcesComponent>
 		);
 	}
 
-	private onSourceEdit = (id: string, value: string) => {
+	private onSourceEdit = (id: number, value: string) => {
 		const { updateBibliography, note } = this.props;
 
 		if (value.length === 0) {
@@ -62,7 +63,7 @@ export default class SourcesComponent extends React.Component<ISourcesComponent>
 		updateBibliography!([
 			...note.bibliography,
 			{
-				id: (note.bibliography.length + 1).toString(10),
+				id: note.bibliography.length + 1,
 				item: element.args.id,
 				content: url
 			}

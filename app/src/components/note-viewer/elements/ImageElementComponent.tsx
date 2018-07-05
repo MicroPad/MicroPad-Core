@@ -3,9 +3,9 @@ import { SyntheticEvent } from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
 import { dataURItoBlob } from '../../../util';
 import { Col, Input, Row } from 'react-materialize';
-import { NoteElement } from '../../../types/NotepadTypes';
 import Resizable from 're-resizable';
 import { Dialog } from '../../../dialogs';
+import { NoteElement } from 'upad-parse/dist/Note';
 
 export default class ImageElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {

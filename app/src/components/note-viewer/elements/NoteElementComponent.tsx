@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { NoteElement } from '../../../types/NotepadTypes';
 import './NoteElementComponent.css';
 import MarkdownElementComponent from './markdown/MarkdownElementComponent';
 import ImageElementComponent from './ImageElementComponent';
@@ -11,6 +10,7 @@ import { Button, Icon, Row } from 'react-materialize';
 import Draggable, { DraggableData } from 'react-draggable';
 import SourcesComponent from '../../../containers/SourcesContainer';
 import { Dialog } from '../../../dialogs';
+import { NoteElement } from 'upad-parse/dist/Note';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
