@@ -9,7 +9,7 @@ import { NewNotepadObjectAction } from '../../types/ActionTypes';
 import HelpMessageComponent from '../../containers/HelpMessageContainer';
 import { Dialog } from '../../dialogs';
 import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
-import { Note, Notepad, Parent, Section } from "upad-parse/dist";
+import { Note, Notepad, Parent, Section } from 'upad-parse/dist';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: Notepad;
