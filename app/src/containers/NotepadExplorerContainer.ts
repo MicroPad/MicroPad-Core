@@ -4,16 +4,19 @@ import NotepadExplorerComponent, { INotepadExplorerComponentProps } from '../com
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { Action } from 'redux';
 import { actions } from '../actions';
-import { Note } from 'upad-parse/dist';
+import { FlatNotepad, Note } from 'upad-parse/dist';
 
+let notepad: FlatNotepad | undefined;
 export function mapStateToProps({ notepads, explorer, meta, currentNote }: IStoreState) {
 	let note: Note | undefined = undefined;
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
 	}
 
+	notepad = ((notepads || <INotepadsStoreState> {}).notepad || <INotepadStoreState> {}).item;
+
 	return {
-		notepad: ((notepads || <INotepadsStoreState> {}).notepad || <INotepadStoreState> {}).item,
+		notepad: (!!notepad) ? notepad.toNotepad() : undefined,
 		openSections: explorer.openSections,
 		isFullScreen: meta.isFullScreen,
 		openNote: note
@@ -35,7 +38,13 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepad
 		collapseAll: () => dispatch(actions.collapseAllExplorer(undefined)),
 		newSection: obj => dispatch(actions.newSection(obj)),
 		newNote: obj => dispatch(actions.newNote(obj)),
-		expandFromNote: note => dispatch(actions.expandFromNote(note)),
+		expandFromNote: note => {
+			if (!notepad) return;
+			dispatch(actions.expandFromNote({
+				notepad,
+				note: notepad.notes[note.internalRef]
+			}));
+		},
 		print: () => dispatch(actions.print.started(undefined))
 	};
 }
