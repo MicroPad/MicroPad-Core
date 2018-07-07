@@ -138,14 +138,20 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				// Remove the section + any children it might have
 				sections: Object.values(state.notepad!.item!.sections)
 					.filter(s => s.internalRef !== action.payload && !isSubSectionOf(s, action.payload))
-					.reduce((sections, cur) => sections[cur.internalRef] = cur, {}),
+					.reduce((sections, cur) => {
+						sections[cur.internalRef] = cur;
+						return sections;
+					}, {})
 			});
 
 			// Remove the note if it's the one we want out/if it's the child of a section that doesn't exist anymore
 			notepad = notepad.clone({
 				notes: Object.values(state.notepad!.item!.notes)
-					.filter(n => n.internalRef !== action.payload && !!state.notepad!.item!.sections[n.parent as string])
-					.reduce((notes, cur) => notes[cur.internalRef] = cur, {})
+					.filter(n => n.internalRef !== action.payload && !!notepad.sections[n.parent as string])
+					.reduce((notes, cur) => {
+						notes[cur.internalRef] = cur;
+						return notes;
+					}, {})
 			});
 
 			return {
