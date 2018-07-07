@@ -1,5 +1,5 @@
 import { ActionsObservable, createEpicMiddleware } from 'redux-observable';
-import * as configureStore from 'redux-mock-store';
+import configureStore from 'redux-mock-store';
 import { ExplorerEpics } from '../ExplorerEpics';
 import { actions } from '../../actions';
 import { cold } from 'jest-marbles';

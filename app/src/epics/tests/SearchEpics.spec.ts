@@ -2,7 +2,7 @@ import { SearchEpics } from '../SearchEpics';
 import { ActionsObservable } from 'redux-observable';
 import { actions } from '../../actions';
 import { cold } from 'jest-marbles';
-import * as configureStore from 'redux-mock-store';
+import configureStore from 'redux-mock-store';
 import { IStoreState } from '../../types';
 import { ineeda } from 'ineeda';
 import { Action } from 'redux-typescript-actions';
