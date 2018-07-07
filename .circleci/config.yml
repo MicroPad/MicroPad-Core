@@ -45,30 +45,29 @@ jobs:
     working_directory: ~/repo
 
     steps:
-      steps:
-        - checkout
+      - checkout
 
-        - restore_cache:
-            name: Restore Yarn Package Cache
-            keys:
-              - yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
-              - yarn-packages-{{ .Branch }}
-              - yarn-packages-master
-              - yarn-packages-
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
+            - yarn-packages-{{ .Branch }}
+            - yarn-packages-master
+            - yarn-packages-
 
-        - run: cd app && yarn
+      - run: cd app && yarn
 
-        - save_cache:
-            name: Save Yarn Package Cache
-            key: yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
-            paths:
-              - app/node_modules/
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
+          paths:
+            - app/node_modules/
 
-      - run: cd app && yarn build
+    - run: cd app && yarn build
 
-      - run: sudo apt install rsync
+    - run: sudo apt install rsync
 
-      - run: rsync -aue "ssh -p 1276 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" app/build/* $SSH_PATH
+    - run: rsync -aue "ssh -p 1276 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" app/build/* $SSH_PATH
 
 workflows:
   version: 2
