@@ -180,8 +180,7 @@ const exportAllToMarkdown$ = (action$, store) =>
 			return Observable.fromPromise(Promise.all(notepadsInStorage));
 		}),
 		switchMap((notepads: string[]) => {
-			const pendingContent: Promise<IExportedNotepad>[] = [];
-			notepads.map((notepadJSON: string) => {
+			const pendingContent = notepads.map((notepadJSON: string) => {
 				const notepad = Translators.Json.toNotepadFromNotepad(notepadJSON);
 				return getNotepadMarkdownWithAssets(notepad);
 			});

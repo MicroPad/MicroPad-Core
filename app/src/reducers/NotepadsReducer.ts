@@ -201,6 +201,7 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 			notepad = notepad.clone({
 				lastModified: new Date(),
 				notes: {
+					...notepad.notes,
 					[action.payload.noteRef]: notepad.notes[action.payload.noteRef].clone({
 						elements: notepad.notes[action.payload.noteRef].elements.map(e =>
 							(e.args.id === action.payload.elementId) ? action.payload.element : e

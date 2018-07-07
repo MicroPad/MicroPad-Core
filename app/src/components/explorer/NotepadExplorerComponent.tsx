@@ -158,8 +158,6 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 			paddingTop: '10px'
 		};
 
-		debugger;
-
 		const childSections: JSX.Element[] = [];
 		((section || {} as Section).sections || [])
 			.forEach((child: Section) => childSections.push(this.generateSectionTreeView(child)));

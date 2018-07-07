@@ -7,7 +7,6 @@ import 'rxjs/add/observable/fromPromise';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
-import * as stringify from 'json-stringify-safe';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
 import * as localforage from 'localforage';
 import { fromPromise } from 'rxjs/observable/fromPromise';
@@ -23,7 +22,7 @@ const saveNotepad$ = action$ =>
 	action$.pipe(
 		filter((action: Action<Notepad>) => isType(action, actions.saveNotepad.started)),
 		map((action: Action<Notepad>) => action.payload),
-		switchMap((notepad: Notepad) => Observable.fromPromise(NOTEPAD_STORAGE.setItem(notepad.title, stringify(notepad)))),
+		switchMap((notepad: Notepad) => Observable.fromPromise(NOTEPAD_STORAGE.setItem(notepad.title, notepad.toJson()))),
 		catchError(err => Observable.of(actions.saveNotepad.failed({ params: <Notepad> {}, error: err }))),
 		map(() => actions.saveNotepad.done({ params: <Notepad> {}, result: undefined }))
 	);
@@ -37,12 +36,13 @@ const saveOnChanges$ = (action$, store) =>
 		filter(Boolean),
 		debounceTime(1000),
 		distinctUntilChanged(),
-		filter((notepad: Notepad) => {
+		filter((notepad: FlatNotepad) => {
 			const condition = notepad.title === currentNotepadTitle;
 			currentNotepadTitle = notepad.title;
 
 			return condition;
 		}),
+		map((notepad: FlatNotepad) => notepad.toNotepad()),
 		mergeMap((notepad: Notepad) => {
 			const actionsToReturn: Action<any>[] = [];
 

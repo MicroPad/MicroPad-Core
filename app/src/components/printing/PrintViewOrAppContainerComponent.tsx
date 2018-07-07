@@ -43,6 +43,6 @@ export default class PrintViewOrAppContainerComponent extends React.Component<IP
 		setTimeout(() => {
 			window.print();
 			clearPrintView();
-		}, 500);
+		}, 1000);
 	}
 }
