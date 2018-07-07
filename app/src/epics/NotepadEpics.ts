@@ -80,8 +80,7 @@ const parseEnex$ = action$ =>
 					map((notepad: FlatNotepad) => actions.parseNpx.done({ params: '', result: notepad })),
 					catchError(err => Observable.of(actions.parseNpx.failed({ params: '', error: err })))
 				)
-		),
-		map((notepad: FlatNotepad) => actions.parseNpx.done({ params: '', result: notepad }))
+		)
 	);
 
 const restoreJsonNotepad$ = action$ =>
