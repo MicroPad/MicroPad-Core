@@ -1,12 +1,12 @@
 import { combineEpics } from 'redux-observable';
 import { filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { from } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { dataURItoBlob, generateGuid, isAction } from '../util';
 import saveAs from 'save-as';
 import { ASSET_STORAGE } from '../index';
-import { fromPromise } from 'rxjs/observable/fromPromise';
 import { NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
@@ -30,7 +30,7 @@ const checkNoteAssets$ = (action$, store) =>
 		filter((action: Action<[string, NoteElement[]]>) => isType(action, actions.checkNoteAssets.started)),
 		map((action: Action<[string, NoteElement[]]>) => action.payload),
 		switchMap(([ref, elements]) =>
-			fromPromise(getNoteAssets(elements))
+			from(getNoteAssets(elements))
 				.pipe(map((res) => [ref, res.elements, res.blobUrls]))
 		),
 		map(([ref, elements, blobUrls]) => [ref, elements, blobUrls, (store.getState().notepads.notepad || <INotepadStoreState> {}).item]),
@@ -63,7 +63,7 @@ const downloadAsset$ = action$ =>
 		filter((action: Action<{ filename: string, uuid: string }>) => isType(action, actions.downloadAsset.started)),
 		map((action: Action<{ filename: string, uuid: string }>) => action.payload),
 		switchMap(({filename, uuid}: { filename: string, uuid: string }) =>
-			fromPromise(ASSET_STORAGE.getItem(uuid))
+			from(ASSET_STORAGE.getItem(uuid))
 				.pipe(
 					map((blob: Blob) => [blob, filename])
 				)
@@ -79,7 +79,7 @@ const binaryElementUpdate$ = action$ =>
 		map((action: Action<UpdateElementAction>) => action.payload),
 		filter((params: UpdateElementAction) => !!params.newAsset),
 		switchMap((params: UpdateElementAction) =>
-			fromPromise(
+			from(
 				ASSET_STORAGE.setItem(params.element.args.ext || generateGuid(), params.newAsset)
 					.then(() => [params, params.element.args.ext || generateGuid()])
 			)

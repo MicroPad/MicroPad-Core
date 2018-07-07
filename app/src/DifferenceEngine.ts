@@ -1,17 +1,15 @@
 // @ts-ignore
 import SyncWorker from '!workerize-loader!./SyncWorker.js';
 
-import { Observable } from 'rxjs/Observable';
-import { ajax } from 'rxjs/observable/dom/ajax';
+import { Observable } from 'rxjs';
 import { MICROPAD_URL } from './types';
 import { map, retry } from 'rxjs/operators';
-import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 import { AssetList, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from './types/SyncTypes';
 import { parse } from 'date-fns';
-import * as stringify from 'json-stringify-safe';
 import { Base64 } from 'js-base64';
 import * as QueryString from 'querystring';
 import { Notepad } from 'upad-parse/dist';
+import { ajax, AjaxResponse } from 'rxjs/ajax';
 
 export namespace DifferenceEngine {
 	const SyncThread = new SyncWorker() as ISyncWorker;
@@ -20,11 +18,7 @@ export namespace DifferenceEngine {
 		const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);
 
 		export const login = (username: string, password: string): Observable<{ username: string, token: string }> => {
-			// TODO: Remove this and send the object natively when https://github.com/ReactiveX/rxjs/issues/3824 is fixed
-			const data = new URLSearchParams();
-			data.append('password', password);
-
-			return call<{ token: string }>('login', username, data.toString() as any)
+			return call<{ token: string }>('login', username, { password })
 				.pipe(map(res => { return { username, token: res.token }; }));
 		};
 
@@ -41,12 +35,7 @@ export namespace DifferenceEngine {
 			call<{ notepads: SyncedNotepadList }>('list_notepads', username, { token }).pipe(map(res => res.notepads));
 
 		export const create = (username: string, token: string, notepadTitle: string): Observable<string> => {
-			// TODO: Remove this and send the object natively when https://github.com/ReactiveX/rxjs/issues/3824 is fixed
-			const data = new URLSearchParams();
-			data.append('token', token);
-			data.append('notepadTitle', notepadTitle);
-
-			return call<{ notepad: string }>('create', username, data.toString() as any).pipe(map(res => res.notepad));
+			return call<{ notepad: string }>('create', username, { token, notepadTitle }).pipe(map(res => res.notepad));
 		};
 	}
 
@@ -63,7 +52,15 @@ export namespace DifferenceEngine {
 			call<{ urlList: AssetList }>('download_assets', syncId, { assets: JSON.stringify(assets) }).pipe(map(res => res.urlList));
 
 		export const uploadNotepad = (syncId: string, notepad: ISyncedNotepad): Observable<AssetList> =>
-			call<{ assetsToUpload: AssetList }>('upload', syncId, { notepad: encodeURIComponent(stringify(notepad)) }).pipe(map(res => res.assetsToUpload));
+			call<{ assetsToUpload: AssetList }>('upload', syncId, {
+				notepadV2: JSON.stringify(notepad, (k, v) => (k === 'parent') ? undefined : v) // Remove parent links here, unneeded content
+					.replace(
+						/[\u007f-\uffff]/g,
+						char => '\\u' + ('0000' + char.charCodeAt(0).toString(16)).slice(-4)
+					) // Fix unicode encoding
+			}).pipe(
+				map(res => res.assetsToUpload)
+			);
 
 		export const deleteNotepad = (syncId: string): Observable<void> => call<void>('delete', syncId);
 

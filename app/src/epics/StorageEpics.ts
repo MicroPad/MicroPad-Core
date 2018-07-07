@@ -2,14 +2,12 @@ import { actions } from '../actions';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/fromPromise';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
 import * as localforage from 'localforage';
-import { fromPromise } from 'rxjs/observable/fromPromise';
+import { from, of } from 'rxjs';
 import { Dialog } from '../dialogs';
 import { ISyncedNotepad } from '../types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
@@ -22,8 +20,8 @@ const saveNotepad$ = action$ =>
 	action$.pipe(
 		filter((action: Action<Notepad>) => isType(action, actions.saveNotepad.started)),
 		map((action: Action<Notepad>) => action.payload),
-		switchMap((notepad: Notepad) => Observable.fromPromise(NOTEPAD_STORAGE.setItem(notepad.title, notepad.toJson()))),
-		catchError(err => Observable.of(actions.saveNotepad.failed({ params: <Notepad> {}, error: err }))),
+		switchMap((notepad: Notepad) => from(NOTEPAD_STORAGE.setItem(notepad.title, notepad.toJson()))),
+		catchError(err => of(actions.saveNotepad.failed({ params: <Notepad> {}, error: err }))),
 		map(() => actions.saveNotepad.done({ params: <Notepad> {}, result: undefined }))
 	);
 
@@ -78,8 +76,8 @@ const saveDefaultFontSize$ = (action$, store) =>
 const getNotepadList$ = action$ =>
 	action$.pipe(
 		filter((action: Action<void>) => isType(action, actions.getNotepadList.started)),
-		switchMap(() => Observable.fromPromise(NOTEPAD_STORAGE.keys())),
-		catchError(err => Observable.of(actions.getNotepadList.failed({ params: undefined, error: err }))),
+		switchMap(() => from(NOTEPAD_STORAGE.keys())),
+		catchError(err => of(actions.getNotepadList.failed({ params: undefined, error: err }))),
 		map((keys: string[]) => {
 			return actions.getNotepadList.done({ params: undefined, result: keys });
 		})
@@ -89,10 +87,10 @@ const openNotepadFromStorage$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.openNotepadFromStorage.started)),
 		map((action: Action<string>) => action.payload),
-		switchMap((notepadTitle: string) => Observable.fromPromise(NOTEPAD_STORAGE.getItem(notepadTitle))),
+		switchMap((notepadTitle: string) => from(NOTEPAD_STORAGE.getItem(notepadTitle))),
 		catchError(err => {
 			Dialog.alert(`Error opening notepad`);
-			return Observable.of(actions.openNotepadFromStorage.failed(err));
+			return of(actions.openNotepadFromStorage.failed(err));
 		}),
 		mergeMap((json: string) => [
 			actions.openNotepadFromStorage.done({ params: '', result: undefined }),
@@ -113,7 +111,7 @@ const cleanUnusedAssets$ = (action$, store) =>
 			filter(([usedAssets, npAssets]: [Set<string>, string[]]) => !!usedAssets && !!npAssets),
 			switchMap(([usedAssets, npAssets]: [Set<string>, string[]]) => {
 				const unusedAssets = npAssets.filter(guid => !usedAssets.has(guid));
-				return fromPromise(Promise.all(unusedAssets.map(guid => ASSET_STORAGE.removeItem(guid))).then(() => unusedAssets));
+				return from(Promise.all(unusedAssets.map(guid => ASSET_STORAGE.removeItem(guid))).then(() => unusedAssets));
 			}),
 			mergeMap((unusedAssets: string[]) => [
 				...unusedAssets.map(guid => actions.untrackAsset(guid))
@@ -125,7 +123,7 @@ const deleteNotepad$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.deleteNotepad)),
 		map((action: Action<string>) => action.payload),
-		tap((notepadTitle: string) => Observable.fromPromise(NOTEPAD_STORAGE.removeItem(notepadTitle))),
+		tap((notepadTitle: string) => from(NOTEPAD_STORAGE.removeItem(notepadTitle))),
 		filter(() => false)
 	);
 

@@ -5,7 +5,7 @@ import * as Materialize from 'materialize-css/dist/js/materialize.js';
 import { ProgressBar } from 'react-materialize';
 import { Observable } from 'rxjs/Observable';
 import { filter, map } from 'rxjs/operators';
-import { fromEvent } from 'rxjs/observable/fromEvent';
+import { fromEvent } from 'rxjs';
 import { IInsertElementState } from '../../reducers/NoteReducer';
 import ZoomComponent from '../../containers/ZoomContainer';
 import { Note } from 'upad-parse/dist';

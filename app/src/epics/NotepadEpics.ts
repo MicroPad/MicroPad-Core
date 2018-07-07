@@ -2,23 +2,18 @@ import { actions } from '../actions';
 import { catchError, combineLatest, filter, map, mergeMap, retry, switchMap, tap } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/empty';
-import { Observable } from 'rxjs/Observable';
-import { fromPromise } from 'rxjs/observable/fromPromise';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
 import * as JSZip from 'jszip';
 import { isAction } from '../util';
-import { ajax } from 'rxjs/observable/dom/ajax';
-import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 import { Dialog } from '../dialogs';
-import { of } from 'rxjs/observable/of';
 import { ISyncedNotepad, SyncedNotepadList, SyncUser } from '../types/SyncTypes';
 import { Asset, FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 import { MarkdownNote } from 'upad-parse/dist/Note';
+import { from, of } from 'rxjs';
+import { ajax, AjaxResponse } from 'rxjs/ajax';
 
 const parseQueue: string[] = [];
 
@@ -26,7 +21,7 @@ const parseNpx$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.parseNpx.started)),
 		switchMap((action: Action<string>) =>
-			fromPromise((async () => {
+			from((async () => {
 				let notepad: Notepad;
 				try {
 					notepad = await Translators.Xml.toNotepadFromNpx(action.payload);
@@ -43,7 +38,7 @@ const parseNpx$ = action$ =>
 			})())
 				.pipe(
 					map((notepad: FlatNotepad) => actions.parseNpx.done({ params: '', result: notepad })),
-					catchError(err => Observable.of(actions.parseNpx.failed({ params: '', error: err })))
+					catchError(err => of(actions.parseNpx.failed({ params: '', error: err })))
 				)
 		)
 	);
@@ -61,7 +56,7 @@ const parseEnex$ = action$ =>
 	action$.pipe(
 		isAction(actions.parseEnex),
 		switchMap((action: Action<string>) =>
-			fromPromise((async () => {
+			from((async () => {
 				let notepad: Notepad;
 				try {
 					notepad = await Translators.Xml.toNotepadFromEnex(action.payload);
@@ -78,7 +73,7 @@ const parseEnex$ = action$ =>
 			})())
 				.pipe(
 					map((notepad: FlatNotepad) => actions.parseNpx.done({ params: '', result: notepad })),
-					catchError(err => Observable.of(actions.parseNpx.failed({ params: '', error: err })))
+					catchError(err => of(actions.parseNpx.failed({ params: '', error: err })))
 				)
 		)
 	);
@@ -115,7 +110,7 @@ const exportNotepad$ = (action$, store) =>
 		map((state: INotepadsStoreState) => (state.notepad || <INotepadStoreState> {}).item),
 		filter(Boolean),
 		switchMap((notepad: FlatNotepad) =>
-			Observable.fromPromise(getNotepadXmlWithAssets(notepad.toNotepad()))
+			from(getNotepadXmlWithAssets(notepad.toNotepad()))
 		),
 		tap((exportedNotepad: IExportedNotepad) => {
 			const blob = new Blob([exportedNotepad.content], { type: 'text/xml;charset=utf-8' });
@@ -136,7 +131,7 @@ const exportAll$ = (action$, store) =>
 			const notepadsInStorage: Promise<string>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
-			return Observable.fromPromise(Promise.all(notepadsInStorage));
+			return from(Promise.all(notepadsInStorage));
 		}),
 		switchMap((notepads: string[]) => {
 			const pendingXml = notepads.map((notepadJSON: string) => {
@@ -144,7 +139,7 @@ const exportAll$ = (action$, store) =>
 				return getNotepadXmlWithAssets(notepad);
 			});
 
-			return Observable.fromPromise(Promise.all(pendingXml));
+			return from(Promise.all(pendingXml));
 		}),
 		tap((exportNotepads: IExportedNotepad[]) => {
 			const zip: JSZip = new JSZip();
@@ -176,7 +171,7 @@ const exportAllToMarkdown$ = (action$, store) =>
 			const notepadsInStorage: Promise<string>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
-			return Observable.fromPromise(Promise.all(notepadsInStorage));
+			return from(Promise.all(notepadsInStorage));
 		}),
 		switchMap((notepads: string[]) => {
 			const pendingContent = notepads.map((notepadJSON: string) => {
@@ -184,7 +179,7 @@ const exportAllToMarkdown$ = (action$, store) =>
 				return getNotepadMarkdownWithAssets(notepad);
 			});
 
-			return Observable.fromPromise(Promise.all(pendingContent));
+			return from(Promise.all(pendingContent));
 		}),
 		tap((exportNotepads: IExportedNotepad[]) => {
 			const zip: JSZip = new JSZip();
@@ -214,7 +209,7 @@ const renameNotepad$ = (action$, store) =>
 		switchMap((action: Action<string>) => {
 			const oldTitle = store.getState().notepads.notepad.item.title;
 
-			return Observable.fromPromise(NOTEPAD_STORAGE.removeItem(oldTitle))
+			return from(NOTEPAD_STORAGE.removeItem(oldTitle))
 				.pipe(
 					map(() => { return { newTitle: action.payload, oldTitle }; })
 				);
@@ -235,7 +230,7 @@ const downloadExternalNotepad$ = action$ =>
 		isAction(actions.downloadNotepad.started),
 		map((action: Action<string>) => action.payload),
 		switchMap(url => of(url).pipe(
-			combineLatest(fromPromise(Dialog.confirm(`Are you sure you want to download this notepad: ${url}?`)))
+			combineLatest(from(Dialog.confirm(`Are you sure you want to download this notepad: ${url}?`)))
 		)),
 		filter(([url, shouldDownload]: [string, boolean]) => shouldDownload),
 		map(([url]: [string, boolean]) => url),
@@ -252,7 +247,7 @@ const downloadExternalNotepad$ = action$ =>
 				retry(2),
 				catchError(err => {
 					Dialog.alert(`Download failed. Are you online?`);
-					return Observable.of(actions.downloadNotepad.failed({ params: url, error: err }));
+					return of(actions.downloadNotepad.failed({ params: url, error: err }));
 				})
 			)
 		)

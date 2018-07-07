@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Autocomplete, Collection, CollectionItem, Icon, Modal, NavItem, Row } from 'react-materialize';
 import { generateGuid } from '../../util';
-import { fromEvent } from 'rxjs/observable/fromEvent';
 import { shareReplay } from 'rxjs/operators';
-import { Subscription } from 'rxjs/Subscription';
 import { FlatNotepad, Note } from 'upad-parse/dist';
+import { Subscription } from 'rxjs/Subscription';
+import { fromEvent } from 'rxjs';
 
 export interface ISearchComponentProps {
 	notepad: FlatNotepad;

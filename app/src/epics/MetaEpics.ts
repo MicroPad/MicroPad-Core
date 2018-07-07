@@ -8,8 +8,8 @@ import { Action, Success } from 'redux-typescript-actions';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { IVersion } from '../types/MetaTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
-import { empty } from 'rxjs/observable/empty';
 import { FlatNotepad } from 'upad-parse/dist';
+import { EMPTY } from 'rxjs';
 
 export namespace MetaEpics {
 	export const closeDrawingEditorOnZoom$ = (action$, store) =>
@@ -59,7 +59,7 @@ export namespace MetaEpics {
 					),
 					catchError(err => {
 						console.error(err);
-						return empty();
+						return EMPTY;
 					})
 				)
 			),

@@ -5,10 +5,10 @@ import { filter, map, switchMap } from 'rxjs/operators';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';
 import { ASSET_STORAGE } from '../index';
-import { fromPromise } from 'rxjs/observable/fromPromise';
 import { trim } from '../components/note-viewer/elements/drawing/trim-canvas';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist';
 import { MarkdownNote, NoteElement } from 'upad-parse/dist/Note';
+import { from } from 'rxjs';
 
 export namespace PrintEpics {
 	export const generateMarkdownForPrint$ = (action$, store) =>
@@ -20,7 +20,7 @@ export namespace PrintEpics {
 			map(([notepad, noteRef]: [FlatNotepad, string]) => notepad.notes[noteRef]),
 			filter(Boolean),
 			switchMap((note: Note) =>
-				fromPromise((async () => {
+				from((async () => {
 					const resolvedAssets = await Promise.all(note.elements
 						.filter(e => e.type === 'drawing' || e.type === 'image')
 						.filter(e => !!e.args.ext)
@@ -38,7 +38,7 @@ export namespace PrintEpics {
 					];
 				})())
 			),
-			switchMap(([note, assets]: [Note, Asset[]]) => fromPromise((note as Note).toMarkdown(assets))),
+			switchMap(([note, assets]: [Note, Asset[]]) => from((note as Note).toMarkdown(assets))),
 			map((mdNote: MarkdownNote) => <NoteElement> {
 				content: mdNote.md,
 				args: {
