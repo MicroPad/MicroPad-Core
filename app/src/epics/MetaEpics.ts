@@ -1,15 +1,15 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../actions';
-import { filter, map, switchMap, tap, catchError } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
 import * as localforage from 'localforage';
 import { Action, Success } from 'redux-typescript-actions';
-import { INotepad } from '../types/NotepadTypes';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { IVersion } from '../types/MetaTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
-import { empty } from 'rxjs/observable/empty';
+import { FlatNotepad } from 'upad-parse/dist';
+import { EMPTY } from 'rxjs';
 
 export namespace MetaEpics {
 	export const closeDrawingEditorOnZoom$ = (action$, store) =>
@@ -31,7 +31,7 @@ export namespace MetaEpics {
 	export const revertHelpPrefOnHelpLoad$ = action$ =>
 		action$.pipe(
 			isAction(actions.parseNpx.done),
-			map((action: Action<Success<string, INotepad>>) => action.payload.result.title),
+			map((action: Action<Success<string, FlatNotepad>>) => action.payload.result.title),
 			filter((title: string) => title === 'Help'),
 			map(() => actions.setHelpPref(true))
 		);
@@ -59,7 +59,7 @@ export namespace MetaEpics {
 					),
 					catchError(err => {
 						console.error(err);
-						return empty();
+						return EMPTY;
 					})
 				)
 			),

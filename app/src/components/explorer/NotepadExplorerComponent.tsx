@@ -1,20 +1,21 @@
 import * as React from 'react';
 import './NotepadExplorerComponent.css';
-import { INote, INotepad, IParent, IRenameNotepadObjectAction, ISection } from '../../types/NotepadTypes';
+import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
 import { Icon } from 'react-materialize';
 import TreeView from 'react-treeview';
 import { generateGuid } from '../../util';
 import ExplorerOptionsComponent from './ExplorerOptionsComponent';
-import { INewNotepadObjectAction } from '../../types/ActionTypes';
+import { NewNotepadObjectAction } from '../../types/ActionTypes';
 import HelpMessageComponent from '../../containers/HelpMessageContainer';
 import { Dialog } from '../../dialogs';
 import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
+import { Note, Notepad, Parent, Section } from 'upad-parse/dist';
 
 export interface INotepadExplorerComponentProps {
-	notepad?: INotepad;
+	notepad?: Notepad;
 	openSections: string[];
 	isFullScreen: boolean;
-	openNote?: INote;
+	openNote?: Note;
 	flipFullScreenState?: () => void;
 	deleteNotepad?: (title: string) => void;
 	exportNotepad?: () => void;
@@ -25,10 +26,10 @@ export interface INotepadExplorerComponentProps {
 	expandSection?: (guid: string) => void;
 	collapseSection?: (guid: string) => void;
 	expandAll?: () => void;
-	expandFromNote?: (note: INote) => void;
+	expandFromNote?: (note: Note) => void;
 	collapseAll?: () => void;
-	newSection?: (obj: INewNotepadObjectAction) => void;
-	newNote?: (obj: INewNotepadObjectAction) => void;
+	newSection?: (obj: NewNotepadObjectAction) => void;
+	newNote?: (obj: NewNotepadObjectAction) => void;
 	print?: () => void;
 }
 
@@ -58,8 +59,8 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 
 		// Generate TreeViews
 		const treeViews: JSX.Element[] = [];
-		((notepad || {} as INotepad).sections || [])
-			.forEach((section: ISection) => treeViews.push(this.generateSectionTreeView(section)));
+		((notepad || {} as Notepad).sections || [])
+			.forEach((section: Section) => treeViews.push(this.generateSectionTreeView(section)));
 
 		return (
 			<div id="notepad-explorer" style={notepadExplorerStyle}>
@@ -133,21 +134,21 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		);
 	}
 
-	private newNotepadObject = async (type: 'note' | 'section', parent: IParent) => {
+	private newNotepadObject = async (type: 'note' | 'section', parent: Parent) => {
 		const { newNote, newSection } = this.props;
 		const title = await Dialog.prompt('Title:');
 
 		if (title) {
-			const action: INewNotepadObjectAction = {
+			const action: NewNotepadObjectAction = {
 				title,
-				parent
+				parent: (parent as Section).internalRef // will automatically be undefined for Notepad parents
 			};
 
 			(type === 'note') ? newNote!(action) : newSection!(action);
 		}
 	}
 
-	private generateSectionTreeView(section: ISection): JSX.Element {
+	private generateSectionTreeView(section: Section): JSX.Element {
 		const { loadNote, deleteNotepadObject, renameNotepadObject, openNote, print } = this.props;
 
 		const nodeLabelStyle = {
@@ -158,12 +159,12 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		};
 
 		const childSections: JSX.Element[] = [];
-		((section || {} as ISection).sections || [])
-			.forEach((child: ISection) => childSections.push(this.generateSectionTreeView(child)));
+		((section || {} as Section).sections || [])
+			.forEach((child: Section) => childSections.push(this.generateSectionTreeView(child)));
 
 		const childNotes: JSX.Element[] = [];
-		((section || {} as ISection).notes || [])
-			.forEach((child: INote) => childNotes.push(
+		((section || {} as Section).notes || [])
+			.forEach((child: Note) => childNotes.push(
 				<div className="explorer-note" key={generateGuid()}>
 					<span>
 						<a href="#!" style={{ color: 'white' }} onClick={() => loadNote!(child.internalRef)}><Icon>note</Icon> {child.title}</a>

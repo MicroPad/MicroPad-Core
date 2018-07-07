@@ -2,10 +2,12 @@ import { combineEpics } from 'redux-observable';
 import { filter, map } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { INotepad, INotepadStoreState, IParent, ISection } from '../types/NotepadTypes';
-import { getNotepadObjectByRef, isAction } from '../util';
-import { INewNotepadObjectAction } from '../types/ActionTypes';
+import { INotepadStoreState } from '../types/NotepadTypes';
+import { isAction } from '../util';
+import { NewNotepadObjectAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
+import { FlatNotepad } from 'upad-parse/dist';
+import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 
 export namespace ExplorerEpics {
 	export const expandAll$ = (action$, store) =>
@@ -13,39 +15,25 @@ export namespace ExplorerEpics {
 			filter((action: Action<void>) => isType(action, actions.expandAllExplorer.started)),
 			map(() => (store.getState().notepads.notepad || <INotepadStoreState> {}).item),
 			filter(Boolean),
-			map((notepad: INotepad) => {
-				const response: string[] = [];
-
-				const mapSection = (section: ISection) => {
-					response.push(section.internalRef);
-					section.notes.forEach(note => response.push(note.internalRef));
-					section.sections.forEach(subSection => mapSection(subSection));
-				};
-				notepad.sections.forEach(section => mapSection(section));
-
-				return response;
-			}),
+			map((notepad: FlatNotepad) => [
+				...Object.keys(notepad.sections),
+				...Object.keys(notepad.notes)
+			]),
 			map((allRefs: string[]) => actions.expandAllExplorer.done({ params: undefined, result: allRefs }))
 		);
 
 	export const autoLoadNewSection$ = (action$, store) =>
 		action$.pipe(
 			isAction(actions.newSection),
-			map((action: Action<INewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
-			filter(([insertAction, notepad]: [INewNotepadObjectAction, INotepad]) => !!insertAction && !!notepad),
-			map(([insertAction, notepad]: [INewNotepadObjectAction, INotepad]) => {
-				if (!insertAction.parent.internalRef) return [insertAction, notepad];
+			map((action: Action<NewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
+			filter(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!notepad),
+			map(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => {
+				const parentRef = insertAction.parent || undefined;
 
-				// Find the new section
-				let parent: ISection | false = false;
-				getNotepadObjectByRef(notepad, insertAction.parent.internalRef!, obj => parent = <ISection> obj);
-
-				return [insertAction, parent];
+				return Object.values((notepad as FlatNotepad).sections).find(s => s.title === insertAction.title && s.parentRef === parentRef);
 			}),
-			filter(([insertAction, parent]: [INewNotepadObjectAction, IParent]) => !!parent),
-			map(([insertAction, parent]: [INewNotepadObjectAction, IParent]) => parent.sections.find(s => s.title === insertAction.title)),
 			filter(Boolean),
-			map((newSection: ISection) => actions.expandSection(newSection.internalRef))
+			map((newSection: FlatSection) => actions.expandSection(newSection.internalRef))
 		);
 
 	export const explorerEpics$ = combineEpics(

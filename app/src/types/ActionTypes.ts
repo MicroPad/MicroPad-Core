@@ -1,50 +1,56 @@
-import { INotepad, IParent, NoteElement, Source } from './NotepadTypes';
 import { ISyncedNotepad, SyncUser } from './SyncTypes';
 import { Action } from 'redux-typescript-actions';
+import { NoteElement, Source } from 'upad-parse/dist/Note';
+import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 
-export interface IUpdateElementAction {
+export type UpdateElementAction = {
 	noteRef: string;
 	elementId: string;
 	element: NoteElement;
 	newAsset?: Blob;
-}
+};
 
-export interface INewNotepadObjectAction {
+export type NewNotepadObjectAction = {
 	title: string;
-	parent: IParent;
-}
+	parent?: string;
+};
 
-export interface IInsertElementAction {
+export type InsertElementAction = {
 	noteRef: string;
 	element: NoteElement;
-}
+};
 
-export interface IDeleteElementAction {
+export type DeleteElementAction = {
 	noteRef: string;
 	elementId: string;
-}
+};
 
-export interface IUpdateBibliographyAction {
+export type UpdateBibliographyAction = {
 	noteRef: string;
 	sources: Source[];
-}
+};
 
-export interface ISyncAction {
+export type SyncAction = {
 	syncId: string;
 	notepad: ISyncedNotepad;
-}
+};
 
-export interface IAddToSyncAction {
+export type AddToSyncAction = {
 	user: SyncUser;
 	notepadTitle: string;
-}
+};
 
-export interface IUploadAssetAction {
+export type UploadAssetAction = {
 	asset: Blob;
 	url: string;
-}
+};
 
-export interface INotepadToSyncNotepadAction {
-	notepad: INotepad;
+export type NotepadToSyncNotepadAction = {
+	notepad: Notepad;
 	action: (notepad: ISyncedNotepad) => Action<any>;
-}
+};
+
+export type ExpandFromNoteAction = {
+	note: Note;
+	notepad: FlatNotepad;
+};

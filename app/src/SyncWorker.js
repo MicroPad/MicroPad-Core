@@ -1,7 +1,7 @@
+import { getAsBase64, getUsedAssets } from './util';
+import { Translators } from 'upad-parse';
 import * as localforage from 'localforage';
-import {getAsBase64} from './util';
 import * as md5 from 'md5';
-import * as Parser from 'upad-parse/dist/index';
 
 export async function toSyncedNotepad(notepad) {
 	// Setup access to our binary assets
@@ -13,8 +13,8 @@ export async function toSyncedNotepad(notepad) {
 
 	const assetHashes = {};
 
-	notepad = Parser.restoreNotepad(notepad);
-	const npAssets = Array.from(notepad.getUsedAssets());
+	notepad = Translators.Json.toNotepadFromNotepad(notepad);
+	const npAssets = Array.from(getUsedAssets(notepad.flatten()));
 
 	// Get assets from storage as base64
 	const base64Assets = await Promise.all((await Promise.all(npAssets.map(uuid => ASSET_STORAGE.getItem(uuid))))

@@ -2,7 +2,8 @@ import { IReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { INote, ISection } from '../types/NotepadTypes';
+import { Note } from 'upad-parse/dist';
+import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 
 export interface IExplorerState {
 	openSections: string[];
@@ -34,15 +35,12 @@ export class ExplorerReducer implements IReducer<IExplorerState> {
 				openSections: state.openSections.filter((guid: string) => guid !== guidToClose)
 			};
 		} else if (isType(action, actions.expandFromNote)) {
-			const note: INote = action.payload;
-			const noteFamily: Set<string> = new Set<string>(state.openSections);
-
-			// Add the note and its parents to the list
-			let parent: ISection = <ISection> note.parent;
-			while (!!parent.parent) {
-				noteFamily.add(parent.internalRef);
-				parent = <ISection> parent.parent;
-			}
+			const note: Note = action.payload.note;
+			const notepad = action.payload.notepad;
+			const noteFamily: Set<string> = new Set<string>([
+				...state.openSections,
+				...notepad.pathFrom(note).slice(1).map((parent: FlatSection) => parent.internalRef)
+			]);
 
 			return {
 				...state,

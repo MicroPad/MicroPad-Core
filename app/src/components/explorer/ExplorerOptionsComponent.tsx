@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { INote, INPXObject, IRenameNotepadObjectAction, ISection } from '../../types/NotepadTypes';
+import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL } from '../../types';
 import { Dialog } from 'src/dialogs';
+import { Notepad } from 'upad-parse/dist';
+import { NPXObject } from 'upad-parse/dist/NPXObject';
 
 export interface IExplorerOptionsComponentProps {
-	objToEdit: INPXObject;
+	objToEdit: NPXObject | Notepad;
 	type: 'notepad' | 'section' | 'note';
 	deleteNotepad?: (title: string) => void;
 	exportNotepad?: () => void;
@@ -80,7 +82,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 
 			case 'section':
 			case 'note':
-				renameNotepadObject!({ internalRef: (objToEdit as INote | ISection).internalRef, newName: value });
+				renameNotepadObject!({ internalRef: (objToEdit as NPXObject).internalRef, newName: value });
 				break;
 
 			default:
@@ -101,7 +103,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 
 			case 'section':
 			case 'note':
-				deleteNotepadObject!((objToEdit as INote | ISection).internalRef);
+				deleteNotepadObject!((objToEdit as NPXObject).internalRef);
 				break;
 
 			default:

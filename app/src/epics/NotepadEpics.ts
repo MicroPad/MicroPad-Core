@@ -2,71 +2,45 @@ import { actions } from '../actions';
 import { catchError, combineLatest, filter, map, mergeMap, retry, switchMap, tap } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
-import * as Parser from 'upad-parse/dist/index.js';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/empty';
-import { Observable } from 'rxjs/Observable';
-import { fromPromise } from 'rxjs/observable/fromPromise';
-import {
-	IAsset,
-	IAssets,
-	IMarkdownNote,
-	INotepad,
-	INotepadsStoreState,
-	INotepadStoreState
-} from '../types/NotepadTypes';
+import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
 import * as JSZip from 'jszip';
 import { isAction } from '../util';
-import { ajax } from 'rxjs/observable/dom/ajax';
-import { AjaxResponse } from 'rxjs/observable/dom/AjaxObservable';
 import { Dialog } from '../dialogs';
-import { of } from 'rxjs/observable/of';
 import { ISyncedNotepad, SyncedNotepadList, SyncUser } from '../types/SyncTypes';
+import { Asset, FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
+import { MarkdownNote } from 'upad-parse/dist/Note';
+import { from, of } from 'rxjs';
+import { ajax, AjaxResponse } from 'rxjs/ajax';
 
 const parseQueue: string[] = [];
 
 const parseNpx$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.parseNpx.started)),
-		switchMap((action: Action<string>) => {
-			return fromPromise(new Promise((resolve, reject) => {
+		switchMap((action: Action<string>) =>
+			from((async () => {
+				let notepad: Notepad;
 				try {
-					Parser.parse(action.payload, ['asciimath']);
+					notepad = await Translators.Xml.toNotepadFromNpx(action.payload);
 				} catch (err) {
 					Dialog.alert(`Error reading file`);
 					console.error(err);
-					reject(err);
-					return;
+					throw err;
 				}
 
-				const notepad: INotepad = Parser.notepad;
+				// Save assets to localforage
+				await Promise.all(notepad.assets.map(async asset => ASSET_STORAGE.setItem(asset.uuid, asset.data)));
 
-				// Sort out assets
-				try {
-					Parser.parseAssets(action.payload, async (assets: IAssets) => {
-						const notepadAssets = new Set((notepad.notepadAssets || []));
-						for (let i = 0; i < assets.assets.length; i++) {
-							if (!notepadAssets.has(assets.assets[i].uuid)) notepadAssets.add(assets.assets[i].uuid);
-							await ASSET_STORAGE.setItem(assets.assets[i].uuid, assets.assets[i].data);
-						}
-
-						notepad.notepadAssets = Array.from(notepadAssets);
-						resolve(notepad);
-					});
-				} catch (err) {
-					Dialog.alert(`Error reading file`);
-					console.error(err);
-					reject(err);
-				}
-			}))
+				return notepad.flatten();
+			})())
 				.pipe(
-					map((notepad: INotepad) => actions.parseNpx.done({ params: '', result: notepad })),
-					catchError(err => Observable.of(actions.parseNpx.failed({ params: '', error: err })))
-				);
-		})
+					map((notepad: FlatNotepad) => actions.parseNpx.done({ params: '', result: notepad })),
+					catchError(err => of(actions.parseNpx.failed({ params: '', error: err })))
+				)
+		)
 	);
 
 const syncOnNotepadParsed$ = (action$, store) =>
@@ -75,29 +49,33 @@ const syncOnNotepadParsed$ = (action$, store) =>
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads.notepad),
 		filter((npState: INotepadStoreState) => !!npState && !!npState.item),
-		map((npState: INotepadStoreState) => actions.actWithSyncNotepad({ notepad: npState.item!, action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId: npState.activeSyncId! }) }))
+		map((npState: INotepadStoreState) => actions.actWithSyncNotepad({ notepad: (npState.item!).toNotepad(), action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId: npState.activeSyncId! }) }))
 	);
 
 const parseEnex$ = action$ =>
 	action$.pipe(
 		isAction(actions.parseEnex),
-		map((action: Action<string>) => action.payload),
-		map((enex: string) => {
-			try {
-				Parser.parseFromEvernote(enex, ['asciimath']);
-			} catch (err) {
-				Dialog.alert(`Error reading file`);
-				console.error(err);
-				return;
-			}
+		switchMap((action: Action<string>) =>
+			from((async () => {
+				let notepad: Notepad;
+				try {
+					notepad = await Translators.Xml.toNotepadFromEnex(action.payload);
+				} catch (err) {
+					Dialog.alert(`Error reading file`);
+					console.error(err);
+					throw err;
+				}
 
-			const notepad: INotepad = Parser.notepad;
-			notepad.notepadAssets = [];
+				// Save assets to localforage
+				await Promise.all(notepad.assets.map(async asset => ASSET_STORAGE.setItem(asset.uuid, asset.data)));
 
-			return notepad;
-		}),
-		filter(Boolean),
-		map((notepad: INotepad) => actions.parseNpx.done({ params: '', result: notepad }))
+				return notepad.flatten();
+			})())
+				.pipe(
+					map((notepad: FlatNotepad) => actions.parseNpx.done({ params: '', result: notepad })),
+					catchError(err => of(actions.parseNpx.failed({ params: '', error: err })))
+				)
+		)
 	);
 
 const restoreJsonNotepad$ = action$ =>
@@ -106,9 +84,7 @@ const restoreJsonNotepad$ = action$ =>
 		map((action: Action<string>) => action.payload),
 		map((json: string) => {
 			try {
-				const res = JSON.parse(json);
-				const notepad: INotepad = Parser.restoreNotepad(res);
-				notepad.notepadAssets = res.notepadAssets;
+				const notepad: FlatNotepad = Translators.Json.toFlatNotepadFromNotepad(json);
 
 				return actions.parseNpx.done({
 					params: '',
@@ -133,8 +109,8 @@ const exportNotepad$ = (action$, store) =>
 		filter(Boolean),
 		map((state: INotepadsStoreState) => (state.notepad || <INotepadStoreState> {}).item),
 		filter(Boolean),
-		switchMap((notepad: INotepad) =>
-			Observable.fromPromise(getNotepadXmlWithAssets(notepad))
+		switchMap((notepad: FlatNotepad) =>
+			from(getNotepadXmlWithAssets(notepad.toNotepad()))
 		),
 		tap((exportedNotepad: IExportedNotepad) => {
 			const blob = new Blob([exportedNotepad.content], { type: 'text/xml;charset=utf-8' });
@@ -155,19 +131,15 @@ const exportAll$ = (action$, store) =>
 			const notepadsInStorage: Promise<string>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
-			return Observable.fromPromise(Promise.all(notepadsInStorage));
+			return from(Promise.all(notepadsInStorage));
 		}),
 		switchMap((notepads: string[]) => {
-			const pendingXml: Promise<IExportedNotepad>[] = [];
-			notepads.forEach((notepadJSON: string) => {
-				const res = JSON.parse(notepadJSON);
-				const notepad: INotepad = Parser.restoreNotepad(res);
-				notepad.notepadAssets = res.notepadAssets;
-
-				pendingXml.push(getNotepadXmlWithAssets(notepad));
+			const pendingXml = notepads.map((notepadJSON: string) => {
+				const notepad = Translators.Json.toNotepadFromNotepad(notepadJSON);
+				return getNotepadXmlWithAssets(notepad);
 			});
 
-			return Observable.fromPromise(Promise.all(pendingXml));
+			return from(Promise.all(pendingXml));
 		}),
 		tap((exportNotepads: IExportedNotepad[]) => {
 			const zip: JSZip = new JSZip();
@@ -199,25 +171,21 @@ const exportAllToMarkdown$ = (action$, store) =>
 			const notepadsInStorage: Promise<string>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
-			return Observable.fromPromise(Promise.all(notepadsInStorage));
+			return from(Promise.all(notepadsInStorage));
 		}),
 		switchMap((notepads: string[]) => {
-			const pendingContent: Promise<IExportedNotepad>[] = [];
-			notepads.forEach((notepadJSON: string) => {
-				const res = JSON.parse(notepadJSON);
-				const notepad: INotepad = Parser.restoreNotepad(res);
-				notepad.notepadAssets = res.notepadAssets;
-
-				pendingContent.push(getNotepadMarkdownWithAssets(notepad));
+			const pendingContent = notepads.map((notepadJSON: string) => {
+				const notepad = Translators.Json.toNotepadFromNotepad(notepadJSON);
+				return getNotepadMarkdownWithAssets(notepad);
 			});
 
-			return Observable.fromPromise(Promise.all(pendingContent));
+			return from(Promise.all(pendingContent));
 		}),
 		tap((exportNotepads: IExportedNotepad[]) => {
 			const zip: JSZip = new JSZip();
 
 			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
-				(<IMarkdownNote[]> exportedNotepad.content).forEach(mdNote =>
+				(<MarkdownNote[]> exportedNotepad.content).forEach(mdNote =>
 					zip.file(
 						`${exportedNotepad.title}/${mdNote.title}.md`,
 						new Blob([mdNote.md], { type: 'text/markdown;charset=utf-8' })
@@ -241,7 +209,7 @@ const renameNotepad$ = (action$, store) =>
 		switchMap((action: Action<string>) => {
 			const oldTitle = store.getState().notepads.notepad.item.title;
 
-			return Observable.fromPromise(NOTEPAD_STORAGE.removeItem(oldTitle))
+			return from(NOTEPAD_STORAGE.removeItem(oldTitle))
 				.pipe(
 					map(() => { return { newTitle: action.payload, oldTitle }; })
 				);
@@ -254,7 +222,7 @@ const saveNotepadOnRenameOrNew$ = (action$, store) =>
 		.pipe(
 			filter((action: Action<Success<any, any>>) => isType(action, actions.renameNotepad.done) || isType(action, actions.parseNpx.done)),
 			map(() => store.getState().notepads.notepad.item),
-			map((notepad: INotepad) => actions.saveNotepad.started(notepad))
+			map((notepad: FlatNotepad) => actions.saveNotepad.started(notepad.toNotepad()))
 		);
 
 const downloadExternalNotepad$ = action$ =>
@@ -262,7 +230,7 @@ const downloadExternalNotepad$ = action$ =>
 		isAction(actions.downloadNotepad.started),
 		map((action: Action<string>) => action.payload),
 		switchMap(url => of(url).pipe(
-			combineLatest(fromPromise(Dialog.confirm(`Are you sure you want to download this notepad: ${url}?`)))
+			combineLatest(from(Dialog.confirm(`Are you sure you want to download this notepad: ${url}?`)))
 		)),
 		filter(([url, shouldDownload]: [string, boolean]) => shouldDownload),
 		map(([url]: [string, boolean]) => url),
@@ -279,7 +247,7 @@ const downloadExternalNotepad$ = action$ =>
 				retry(2),
 				catchError(err => {
 					Dialog.alert(`Download failed. Are you online?`);
-					return Observable.of(actions.downloadNotepad.failed({ params: url, error: err }));
+					return of(actions.downloadNotepad.failed({ params: url, error: err }));
 				})
 			)
 		)
@@ -340,42 +308,22 @@ export const notepadEpics$ = combineEpics(
 
 interface IExportedNotepad {
 	title: string;
-	content: string | IMarkdownNote[];
+	content: string | MarkdownNote[];
 }
 
-function getNotepadXmlWithAssets(notepad: INotepad): Promise<IExportedNotepad> {
-	return new Promise<IExportedNotepad>((resolve, reject) => {
-		try {
-			getAssets(notepad.notepadAssets)
-				.then((assets: IAssets) => notepad.toXML((xml: string) => {
-					notepad.assets = new Parser.Assets();
-					resolve({title: notepad.title, content: xml});
-				}, assets))
-				.catch((err) => reject(err));
-		} catch (err) {
-			reject(err);
-		}
-	});
+async function getNotepadXmlWithAssets(notepad: Notepad): Promise<IExportedNotepad> {
+	const assets = await getAssets(notepad.notepadAssets);
+	return { title: notepad.title, content: await notepad.clone({ assets }).toXml() };
 }
 
-function getNotepadMarkdownWithAssets(notepad: INotepad): Promise<IExportedNotepad> {
-	return new Promise<IExportedNotepad>((resolve, reject) => {
-		try {
-			getAssets(notepad.notepadAssets)
-				.then((assets: IAssets) => notepad.toMarkdown((md: IMarkdownNote[]) => {
-					notepad.assets = new Parser.Assets();
-					resolve({title: notepad.title, content: md});
-				}, assets))
-				.catch((err) => reject(err));
-		} catch (err) {
-			reject(err);
-		}
-	});
+async function getNotepadMarkdownWithAssets(notepad: Notepad): Promise<IExportedNotepad> {
+	const assets = await getAssets(notepad.notepadAssets);
+	return { title: notepad.title, content: await notepad.toMarkdown(assets) };
 }
 
-export function getAssets(notepadAssets: string[]): Promise<IAssets> {
-	return new Promise<IAssets>(resolve => {
-		const assets: IAssets = new Parser.Assets();
+export function getAssets(notepadAssets: string[]): Promise<Asset[]> {
+	return new Promise<Asset[]>(resolve => {
+		const assets: Asset[] = [];
 
 		if (!notepadAssets || notepadAssets.length === 0) {
 			resolve(assets);
@@ -390,9 +338,7 @@ export function getAssets(notepadAssets: string[]): Promise<IAssets> {
 		Promise.all(resolvedAssets)
 			.then((blobs: Blob[]) => {
 				blobs.forEach((blob: Blob, i: number) => {
-					let asset: IAsset = new Parser.Asset(blob);
-					asset.uuid = notepadAssets[i];
-					assets.addAsset(asset);
+					assets.push(new Asset(blob, notepadAssets[i]));
 				});
 
 				resolve(assets);

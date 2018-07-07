@@ -1,14 +1,13 @@
 import * as React from 'react';
 import { Col, Dropdown, Icon, Modal, NavItem, Row } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
-import * as Parser from 'upad-parse/dist/index.js';
-import { INotepad } from '../../types/NotepadTypes';
 import { generateGuid } from '../../util';
 import { Dialog } from '../../dialogs';
 import { SYNC_NAME } from '../../types';
 import LoginComponent from '../../containers/LoginContainer';
 import { ISyncState } from '../../reducers/SyncReducer';
 import ManageSyncComponent from '../../containers/ManageSyncContainer';
+import { FlatNotepad } from 'upad-parse/dist';
 
 const NPX_ICON = require('../../assets/npx.png');
 const MD_ICON = require('../../assets/md.svg');
@@ -17,7 +16,7 @@ export interface INotepadDropdownProps {
 	notepadTitles?: string[];
 	syncState: ISyncState;
 	openNotepadFromStorage?: (title: string) => void;
-	newNotepad?: (notepad: INotepad) => void;
+	newNotepad?: (notepad: FlatNotepad) => void;
 	exportAll?: () => void;
 	exportToMarkdown?: () => void;
 	downloadNotepad?: (syncId: string) => void;
@@ -96,6 +95,6 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 	private createNotepad = async () => {
 		const title = await Dialog.prompt('Notepad Title:');
 
-		if (title) this.props.newNotepad!(Parser.createNotepad(title));
+		if (title) this.props.newNotepad!(new FlatNotepad(title));
 	}
 }

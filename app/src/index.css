@@ -19,6 +19,10 @@ body {
 	height: calc(100vh - 128px);
 }
 
+a {
+	-webkit-user-drag: none;
+}
+
 nav {
 	z-index: 1000 !important;
 	cursor: default;

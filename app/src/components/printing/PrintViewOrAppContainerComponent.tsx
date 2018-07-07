@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { INote, NoteElement } from '../../types/NotepadTypes';
 import './PrintViewComponent.css';
 import MarkdownElementComponent from '../note-viewer/elements/markdown/MarkdownElementComponent';
-import { noop } from 'rxjs/util/noop';
+import { Note } from 'upad-parse/dist';
+import { NoteElement } from 'upad-parse/dist/Note';
 
 export interface IPrintViewComponentProps {
-	note: INote | undefined;
+	note?: Note;
 	printElement: NoteElement;
 	clearPrintView: () => void;
 }
@@ -29,8 +29,8 @@ export default class PrintViewOrAppContainerComponent extends React.Component<IP
 					}}
 					elementEditing=""
 					noteAssets={{}}
-					edit={noop}
-					search={noop} />
+					edit={() => { return; }}
+					search={() => { return; }} />
 			</div>
 		);
 	}
@@ -42,6 +42,6 @@ export default class PrintViewOrAppContainerComponent extends React.Component<IP
 		setTimeout(() => {
 			window.print();
 			clearPrintView();
-		}, 500);
+		}, 1000);
 	}
 }

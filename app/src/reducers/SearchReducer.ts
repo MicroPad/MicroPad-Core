@@ -1,11 +1,11 @@
 import { IReducer } from '../types/ReducerType';
-import { INote } from '../types/NotepadTypes';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
+import { Note } from 'upad-parse/dist';
 
 export interface ISearchState {
-	hashTagResults: INote[];
+	hashTagResults: Note[];
 	query: string;
 }
 

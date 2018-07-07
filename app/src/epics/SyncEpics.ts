@@ -16,19 +16,17 @@ import { Action, Success } from 'redux-typescript-actions';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
 import { ASSET_STORAGE, SYNC_STORAGE } from '../index';
 import { DifferenceEngine } from '../DifferenceEngine';
-import { of } from 'rxjs/observable/of';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
-import { IAddToSyncAction, INotepadToSyncNotepadAction, ISyncAction, IUploadAssetAction } from '../types/ActionTypes';
-import { empty } from 'rxjs/observable/empty';
+import { AddToSyncAction, NotepadToSyncNotepadAction, SyncAction, UploadAssetAction } from '../types/ActionTypes';
+import { defer, EMPTY, from, of } from 'rxjs';
 import { parse } from 'date-fns';
-import { INotepad, INotepadStoreState } from '../types/NotepadTypes';
-import { fromPromise } from 'rxjs/observable/fromPromise';
-import * as Parser from 'upad-parse/dist/index';
+import { INotepadStoreState } from '../types/NotepadTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
-import { defer } from 'rxjs/observable/defer';
 import { Observable } from 'rxjs/Observable';
 import { Store } from 'redux';
+import { FlatNotepad } from 'upad-parse/dist';
+import * as stringify from 'json-stringify-safe';
 
 export namespace SyncEpics {
 	export const persistOnLogin$ = action$ =>
@@ -66,9 +64,9 @@ export namespace SyncEpics {
 		action$.pipe(
 			isAction(actions.actWithSyncNotepad),
 			filter(() => !!(store as Store<IStoreState>).getState().sync.user),
-			map((action: Action<INotepadToSyncNotepadAction>) => action.payload),
-			switchMap((payload: INotepadToSyncNotepadAction) =>
-				fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(payload.notepad)).pipe(
+			map((action: Action<NotepadToSyncNotepadAction>) => action.payload),
+			switchMap((payload: NotepadToSyncNotepadAction) =>
+				from(DifferenceEngine.SyncService.notepadToSyncedNotepad(payload.notepad)).pipe(
 					map((syncedNotepad: ISyncedNotepad) => {
 						return payload.action(syncedNotepad);
 					})
@@ -80,18 +78,18 @@ export namespace SyncEpics {
 		action$.pipe(
 			isAction(actions.sync),
 			tap(() => Materialize.Toast.removeAll()),
-			map((action: Action<ISyncAction>) => action.payload),
-			filter((syncAction: ISyncAction) => !!syncAction && !!syncAction.syncId && !!syncAction.notepad),
-			switchMap((syncAction: ISyncAction) =>
+			map((action: Action<SyncAction>) => action.payload),
+			filter((syncAction: SyncAction) => !!syncAction && !!syncAction.syncId && !!syncAction.notepad),
+			switchMap((syncAction: SyncAction) =>
 				of(syncAction).pipe(
 					combineLatest(
 						DifferenceEngine.SyncService.getLastModified(syncAction.syncId)
-							.pipe(catchError(() => empty()))
+							.pipe(catchError(() => EMPTY))
 					)
 				)
 			),
-			filter(([syncAction, lastModified]: [ISyncAction, Date]) => !!syncAction && !!lastModified),
-			map(([syncAction, lastModified]: [ISyncAction, Date]) => {
+			filter(([syncAction, lastModified]: [SyncAction, Date]) => !!syncAction && !!lastModified),
+			map(([syncAction, lastModified]: [SyncAction, Date]) => {
 				if (parse(syncAction.notepad.lastModified).getTime() < lastModified.getTime()) {
 					// Local notepad is older than remote
 					return actions.requestSyncDownload(syncAction.syncId);
@@ -121,9 +119,9 @@ export namespace SyncEpics {
 				DifferenceEngine.SyncService.downloadNotepad(syncId).pipe(
 					switchMap((remoteNotepad: ISyncedNotepad) => {
 						let localNotepad = (((<IStoreState> store.getState()).notepads || <INotepadStoreState> {}).notepad || <INotepadStoreState> {}).item;
-						if (!localNotepad) localNotepad = <INotepad> Parser.createNotepad('');
+						if (!localNotepad) localNotepad = new FlatNotepad('');
 
-						return fromPromise(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad)).pipe(
+						return from(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad.toNotepad())).pipe(
 							switchMap((local: ISyncedNotepad) => {
 								const diffAssets = Object.keys(remoteNotepad.assetHashList)
 									.filter(uuid => local.assetHashList[uuid] !== remoteNotepad.assetHashList[uuid]);
@@ -136,7 +134,7 @@ export namespace SyncEpics {
 										const downloads$ = Object.keys(urlList)
 											.map(uuid =>
 												DifferenceEngine.downloadAsset(urlList[uuid]).pipe(
-													switchMap((asset: Blob) => fromPromise(
+													switchMap((asset: Blob) => from(
 														ASSET_STORAGE.setItem(uuid, asset)
 													))
 												)
@@ -151,14 +149,13 @@ export namespace SyncEpics {
 										return of(remoteNotepad);
 									}),
 									map(() => {
-										remoteNotepad.notepadAssets = Object.keys(remoteNotepad.assetHashList);
-										return remoteNotepad;
+										return { ...remoteNotepad, notepadAssets: Object.keys(remoteNotepad.assetHashList) };
 									})
 								);
 							})
 						);
 					}),
-					map((remoteNotepad: ISyncedNotepad) => actions.restoreJsonNotepad(JSON.stringify(remoteNotepad))),
+					map((remoteNotepad: ISyncedNotepad) => actions.restoreJsonNotepad(stringify(remoteNotepad))),
 					catchError((error): Observable<Action<any>> => {
 						console.error(error);
 						const message = (!!error.response) ? error.response : 'There was an error syncing';
@@ -178,17 +175,17 @@ export namespace SyncEpics {
 	export const upload$ = (action$, store) =>
 		action$.pipe(
 			isAction(actions.syncUpload.started),
-			map((action: Action<ISyncAction>) => action.payload),
-			map((payload: ISyncAction) => [payload, (<IStoreState> store.getState()).sync.user]),
-			filter(([payload, user]: [ISyncAction, SyncUser]) => !!payload && !!user),
-			switchMap(([payload, user]: [ISyncAction, SyncUser]) =>
+			map((action: Action<SyncAction>) => action.payload),
+			map((payload: SyncAction) => [payload, (<IStoreState> store.getState()).sync.user]),
+			filter(([payload, user]: [SyncAction, SyncUser]) => !!payload && !!user),
+			switchMap(([payload, user]: [SyncAction, SyncUser]) =>
 				DifferenceEngine.AccountService.isPro(user.username, user.token).pipe(
 					tap((isPro: boolean) => {
 						if (Object.keys(payload.notepad.assetHashList).length < 10 || isPro) return;
 						throw 'too many assets';
 					}),
 					switchMap(() => DifferenceEngine.SyncService.uploadNotepad(payload.syncId, payload.notepad)),
-					map((assetList: AssetList) => actions.syncUpload.done({ params: {} as ISyncAction, result: assetList })),
+					map((assetList: AssetList) => actions.syncUpload.done({ params: {} as SyncAction, result: assetList })),
 					catchError((error): Observable<Action<any>> => {
 						if (error === 'too many assets') {
 							return of(actions.syncProError(undefined));
@@ -202,7 +199,7 @@ export namespace SyncEpics {
 						}
 
 						Dialog.alert(message);
-						return of(actions.syncUpload.failed({ params: {} as ISyncAction, error }));
+						return of(actions.syncUpload.failed({ params: {} as SyncAction, error }));
 					})
 				)
 			)
@@ -211,24 +208,24 @@ export namespace SyncEpics {
 	export const uploadAssets$ = action$ =>
 		action$.pipe(
 			isAction(actions.syncUpload.done),
-			map((action: Action<Success<ISyncAction, AssetList>>) => action.payload.result),
-			switchMap((assetList: AssetList) => fromPromise((async () => {
-				const requests: IUploadAssetAction[] = [];
+			map((action: Action<Success<SyncAction, AssetList>>) => action.payload.result),
+			switchMap((assetList: AssetList) => from((async () => {
+				const requests: UploadAssetAction[] = [];
 
 				const blobs: Blob[] = await Promise.all(Object.keys(assetList).map(uuid => ASSET_STORAGE.getItem<Blob>(uuid)));
 				Object.values(assetList).forEach((url, i) => requests.push({ url, asset: blobs[i] }));
 
 				return requests;
 			})())),
-			mergeMap((requests: IUploadAssetAction[]) => requests.map(req => actions.syncUploadAsset.started(req)))
+			mergeMap((requests: UploadAssetAction[]) => requests.map(req => actions.syncUploadAsset.started(req)))
 		);
 
 	export const uploadAsset$ = action$ =>
 		action$.pipe(
 			isAction(actions.syncUploadAsset.started),
-			map((action: Action<IUploadAssetAction>) => action.payload),
-			concatMap((payload: IUploadAssetAction) => defer(() => DifferenceEngine.uploadAsset(payload.url, payload.asset))),
-			map(() => actions.syncUploadAsset.done({ params: {} as IUploadAssetAction, result: undefined }))
+			map((action: Action<UploadAssetAction>) => action.payload),
+			concatMap((payload: UploadAssetAction) => defer(() => DifferenceEngine.uploadAsset(payload.url, payload.asset))),
+			map(() => actions.syncUploadAsset.done({ params: {} as UploadAssetAction, result: undefined }))
 		);
 
 	export const syncAssetsAllDone$ = action$ =>
@@ -296,9 +293,9 @@ export namespace SyncEpics {
 	export const addNotepad$ = action$ =>
 		action$.pipe(
 			isAction(actions.addToSync.started),
-			switchMap((action: Action<IAddToSyncAction>) =>
+			switchMap((action: Action<AddToSyncAction>) =>
 				DifferenceEngine.NotepadService.create(action.payload.user.username, action.payload.user.token, action.payload.notepadTitle).pipe(
-					map((syncId: string) => actions.addToSync.done({ params: <IAddToSyncAction> {}, result: syncId })),
+					map((syncId: string) => actions.addToSync.done({ params: <AddToSyncAction> {}, result: syncId })),
 					catchError((error): Observable<Action<any>> => {
 						console.error(error);
 						if (!!error.response && !!error.response.error) {
@@ -310,7 +307,7 @@ export namespace SyncEpics {
 							Dialog.alert(error.response.error);
 						}
 
-						return of(actions.addToSync.failed({ params: <IAddToSyncAction> {}, error }));
+						return of(actions.addToSync.failed({ params: <AddToSyncAction> {}, error }));
 					})
 				)
 			)
@@ -324,7 +321,7 @@ export namespace SyncEpics {
 			filter(Boolean),
 			filter((notepadState: INotepadStoreState) => !!notepadState.item && !!notepadState.activeSyncId),
 			map((notepadState: INotepadStoreState) => actions.actWithSyncNotepad({
-				notepad: notepadState.item!,
+				notepad: notepadState.item!.toNotepad(),
 				action: notepad => actions.sync({ notepad, syncId: notepadState.activeSyncId! })
 			}))
 		);
@@ -341,7 +338,7 @@ export namespace SyncEpics {
 	export const clearStorageOnLogout$ = action$ =>
 		action$.pipe(
 			isAction(actions.syncLogout),
-			switchMap(() => fromPromise(SYNC_STORAGE.removeItem('sync user'))),
+			switchMap(() => from(SYNC_STORAGE.removeItem('sync user'))),
 			tap(() => Dialog.alert(`You have been logged out of ${SYNC_NAME}`)),
 			filter(() => false)
 		);

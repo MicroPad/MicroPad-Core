@@ -1,18 +1,17 @@
 import { IStoreState } from '../types';
 import { connect, Dispatch } from 'react-redux';
 import { Action } from 'redux';
-import { getNotepadObjectByRef } from '../util';
-import { INote } from '../types/NotepadTypes';
 import SourcesComponent, { ISourcesComponent } from '../components/note-viewer/SourcesComponent';
 import { actions } from '../actions';
+import { Note } from 'upad-parse/dist';
 
 let noteRef: string = '';
 export function mapStateToProps({ notepads, currentNote }: IStoreState) {
 	noteRef = currentNote.ref;
 
-	let note = <INote> {};
+	let note = <Note> {};
 	if (currentNote.ref.length !== 0) {
-		getNotepadObjectByRef(notepads.notepad!.item!, currentNote.ref, obj => note = <INote> obj);
+		note = notepads.notepad!.item!.notes[currentNote.ref];
 	}
 
 	return {

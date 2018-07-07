@@ -2,15 +2,15 @@ import * as React from 'react';
 import { ISyncState } from '../../reducers/SyncReducer';
 import { SYNC_NAME } from '../../types';
 import { ISyncedNotepad, SyncUser } from '../../types/SyncTypes';
-import { INotepad } from '../../types/NotepadTypes';
 import { DifferenceEngine } from '../../DifferenceEngine';
 import { Dialog } from '../../dialogs';
 import LoginComponent from '../../containers/LoginContainer';
+import { FlatNotepad } from 'upad-parse/dist';
 
 export interface ISyncOptionsComponentProps {
 	syncState: ISyncState;
 	syncId?: string;
-	notepad?: INotepad;
+	notepad?: FlatNotepad;
 	sync?: (syncId: string, notepad: ISyncedNotepad) => void;
 	deleteNotepad?: (syncId: string) => void;
 	addNotepad?: (user: SyncUser, title: string) => void;
@@ -67,7 +67,7 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 		const { syncId, notepad, sync } = this.props;
 		if (!syncId || !notepad || !sync) return;
 
-		const syncedNotepad = await DifferenceEngine.SyncService.notepadToSyncedNotepad(notepad);
+		const syncedNotepad = await DifferenceEngine.SyncService.notepadToSyncedNotepad(notepad.toNotepad());
 		sync(syncId, syncedNotepad);
 	}
 

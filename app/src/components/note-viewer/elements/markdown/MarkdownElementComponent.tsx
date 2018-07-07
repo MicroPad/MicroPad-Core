@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
-import { NoteElement } from '../../../../types/NotepadTypes';
 import { MarkDownViewer } from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
@@ -11,6 +10,7 @@ import { Col, Input, Row } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
 import Resizable from 're-resizable';
 import { Dialog } from '../../../../dialogs';
+import { NoteElement } from 'upad-parse/dist/Note';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;

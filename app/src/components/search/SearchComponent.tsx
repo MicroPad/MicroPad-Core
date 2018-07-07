@@ -1,21 +1,21 @@
 import * as React from 'react';
 import { Autocomplete, Collection, CollectionItem, Icon, Modal, NavItem, Row } from 'react-materialize';
-import { INote, INotepad } from '../../types/NotepadTypes';
 import { generateGuid } from '../../util';
-import { fromEvent } from 'rxjs/observable/fromEvent';
 import { shareReplay } from 'rxjs/operators';
+import { FlatNotepad, Note } from 'upad-parse/dist';
 import { Subscription } from 'rxjs/Subscription';
+import { fromEvent } from 'rxjs';
 
 export interface ISearchComponentProps {
-	notepad: INotepad;
-	hashTagResults: INote[];
+	notepad: FlatNotepad;
+	hashTagResults: Note[];
 	query: string;
 	loadNote?: (ref: string) => void;
 	search?: (query: string) => void;
 }
 
 export default class SearchComponent extends React.Component<ISearchComponentProps> {
-	private mappedNotesToOptions: INote[];
+	private mappedNotesToOptions: Note[];
 	private autoCompleteOptions: object;
 	private triggerClickedSub: Subscription;
 
@@ -24,13 +24,13 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 
 		this.autoCompleteOptions = {};
 		this.mappedNotesToOptions = [];
-		notepad.search('').forEach((note: INote, i: number) => {
-			this.autoCompleteOptions[`${i + 1}. ${note.parent.title} > ${note.title}`] = null;
+		notepad.search('').forEach((note: Note, i: number) => {
+			this.autoCompleteOptions[`${i + 1}. ${notepad.sections[note.parent as string].title} > ${note.title}`] = null;
 			this.mappedNotesToOptions[i] = note;
 		});
 
-		const resultElements: JSX.Element[] = hashTagResults.map((note: INote) =>
-			<CollectionItem key={generateGuid()} href="#!" onClick={() => loadNote!(note.internalRef)}>{note.parent.title} > {note.title}</CollectionItem>
+		const resultElements: JSX.Element[] = hashTagResults.map((note: Note) =>
+			<CollectionItem key={generateGuid()} href="#!" onClick={() => loadNote!(note.internalRef)}>{notepad.sections[note.parent as string].title} > {note.title}</CollectionItem>
 		);
 
 		return (

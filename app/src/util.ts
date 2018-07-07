@@ -1,10 +1,8 @@
-import { INote, INotepad, ISection } from './types/NotepadTypes';
 import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
-import * as Parser from 'upad-parse/dist/index';
-import * as stringify from 'json-stringify-safe';
+import { FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
@@ -12,29 +10,6 @@ export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 export function restoreObject<T>(objectToRestore: T, template: T): T {
 	objectToRestore['__proto__'] = { ...template['__proto__'] };
 	return objectToRestore;
-}
-
-export function getNotepadObjectByRef(notepad: INotepad, ref: string, actionOnObj: (obj: ISection | INote) => ISection | INote): INotepad {
-	for (let section of notepad.sections) {
-		let res = findInSection(section);
-		if (!!res) {
-			res = actionOnObj(res);
-			return notepad;
-		}
-	}
-
-	function findInSection(section: ISection): ISection | INote | false {
-		if (section.internalRef === ref) return section;
-		for (let note of section.notes) if (note.internalRef === ref) return note;
-		for (let subSection of section.sections) {
-			const res = findInSection(subSection);
-			if (!!res) return res;
-		}
-
-		return false;
-	}
-
-	return notepad;
 }
 
 export function isDev(): boolean {
@@ -84,26 +59,27 @@ export function getAsBase64(blob: Blob): Promise<string> {
  * Clean up all the assets that aren't in any notepads yet
  */
 export async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage): Promise<void> {
-	const notepads: INotepad[] = [];
-	await notepadStorage.iterate((value: string) => {
-		notepads.push(Parser.restoreNotepad(JSON.parse(value)));
+	const notepads: Notepad[] = [];
+	await notepadStorage.iterate((json: string) => {
+		notepads.push(Translators.Json.toNotepadFromNotepad(json));
 		return;
 	});
 
 	const allUsedAssets: Set<string> = new Set<string>();
 
 	// Handle deletion of unused assets, same as what's done in the epic
-	for (const notepad of notepads) {
-		const assets = notepad.notepadAssets || [];
-		const usedAssets = notepad.getUsedAssets();
+	for (let notepad of notepads) {
+		const assets = notepad.notepadAssets;
+		const usedAssets = getUsedAssets(notepad.flatten());
 		const unusedAssets = assets.filter(uuid => !usedAssets.has(uuid));
 		usedAssets.forEach(uuid => allUsedAssets.add(uuid));
 
 		await Promise.all(unusedAssets.map(uuid => assetStorage.removeItem(uuid)));
 
 		// Update notepadAssets
-		notepad.notepadAssets = Array.from(usedAssets);
-		await notepadStorage.setItem(notepad.title, stringify(notepad));
+		notepad = notepad.clone({ notepadAssets: Array.from(usedAssets) });
+
+		await notepadStorage.setItem(notepad.title, notepad.toJson());
 	}
 
 	// Handle the deletion of assets we've lost track of and aren't in any notepad
@@ -117,6 +93,18 @@ export async function cleanHangingAssets(notepadStorage: LocalForage, assetStora
 	for (const uuid of lostAssets) {
 		await assetStorage.removeItem(uuid);
 	}
+}
+
+export function getUsedAssets(notepad: FlatNotepad): Set<string> {
+	return new Set(
+		Object.values(notepad.notes)
+		.map(
+			n => n.elements
+				.map(e => e.args.ext!)
+				.filter(Boolean)
+		)
+		.reduce((used, cur) => used.concat(cur), [])
+	);
 }
 
 // Thanks to http://stackoverflow.com/a/12300351/998467

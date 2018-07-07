@@ -1,18 +1,40 @@
-import * as React from 'react';
-import { Modal } from 'react-materialize';
-import { INotepad } from '../../../../types/NotepadTypes';
-import * as Parser from 'upad-parse/dist/index';
 // @ts-ignore
 import helpNpx from '!raw-loader!../../../../assets/Help.npx';
+
+import * as React from 'react';
+import { Modal } from 'react-materialize';
 import { Converter, extension } from 'showdown';
 import { IShowdownOpts } from './MarkdownElementComponent';
 import './MarkdownHelpComponent.css';
+import Async, { Props as AsyncProps } from 'react-promise';
+import { Translators } from 'upad-parse/dist';
+
+const ModalAsync = Async as { new (props: AsyncProps<FormattingHelpNote>): Async<FormattingHelpNote> };
+
+type FormattingHelpNote = {
+	title: string;
+	html: string;
+};
 
 export default class MarkdownHelpComponent extends React.Component {
 	render() {
-		Parser.parse(helpNpx, ['asciimath']);
-		const help: INotepad = Parser.notepad;
-		const mdGuide = help.sections[1].notes[0];
+		return (
+			<ModalAsync promise={this.getHtml()} then={note =>
+				<Modal
+					header={note.title}
+					trigger={<a href="#!">Formatting Help</a>}
+					fixedFooter={true}>
+					<div id="markdown-help" dangerouslySetInnerHTML={{
+						__html: note.html
+
+					}} />
+				</Modal>
+			} />
+		);
+	}
+
+	private getHtml: () => Promise<FormattingHelpNote> = async () => {
+		const mdGuideNote = (await Translators.Xml.toNotepadFromNpx(helpNpx)).sections[1].notes[0];
 
 		extension('mock', () => {
 			let matches: string[] = [];
@@ -50,20 +72,15 @@ export default class MarkdownHelpComponent extends React.Component {
 			prefixHeaderId: 'mdheader_',
 			emoji: true,
 			extensions: ['mock']
-		} as IShowdownOpts).makeHtml(mdGuide.elements[0].content);
+		} as IShowdownOpts)
+			.makeHtml(mdGuideNote.elements[0].content)
+			.split('<ul>').join('<ul class="browser-default">')
+			.split('<li>').join('<li class="browser-default">')
+			.split('<a').join('<a target="_blank" rel="nofollow noreferrer"');
 
-		return (
-			<Modal
-				header={mdGuide.title}
-				trigger={<a href="#!">Formatting Help</a>}
-				fixedFooter={true}>
-				<div id="markdown-help" dangerouslySetInnerHTML={{
-					__html: html
-						.split('<ul>').join('<ul class="browser-default">')
-						.split('<li>').join('<li class="browser-default">')
-						.split('<a').join('<a target="_blank" rel="nofollow noreferrer"')
-				}} />
-			</Modal>
-		);
+		return {
+			title: mdGuideNote.title,
+			html: html
+		};
 	}
 }

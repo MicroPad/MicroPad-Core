@@ -1,14 +1,12 @@
-import { createEpicMiddleware } from 'redux-observable';
-import * as configureStore from 'redux-mock-store';
+import { ActionsObservable, createEpicMiddleware } from 'redux-observable';
+import configureStore from 'redux-mock-store';
 import { ExplorerEpics } from '../ExplorerEpics';
 import { actions } from '../../actions';
 import { cold } from 'jest-marbles';
-import { Observable } from 'rxjs/Observable';
-import { Action } from 'redux-typescript-actions';
 import { IStoreState } from '../../types';
 import { ineeda } from 'ineeda';
-import { INote, IParent, ISection } from '../../types/NotepadTypes';
-import { INewNotepadObjectAction } from '../../types/ActionTypes';
+import { NewNotepadObjectAction } from '../../types/ActionTypes';
+import { FlatNotepad } from 'upad-parse/dist';
 
 const epic = createEpicMiddleware(ExplorerEpics.explorerEpics$);
 const mockStore = configureStore([epic]);
@@ -22,44 +20,26 @@ afterEach(() => {
 describe('expandAll$', () => {
 	it('should map to action with list of internalRefs', () => {
 		// Arrange
+		const testNotepad = new FlatNotepad('test')
+			.addSection({ title: 'test1', internalRef: '1' })
+			.addSection({ title: 'test2', internalRef: '2', parentRef: '1' })
+			.addSection({ title: 'test3', internalRef: '3' });
+
 		store = mockStore(ineeda<IStoreState>({
 			notepads: {
 				notepad: {
-					item: {
-						sections: [
-							<ISection> {
-								internalRef: 'test1',
-								sections: <ISection[]> [
-									<ISection> {
-										internalRef: 'test2',
-										sections: <ISection[]> [],
-										notes: <INote[]> []
-									}
-								],
-								notes: <INote[]> []
-							},
-							<ISection> {
-								internalRef: 'test3',
-								sections: <ISection[]> [],
-								notes: <INote[]> []
-							}
-						]
-					}
+					item: testNotepad
 				}
 			}
 		}));
 
-		const res: Observable<Action<string[]>> = ExplorerEpics.expandAll$(cold('a', {
-			a: actions.expandAllExplorer.started(undefined)
-		}), store);
-
 		// Act
-		res.subscribe();
+		const res = ExplorerEpics.expandAll$(ActionsObservable.of(actions.expandAllExplorer.started(undefined)), store);
 
 		// Assert
-		expect(res).toBeObservable(cold('a', { a: actions.expandAllExplorer.done({
+		expect(res).toBeObservable(cold('(a|)', { a: actions.expandAllExplorer.done({
 				params: undefined,
-				result: ['test1', 'test2', 'test3']
+				result: ['1', '2', '3']
 		})}));
 	});
 
@@ -68,22 +48,16 @@ describe('expandAll$', () => {
 		store = mockStore(ineeda<IStoreState>({
 			notepads: {
 				notepad: {
-					item: {
-						sections: []
-					}
+					item: new FlatNotepad('test')
 				}
 			}
 		}));
-		
-		const res: Observable<Action<string[]>> = ExplorerEpics.expandAll$(cold('a', {
-			a: actions.expandAllExplorer.started(undefined)
-		}), store);
 
 		// Act
-		res.subscribe();
+		const res = ExplorerEpics.expandAll$(ActionsObservable.of(actions.expandAllExplorer.started(undefined)), store);
 
 		// Assert
-		expect(res).toBeObservable(cold('a', { a: actions.expandAllExplorer.done({
+		expect(res).toBeObservable(cold('(a|)', { a: actions.expandAllExplorer.done({
 				params: undefined,
 				result: []
 		})}));
@@ -91,42 +65,53 @@ describe('expandAll$', () => {
 });
 
 describe('autoLoadNewSection$', () => {
-	it('should map to action with list of internalRefs', () => {
+	it('should map to action with list of internalRefs for a root level section', () => {
 		// Arrange
-		const mockNotepad: Partial<IParent> = {
-			sections: <ISection[]> [
-				{
-					parent: <IParent> {},
-					internalRef: 'expand me pls',
-					title: 'test',
-					sections: <ISection[]> [],
-					notes: <INote[]> []
-				}
-			]
-		};
-		mockNotepad.sections![0].parent = <IParent> mockNotepad;
+		const testNotepad = new FlatNotepad('test')
+			.addSection({ title: 'test', internalRef: 'expand me pls' });
 
-		const params: INewNotepadObjectAction = {
-			title: 'test',
-			parent: <IParent> mockNotepad
+		const params: NewNotepadObjectAction = {
+			title: 'test'
 		};
 
-		store = mockStore(ineeda<IStoreState>({
+		store = mockStore({
 			notepads: {
 				notepad: {
-					item: mockNotepad
+					item: testNotepad
 				}
 			}
-		}));
-
-		const res: Observable<Action<string[]>> = ExplorerEpics.autoLoadNewSection$(cold('a', {
-			a: actions.newSection(params)
-		}), store);
+		} as IStoreState);
 
 		// Act
-		res.subscribe();
+		const res = ExplorerEpics.autoLoadNewSection$(ActionsObservable.of(actions.newSection(params)), store);
 
 		// Assert
-		expect(res).toBeObservable(cold('a', { a: actions.expandSection('expand me pls') }));
+		expect(res).toBeObservable(cold('(a|)', { a: actions.expandSection('expand me pls') }));
+	});
+
+	it('should map to action with list of internalRefs for a nested section', () => {
+		// Arrange
+		const testNotepad = new FlatNotepad('test')
+			.addSection({ title: 'test', internalRef: 'parent' })
+			.addSection({ title: 'child', internalRef: 'expand me pls', parentRef: 'parent'});
+
+		const params: NewNotepadObjectAction = {
+			title: 'child',
+			parent: 'parent'
+		};
+
+		store = mockStore({
+			notepads: {
+				notepad: {
+					item: testNotepad
+				}
+			}
+		} as IStoreState);
+
+		// Act
+		const res = ExplorerEpics.autoLoadNewSection$(ActionsObservable.of(actions.newSection(params)), store);
+
+		// Assert
+		expect(res).toBeObservable(cold('(a|)', { a: actions.expandSection('expand me pls') }));
 	});
 });
