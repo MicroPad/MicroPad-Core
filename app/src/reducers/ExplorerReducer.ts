@@ -39,7 +39,7 @@ export class ExplorerReducer implements IReducer<IExplorerState> {
 			const notepad = action.payload.notepad;
 			const noteFamily: Set<string> = new Set<string>([
 				...state.openSections,
-				...notepad.pathFrom(note).slice(1).map((parent: FlatSection) => parent.internalRef)
+				...notepad.pathFrom(note).map((parent: FlatSection) => parent.internalRef)
 			]);
 
 			return {
