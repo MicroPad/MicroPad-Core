@@ -17,7 +17,10 @@ export function mapStateToProps({ notepads, currentNote }: IStoreState): INotepa
 		if (!note) return { breadcrumbs: ['Error loading note'] };
 
 		// Get parent list up the tree
-		breadcrumbs = notepads.notepad!.item!.pathFrom(note).map(parent => parent.title);
+		breadcrumbs = [
+			...notepads.notepad!.item!.pathFrom(note).map(parent => parent.title),
+			note.title
+		];
 
 		if (breadcrumbs.length > 1) {
 			time = format(new Date(note.time), 'dddd, D MMMM h:mm A');
