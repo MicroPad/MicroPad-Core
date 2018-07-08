@@ -7611,9 +7611,9 @@ unzip-response@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/unzip-response/-/unzip-response-2.0.1.tgz#d2f0f737d16b0615e72a6935ed04214572d56f97"
 
-upad-parse@3.2.2:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-3.2.2.tgz#10d8ee779bfa25174a3f7a9d0463f26a722b9ec9"
+upad-parse@3.2.3:
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-3.2.3.tgz#3c7974c962f26939697e37e53c0d2706a4940877"
   dependencies:
     date-fns "^1.29.0"
     json-stringify-safe "^5.0.1"
