@@ -7,6 +7,7 @@ import {
 	InsertElementAction,
 	NewNotepadObjectAction,
 	NotepadToSyncNotepadAction,
+	RestoreJsonNotepadAndLoadNoteAction,
 	SyncAction,
 	UpdateBibliographyAction,
 	UpdateElementAction,
@@ -14,8 +15,9 @@ import {
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
 import { AssetList, SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
-import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
+import { FlatNotepad, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
+import { HashTagSearchResults } from './reducers/SearchReducer';
 
 const actionCreator = actionCreatorFactory();
 
@@ -40,6 +42,7 @@ export const actions = {
 	addToSync: actionCreator.async<AddToSyncAction, string, any>('SYNC_CREATE'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
+	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
 	newNotepad: actionCreator<FlatNotepad>('NEW_NOTEPAD'),
 	flipFullScreenState: actionCreator<void>('FLIP_FULL_SCREEN'),
 	deleteNotepad: actionCreator<string>('DELETE_NOTEPAD'),
@@ -49,7 +52,7 @@ export const actions = {
 	expandSection: actionCreator<string>('OPEN_SECTION'),
 	collapseSelection: actionCreator<string>('CLOSE_SECTION'),
 	search: actionCreator<string>('SEARCH'),
-	displayHashTagSearchResults: actionCreator<Note[]>('DISPLAY_HASH_TAG_SEARCH_RESULTS'),
+	displayHashTagSearchResults: actionCreator<HashTagSearchResults>('DISPLAY_HASH_TAG_SEARCH_RESULTS'),
 	deleteNotepadObject: actionCreator<string>('DELETE_NOTEPAD_OBJECT'),
 	renameNotepadObject: actionCreator<IRenameNotepadObjectAction>('RENAME_NOTEPAD_OBJECT'),
 	expandFromNote: actionCreator<ExpandFromNoteAction>('EXPAND_FROM_NOTE'),

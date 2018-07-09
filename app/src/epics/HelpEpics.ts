@@ -10,7 +10,10 @@ export namespace HelpEpics {
 			map(() => actions.parseNpx.started(helpNpx))
 		);
 
-	export const helpEpics$ = combineEpics(
+	export const helpEpics$ = combineEpics<Action<any>, any, {
+		helpNpx: string,
+		getStorage: () => { [name: string]: LocalForage }
+	}>(
 		getHelp$
 	);
 }

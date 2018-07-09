@@ -39,7 +39,11 @@ describe('search$', () => {
 		// Arrange
 
 		// Act
-		const res = SearchEpics.search$(ActionsObservable.of(actions.search('#test')), store);
+		const res = SearchEpics.search$(ActionsObservable.of(actions.search('#test')), store, {
+			getStorage: () => {
+				return {};
+			}
+		});
 
 		// Assert
 		res.subscribe((action: Action<Note[]>) => expect(action.payload[0].title).toEqual(toFind.title));
@@ -55,11 +59,15 @@ describe('search$', () => {
 			// Arrange
 
 			// Act
-			const res = SearchEpics.search$(ActionsObservable.of(actions.search(query)), store);
+			const res = SearchEpics.search$(ActionsObservable.of(actions.search(query)), store, {
+				getStorage: () => {
+					return {};
+				}
+			});
 
 			// Assert
 			expect(res).toBeObservable(cold('(a|)', {
-				a: actions.displayHashTagSearchResults([])
+				a: actions.displayHashTagSearchResults({})
 			}));
 		});
 	});

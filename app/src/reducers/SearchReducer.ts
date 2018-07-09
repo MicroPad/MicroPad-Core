@@ -2,17 +2,24 @@ import { IReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { Note } from 'upad-parse/dist';
 
 export interface ISearchState {
-	hashTagResults: Note[];
+	hashTagResults: HashTagSearchResults;
 	query: string;
 }
+
+export type HashTagSearchResult = {
+	title: string;
+	parentTitle: string;
+	noteRef: string;
+};
+
+export type HashTagSearchResults = { [notepadTitle: string]: HashTagSearchResult[] };
 
 export class SearchReducer implements IReducer<ISearchState> {
 	public readonly key: string = 'search';
 	public readonly initialState: ISearchState = {
-		hashTagResults: [],
+		hashTagResults: {},
 		query: ''
 	};
 

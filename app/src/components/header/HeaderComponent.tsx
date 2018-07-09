@@ -38,7 +38,7 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 				<Navbar className="blue-grey menu-items" brand={<AppNameComponent />} href="#!" style={this.navStyle} right={true}>
 					<li style={{ marginRight: '10px' }}>{saveText}</li>
 					<NotepadDropdownComponent />
-					{!!notepad && !!notepad.item && <SearchComponent />}
+					<SearchComponent />
 					<NavItem href="#!" onClick={getHelp}><Icon left={true}>help_outline</Icon> Help</NavItem>
 					{isFullScreen && <NavItem href="#!" onClick={flipFullScreenState}><Icon left={true}>fullscreen_exit</Icon> Exit Full Screen</NavItem>}
 				</Navbar>

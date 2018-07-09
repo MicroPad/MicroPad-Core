@@ -76,26 +76,32 @@ const saveDefaultFontSize$ = (action$, store) =>
 const getNotepadList$ = action$ =>
 	action$.pipe(
 		filter((action: Action<void>) => isType(action, actions.getNotepadList.started)),
-		switchMap(() => from(NOTEPAD_STORAGE.keys())),
-		catchError(err => of(actions.getNotepadList.failed({ params: undefined, error: err }))),
-		map((keys: string[]) => {
-			return actions.getNotepadList.done({ params: undefined, result: keys });
-		})
+		switchMap(() =>
+			from(NOTEPAD_STORAGE.keys()).pipe(
+				map((keys: string[]) => {
+					return actions.getNotepadList.done({ params: undefined, result: keys });
+				}),
+				catchError(err => of(actions.getNotepadList.failed({ params: undefined, error: err })))
+			)
+		)
 	);
 
 const openNotepadFromStorage$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.openNotepadFromStorage.started)),
 		map((action: Action<string>) => action.payload),
-		switchMap((notepadTitle: string) => from(NOTEPAD_STORAGE.getItem(notepadTitle))),
-		catchError(err => {
-			Dialog.alert(`Error opening notepad`);
-			return of(actions.openNotepadFromStorage.failed(err));
-		}),
-		mergeMap((json: string) => [
-			actions.openNotepadFromStorage.done({ params: '', result: undefined }),
-			actions.restoreJsonNotepad(json)
-		])
+		switchMap((notepadTitle: string) =>
+			from(NOTEPAD_STORAGE.getItem(notepadTitle)).pipe(
+				mergeMap((json: string) => [
+					actions.openNotepadFromStorage.done({ params: '', result: undefined }),
+					actions.restoreJsonNotepad(json)
+				]),
+				catchError(err => {
+					Dialog.alert(`Error opening notepad`);
+					return of(actions.openNotepadFromStorage.failed(err));
+				})
+			)
+		)
 	);
 
 const cleanUnusedAssets$ = (action$, store) =>
