@@ -54,3 +54,8 @@ export type ExpandFromNoteAction = {
 	note: Note;
 	notepad: FlatNotepad;
 };
+
+export type RestoreJsonNotepadAndLoadNoteAction = {
+	notepadTitle: string;
+	noteRef: string;
+};

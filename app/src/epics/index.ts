@@ -11,6 +11,8 @@ import { PrintEpics } from './PrintEpics';
 import { SyncEpics } from './SyncEpics';
 import { HelpEpics } from './HelpEpics';
 import { SearchEpics } from './SearchEpics';
+import { getStorage } from '../index';
+import { Action } from 'redux-typescript-actions';
 
 const baseEpic$ = combineEpics(
 	notepadEpics$,
@@ -24,8 +26,12 @@ const baseEpic$ = combineEpics(
 	SyncEpics.syncEpics$
 );
 
-export const epicMiddleware = createEpicMiddleware(baseEpic$, {
+export const epicMiddleware = createEpicMiddleware<Action<any>, any, {
+	helpNpx: string,
+	getStorage: () => { [name: string]: LocalForage }
+}>(baseEpic$, {
 	dependencies: {
-		helpNpx
+		helpNpx,
+		getStorage: getStorage
 	}
 });

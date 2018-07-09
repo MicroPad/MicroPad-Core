@@ -1,16 +1,18 @@
 import * as React from 'react';
 import { Autocomplete, Collection, CollectionItem, Icon, Modal, NavItem, Row } from 'react-materialize';
-import { generateGuid } from '../../util';
 import { shareReplay } from 'rxjs/operators';
 import { FlatNotepad, Note } from 'upad-parse/dist';
 import { Subscription } from 'rxjs/Subscription';
 import { fromEvent } from 'rxjs';
+import { HashTagSearchResult, HashTagSearchResults } from '../../reducers/SearchReducer';
+import { RestoreJsonNotepadAndLoadNoteAction } from '../../types/ActionTypes';
 
 export interface ISearchComponentProps {
-	notepad: FlatNotepad;
-	hashTagResults: Note[];
+	notepad?: FlatNotepad;
+	hashTagResults: HashTagSearchResults;
 	query: string;
 	loadNote?: (ref: string) => void;
+	loadNoteFromHashTagResults?: (data: RestoreJsonNotepadAndLoadNoteAction) => void;
 	search?: (query: string) => void;
 }
 
@@ -20,29 +22,28 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	private triggerClickedSub: Subscription;
 
 	render() {
-		const { notepad, query, hashTagResults, loadNote } = this.props;
+		const { notepad, query, hashTagResults } = this.props;
 
 		this.autoCompleteOptions = {};
 		this.mappedNotesToOptions = [];
-		notepad.search('').forEach((note: Note, i: number) => {
-			this.autoCompleteOptions[`${i + 1}. ${notepad.sections[note.parent as string].title} > ${note.title}`] = null;
-			this.mappedNotesToOptions[i] = note;
-		});
 
-		const resultElements: JSX.Element[] = hashTagResults.map((note: Note) =>
-			<CollectionItem key={generateGuid()} href="#!" onClick={() => loadNote!(note.internalRef)}>{notepad.sections[note.parent as string].title} > {note.title}</CollectionItem>
-		);
+		if (!!notepad) {
+			notepad.search('').forEach((note: Note, i: number) => {
+				this.autoCompleteOptions[`${i + 1}. ${notepad.sections[note.parent as string].title} > ${note.title}`] = null;
+				this.mappedNotesToOptions[i] = note;
+			});
+		}
 
 		return (
 			<Modal
-				key={`search-${notepad.title}`}
+				key={`search-${(notepad || { title: 'all' }).title}`}
 				header="Search Notepad"
 				trigger={<NavItem id={`search-button`} href="#!"><Icon left={true}>search</Icon> Search</NavItem>}>
 				<Row>
 					<Autocomplete
 						id="search-input"
 						s={12}
-						title="Search by note title or a hashtag"
+						title={`Search by ${(!!notepad && `note title or a`) || ''} hashtag`}
 						onChange={this.onInput}
 						value={query}
 						onAutocomplete={this.loadNoteFromInput}
@@ -50,11 +51,22 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 				</Row>
 
 				{
-					hashTagResults.length > 0
-					&& <div>
-						<h4>Hashtag Search Results</h4>
-						<Collection>{resultElements}</Collection>
-					</div>
+					// Display results for the current notepad first
+					!!notepad
+					&& !!hashTagResults[notepad.title]
+					&& hashTagResults[notepad.title].length > 0
+					&& this.generateHashTagSearchResultList(notepad.title, hashTagResults[notepad.title])
+				}
+
+				{
+					// Display results for all the other notepads
+					Object.entries(hashTagResults)
+						.filter(([notepadTitle, results]: [string, HashTagSearchResult[]]) =>
+							!!results && results.length > 0 && (!notepad || notepadTitle !== notepad.title)
+						)
+						.map(([notepadTitle, results]: [string, HashTagSearchResult[]]) =>
+							this.generateHashTagSearchResultList(notepadTitle, results)
+						)
 				}
 			</Modal>
 		);
@@ -97,6 +109,30 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 		this.closeModal();
 		setTimeout(() => search!(''), 10);
 		loadNote!(this.mappedNotesToOptions[index].internalRef);
+	}
+
+	private generateHashTagSearchResultList = (notepadTitle: string, results: HashTagSearchResult[]): JSX.Element | null => {
+		const { loadNoteFromHashTagResults } = this.props;
+		if (!loadNoteFromHashTagResults) return null;
+
+		return (
+			<div key={`res-collection-list-${notepadTitle}`}>
+				<h4 key={`res-collection-header-${notepadTitle}`}>Hashtag Search Results for <em>{notepadTitle}</em></h4>
+				<Collection key={`res-collection-${notepadTitle}`}>{
+					results.map(result => (
+						<CollectionItem
+							key={`res-${notepadTitle}-${result.parentTitle}-${result.title}-item`}
+							href="#!"
+							onClick={() => {
+								loadNoteFromHashTagResults({ notepadTitle, noteRef: result.noteRef });
+								setTimeout(() => this.closeModal(), 0);
+							}}>
+							{result.parentTitle} > {result.title}
+						</CollectionItem>
+					))
+				}</Collection>
+			</div>
+		);
 	}
 
 	private closeModal = () => {

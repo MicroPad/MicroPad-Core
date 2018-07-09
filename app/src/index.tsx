@@ -56,6 +56,14 @@ export const SYNC_STORAGE = localforage.createInstance({
 	storeName: 'sync'
 });
 
+export function getStorage(): { [name: string]: LocalForage } {
+	return {
+		notepadStorage: NOTEPAD_STORAGE,
+		assetStorage: ASSET_STORAGE,
+		syncStorage: SYNC_STORAGE
+	};
+}
+
 (async function init() {
 	if (!await compatibilityCheck()) return;
 	await hydrateStoreFromLocalforage();

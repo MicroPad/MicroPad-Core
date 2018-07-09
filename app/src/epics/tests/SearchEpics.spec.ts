@@ -1,17 +1,15 @@
 import { SearchEpics } from '../SearchEpics';
 import { ActionsObservable } from 'redux-observable';
 import { actions } from '../../actions';
-import { cold } from 'jest-marbles';
-import configureStore from 'redux-mock-store';
-import { IStoreState } from '../../types';
 import { ineeda } from 'ineeda';
 import { Action } from 'redux-typescript-actions';
 import { ElementArgs } from 'upad-parse/dist/Note';
 import { FlatNotepad, Note } from 'upad-parse/dist';
+import { HashTagSearchResults } from '../../reducers/SearchReducer';
 
 describe('search$', () => {
 	let toFind: Note;
-	let store;
+	let mockStorage: () => { [name: string]: LocalForage };
 
 	beforeEach(() => {
 		toFind = new Note('Found it!');
@@ -26,23 +24,30 @@ describe('search$', () => {
 		mockNotepad = mockNotepad.addSection({ title: 'Test', internalRef: 'abc' });
 		mockNotepad = mockNotepad.addNote(toFind);
 
-		store = configureStore()({
-			notepads: {
-				notepad: {
-					item: mockNotepad
-				}
+		mockStorage = () => {
+			return {
+				notepadStorage: ineeda<LocalForage>({
+					iterate: async (callback: (res: string) => void): Promise<void> => {
+						callback(mockNotepad.toNotepad().toJson());
+						return;
+					}
+				})
 			}
-		} as IStoreState);
+		};
 	});
 
 	it(`should search the notepad with the hashtag`, () => {
 		// Arrange
 
 		// Act
-		const res = SearchEpics.search$(ActionsObservable.of(actions.search('#test')), store);
+		const res = SearchEpics.search$(ActionsObservable.of(actions.search('#test')), null, {
+			getStorage: mockStorage
+		});
 
 		// Assert
-		res.subscribe((action: Action<Note[]>) => expect(action.payload[0].title).toEqual(toFind.title));
+		res.subscribe((action: Action<HashTagSearchResults>) =>
+			expect(action.payload['Test Notepad'][0].title).toEqual(toFind.title)
+		);
 	});
 
 	[
@@ -55,12 +60,12 @@ describe('search$', () => {
 			// Arrange
 
 			// Act
-			const res = SearchEpics.search$(ActionsObservable.of(actions.search(query)), store);
+			const res = SearchEpics.search$(ActionsObservable.of(actions.search(query)), null, {
+				getStorage: mockStorage
+			});
 
 			// Assert
-			expect(res).toBeObservable(cold('(a|)', {
-				a: actions.displayHashTagSearchResults([])
-			}));
+			res.subscribe(result => expect(result).toEqual(actions.displayHashTagSearchResults({})));
 		});
 	});
 });

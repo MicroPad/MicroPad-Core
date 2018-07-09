@@ -1,5 +1,5 @@
 import { actions } from '../actions';
-import { catchError, combineLatest, filter, map, mergeMap, retry, switchMap, tap } from 'rxjs/operators';
+import { catchError, combineLatest, concatMap, filter, map, mergeMap, retry, switchMap, tap } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
@@ -14,6 +14,7 @@ import { Asset, FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 import { MarkdownNote } from 'upad-parse/dist/Note';
 import { from, of } from 'rxjs';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
+import { RestoreJsonNotepadAndLoadNoteAction } from '../types/ActionTypes';
 
 const parseQueue: string[] = [];
 
@@ -99,6 +100,28 @@ const restoreJsonNotepad$ = action$ =>
 				});
 			}
 		})
+	);
+
+const restoreJsonNotepadAndLoadNote$ = (action$, _, { getStorage }) =>
+	action$.pipe(
+		isAction(actions.restoreJsonNotepadAndLoadNote),
+		map((action: Action<RestoreJsonNotepadAndLoadNoteAction>) => action.payload),
+		switchMap((result: RestoreJsonNotepadAndLoadNoteAction) =>
+			from((getStorage().notepadStorage as LocalForage).getItem(result.notepadTitle)).pipe(
+				map((notepadJson: string) => Translators.Json.toFlatNotepadFromNotepad(notepadJson)),
+				map((notepad: FlatNotepad) => [result.noteRef, notepad]),
+				catchError(err => {
+					console.error(err);
+					Dialog.alert(`Error opening notepad`);
+					return of(null);
+				})
+			)
+		),
+		filter(Boolean),
+		concatMap(([noteRef, notepad]: [string, FlatNotepad]) => [
+			actions.parseNpx.done({ params: '', result: notepad }),
+			actions.loadNote.started(noteRef)
+		])
 	);
 
 const exportNotepad$ = (action$, store) =>
@@ -293,6 +316,7 @@ export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	syncOnNotepadParsed$,
 	restoreJsonNotepad$,
+	restoreJsonNotepadAndLoadNote$,
 	exportNotepad$,
 	exportAll$,
 	renameNotepad$,
