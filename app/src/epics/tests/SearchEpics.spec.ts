@@ -32,7 +32,7 @@ describe('search$', () => {
 						return;
 					}
 				})
-			}
+			};
 		};
 	});
 
