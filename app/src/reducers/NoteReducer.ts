@@ -84,6 +84,11 @@ export class NoteReducer implements IReducer<ICurrentNoteState> {
 					...action.payload
 				}
 			};
+		} else if (isType(action, actions.closeNote)) {
+			return {
+				...state,
+				ref: ''
+			};
 		}
 
 		return state;

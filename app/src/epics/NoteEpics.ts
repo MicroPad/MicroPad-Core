@@ -11,6 +11,7 @@ import { NewNotepadObjectAction, UpdateElementAction } from '../types/ActionType
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
+import { Store } from 'redux';
 
 const loadNote$ = (action$, store) =>
 	action$.pipe(
@@ -125,13 +126,26 @@ const autoLoadNewNote$ = (action$, store) =>
 		map((newNote: Note) => actions.loadNote.started(newNote.internalRef))
 	);
 
+const closeNoteOnDeletedParent$ = (action$, store: Store<IStoreState>) =>
+	action$.pipe(
+		isAction(actions.deleteNotepadObject),
+		map(() => store.getState().notepads.notepad),
+		filter(Boolean),
+		map((notepadState: INotepadStoreState) => notepadState.item),
+
+		// Has the currently opened note been deleted?
+		filter((notepad: FlatNotepad) => store.getState().currentNote.ref.length > 0 && !notepad.notes[store.getState().currentNote.ref]),
+		map(() => actions.closeNote(undefined))
+	);
+
 export const noteEpics$ = combineEpics(
 	loadNote$,
 	checkNoteAssets$,
 	downloadAsset$,
 	binaryElementUpdate$,
 	reloadNote$,
-	autoLoadNewNote$
+	autoLoadNewNote$,
+	closeNoteOnDeletedParent$
 );
 
 function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {
