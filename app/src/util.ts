@@ -7,11 +7,6 @@ import { FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
 
-export function restoreObject<T>(objectToRestore: T, template: T): T {
-	objectToRestore['__proto__'] = { ...template['__proto__'] };
-	return objectToRestore;
-}
-
 export function isDev(): boolean {
 	return (
 		!QueryString.parse(location.search.slice(1)).prod
