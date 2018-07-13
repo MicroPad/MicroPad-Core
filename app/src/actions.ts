@@ -83,5 +83,6 @@ export const actions = {
 	syncProError: actionCreator<void>('SYNC_PRO_ERROR'),
 	setHelpPref: actionCreator<boolean>('SET_HELP_PREF'),
 	syncAssetsAllDone: actionCreator<void>('SYNC_ASSETS_ALL_DONE'),
-	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON')
+	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON'),
+	closeNote: actionCreator<void>('CLOSE_NOTE')
 };

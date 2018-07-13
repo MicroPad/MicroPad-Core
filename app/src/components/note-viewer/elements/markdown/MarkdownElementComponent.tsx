@@ -377,7 +377,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					type: 'lang',
 					regex: /(^|\s)(#[a-z\d-]+)/gi,
 					replace: function(s: string, match: string) {
-						matches.push(`<a href="javascript:searchHashtag(\'#${s.split('#')[1]}\');">${s}</a>`);
+						matches.push(`<a href="javascript:void(0);" onclick="searchHashtag(\'#${s.split('#')[1]}\');">${s}</a>`);
 						var n = matches.length - 1;
 						return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
 					}

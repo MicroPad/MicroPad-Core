@@ -10,6 +10,7 @@ import { IVersion } from '../types/MetaTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { FlatNotepad } from 'upad-parse/dist';
 import { EMPTY } from 'rxjs';
+import { lt as versionLessThan } from 'semver';
 
 export namespace MetaEpics {
 	export const closeDrawingEditorOnZoom$ = (action$, store) =>
@@ -53,7 +54,7 @@ export namespace MetaEpics {
 					timeout: 10000 // 10 seconds
 				}).pipe(
 					map((res: AjaxResponse) => res.response.trim()),
-					filter(latestVersion => latestVersion !== version),
+					filter(latestVersion => versionLessThan(version, latestVersion)),
 					tap((latestVersion: string) =>
 						Materialize.toast(`v${latestVersion} of ${APP_NAME} is out now <a target="_blank" class="btn-flat amber-text" style="font-weight: 500;" href="${MICROPAD_URL}/#download">UPDATE</a>`)
 					),

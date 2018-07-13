@@ -1,6 +1,6 @@
 {
 	"name": "micropad",
-	"version": "3.7.0",
+	"version": "3.7.1",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/MicroPad/Web.git"
@@ -49,6 +49,7 @@
 		"rxjs": "^6.2.1",
 		"rxjs-compat": "^6.2.1",
 		"save-as": "^0.1.8",
+		"semver": "^5.5.0",
 		"showdown": "^1.8.6",
 		"upad-parse": "3.2.3",
 		"vex-dialog": "^1.1.0",
@@ -68,6 +69,7 @@
 		"@types/react-dom": "^16.0.3",
 		"@types/react-google-recaptcha": "^0.9.1",
 		"@types/react-redux": "^5.0.14",
+		"@types/semver": "^5.5.0",
 		"@types/showdown": "^1.7.3",
 		"enzyme": "^3.3.0",
 		"enzyme-adapter-react-16": "^1.1.1",
