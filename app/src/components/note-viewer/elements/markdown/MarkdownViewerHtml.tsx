@@ -176,7 +176,7 @@ export namespace MarkDownViewer {
 				document.getElementById('content').innerHTML = element.content;
 				
 				document.querySelectorAll('a').forEach(function(link) {
-					if (link.getAttribute('href').substring(0, 24) !== 'javascript:searchHashtag') {
+					if ((link.getAttribute('onclick') || '').substring(0, 13) !== 'searchHashtag') {
 						link.setAttribute('onclick', 'redirectLinkClick(event);');
 					}
 				});
