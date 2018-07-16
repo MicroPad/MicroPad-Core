@@ -3,13 +3,14 @@ import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL } from '../../types';
 import { Dialog } from 'src/dialogs';
-import { Notepad } from 'upad-parse/dist';
+import { FlatNotepad, Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 
 export interface IExplorerOptionsComponentProps {
 	objToEdit: NPXObject | Notepad;
 	type: 'notepad' | 'section' | 'note';
 	colour: string;
+	notepad: FlatNotepad;
 	deleteNotepad?: (title: string) => void;
 	exportNotepad?: () => void;
 	renameNotepad?: (newTitle: string) => void;
