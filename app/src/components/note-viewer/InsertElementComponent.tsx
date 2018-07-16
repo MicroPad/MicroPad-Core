@@ -28,10 +28,12 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 		if (!note) return null;
 
 		const elementHeight = 260;
+		const elementWidth = 266;
 		const containerStyles = {
 			padding: 0,
 			height: elementHeight + 'px',
-			left: x,
+			width: elementWidth + 'px',
+			left: (x < window.innerWidth - elementWidth - 200) ? x : x - elementWidth,
 			top: (y < window.innerHeight - elementHeight - 200) ? y : y - elementHeight,
 			zIndex: 5000,
 			display: (enabled) ? undefined : 'none'

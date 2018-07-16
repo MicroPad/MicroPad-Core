@@ -2,11 +2,19 @@ import { connect, Dispatch } from 'react-redux';
 import ZoomComponent, { IZoomComponentProps } from '../components/note-viewer/ZoomComponent';
 import { Action } from 'redux';
 import { actions } from '../actions';
+import { IStoreState } from '../types';
+import { ThemeValues } from '../ThemeValues';
 
-export function mapDispatchToProps(dispatch: Dispatch<Action>) {
+function mapStateToProps({ meta }: IStoreState) {
+	return {
+		theme: ThemeValues[meta.theme]
+	};
+}
+
+function mapDispatchToProps(dispatch: Dispatch<Action>) {
 	return <Partial<IZoomComponentProps>> {
 		update: newZoom => dispatch(actions.updateZoomLevel(newZoom))
 	};
 }
 
-export default connect(null, mapDispatchToProps)(ZoomComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(ZoomComponent);

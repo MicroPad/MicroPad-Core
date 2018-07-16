@@ -27,8 +27,7 @@ export default class PrintViewOrAppContainerComponent extends React.Component<IP
 						backgroundColor: theme.background,
 						transition: 'background-color .3s',
 						width: '100vw',
-						height: '100vh',
-						position: 'fixed'
+						height: '100vh'
 					}}
 					className={`theme-${themeName}`}>
 						{this.props.children}
