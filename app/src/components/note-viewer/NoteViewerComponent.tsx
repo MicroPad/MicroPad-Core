@@ -86,6 +86,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				key={`${note.internalRef}-${element.args.id}`}
 				element={element}
 				noteAssets={noteAssets}
+				theme={theme}
 				edit={edit!}
 				deleteElement={deleteElement!}
 				search={search!}

@@ -8,4 +8,5 @@ export interface ITheme {
 	links: string;
 	explorerContent: string;
 	backgroundImage?: string;
+	drawingBackground?: string;
 }

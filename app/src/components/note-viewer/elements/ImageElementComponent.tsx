@@ -9,7 +9,9 @@ import { NoteElement } from 'upad-parse/dist/Note';
 
 export default class ImageElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {
-		const { element, noteAssets, elementEditing } = this.props;
+		const { element, noteAssets, elementEditing, theme } = this.props;
+		if (!theme) return null;
+
 		const isEditing = elementEditing === element.args.id;
 
 		return (
@@ -32,8 +34,8 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 				{
 					isEditing &&
 					<div style={{height: '100%'}}>
-						<em>Upload a new image...</em><br />
-						<input type="file" onChange={this.fileSelected} style={{padding: '5px'}} />
+						<em style={{ color: theme.text }}>Upload a new image...</em><br />
+						<input type="file" onChange={this.fileSelected} style={{ padding: '5px', color: theme.text }} />
 
 						<Row>
 							<Col s={6}>
@@ -41,6 +43,7 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 									label="Width"
 									defaultValue={element.args.width}
 									onChange={(e, v) => this.onSizeEdit('width', v)}
+									style={{ color: theme.text }}
 								/>
 							</Col>
 
@@ -49,6 +52,7 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 									label="Height"
 									defaultValue={element.args.height}
 									onChange={(e, v) => this.onSizeEdit('height', v)}
+									style={{ color: theme.text }}
 								/>
 							</Col>
 						</Row>

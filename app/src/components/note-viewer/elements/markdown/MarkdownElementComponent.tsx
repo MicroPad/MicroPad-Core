@@ -11,9 +11,11 @@ import MarkdownHelpComponent from './MarkdownHelpComponent';
 import Resizable from 're-resizable';
 import { Dialog } from '../../../../dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
+import { ITheme } from '../../../../types/Themes';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
+	theme: ITheme;
 	isPrinting?: boolean;
 	onReady?: () => void;
 }
@@ -53,7 +55,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	}
 
 	render() {
-		const { element, elementEditing } = this.props;
+		const { element, elementEditing, theme } = this.props;
 
 		const iframeStyle = {
 			borderStyle: 'none',
@@ -89,7 +91,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 				{
 					isEditing &&
-					<Row style={{ marginBottom: 0 }}>
+					<Row style={{ marginBottom: 0, color: theme.text }}>
 						<Col s={6}>
 							<Input
 								label="Font Size"
@@ -100,7 +102,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 						<Col s={6}>
 							<Input
-								style={{width: '100%'}}
+								style={{ width: '100%', color: theme.text }}
 								label="Width"
 								defaultValue={element.args.width}
 								onChange={(e, v) => this.onSizeEdit('width', v)}
@@ -118,7 +120,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 							id={`${element.args.id}-iframe`}
 							style={iframeStyle}
 							ref={iframe => this.iframe = iframe!}
-							srcDoc={MarkDownViewer.getHtml(element.args.id)}
+							srcDoc={MarkDownViewer.getHtml(element.args.id, theme)}
 							sandbox="allow-scripts allow-popups" />
 					}
 
@@ -128,7 +130,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 							style={
 								{
 									height: '400px',
-									backgroundColor: 'white',
+									backgroundColor: theme.background,
+									color: theme.text,
 									maxWidth: '100%',
 									minWidth: (element.args.width !== 'auto') ? '100%' : '400px'
 								}

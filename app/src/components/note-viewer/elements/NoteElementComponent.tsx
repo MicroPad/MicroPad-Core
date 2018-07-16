@@ -29,7 +29,9 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 	private isDragging = false;
 
 	render() {
-		const { element, noteAssets, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
+		const { element, noteAssets, theme, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
+		if (!theme) return null;
+
 		const isEditing = element.args.id === elementEditing;
 
 		const containerStyles = {
@@ -38,7 +40,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 
 		const elementStyles = {
 			width: (element.type !== 'image' && element.type !== 'markdown') ? element.args.width : 'auto',
-			backgroundColor: (isEditing) ? 'white' : undefined
+			backgroundColor: (isEditing) ? theme.background : undefined
 		};
 
 		let elementComponent: JSX.Element | undefined = undefined;
@@ -49,6 +51,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					element={element}
 					elementEditing={elementEditing}
 					noteAssets={noteAssets}
+					theme={theme}
 					updateElement={updateElement}
 					edit={edit}
 					search={search!} />
@@ -60,6 +63,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					<ImageElementComponent
 					element={element}
 					elementEditing={elementEditing}
+					theme={theme}
 					updateElement={updateElement}
 					noteAssets={noteAssets}
 					edit={edit} />
@@ -70,6 +74,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				elementComponent = (
 					<FileElementComponent
 					element={element}
+					theme={theme}
 					elementEditing={elementEditing}
 					updateElement={updateElement}
 					noteAssets={noteAssets}
@@ -82,6 +87,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				elementComponent = (
 					<RecordingElement
 					element={element}
+					theme={theme}
 					elementEditing={elementEditing}
 					updateElement={updateElement}
 					noteAssets={noteAssets}
@@ -94,6 +100,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				elementComponent = (
 					<DrawingElementComponent
 					element={element}
+					theme={theme}
 					elementEditing={elementEditing}
 					updateElement={updateElement}
 					noteAssets={noteAssets}

@@ -4,6 +4,7 @@ import MarkdownElementComponent from '../note-viewer/elements/markdown/MarkdownE
 import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';
+import { ThemeValues } from '../../ThemeValues';
 
 export interface IPrintViewComponentProps {
 	note?: Note;
@@ -49,6 +50,7 @@ export default class PrintViewOrAppContainerComponent extends React.Component<IP
 					}}
 					elementEditing=""
 					noteAssets={{}}
+					theme={ThemeValues.Classic}
 					edit={() => { return; }}
 					search={() => { return; }} />
 			</div>

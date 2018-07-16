@@ -40,7 +40,9 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 	private rainbowIndex = 0;
 
 	render() {
-		const { element, noteAssets, elementEditing } = this.props;
+		const { element, noteAssets, elementEditing, theme } = this.props;
+		if (!theme) return null;
+
 		const isEditing = element.args.id === elementEditing;
 
 		this.hasTrimmed = false;
@@ -91,7 +93,13 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 		}
 
 		return (
-			<div style={{overflow: 'hidden', height: 'auto', minWidth: '170px', minHeight: '130px'}} onClick={this.openEditor}>
+			<div style={{
+				overflow: 'hidden',
+				height: 'auto',
+				minWidth: '170px',
+				minHeight: '130px',
+				backgroundColor: !isEditing ? theme.drawingBackground : undefined
+			}} onClick={this.openEditor}>
 				<img ref={elm => this.imageElement = elm!} style={{height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px'}} src={noteAssets[element.args.ext!]} />
 			</div>
 		);

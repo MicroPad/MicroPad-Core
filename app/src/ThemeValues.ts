@@ -20,6 +20,7 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		text: '#839496',
 		links: '#eee8d5',
 		explorerContent: '#eee8d5',
-		backgroundImage: solarizedBackground
+		backgroundImage: solarizedBackground,
+		drawingBackground: '#fdf6e3'
 	}
 };

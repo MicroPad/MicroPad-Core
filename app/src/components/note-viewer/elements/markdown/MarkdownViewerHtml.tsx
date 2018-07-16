@@ -1,8 +1,9 @@
 // @ts-ignore
 import MathJax from '!raw-loader!../../../../assets/MathJax.js';
+import { ITheme } from '../../../../types/Themes';
 
 export namespace MarkDownViewer {
-	export const getHtml = (id: string, initialContent?: string, doInitialMathJaxRender?: boolean): string => `<!DOCTYPE html>
+	export const getHtml = (id: string, theme: ITheme, initialContent?: string, doInitialMathJaxRender?: boolean): string => `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
@@ -23,6 +24,7 @@ export namespace MarkDownViewer {
 			padding: 5px;
 			font-family: "Roboto", sans-serif;
 			line-height: 1.5;
+			color: ${theme.text}
 		}
 
 		#content > :first-child {
@@ -39,7 +41,7 @@ export namespace MarkDownViewer {
 		}
 
 		a {
-			color: #039be5;
+			color: ${theme.links};
 			text-decoration: none;
 		}
 
@@ -55,9 +57,9 @@ export namespace MarkDownViewer {
 		}
 
 		table, th, td {
-			border: 1px solid black;
+			border: 1px solid ${theme.text};
 			border-collapse: collapse;
-			background-color: white;
+			background-color: ${theme.background};
 		}
 
 		th, td {
