@@ -84,6 +84,10 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	color: #607d8b;
 }
 
+.dropdown-content li>span {
+	color: #607d8b;
+}
+
 .vex-dialog-prompt-input {
 	padding: 0 !important;
 }
