@@ -15,3 +15,7 @@
 #breadcrumb-holder > nav.Solarized {
 	background-color: #073642;
 }
+
+#breadcrumb-holder > nav.Midnight {
+	background-color: #303030;
+}

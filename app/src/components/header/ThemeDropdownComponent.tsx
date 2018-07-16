@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Dropdown, Icon, NavItem } from 'react-materialize';
 import { ThemeName } from '../../types/Themes';
+import { ThemeValues } from '../../ThemeValues';
 
 export interface IThemeDropdownComponentProps {
 	selectedTheme: ThemeName;
@@ -8,11 +9,6 @@ export interface IThemeDropdownComponentProps {
 }
 
 export default class ThemeDropdownComponent extends React.Component<IThemeDropdownComponentProps> {
-	private readonly themes: ThemeName[] = [
-		'Classic',
-		'Solarized'
-	];
-
 	render() {
 		const { selectedTheme, select } = this.props;
 		if (!select) return null;
@@ -27,7 +23,7 @@ export default class ThemeDropdownComponent extends React.Component<IThemeDropdo
 					</ul>
 				}>
 					{
-						this.themes.map(theme =>
+						Object.keys(ThemeValues).map((theme: ThemeName) =>
 							<NavItem key={theme} href="#!" onClick={() => select(theme)}>
 								{theme} {selectedTheme === theme && <Icon left={true}>done</Icon>}
 							</NavItem>

@@ -141,7 +141,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				// Flash the Notepad Explorer amber
 				const explorer = document.getElementById('notepad-explorer')!;
 				explorer.style.backgroundColor = theme.accent;
-				setTimeout(() => explorer.style.backgroundColor = null, 150);
+				setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);
 			} else {
 				// Flash notepads drop-down
 				const explorer = document.getElementById('notepad-dropdown')!;

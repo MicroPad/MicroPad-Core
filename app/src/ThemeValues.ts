@@ -21,6 +21,16 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		links: '#eee8d5',
 		explorerContent: '#eee8d5',
 		backgroundImage: solarizedBackground,
-		drawingBackground: '#fdf6e3'
+		drawingBackground: '#ffffff30'
+	},
+	Midnight: {
+		background: '#212121',
+		accent: '#424242',
+		chrome: '#303030',
+		text: '#fff',
+		links: '#039be5',
+		explorerContent: '#fff',
+		backgroundImage: solarizedBackground,
+		drawingBackground: '#ffffff30'
 	}
 };

@@ -27,6 +27,7 @@ import { INotepadStoreState } from './types/NotepadTypes';
 import { cleanHangingAssets } from './util';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 import InsertElementComponent from './containers/InsertElementContainer';
+import { ThemeName } from './types/Themes';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -125,6 +126,9 @@ async function hydrateStoreFromLocalforage() {
 
 	const syncUser: SyncUser = await SYNC_STORAGE.getItem<SyncUser>('sync user');
 	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
+
+	const theme = await localforage.getItem<ThemeName>('theme');
+	if (!!theme) store.dispatch(actions.selectTheme(theme));
 }
 
 async function compatibilityCheck(): Promise<boolean> {

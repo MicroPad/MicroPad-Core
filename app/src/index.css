@@ -127,3 +127,11 @@ input:not([type]):focus:not([readonly])+label, input[type=text]:not(.browser-def
 .theme-Solarized .btn:hover, .theme-Solarized .btn-large:hover {
 	background-color: #b58900;
 }
+
+.theme-Midnight .btn-flat {
+	color: #fff;
+}
+
+.theme-Midnight .btn:hover, .theme-Midnight .btn-large:hover {
+	background-color: #424242;
+}
