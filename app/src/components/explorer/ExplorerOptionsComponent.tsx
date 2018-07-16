@@ -9,6 +9,7 @@ import { NPXObject } from 'upad-parse/dist/NPXObject';
 export interface IExplorerOptionsComponentProps {
 	objToEdit: NPXObject | Notepad;
 	type: 'notepad' | 'section' | 'note';
+	colour: string;
 	deleteNotepad?: (title: string) => void;
 	exportNotepad?: () => void;
 	renameNotepad?: (newTitle: string) => void;
@@ -22,7 +23,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 	private titleInput: Input;
 
 	render() {
-		const { objToEdit, type, exportNotepad, loadNote, print } = this.props;
+		const { objToEdit, type, colour, exportNotepad, loadNote, print } = this.props;
 
 		const notepadOptions: JSX.Element = (
 			<div>
@@ -46,7 +47,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			<Modal
 				key={`npeo-${objToEdit.title}`}
 				header={`Options for ${objToEdit.title}`}
-				trigger={<a href="#!" className="exp-options-trigger" style={{ color: 'white' }}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}>
+				trigger={<a href="#!" className="exp-options-trigger" style={{ color: colour }}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}>
 				<div id="explorer-options-modal">
 					<Row>
 						<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>

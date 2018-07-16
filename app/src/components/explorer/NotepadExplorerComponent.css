@@ -2,10 +2,7 @@
 	order: 1;
 	padding: 5px;
 	width: 300px;
-	background-color: #607d8b;
 	overflow: auto;
-	color: #fff;
-	border-left: 2px solid #ffb300;
 
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -91,6 +88,6 @@
 	width: initial;
 }
 
-#notepad-explorer a {
+.theme-Classic #notepad-explorer a {
 	color: white;
 }

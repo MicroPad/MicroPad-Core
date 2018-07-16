@@ -1,9 +1,17 @@
 #breadcrumb-holder > nav {
-	background-color: #607d8b !important;
+	transition: background-color .3s;
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
 	height: 64px;
 	line-height: 64px;
 	margin-bottom: 0;
+}
+
+#breadcrumb-holder > nav.Classic {
+	background-color: #607d8b;
+}
+
+#breadcrumb-holder > nav.Solarized {
+	background-color: #073642;
 }

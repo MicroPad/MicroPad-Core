@@ -7,12 +7,14 @@ import {
 import { connect, Dispatch } from 'react-redux';
 import { Action } from 'redux';
 import { actions } from '../actions';
+import { ThemeValues } from '../ThemeValues';
 
 export function mapStateToProps({ meta }: IStoreState, { message, video }: IHelpMessageComponentLocalProps) {
 	return {
 		message,
 		video,
-		show: meta.showHelp
+		show: meta.showHelp,
+		theme: ThemeValues[meta.theme]
 	};
 }
 

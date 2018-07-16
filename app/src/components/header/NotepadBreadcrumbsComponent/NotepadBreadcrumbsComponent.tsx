@@ -1,21 +1,17 @@
 import * as React from 'react';
+import { CSSProperties } from 'react';
 import './NotepadBreadcrumbsComponent.css';
-// @ts-ignore
 import { Breadcrumb, MenuItem } from 'react-materialize';
 import { generateGuid } from '../../../util';
+import { ThemeName } from '../../../types/Themes';
 
 export interface INotepadBreadcrumbsProps {
+	themeName: ThemeName;
 	breadcrumbs: string[];
 	noteTime?: string;
 }
 
 export default class NotepadBreadcrumbsComponent extends React.Component<INotepadBreadcrumbsProps> {
-	private readonly breadcrumbStyle = {
-		position: 'fixed',
-		width: '100%',
-		top: '64px'
-	};
-
 	private readonly timeStyle = {
 		paddingLeft: '20px',
 		fontFamily: 'Roboto',
@@ -23,7 +19,13 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 	};
 
 	render() {
-		const { breadcrumbs, noteTime } = this.props;
+		const { themeName, breadcrumbs, noteTime } = this.props;
+
+		const breadcrumbStyle: CSSProperties = {
+			position: 'fixed',
+			width: '100%',
+			top: '64px'
+		};
 
 		const crumbs: JSX.Element[] = [];
 		(breadcrumbs || []).forEach((title: string, i: number) =>
@@ -34,8 +36,8 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 			));
 
 		return (
-			<div id="breadcrumb-holder" style={this.breadcrumbStyle as any}>
-				<Breadcrumb className="blue-grey">
+			<div id="breadcrumb-holder" style={breadcrumbStyle}>
+				<Breadcrumb className={themeName}>
 					{crumbs}
 				</Breadcrumb>
 			</div>

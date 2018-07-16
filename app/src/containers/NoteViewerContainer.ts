@@ -6,6 +6,7 @@ import {
 	INoteViewerComponentProps
 } from '../components/note-viewer/NoteViewerComponent';
 import { actions } from '../actions';
+import { ThemeValues } from '../ThemeValues';
 
 let noteRef: string = '';
 
@@ -24,8 +25,9 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 		noteAssets: currentNote.assetUrls,
 		elementEditing: currentNote.elementEditing,
 		isNotepadOpen: !!notepads.notepad && !!notepads.notepad.item,
-		isLoading: currentNote.isLoading || notepads.isLoading || (!!notepads.notepad && notepads.notepad.isLoading)
-	};
+		isLoading: currentNote.isLoading || notepads.isLoading || (!!notepads.notepad && notepads.notepad.isLoading),
+		theme: ThemeValues[meta.theme]
+	} as INoteViewerComponentProps;
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteViewerComponentProps> {

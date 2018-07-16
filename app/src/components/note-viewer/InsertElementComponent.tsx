@@ -8,6 +8,7 @@ import { Icon } from 'react-materialize';
 import JupyterInserterComponent from './elements/JupyterInserterComponent';
 import { Note } from 'upad-parse/dist';
 import { ElementArgs, NoteElement } from 'upad-parse/dist/Note';
+import { ITheme } from '../../types/Themes';
 
 export interface IInsertElementComponentProps {
 	note: Note;
@@ -15,6 +16,7 @@ export interface IInsertElementComponentProps {
 	y: number;
 	enabled: boolean;
 	fontSize: string;
+	theme: ITheme;
 	insert?: (action: InsertElementAction) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
 	edit?: (id: string) => void;
@@ -22,7 +24,7 @@ export interface IInsertElementComponentProps {
 
 export default class InsertElementComponent extends React.Component<IInsertElementComponentProps> {
 	render() {
-		const { note, x, y, enabled, fontSize } = this.props;
+		const { note, x, y, enabled, fontSize, theme } = this.props;
 		if (!note) return null;
 
 		const elementHeight = 260;
@@ -51,7 +53,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 
 		return (
 			<div className="noteElement" style={containerStyles}>
-				<div id="insert-element" className="z-depth-2 hoverable">
+				<div id="insert-element" className="z-depth-2 hoverable" style={{ backgroundColor: theme.background, color: theme.text }}>
 					<h4>Insert an Element</h4>
 					<ul>
 						<li><a href="#!" onClick={() => this.doInsert({

@@ -1,19 +1,25 @@
 import { IStoreState } from '../types';
 import { connect, Dispatch } from 'react-redux';
-import PrintViewOrAppContainerComponent, { IPrintViewComponentProps } from '../components/printing/PrintViewOrAppContainerComponent';
+import PrintViewOrAppContainerComponent, {
+	IAppProps,
+	IPrintViewComponentProps
+} from '../components/printing/PrintViewOrAppContainerComponent';
 import { Action } from 'redux';
 import { actions } from '../actions';
 import { Note } from 'upad-parse/dist';
+import { ThemeValues } from '../ThemeValues';
 
-export function mapStateToProps({ notepads, currentNote, print }: IStoreState) {
+export function mapStateToProps({ notepads, currentNote, print, meta }: IStoreState) {
 	let note: Note | undefined = undefined;
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
 	}
 
-	return <IPrintViewComponentProps> {
+	return <IPrintViewComponentProps & IAppProps> {
 		note,
-		printElement: print.elementToPrint
+		printElement: print.elementToPrint,
+		theme: ThemeValues[meta.theme],
+		themeName: meta.theme
 	};
 }
 
@@ -23,4 +29,4 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IPrintVi
 	};
 }
 
-export default connect<IPrintViewComponentProps>(mapStateToProps, mapDispatchToProps)(PrintViewOrAppContainerComponent);
+export default connect<IPrintViewComponentProps & IAppProps>(mapStateToProps, mapDispatchToProps)(PrintViewOrAppContainerComponent);

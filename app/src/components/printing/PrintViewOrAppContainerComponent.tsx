@@ -3,6 +3,7 @@ import './PrintViewComponent.css';
 import MarkdownElementComponent from '../note-viewer/elements/markdown/MarkdownElementComponent';
 import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
+import { ITheme } from '../../types/Themes';
 
 export interface IPrintViewComponentProps {
 	note?: Note;
@@ -10,10 +11,30 @@ export interface IPrintViewComponentProps {
 	clearPrintView: () => void;
 }
 
-export default class PrintViewOrAppContainerComponent extends React.Component<IPrintViewComponentProps> {
+export interface IAppProps {
+	theme: ITheme;
+	themeName: string;
+}
+
+export default class PrintViewOrAppContainerComponent extends React.Component<IPrintViewComponentProps & IAppProps> {
 	render() {
-		const { note, printElement } = this.props;
-		if (!note || !printElement) return this.props.children;
+		const { note, printElement, theme, themeName } = this.props;
+		if (!note || !printElement) {
+			// Render the real app
+			return (
+				<div
+					style={{
+						backgroundColor: theme.background,
+						transition: 'background-color .3s',
+						width: '100vw',
+						height: '100vh',
+						position: 'fixed'
+					}}
+					className={`theme-${themeName}`}>
+						{this.props.children}
+				</div>
+			);
+		}
 
 		return (
 			<div id="printed-elements">

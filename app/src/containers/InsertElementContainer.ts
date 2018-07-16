@@ -7,6 +7,7 @@ import {
 	IInsertElementComponentProps
 } from '../components/note-viewer/InsertElementComponent';
 import { Note } from 'upad-parse/dist';
+import { ThemeValues } from '../ThemeValues';
 
 export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 	let note = <Note> {};
@@ -19,7 +20,8 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 		x: currentNote.insertElement.x,
 		y: currentNote.insertElement.y,
 		enabled: currentNote.insertElement.enabled,
-		fontSize: meta.defaultFontSize
+		fontSize: meta.defaultFontSize,
+		theme: ThemeValues[meta.theme]
 	};
 }
 
