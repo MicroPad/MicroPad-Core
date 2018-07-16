@@ -5,6 +5,7 @@ import NotepadDropdownComponent from '../../containers/header/NotepadDropdownCon
 import { INotepadStoreState } from '../../types/NotepadTypes';
 import NotepadBreadcrumbs from '../../containers/header/NotepadBreadcrumbsContainer';
 import SearchComponent from '../../containers/SearchContainer';
+import ThemeDropdownComponent from '../../containers/header/ThemeDropdownContainer';
 
 export interface IHeaderComponentProps {
 	isFullScreen: boolean;
@@ -37,6 +38,7 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 			<header style={{position: 'fixed', zIndex: 1000}}>
 				<Navbar className="blue-grey menu-items" brand={<AppNameComponent />} href="#!" style={this.navStyle} right={true}>
 					<li style={{ marginRight: '10px' }}>{saveText}</li>
+					<ThemeDropdownComponent />
 					<NotepadDropdownComponent />
 					<SearchComponent />
 					<NavItem href="#!" onClick={getHelp}><Icon left={true}>help_outline</Icon> Help</NavItem>

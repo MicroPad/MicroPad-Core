@@ -18,6 +18,7 @@ import { AssetList, SyncedNotepadList, SyncLoginRequest, SyncUser } from './type
 import { FlatNotepad, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { HashTagSearchResults } from './reducers/SearchReducer';
+import { ThemeName } from './types/Themes';
 
 const actionCreator = actionCreatorFactory();
 
@@ -84,5 +85,6 @@ export const actions = {
 	setHelpPref: actionCreator<boolean>('SET_HELP_PREF'),
 	syncAssetsAllDone: actionCreator<void>('SYNC_ASSETS_ALL_DONE'),
 	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON'),
-	closeNote: actionCreator<void>('CLOSE_NOTE')
+	closeNote: actionCreator<void>('CLOSE_NOTE'),
+	selectTheme: actionCreator<ThemeName>('SELECT_THEME')
 };

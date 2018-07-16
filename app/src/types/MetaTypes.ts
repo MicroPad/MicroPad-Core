@@ -1,9 +1,12 @@
+import { ThemeName } from './Themes';
+
 export interface IMetaStoreState {
 	version: IVersion;
 	isFullScreen: boolean;
 	defaultFontSize: string;
 	zoom: number;
 	showHelp: boolean;
+	theme: ThemeName;
 }
 
 export interface IVersion {
