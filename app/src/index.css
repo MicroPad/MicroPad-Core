@@ -80,6 +80,10 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	background-color: #ffb300 !important;
 }
 
+.collection a.collection-item {
+	color: #607d8b;
+}
+
 .vex-dialog-prompt-input {
 	padding: 0 !important;
 }
