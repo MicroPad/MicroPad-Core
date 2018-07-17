@@ -23,7 +23,7 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState): I
 		];
 
 		if (breadcrumbs.length > 1) {
-			time = format(new Date(note.time), 'dddd, D MMMM h:mm A');
+			time = format(new Date(note.time), 'dddd, D MMMM YYYY h:mm A');
 		}
 	}
 
