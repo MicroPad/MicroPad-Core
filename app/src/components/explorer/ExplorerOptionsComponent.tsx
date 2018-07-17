@@ -5,6 +5,7 @@ import { APP_NAME, MICROPAD_URL } from '../../types';
 import { Dialog } from 'src/dialogs';
 import { FlatNotepad, Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
+import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 
 export interface IExplorerOptionsComponentProps {
 	objToEdit: NPXObject | Notepad;
@@ -111,6 +112,16 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			default:
 				break;
 		}
+	}
+
+	private calculateParentList = (): (FlatNotepad | FlatSection)[][] => {
+		const { notepad } = this.props;
+
+		return [
+			[notepad],
+			...Object.values(notepad.sections)
+				.map(section => [...notepad.pathFrom(section), section])
+		].sort();
 	}
 
 	private closeModal = () => {
