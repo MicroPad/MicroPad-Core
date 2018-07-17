@@ -59,3 +59,9 @@ export type RestoreJsonNotepadAndLoadNoteAction = {
 	notepadTitle: string;
 	noteRef: string;
 };
+
+export type MoveNotepadObjectAction = {
+	type: string;
+	objectRef: string;
+	newParent: string;
+};

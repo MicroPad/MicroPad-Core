@@ -5,6 +5,7 @@ import {
 	DeleteElementAction,
 	ExpandFromNoteAction,
 	InsertElementAction,
+	MoveNotepadObjectAction,
 	NewNotepadObjectAction,
 	NotepadToSyncNotepadAction,
 	RestoreJsonNotepadAndLoadNoteAction,
@@ -86,5 +87,6 @@ export const actions = {
 	syncAssetsAllDone: actionCreator<void>('SYNC_ASSETS_ALL_DONE'),
 	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON'),
 	closeNote: actionCreator<void>('CLOSE_NOTE'),
-	selectTheme: actionCreator<ThemeName>('SELECT_THEME')
+	selectTheme: actionCreator<ThemeName>('SELECT_THEME'),
+	moveNotepadObject: actionCreator<MoveNotepadObjectAction>('MOVE_NOTEPAD_OBJECT')
 };

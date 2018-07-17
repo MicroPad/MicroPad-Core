@@ -1,17 +1,16 @@
 import * as React from 'react';
 import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
-import { APP_NAME, MICROPAD_URL } from '../../types';
+import { APP_NAME } from '../../types';
 import { Dialog } from 'src/dialogs';
-import { FlatNotepad, Notepad } from 'upad-parse/dist';
+import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
-import { FlatSection } from 'upad-parse/dist/FlatNotepad';
+import PathChangeComponent from '../../containers/PathChangeContainer';
 
 export interface IExplorerOptionsComponentProps {
 	objToEdit: NPXObject | Notepad;
 	type: 'notepad' | 'section' | 'note';
 	colour: string;
-	notepad: FlatNotepad;
 	deleteNotepad?: (title: string) => void;
 	exportNotepad?: () => void;
 	renameNotepad?: (newTitle: string) => void;
@@ -61,15 +60,15 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 					{(type === 'note') && noteOptions}
 					{
 						(type === 'note' || type === 'section') &&
-						<p>
-							Changing the path of a {type} isn't supported in the new {APP_NAME}.<br/>
-							If you want to do that, you can import your notepad
-							into <a target="_blank" href={`${MICROPAD_URL}/web`}>{APP_NAME} classic</a> and change the path there.
-						</p>
+						<PathChangeComponent objToEdit={objToEdit as NPXObject} type={type} />
 					}
 				</div>
 			</Modal>
 		);
+	}
+
+	componentWillUpdate() {
+		this.closeModal();
 	}
 
 	private rename = () => {
@@ -112,16 +111,6 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			default:
 				break;
 		}
-	}
-
-	private calculateParentList = (): (FlatNotepad | FlatSection)[][] => {
-		const { notepad } = this.props;
-
-		return [
-			[notepad],
-			...Object.values(notepad.sections)
-				.map(section => [...notepad.pathFrom(section), section])
-		].sort();
 	}
 
 	private closeModal = () => {
