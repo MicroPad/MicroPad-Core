@@ -6,7 +6,7 @@ import { Input } from 'react-materialize';
 
 export interface IPathChangeComponentProps {
 	notepad?: FlatNotepad;
-	moveObj?: (ref: string, newParent: string, type: string) => void;
+	moveObj?: (ref: string, newParent: string, type: 'section' | 'note') => void;
 }
 export const PathChangeComponent = (props: IPathChangeComponentProps & { objToEdit: NPXObject; type: 'section' | 'note' }) => {
 	const { notepad, objToEdit, type, moveObj } = props;

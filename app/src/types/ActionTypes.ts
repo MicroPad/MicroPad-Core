@@ -61,7 +61,7 @@ export type RestoreJsonNotepadAndLoadNoteAction = {
 };
 
 export type MoveNotepadObjectAction = {
-	type: string;
+	type: 'section' | 'note';
 	objectRef: string;
 	newParent: string;
 };
