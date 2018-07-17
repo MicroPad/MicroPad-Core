@@ -88,6 +88,11 @@
 	width: initial;
 }
 
+.tree-view {
+	width: -moz-max-content;
+	width: max-content;
+}
+
 .theme-Classic #notepad-explorer a, .theme-Midnight #notepad-explorer a {
 	color: white;
 }

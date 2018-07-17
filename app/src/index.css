@@ -116,6 +116,10 @@ input:not([type]):focus:not([readonly])+label, input[type=text]:not(.browser-def
 	color: #607d8b !important;
 }
 
+#nav-mobile li {
+	color: black !important;
+}
+
 .theme-Solarized a {
 	color: #eee8d5;
 }
