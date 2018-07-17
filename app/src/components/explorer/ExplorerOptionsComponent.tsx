@@ -60,15 +60,11 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 					{(type === 'note') && noteOptions}
 					{
 						(type === 'note' || type === 'section') &&
-						<PathChangeComponent objToEdit={objToEdit as NPXObject} type={type} />
+						<PathChangeComponent objToEdit={objToEdit as NPXObject} type={type} changed={() => this.closeModal()} />
 					}
 				</div>
 			</Modal>
 		);
-	}
-
-	componentWillUpdate() {
-		this.closeModal();
 	}
 
 	private rename = () => {

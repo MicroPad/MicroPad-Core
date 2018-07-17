@@ -8,15 +8,19 @@ export interface IPathChangeComponentProps {
 	notepad?: FlatNotepad;
 	moveObj?: (ref: string, newParent: string, type: 'section' | 'note') => void;
 }
-export const PathChangeComponent = (props: IPathChangeComponentProps & { objToEdit: NPXObject; type: 'section' | 'note' }) => {
-	const { notepad, objToEdit, type, moveObj } = props;
+export const PathChangeComponent = (props: IPathChangeComponentProps & {
+	objToEdit: NPXObject;
+	type: 'section' | 'note';
+	changed?: () => void;
+}) => {
+	const { notepad, objToEdit, type, moveObj, changed } = props;
 	if (!notepad || !moveObj) return null;
 
 	const parentList: (FlatNotepad|FlatSection)[][] = [
 		[notepad],
 		...Object.values(notepad.sections)
 			.map(section => [...notepad.pathFrom(section), section])
-	].sort();
+	];
 
 	return (
 		<div>
@@ -24,7 +28,10 @@ export const PathChangeComponent = (props: IPathChangeComponentProps & { objToEd
 			<select
 				defaultValue={(objToEdit.parent as any).internalRef || 'notepad'}
 				style={{ display: 'block' }}
-				onChange={event => moveObj(objToEdit.internalRef, event.currentTarget.value, type)}>
+				onChange={event => {
+					moveObj(objToEdit.internalRef, event.currentTarget.value, type);
+					if (!!changed) changed();
+				}}>
 				{
 					parentList
 						.filter(parent => type === 'section' || parent.length > 1)

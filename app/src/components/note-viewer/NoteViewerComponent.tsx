@@ -33,6 +33,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	private viewerDiv: HTMLDivElement;
 	private containerDiv: HTMLDivElement;
 	private escapeHit$: Observable<number>;
+	private scrolling: boolean;
 
 	constructor(props: INoteViewerComponentProps) {
 		super(props);
@@ -103,7 +104,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				style={styles}
 				ref={div => this.viewerDiv = div!}
 				onClick={this.handleEmptyClick}
-				onScroll={() => toggleInsertMenu!({ enabled: false })}>
+				onScroll={() => this.scrolling = true}>
 
 				{isLoading && <div id="progress-bar"><ProgressBar className="amber" /></div>}
 				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}>
@@ -115,9 +116,16 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	componentDidMount() {
-		const { edit } = this.props;
+		const { edit, toggleInsertMenu } = this.props;
 
 		this.escapeHit$.subscribe(() => edit!(''));
+
+		setInterval(() => {
+			if (this.scrolling) {
+				this.scrolling = false;
+				toggleInsertMenu!({ enabled: false });
+			}
+		}, 250);
 	}
 
 	componentWillUpdate(newProps: INoteViewerComponentProps) {

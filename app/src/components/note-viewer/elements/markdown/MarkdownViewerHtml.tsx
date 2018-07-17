@@ -71,6 +71,7 @@ export namespace MarkDownViewer {
 			border-left: 10px solid #ffb300;
 			margin: 1.5em 10px;
 			padding: 0.5em 10px;
+			color: black;
 			quotes: "\\201C""\\201D""\\2018""\\2019";
 		}
 
