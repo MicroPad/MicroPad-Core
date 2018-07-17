@@ -1,0 +1,15 @@
+.theme-Solarized a {
+	color: #eee8d5;
+}
+
+.theme-Solarized .btn-flat {
+	color: #eee8d5;
+}
+
+.theme-Solarized .btn:hover, .theme-Solarized .btn-large:hover {
+	background-color: #b58900;
+}
+
+#breadcrumb-holder > nav.Solarized {
+	background-color: #073642;
+}

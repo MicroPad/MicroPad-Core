@@ -1,10 +1,16 @@
+/* CSS Imports */
 import 'material-icons-font/material-icons-font.css';
 import 'materialize-css/dist/css/materialize.min.css';
 import 'jquery/dist/jquery.slim.js';
 import 'materialize-css/dist/js/materialize.js';
+import './index.css';
+/* Themes */
+import './theme-styles/Classic.css';
+import './theme-styles/Solarized.css';
+import './theme-styles/Midnight.css';
+/* JS Imports */
 import * as React from 'react';
 import registerServiceWorker from './registerServiceWorker';
-import './index.css';
 import { APP_NAME, IStoreState, MICROPAD_URL } from './types';
 import { applyMiddleware, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
