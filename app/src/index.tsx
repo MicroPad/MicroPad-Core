@@ -1,10 +1,16 @@
+/* CSS Imports */
 import 'material-icons-font/material-icons-font.css';
 import 'materialize-css/dist/css/materialize.min.css';
 import 'jquery/dist/jquery.slim.js';
 import 'materialize-css/dist/js/materialize.js';
+import './index.css';
+/* Themes */
+import './theme-styles/Classic.css';
+import './theme-styles/Solarized.css';
+import './theme-styles/Midnight.css';
+/* JS Imports */
 import * as React from 'react';
 import registerServiceWorker from './registerServiceWorker';
-import './index.css';
 import { APP_NAME, IStoreState, MICROPAD_URL } from './types';
 import { applyMiddleware, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
@@ -27,6 +33,7 @@ import { INotepadStoreState } from './types/NotepadTypes';
 import { cleanHangingAssets } from './util';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 import InsertElementComponent from './containers/InsertElementContainer';
+import { ThemeName } from './types/Themes';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -125,6 +132,9 @@ async function hydrateStoreFromLocalforage() {
 
 	const syncUser: SyncUser = await SYNC_STORAGE.getItem<SyncUser>('sync user');
 	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
+
+	const theme = await localforage.getItem<ThemeName>('theme');
+	if (!!theme) store.dispatch(actions.selectTheme(theme));
 }
 
 async function compatibilityCheck(): Promise<boolean> {

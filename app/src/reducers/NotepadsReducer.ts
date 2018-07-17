@@ -344,6 +344,36 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 					activeSyncId: undefined
 				}
 			};
+		} else if (isType(action, actions.moveNotepadObject)) {
+			if (!state.notepad || !state.notepad.item) return state;
+
+			const { objectRef, newParent } = action.payload;
+			const type: 'sections' | 'notes' = action.payload.type + 's' as 'sections' | 'notes';
+			const notepad = state.notepad.item;
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad,
+					item: notepad.clone({
+						[type]: Object.values(notepad[type])
+							.map((item: FlatSection | Note) => {
+								if (item.internalRef !== objectRef) return item;
+
+								// Handle sections being moved to the root (directly under the notepad)
+								if (newParent === 'notepad') return { ...item, parentRef: undefined };
+
+								// Change the parent on the item if it's the one we're moving
+								return !!(item as Note).clone ? (item as Note).clone({ parent: newParent }) : { ...item, parentRef: newParent };
+							})
+							// Convert back to the object from an array of FlatSections/Notes
+							.reduce((items: { [uuid: string]: FlatSection | Note }, item: FlatSection | Note) => {
+								items[item.internalRef] = item;
+								return items;
+							}, {})
+					})
+				}
+			};
 		}
 
 		return Object.freeze(state);

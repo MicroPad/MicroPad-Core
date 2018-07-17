@@ -13,7 +13,7 @@ body {
 #body {
 	position: absolute;
 	display: flex;
-	z-index: -100;
+	/*z-index: -100;*/
 	top: 128px;
 	width: 100vw;
 	height: calc(100vh - 128px);
@@ -80,6 +80,14 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	background-color: #ffb300 !important;
 }
 
+.collection a.collection-item {
+	color: #607d8b;
+}
+
+.dropdown-content li>span {
+	color: #607d8b;
+}
+
 .vex-dialog-prompt-input {
 	padding: 0 !important;
 }
@@ -106,4 +114,8 @@ div.col.input-field {
 
 input:not([type]):focus:not([readonly])+label, input[type=text]:not(.browser-default):focus:not([readonly])+label, input[type=password]:not(.browser-default):focus:not([readonly])+label, input[type=email]:not(.browser-default):focus:not([readonly])+label, input[type=url]:not(.browser-default):focus:not([readonly])+label, input[type=time]:not(.browser-default):focus:not([readonly])+label, input[type=date]:not(.browser-default):focus:not([readonly])+label, input[type=datetime]:not(.browser-default):focus:not([readonly])+label, input[type=datetime-local]:not(.browser-default):focus:not([readonly])+label, input[type=tel]:not(.browser-default):focus:not([readonly])+label, input[type=number]:not(.browser-default):focus:not([readonly])+label, input[type=search]:not(.browser-default):focus:not([readonly])+label, textarea.materialize-textarea:focus:not([readonly])+label {
 	color: #607d8b !important;
+}
+
+#nav-mobile li {
+	color: black !important;
 }

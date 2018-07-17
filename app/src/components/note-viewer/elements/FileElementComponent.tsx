@@ -4,19 +4,21 @@ import { INoteElementComponentProps } from './NoteElementComponent';
 import { Button, Row } from 'react-materialize';
 import { dataURItoBlob } from '../../../util';
 import { Dialog } from '../../../dialogs';
+import { ITheme } from '../../../types/Themes';
 
 export interface IFileElementComponent extends INoteElementComponentProps {
 	downloadAsset: (filename: string, uuid: string) => void;
+	theme: ITheme;
 }
 
 export default class FileElementComponent extends React.Component<IFileElementComponent> {
 	render() {
-		const { element, downloadAsset, elementEditing } = this.props;
+		const { element, downloadAsset, theme, elementEditing } = this.props;
 		const isEditing = elementEditing === element.args.id;
 
 		return (
 			<div style={{padding: '5px', width: 'max-content'}} onClick={this.openEditor}>
-				<em>
+				<em style={{ color: theme.text }}>
 					{!isEditing && element.args.filename}
 					{(isEditing || !element.args.filename) && `Upload a file...`}
 				</em>
@@ -26,13 +28,13 @@ export default class FileElementComponent extends React.Component<IFileElementCo
 						!isEditing &&
 						!!element.args.filename &&
 						<Button className="blue" waves="light" onClick={() => downloadAsset(element.args.filename!, element.args.ext!)}>
-							Download/Open File
+							Download File
 						</Button>
 					}
 
 					{
 						isEditing &&
-						<input type="file" onChange={this.fileSelected} />
+						<input type="file" onChange={this.fileSelected} style={{ color: theme.text }} />
 					}
 				</Row>
 			</div>

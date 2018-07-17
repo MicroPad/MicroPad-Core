@@ -5,6 +5,7 @@ import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { Action } from 'redux';
 import { actions } from '../actions';
 import { FlatNotepad, Note } from 'upad-parse/dist';
+import { ThemeValues } from '../ThemeValues';
 
 let notepad: FlatNotepad | undefined;
 export function mapStateToProps({ notepads, explorer, meta, currentNote }: IStoreState) {
@@ -19,7 +20,8 @@ export function mapStateToProps({ notepads, explorer, meta, currentNote }: IStor
 		notepad: (!!notepad) ? notepad.toNotepad() : undefined,
 		openSections: explorer.openSections,
 		isFullScreen: meta.isFullScreen,
-		openNote: note
+		openNote: note,
+		theme: ThemeValues[meta.theme]
 	};
 }
 

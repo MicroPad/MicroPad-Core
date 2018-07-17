@@ -3,12 +3,14 @@ import { connect, Dispatch } from 'react-redux';
 import { actions } from '../../actions';
 import HeaderComponent, { IHeaderComponentProps } from '../../components/header/HeaderComponent';
 import { IStoreState } from '../../types';
+import { ThemeValues } from '../../ThemeValues';
 
 export function mapStateToProps({ notepads, meta, sync }: IStoreState) {
 	return {
 		notepad: notepads.notepad,
 		isSyncing: sync.isLoading,
-		isFullScreen: meta.isFullScreen
+		isFullScreen: meta.isFullScreen,
+		theme: ThemeValues[meta.theme]
 	};
 }
 

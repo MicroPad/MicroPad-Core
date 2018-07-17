@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { CSSProperties } from 'react';
 import './NoteViewerComponent.css';
 import NoteElementComponent from './elements/NoteElementComponent';
 import * as Materialize from 'materialize-css/dist/js/materialize.js';
@@ -9,6 +10,7 @@ import { IInsertElementState } from '../../reducers/NoteReducer';
 import ZoomComponent from '../../containers/ZoomContainer';
 import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
+import { ITheme } from '../../types/Themes';
 
 export interface INoteViewerComponentProps {
 	isLoading: boolean;
@@ -18,6 +20,7 @@ export interface INoteViewerComponentProps {
 	elementEditing: string;
 	noteAssets: object;
 	isNotepadOpen: boolean;
+	theme: ITheme;
 	edit?: (id: string) => void;
 	search?: (query: string) => void;
 	downloadAsset?: (filename: string, uuid: string) => void;
@@ -30,6 +33,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	private viewerDiv: HTMLDivElement;
 	private containerDiv: HTMLDivElement;
 	private escapeHit$: Observable<number>;
+	private scrolling: boolean;
 
 	constructor(props: INoteViewerComponentProps) {
 		super(props);
@@ -51,14 +55,17 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			search,
 			downloadAsset,
 			elementEditing,
+			theme,
 			edit,
 			updateElement,
 			deleteElement,
 			toggleInsertMenu
 		} = this.props;
 
-		const classes: string = (!note || note.elements.length === 0) ? 'empty' : '';
-		let styles = {};
+		let styles: CSSProperties = {
+			backgroundImage: (!note || note.elements.length === 0) ? `url(${theme.backgroundImage})` : undefined,
+			transition: 'background-image .3s'
+		};
 
 		if (isFullscreen) styles = {
 			...styles,
@@ -80,6 +87,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				key={`${note.internalRef}-${element.args.id}`}
 				element={element}
 				noteAssets={noteAssets}
+				theme={theme}
 				edit={edit!}
 				deleteElement={deleteElement!}
 				search={search!}
@@ -93,11 +101,10 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		return (
 			<div
 				id="note-viewer"
-				className={classes}
 				style={styles}
 				ref={div => this.viewerDiv = div!}
 				onClick={this.handleEmptyClick}
-				onScroll={() => toggleInsertMenu!({ enabled: false })}>
+				onScroll={() => this.scrolling = true}>
 
 				{isLoading && <div id="progress-bar"><ProgressBar className="amber" /></div>}
 				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}>
@@ -109,9 +116,16 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	componentDidMount() {
-		const { edit } = this.props;
+		const { edit, toggleInsertMenu } = this.props;
 
 		this.escapeHit$.subscribe(() => edit!(''));
+
+		setInterval(() => {
+			if (this.scrolling) {
+				this.scrolling = false;
+				toggleInsertMenu!({ enabled: false });
+			}
+		}, 250);
 	}
 
 	componentWillUpdate(newProps: INoteViewerComponentProps) {
@@ -127,20 +141,20 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	private handleEmptyClick = (event) => {
-		const { note, edit, elementEditing, toggleInsertMenu, isNotepadOpen } = this.props;
+		const { note, edit, elementEditing, theme, toggleInsertMenu, isNotepadOpen } = this.props;
 		if ((event.target !== this.viewerDiv && event.target !== this.containerDiv)) return;
 
 		if (!note) {
 			if (isNotepadOpen) {
 				// Flash the Notepad Explorer amber
 				const explorer = document.getElementById('notepad-explorer')!;
-				explorer.style.backgroundColor = '#ffb300';
-				setTimeout(() => explorer.style.backgroundColor = '#607d8b', 100);
+				explorer.style.backgroundColor = theme.accent;
+				setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);
 			} else {
 				// Flash notepads drop-down
 				const explorer = document.getElementById('notepad-dropdown')!;
-				explorer.style.backgroundColor = '#ffb300';
-				setTimeout(() => explorer.style.backgroundColor = '#607d8b', 100);
+				explorer.style.backgroundColor = theme.accent;
+				setTimeout(() => explorer.style.backgroundColor = null, 150);
 			}
 
 			return;

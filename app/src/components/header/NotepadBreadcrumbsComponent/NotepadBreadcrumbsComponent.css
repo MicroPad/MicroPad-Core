@@ -1,5 +1,5 @@
 #breadcrumb-holder > nav {
-	background-color: #607d8b !important;
+	transition: background-color .3s;
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;

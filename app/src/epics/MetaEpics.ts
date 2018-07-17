@@ -11,6 +11,7 @@ import * as Materialize from 'materialize-css/dist/js/materialize';
 import { FlatNotepad } from 'upad-parse/dist';
 import { EMPTY } from 'rxjs';
 import { lt as versionLessThan } from 'semver';
+import { ThemeName } from '../types/Themes';
 
 export namespace MetaEpics {
 	export const closeDrawingEditorOnZoom$ = (action$, store) =>
@@ -67,10 +68,18 @@ export namespace MetaEpics {
 			filter(() => false)
 		);
 
+	export const persistTheme$ = action$ =>
+		action$.pipe(
+			isAction(actions.selectTheme),
+			switchMap((action: Action<ThemeName>) => localforage.setItem('theme', action.payload)),
+			filter(() => false)
+		);
+
 	export const metaEpics$ = combineEpics(
 		closeDrawingEditorOnZoom$,
 		saveHelpPreference$,
 		revertHelpPrefOnHelpLoad$,
-		checkVersion$
+		checkVersion$,
+		persistTheme$
 	);
 }

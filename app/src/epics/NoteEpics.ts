@@ -7,7 +7,7 @@ import { INotepadStoreState } from '../types/NotepadTypes';
 import { dataURItoBlob, generateGuid, isAction } from '../util';
 import saveAs from 'save-as';
 import { ASSET_STORAGE } from '../index';
-import { NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
+import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
@@ -138,6 +138,14 @@ const closeNoteOnDeletedParent$ = (action$, store: Store<IStoreState>) =>
 		map(() => actions.closeNote(undefined))
 	);
 
+const loadNoteOnMove$ = action$ =>
+	action$.pipe(
+		isAction(actions.moveNotepadObject),
+		map((action: Action<MoveNotepadObjectAction>) => action.payload),
+		filter((payload: MoveNotepadObjectAction) => payload.type === 'note'),
+		map((payload: MoveNotepadObjectAction) => actions.loadNote.started(payload.objectRef))
+	);
+
 export const noteEpics$ = combineEpics(
 	loadNote$,
 	checkNoteAssets$,
@@ -145,7 +153,8 @@ export const noteEpics$ = combineEpics(
 	binaryElementUpdate$,
 	reloadNote$,
 	autoLoadNewNote$,
-	closeNoteOnDeletedParent$
+	closeNoteOnDeletedParent$,
+	loadNoteOnMove$
 );
 
 function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {

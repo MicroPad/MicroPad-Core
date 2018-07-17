@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { CSSProperties } from 'react';
 import './NotepadExplorerComponent.css';
 import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
 import { Icon } from 'react-materialize';
@@ -10,12 +11,14 @@ import HelpMessageComponent from '../../containers/HelpMessageContainer';
 import { Dialog } from '../../dialogs';
 import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
 import { Note, Notepad, Parent, Section } from 'upad-parse/dist';
+import { ITheme } from '../../types/Themes';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: Notepad;
 	openSections: string[];
 	isFullScreen: boolean;
 	openNote?: Note;
+	theme: ITheme;
 	flipFullScreenState?: () => void;
 	deleteNotepad?: (title: string) => void;
 	exportNotepad?: () => void;
@@ -41,6 +44,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 			notepad,
 			isFullScreen,
 			openNote,
+			theme,
 			flipFullScreenState,
 			deleteNotepad,
 			exportNotepad,
@@ -51,9 +55,12 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 		} = this.props;
 		this.openSections = new Set<string>(this.props.openSections);
 
-		const notepadExplorerStyle = {
+		const notepadExplorerStyle: CSSProperties = {
 			display: 'initial',
-			transition: 'background-color .3s'
+			transition: 'background-color .3s',
+			backgroundColor: theme.chrome,
+			borderLeft: `2px solid ${theme.accent}`,
+			color: theme.explorerContent
 		};
 		if (isFullScreen) notepadExplorerStyle.display = 'none';
 
@@ -73,6 +80,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 							<ExplorerOptionsComponent
 								objToEdit={notepad}
 								type="notepad"
+								colour={theme.explorerContent}
 								deleteNotepad={deleteNotepad}
 								exportNotepad={exportNotepad}
 								renameNotepad={renameNotepad}/>
@@ -88,7 +96,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						</p>
 
 						<div className="explorer-note add-button" key={generateGuid()} style={{margin: 0}}>
-							<a href="#!" style={{ color: 'white' }} onClick={() => this.newNotepadObject('section', notepad)}> <Icon>add</Icon> Section</a>
+							<a href="#!" style={{ color: theme.explorerContent }} onClick={() => this.newNotepadObject('section', notepad)}> <Icon>add</Icon> Section</a>
 						</div>
 
 						{treeViews}
@@ -149,7 +157,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 	}
 
 	private generateSectionTreeView(section: Section): JSX.Element {
-		const { loadNote, deleteNotepadObject, renameNotepadObject, openNote, print } = this.props;
+		const { theme, loadNote, deleteNotepadObject, renameNotepadObject, openNote, print } = this.props;
 
 		const nodeLabelStyle = {
 			display: 'inline-flex',
@@ -167,10 +175,11 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 			.forEach((child: Note) => childNotes.push(
 				<div className="explorer-note" key={generateGuid()}>
 					<span>
-						<a href="#!" style={{ color: 'white' }} onClick={() => loadNote!(child.internalRef)}><Icon>note</Icon> {child.title}</a>
+						<a href="#!" style={{ color: theme.explorerContent }} onClick={() => loadNote!(child.internalRef)}><Icon>note</Icon> {child.title}</a>
 						<ExplorerOptionsComponent
 							objToEdit={child}
 							type="note"
+							colour={theme.explorerContent}
 							loadNote={() => {
 								if (!openNote || openNote.internalRef !== child.internalRef) loadNote!(child.internalRef);
 							}}
@@ -194,14 +203,15 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						<ExplorerOptionsComponent
 							objToEdit={section}
 							type="section"
+							colour={theme.explorerContent}
 							deleteNotepadObject={deleteNotepadObject}
 							renameNotepadObject={renameNotepadObject}/>
 					</span>
 				}
 				collapsed={!this.openSections.has(section.internalRef)}>
 				<div className="explorer-note add-button" key={generateGuid()}>
-					<a href="#!" style={{ color: 'white', paddingRight: '3px' }} onClick={() => this.newNotepadObject('note', section)}><Icon>add</Icon> Note </a>
-					<a href="#!" style={{ color: 'white', paddingLeft: '3px' }} onClick={() => this.newNotepadObject('section', section)}> <Icon>add</Icon> Section</a>
+					<a href="#!" style={{ color: theme.explorerContent, paddingRight: '3px' }} onClick={() => this.newNotepadObject('note', section)}><Icon>add</Icon> Note </a>
+					<a href="#!" style={{ color: theme.explorerContent, paddingLeft: '3px' }} onClick={() => this.newNotepadObject('section', section)}> <Icon>add</Icon> Section</a>
 				</div>
 
 				{childSections}

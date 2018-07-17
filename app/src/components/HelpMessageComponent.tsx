@@ -2,9 +2,11 @@ import * as React from 'react';
 import { CSSProperties } from 'react';
 import { isMobile } from '../util';
 import * as Materialize from 'materialize-css/dist/js/materialize';
+import { ITheme } from '../types/Themes';
 
 export interface IHelpMessageComponentProps {
 	show: boolean;
+	theme: ITheme;
 	hide?: (pref: boolean) => void;
 }
 
@@ -19,18 +21,19 @@ export interface IHelpMessageComponentLocalProps {
 export default class HelpMessageComponent extends React.Component<IHelpMessageComponentProps & IHelpMessageComponentLocalProps> {
 	render() {
 		if (isMobile()) return <div />;
-		const { message, video, show, hide } = this.props;
+		const { message, video, show, hide, theme } = this.props;
 		if (!show) return null;
 
 		const containerStyle: CSSProperties = {
 			position: 'fixed',
-			backgroundColor: '#607d8b',
+			backgroundColor: theme.chrome,
 			borderRadius: '10px',
 			right: 310,
 			top: 150,
 			padding: '5px',
 			width: '400px',
-			minHeight: '100px'
+			minHeight: '100px',
+			transition: 'background-color .3s',
 		};
 
 		return (
