@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FlatNotepad, Note } from 'upad-parse/dist';
+import { FlatNotepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { Input } from 'react-materialize';
@@ -22,7 +22,7 @@ export const PathChangeComponent = (props: IPathChangeComponentProps & {
 			.map(section => [...notepad.pathFrom(section), section])
 
 			// Exclude any options which could result on a section being moved into itself
-			.filter(items => !items.some((item: FlatSection | Note) => !!item.internalRef && item.internalRef === objToEdit.internalRef))
+			.filter(items => !items.some((item: FlatSection) => !!item.internalRef && item.internalRef === objToEdit.internalRef))
 	];
 
 	return (
