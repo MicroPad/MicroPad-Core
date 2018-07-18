@@ -1,9 +1,9 @@
 .theme-Midnight #notepad-explorer a {
-	color: white;
+	color: #ddd;
 }
 
 .theme-Midnight .btn-flat {
-	color: #fff;
+	color: #ddd;
 }
 
 .theme-Midnight .btn:hover, .theme-Midnight .btn-large:hover {
