@@ -111,7 +111,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					</Row>
 				}
 
-				{isEditing && <MarkdownHelpComponent />}
+				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>Markdown Editor (<MarkdownHelpComponent />)</span>}
 
 				<div>
 					{

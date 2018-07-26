@@ -136,13 +136,14 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 						{
 							!!elementComponent && isEditing &&
 							<div>
-								<Row style={{paddingLeft: '5px'}}>
+								<span className="bib-container" style={{ color: theme.text }}>Keep track of your sources: <SourcesComponent /></span>
+
+								<Row style={{ paddingLeft: '5px', paddingTop: '10px' }}>
 									<Button className="red" waves="light" onClick={this.delete} style={{marginRight: '5px'}}><Icon left={true}>delete_forever</Icon> Delete</Button>
-									<span className="bib-container" style={{marginRight: '5px'}}><SourcesComponent /></span>
 								</Row>
 
-								<Row style={{paddingLeft: '5px'}}>
-									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{marginRight: '5px', float: 'right'}}>Close</Button>
+								<Row style={{ paddingLeft: '5px' }}>
+									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{marginRight: '5px', float: 'right'}}>Close (autosaved)</Button>
 								</Row>
 							</div>
 						}
