@@ -111,8 +111,6 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					</Row>
 				}
 
-				{isEditing && <MarkdownHelpComponent />}
-
 				<div>
 					{
 						!isEditing
@@ -142,6 +140,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 							onChange={this.onElementEdit} />
 					}
 				</div>
+
+				{isEditing && <div style={{ marginBottom: '5px' }}><MarkdownHelpComponent /></div>}
 			</Resizable>
 		);
 	}
