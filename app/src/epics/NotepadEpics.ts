@@ -15,6 +15,7 @@ import { MarkdownNote } from 'upad-parse/dist/Note';
 import { from, of } from 'rxjs';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { RestoreJsonNotepadAndLoadNoteAction } from '../types/ActionTypes';
+import { Store } from 'redux';
 
 const parseQueue: string[] = [];
 
@@ -312,6 +313,17 @@ const updateSyncedNotepadIdOnSyncListLoad$ = action$ =>
 		map((action: Action<Success<SyncUser, SyncedNotepadList>>) => actions.updateCurrentSyncId(action.payload.result))
 	);
 
+const saveNotepadOnCreation$ = (action$, store: Store<IStoreState>) =>
+	action$.pipe(
+		isAction(actions.newNotepad),
+		map(() => store.getState().notepads.notepad),
+		filter(Boolean),
+		map((notepadState: INotepadStoreState) => notepadState.item),
+		filter(Boolean),
+		map((notepad: FlatNotepad) => notepad.toNotepad()),
+		map((notepad: Notepad) => actions.saveNotepad.started(notepad))
+	);
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	syncOnNotepadParsed$,
@@ -327,7 +339,8 @@ export const notepadEpics$ = combineEpics(
 	getNextParse$,
 	parseEnex$,
 	loadNotepadByIndex$,
-	updateSyncedNotepadIdOnSyncListLoad$
+	updateSyncedNotepadIdOnSyncListLoad$,
+	saveNotepadOnCreation$
 );
 
 interface IExportedNotepad {

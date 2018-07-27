@@ -41,3 +41,7 @@
 	left: 0px;
 	opacity: 1;
 }
+
+#markdown-editor-label > div {
+	display: inline;
+}

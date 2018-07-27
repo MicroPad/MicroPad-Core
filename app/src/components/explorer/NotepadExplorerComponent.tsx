@@ -12,6 +12,7 @@ import { Dialog } from '../../dialogs';
 import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
 import { Note, Notepad, Parent, Section } from 'upad-parse/dist';
 import { ITheme } from '../../types/Themes';
+import { NEW_SECTION_HELP, OPEN_NOTE_HELP, OPEN_NOTEPAD_HELP } from '../../types';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: Notepad;
@@ -115,7 +116,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 										notepad.sections.some(s => s.notes.length === 0 && s.sections.length === 0)
 									) &&
 									<HelpMessageComponent
-										message="Create/open a section and a note to insert elements:"
+										message={NEW_SECTION_HELP}
 										video={require('../../assets/instructions/new-section.mp4')} />
 								}
 								{
@@ -124,7 +125,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 										notepad.sections.every(s => (s.notes.length > 0 || s.sections.length > 0))
 									) &&
 									<HelpMessageComponent
-										message="Open a note to insert elements:"
+										message={OPEN_NOTE_HELP}
 										video={require('../../assets/instructions/open-note.mp4')} />
 								}
 							</React.Fragment>
@@ -135,7 +136,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 				{
 					!notepad &&
 					<HelpMessageComponent
-						message="Open/create a notepad to start:"
+						message={OPEN_NOTEPAD_HELP}
 						video={require('../../assets/instructions/open-notepad.mp4')} />
 				}
 			</div>

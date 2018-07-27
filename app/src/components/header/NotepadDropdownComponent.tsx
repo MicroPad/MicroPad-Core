@@ -40,7 +40,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 				<Dropdown trigger={
 					<ul>
 						<NavItem id="notepad-dropdown">
-							<Icon left={true}>collections_bookmark</Icon> Notepads <Icon right={true}>arrow_drop_down</Icon>
+							<Icon left={true}>collections_bookmark</Icon> Notebooks <Icon right={true}>arrow_drop_down</Icon>
 						</NavItem>
 					</ul>
 				}>
@@ -93,7 +93,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 	}
 
 	private createNotepad = async () => {
-		const title = await Dialog.prompt('Notepad Title:');
+		const title = await Dialog.prompt('Notebook/Notepad Title:');
 
 		if (title) this.props.newNotepad!(new FlatNotepad(title));
 	}
