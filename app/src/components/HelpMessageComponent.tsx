@@ -11,7 +11,7 @@ export interface IHelpMessageComponentProps {
 }
 
 export interface IHelpMessageComponentLocalProps {
-	message: string;
+	message: JSX.Element;
 	video?: any;
 }
 
