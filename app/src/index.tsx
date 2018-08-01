@@ -7,6 +7,7 @@ import './index.css';
 /* Themes */
 import './theme-styles/Classic.css';
 import './theme-styles/Solarized.css';
+import './theme-styles/IanPad.css';
 import './theme-styles/Midnight.css';
 /* JS Imports */
 import * as React from 'react';

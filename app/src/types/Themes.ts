@@ -1,4 +1,4 @@
-export type ThemeName = 'Classic' | 'Solarized' | 'Midnight';
+export type ThemeName = 'Classic' | 'Solarized' | 'IanPad' | 'Midnight';
 
 export interface ITheme {
 	background: string;
