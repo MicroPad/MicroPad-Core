@@ -3,6 +3,13 @@ import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../types/Themes';
 import { distanceInWordsStrict, format } from 'date-fns';
 
+export const DueInMessageComponent = (props: { dueDate: Date }) => {
+	const { dueDate } = props;
+
+	const distance = distanceInWordsStrict(new Date(), dueDate);
+	return <span>{(dueDate.getTime() < new Date().getTime()) ? `Was due ${distance} ago` : `Due in ${distance}`}</span>;
+};
+
 export interface IEditDueDateComponentProps {
 	element: NoteElement;
 	theme: ITheme;
@@ -19,22 +26,28 @@ export class EditDueDateComponent extends React.Component<IEditDueDateComponentP
 
 		const dueDate = !!element.args.dueDate ? new Date(parseInt(element.args.dueDate, 10)) : undefined;
 
-		let dueInText: string = '';
-		if (!!dueDate) {
-			const distance = distanceInWordsStrict(new Date(), dueDate);
-			dueInText = (dueDate.getTime() < new Date().getTime()) ? `Was due ${distance} ago` : `Due in ${distance}`;
-		}
-
 		return (
 			<div style={{
 				color: theme.text
 			}}>
 				<span style={{ marginRight: '5px' }}>Due Date:</span>
-				<input ref={e => this.datePicker = e!} type="date" style={{ width: !isFirefox ? 'min-content' : '-moz-max-content' }} onChange={this.updateDueDate} defaultValue={!!dueDate ? dueDate.toISOString().substr(0, 10) : undefined} />
-				<input ref={e => this.timePicker = e!} type="time" style={{ width: !isFirefox ? 'min-content' : '-moz-max-content' }} onChange={this.updateDueDate} defaultValue={!!dueDate ? format(dueDate, 'HH:mm') : undefined} />
+				<input
+					ref={e => this.datePicker = e!}
+					type="date"
+					style={{ width: !isFirefox ? 'min-content' : '-moz-max-content' }}
+					onChange={this.updateDueDate}
+					defaultValue={!!dueDate ? dueDate.toISOString().substr(0, 10) : undefined} />
+
+				<input
+					ref={e => this.timePicker = e!}
+					type="time"
+					style={{ width: !isFirefox ? 'min-content' : '-moz-max-content' }}
+					onChange={this.updateDueDate}
+					defaultValue={!!dueDate ? format(dueDate, 'HH:mm') : undefined} />
+
 				{
 					!!dueDate &&
-					<span><br />{dueInText}</span>
+					<span style={{ marginLeft: '5px' }}>(<DueInMessageComponent dueDate={dueDate} />)</span>
 				}
 			</div>
 		);
