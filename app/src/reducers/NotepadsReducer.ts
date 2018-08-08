@@ -356,6 +356,7 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 				notepad: {
 					...state.notepad,
 					item: notepad.clone({
+						lastModified: new Date(),
 						[type]: Object.values(notepad[type])
 							.map((item: FlatSection | Note) => {
 								if (item.internalRef !== objectRef) return item;
