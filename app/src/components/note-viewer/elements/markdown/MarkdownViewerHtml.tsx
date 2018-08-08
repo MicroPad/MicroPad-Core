@@ -68,11 +68,11 @@ export namespace MarkDownViewer {
 		}
 
 		blockquote {
-			background: #f9f9f9;
+			background: #${theme.text === '#000' ? 'f9f9f9' : '424242'};
 			border-left: 10px solid #ffb300;
 			margin: 1.5em 10px;
 			padding: 0.5em 10px;
-			color: black;
+			color: ${theme.text};
 			quotes: "\\201C""\\201D""\\2018""\\2019";
 		}
 
