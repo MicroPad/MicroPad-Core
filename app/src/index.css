@@ -116,6 +116,11 @@ input:not([type]):focus:not([readonly])+label, input[type=text]:not(.browser-def
 	color: #607d8b !important;
 }
 
+input[type=date]::-webkit-inner-spin-button, input[type=time]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	display: none;
+}
+
 #nav-mobile li {
 	color: black !important;
 }

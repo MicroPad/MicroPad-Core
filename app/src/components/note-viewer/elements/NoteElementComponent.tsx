@@ -11,6 +11,7 @@ import Draggable, { DraggableData } from 'react-draggable';
 import SourcesComponent from '../../../containers/SourcesContainer';
 import { Dialog } from '../../../dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
+import { EditDueDateComponent } from './EditDueDateComponent';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
@@ -137,6 +138,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 							!!elementComponent && isEditing &&
 							<div>
 								<span className="bib-container" style={{ color: theme.text }}>Keep track of your sources: <SourcesComponent /></span>
+								<EditDueDateComponent element={element} theme={theme} updateElement={updateElement!} />
 
 								<Row style={{ paddingLeft: '5px', paddingTop: '10px' }}>
 									<Button className="red" waves="light" onClick={this.delete} style={{marginRight: '5px'}}><Icon left={true}>delete_forever</Icon> Delete</Button>
