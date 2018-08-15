@@ -13,6 +13,7 @@ import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
 import { Note, Notepad, Parent, Section } from 'upad-parse/dist';
 import { ITheme } from '../../types/Themes';
 import { NEW_SECTION_HELP, OPEN_NOTE_HELP, OPEN_NOTEPAD_HELP } from '../../types';
+import DueDateListComponent from '../../containers/DueDateListContainer';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: Notepad;
@@ -103,6 +104,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						{treeViews}
 
 						<div style={{ paddingLeft: '10px', marginTop: '10px' }}>
+							<DueDateListComponent />
 							<SyncOptionsComponent />
 						</div>
 
