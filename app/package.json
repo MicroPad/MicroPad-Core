@@ -1,6 +1,6 @@
 {
 	"name": "micropad",
-	"version": "3.8.2",
+	"version": "3.9.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/MicroPad/Web.git"
@@ -51,7 +51,7 @@
 		"save-as": "^0.1.8",
 		"semver": "^5.5.0",
 		"showdown": "^1.8.6",
-		"upad-parse": "3.2.4",
+		"upad-parse": "3.3.0",
 		"vex-dialog": "^1.1.0",
 		"vex-js": "^4.1.0"
 	},

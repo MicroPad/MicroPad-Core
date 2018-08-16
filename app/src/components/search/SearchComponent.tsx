@@ -117,7 +117,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 
 		return (
 			<div key={`res-collection-list-${notepadTitle}`}>
-				<h4 key={`res-collection-header-${notepadTitle}`}>Hashtag Search Results for <em>{notepadTitle}</em></h4>
+				<h5 key={`res-collection-header-${notepadTitle}`}>{notepadTitle}</h5>
 				<Collection key={`res-collection-${notepadTitle}`}>{
 					results.map(result => (
 						<CollectionItem

@@ -11,6 +11,10 @@
 	user-select: none;
 }
 
+#notepad-explorer .due-date-list {
+	margin-bottom: 20px;
+}
+
 .tree-view_children {
 	margin-left: 16px;
 }

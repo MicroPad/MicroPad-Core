@@ -1,7 +1,7 @@
 import { ITheme, ThemeName } from './types/Themes';
 
 const classicBackground = require('./assets/background.png');
-const solarizedBackground = require('./assets/dark-background.png');
+const filledBackground = require('./assets/dark-background.png');
 
 export const ThemeValues: { [K in ThemeName]: ITheme } = {
 	Classic: {
@@ -20,8 +20,17 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		text: '#839496',
 		links: '#eee8d5',
 		explorerContent: '#eee8d5',
-		backgroundImage: solarizedBackground,
+		backgroundImage: filledBackground,
 		drawingBackground: '#ffffff30'
+	},
+	IanPad: {
+		background: '#B9F6CA',
+		accent: '#fdff19',
+		chrome: '#40af3a',
+		text: '#000',
+		links: '#039be5',
+		explorerContent: '#fff',
+		backgroundImage: filledBackground
 	},
 	Midnight: {
 		background: '#212121',
@@ -30,7 +39,7 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		text: '#ddd',
 		links: '#039be5',
 		explorerContent: '#ddd',
-		backgroundImage: solarizedBackground,
+		backgroundImage: filledBackground,
 		drawingBackground: '#ffffff30'
 	}
 };

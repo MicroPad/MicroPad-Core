@@ -21,7 +21,6 @@ export class SyncReducer implements IReducer<ISyncState> {
 			isType(action, actions.syncLogin.started)
 			|| isType(action, actions.syncDownload.started)
 			|| isType(action, actions.syncUpload.started)
-			|| isType(action, actions.syncUploadAsset.started)
 			|| isType(action, actions.deleteFromSync.started)
 		) {
 			return {
@@ -42,7 +41,6 @@ export class SyncReducer implements IReducer<ISyncState> {
 		} else if (
 			isType(action, actions.syncDownload.done)
 			|| isType(action, actions.syncUpload.done)
-			|| isType(action, actions.syncAssetsAllDone)
 		) {
 			return {
 				...state,

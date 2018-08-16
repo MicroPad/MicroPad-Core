@@ -58,8 +58,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			theme,
 			edit,
 			updateElement,
-			deleteElement,
-			toggleInsertMenu
+			deleteElement
 		} = this.props;
 
 		let styles: CSSProperties = {
