@@ -11,11 +11,10 @@ import {
 	RestoreJsonNotepadAndLoadNoteAction,
 	SyncAction,
 	UpdateBibliographyAction,
-	UpdateElementAction,
-	UploadAssetAction
+	UpdateElementAction
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
-import { AssetList, SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
+import { SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
 import { FlatNotepad, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { HashTagSearchResults } from './reducers/SearchReducer';
@@ -38,8 +37,7 @@ export const actions = {
 	syncLogin: actionCreator.async<SyncLoginRequest, SyncUser, any>('SYNC_LOGIN'),
 	getSyncedNotepadList: actionCreator.async<SyncUser, SyncedNotepadList, any>('SYNC_GET_NOTEPAD_LIST'),
 	syncDownload: actionCreator.async<string, Notepad, any>('SYNC_DOWNLOAD'),
-	syncUpload: actionCreator.async<SyncAction, AssetList, any>('SYNC_UPLOAD'),
-	syncUploadAsset: actionCreator.async<UploadAssetAction, void, any>('SYNC_UPLOAD_ASSET'),
+	syncUpload: actionCreator.async<SyncAction, void, any>('SYNC_UPLOAD'),
 	deleteFromSync: actionCreator.async<string, void, any>('SYNC_DELETE'),
 	addToSync: actionCreator.async<AddToSyncAction, string, any>('SYNC_CREATE'),
 
@@ -84,7 +82,6 @@ export const actions = {
 	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD'),
 	syncProError: actionCreator<void>('SYNC_PRO_ERROR'),
 	setHelpPref: actionCreator<boolean>('SET_HELP_PREF'),
-	syncAssetsAllDone: actionCreator<void>('SYNC_ASSETS_ALL_DONE'),
 	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON'),
 	closeNote: actionCreator<void>('CLOSE_NOTE'),
 	selectTheme: actionCreator<ThemeName>('SELECT_THEME'),
