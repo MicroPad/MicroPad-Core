@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Note } from 'upad-parse/dist';
 import { distanceInWordsStrict } from 'date-fns';
+import { generateGuid } from '../../util';
 
 export type DueItem = {
 	date: Date;
@@ -23,7 +24,7 @@ export default class DueDateListComponent extends React.Component<IDueDateListCo
 				<ol>
 					{
 						dueItems.map(item =>
-							<li key={item.note.title}>
+							<li key={generateGuid()}>
 								<a href="#!" onClick={() => loadNote(item.note.internalRef)} style={{
 									textDecoration: 'underline'
 								}}>{item.note.title}</a> ({distanceInWordsStrict(new Date(), item.date)})
