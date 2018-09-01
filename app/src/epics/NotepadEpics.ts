@@ -21,12 +21,13 @@ import * as JSZip from 'jszip';
 import { generateGuid, isAction } from '../util';
 import { Dialog } from '../dialogs';
 import { ISyncedNotepad, SyncedNotepadList, SyncUser } from '../types/SyncTypes';
-import { Asset, FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
+import { Asset, FlatNotepad, Note, Notepad, Translators } from 'upad-parse/dist';
 import { MarkdownNote } from 'upad-parse/dist/Note';
 import { from, Observable, of } from 'rxjs';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { RestoreJsonNotepadAndLoadNoteAction } from '../types/ActionTypes';
 import { Store } from 'redux';
+import { format } from 'date-fns';
 
 const parseQueue: string[] = [];
 
@@ -354,6 +355,30 @@ const loadQuickNote$ = (action$: Observable<Action<Success<void, string>>>) =>
 		map((ref: string) => actions.loadNote.started(ref))
 	);
 
+const quickNotepad$ = (action$: Observable<Action<void>>) =>
+	action$.pipe(
+		isAction(actions.quickNotepad),
+		map(() => {
+			let notepad = new FlatNotepad(`Untitled Notepad (${format(new Date(), 'dddd, D MMMM YYYY h:mm:ss A')})`);
+			let section = FlatNotepad.makeFlatSection('Unorganised Notes');
+			let note = new Note('Untitled Note').clone({ parent: section.internalRef });
+
+			return notepad.addSection(section).addNote(note);
+		}),
+		concatMap((notepad: FlatNotepad) => {
+			const noteRef = Object.values(notepad.notes)[0].internalRef;
+			return [
+				actions.newNotepad(notepad),
+				actions.loadNote.started(noteRef),
+				actions.toggleInsertMenu({
+					enabled: true,
+					x: 10,
+					y: 10
+				})
+			];
+		})
+	);
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	syncOnNotepadParsed$,
@@ -372,7 +397,8 @@ export const notepadEpics$ = combineEpics(
 	updateSyncedNotepadIdOnSyncListLoad$,
 	saveNotepadOnCreation$,
 	quickNote$,
-	loadQuickNote$
+	loadQuickNote$,
+	quickNotepad$
 );
 
 interface IExportedNotepad {

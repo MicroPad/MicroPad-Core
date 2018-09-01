@@ -3,6 +3,7 @@
 	padding: 5px;
 	width: 300px;
 	overflow: auto;
+	white-space: nowrap;
 
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;

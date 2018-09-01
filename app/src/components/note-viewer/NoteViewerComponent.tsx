@@ -29,6 +29,8 @@ export interface INoteViewerComponentProps {
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
 	insert?: (element: NoteElement) => void;
 	deleteElement?: (id: string) => void;
+	makeQuickNotepad?: () => void;
+	makeQuickNote?: () => void;
 }
 
 export default class NoteViewerComponent extends React.Component<INoteViewerComponentProps> {
@@ -145,7 +147,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	private handleEmptyClick = (event) => {
-		const { note, edit, elementEditing, theme, toggleInsertMenu, isNotepadOpen, isFullscreen } = this.props;
+		const { note, edit, elementEditing, theme, toggleInsertMenu, isNotepadOpen, isFullscreen, makeQuickNotepad, makeQuickNote } = this.props;
 		if ((event.target !== this.viewerDiv && event.target !== this.containerDiv)) return;
 
 		if (!note) {
@@ -154,11 +156,17 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				const explorer = document.getElementById('notepad-explorer')!;
 				explorer.style.backgroundColor = theme.accent;
 				setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);
+
+				// Create a quick note
+				if (!!makeQuickNote) makeQuickNote();
 			} else {
 				// Flash notepads drop-down
 				const explorer = document.getElementById('notepad-dropdown')!;
 				explorer.style.backgroundColor = theme.accent;
 				setTimeout(() => explorer.style.backgroundColor = null, 150);
+
+				// Create quick notepad
+				if (!!makeQuickNotepad) makeQuickNotepad();
 			}
 
 			return;

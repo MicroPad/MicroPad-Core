@@ -57,7 +57,9 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 				}
 			},
 			noteRef
-		}))
+		})),
+		makeQuickNotepad: () => dispatch(actions.quickNotepad(undefined)),
+		makeQuickNote: () => dispatch(actions.quickNote.started(undefined))
 	};
 }
 

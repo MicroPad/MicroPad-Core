@@ -65,6 +65,9 @@ export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 		} else if (!!store.getState().notepads.notepad && !!store.getState().notepads.notepad!.item) {
 			// In a notepad, insert a note
 			store.dispatch(actions.quickNote.started(undefined));
+		} else {
+			// Outside of a notepad, make a notepad
+			store.dispatch(actions.quickNotepad(undefined));
 		}
 	});
 }

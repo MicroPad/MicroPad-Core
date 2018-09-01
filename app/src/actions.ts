@@ -87,5 +87,6 @@ export const actions = {
 	closeNote: actionCreator<void>('CLOSE_NOTE'),
 	selectTheme: actionCreator<ThemeName>('SELECT_THEME'),
 	moveNotepadObject: actionCreator<MoveNotepadObjectAction>('MOVE_NOTEPAD_OBJECT'),
-	quickMarkdownInsert: actionCreator<void>('QUICK_MARKDOWN_INSERT')
+	quickMarkdownInsert: actionCreator<void>('QUICK_MARKDOWN_INSERT'),
+	quickNotepad: actionCreator<void>('QUICK_NOTEPAD')
 };
