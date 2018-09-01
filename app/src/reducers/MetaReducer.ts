@@ -9,8 +9,8 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 	public readonly initialState: IMetaStoreState = {
 		version: {
 			major: 3,
-			minor: 9,
-			patch: 1,
+			minor: 10,
+			patch: 0,
 			status: 'beta'
 		},
 		isFullScreen: false,
