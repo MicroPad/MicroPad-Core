@@ -35,7 +35,7 @@ export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 	// Export All Notepads
 	mousetrap.bind('mod+shift+s', e => {
 		e.preventDefault();
-		document.getElementById('export-all-notepads-trigger')!.click();
+		(document.querySelector('#export-all-notepads-trigger > a')! as HTMLAnchorElement).click();
 	});
 
 	// Import Notepad(s)
