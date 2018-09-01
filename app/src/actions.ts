@@ -40,6 +40,7 @@ export const actions = {
 	syncUpload: actionCreator.async<SyncAction, void, any>('SYNC_UPLOAD'),
 	deleteFromSync: actionCreator.async<string, void, any>('SYNC_DELETE'),
 	addToSync: actionCreator.async<AddToSyncAction, string, any>('SYNC_CREATE'),
+	quickNote: actionCreator.async<void, string, void>('QUICK_NOTE'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),

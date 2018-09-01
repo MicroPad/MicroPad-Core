@@ -55,9 +55,16 @@ export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 		store.dispatch(actions.getHelp(undefined));
 	});
 
-	// Quick Markdown
-	mousetrap.bind('mod+m', e => {
+	// Quick Actions
+	mousetrap.bind('n', e => {
 		e.preventDefault();
-		store.dispatch(actions.quickMarkdownInsert(undefined));
+
+		if (store.getState().currentNote.ref.length > 0) {
+			// In a note, insert markdown
+			store.dispatch(actions.quickMarkdownInsert(undefined));
+		} else if (!!store.getState().notepads.notepad && !!store.getState().notepads.notepad!.item) {
+			// In a notepad, insert a note
+			store.dispatch(actions.quickNote.started(undefined));
+		}
 	});
 }

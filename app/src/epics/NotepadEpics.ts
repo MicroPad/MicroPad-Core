@@ -1,5 +1,16 @@
 import { actions } from '../actions';
-import { catchError, combineLatest, concatMap, filter, map, mergeMap, retry, switchMap, tap } from 'rxjs/operators';
+import {
+	catchError,
+	combineLatest,
+	concatMap,
+	filter,
+	map,
+	mergeMap,
+	retry,
+	switchMap,
+	tap,
+	throttleTime
+} from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
@@ -7,12 +18,12 @@ import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
 import * as JSZip from 'jszip';
-import { isAction } from '../util';
+import { generateGuid, isAction } from '../util';
 import { Dialog } from '../dialogs';
 import { ISyncedNotepad, SyncedNotepadList, SyncUser } from '../types/SyncTypes';
 import { Asset, FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 import { MarkdownNote } from 'upad-parse/dist/Note';
-import { from, of } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { RestoreJsonNotepadAndLoadNoteAction } from '../types/ActionTypes';
 import { Store } from 'redux';
@@ -324,6 +335,25 @@ const saveNotepadOnCreation$ = (action$, store: Store<IStoreState>) =>
 		map((notepad: Notepad) => actions.saveNotepad.started(notepad))
 	);
 
+const quickNote$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+	action$.pipe(
+		isAction(actions.quickNote.started),
+		map(() => store.getState().notepads.notepad),
+		filter(Boolean),
+		map((notepadState: INotepadStoreState) => notepadState.item),
+		filter(Boolean),
+		throttleTime(1000),
+		map(() => generateGuid()),
+		map(guid => actions.quickNote.done({ params: undefined, result: guid}))
+	);
+
+const loadQuickNote$ = (action$: Observable<Action<Success<void, string>>>) =>
+	action$.pipe(
+		isAction(actions.quickNote.done),
+		map(action => action.payload.result),
+		map((ref: string) => actions.loadNote.started(ref))
+	);
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	syncOnNotepadParsed$,
@@ -340,7 +370,9 @@ export const notepadEpics$ = combineEpics(
 	parseEnex$,
 	loadNotepadByIndex$,
 	updateSyncedNotepadIdOnSyncListLoad$,
-	saveNotepadOnCreation$
+	saveNotepadOnCreation$,
+	quickNote$,
+	loadQuickNote$
 );
 
 interface IExportedNotepad {
