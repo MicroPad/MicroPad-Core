@@ -11,6 +11,7 @@ import ZoomComponent from '../../containers/ZoomContainer';
 import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';
+import { FullScreenService } from '../../FullscreenService';
 
 export interface INoteViewerComponentProps {
 	isLoading: boolean;
@@ -92,7 +93,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				search={search!}
 				updateElement={updateElement}
 				downloadAsset={downloadAsset}
-				elementEditing={elementEditing} />
+				elementEditing={elementEditing}
+				isFullscreen={isFullscreen} />
 		));
 
 		if (!isLoading && !!note && elements.length === 0) Materialize.toast('Welcome to your note! Press anywhere on the white area to insert an element.', 8000);
@@ -140,7 +142,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	private handleEmptyClick = (event) => {
-		const { note, edit, elementEditing, theme, toggleInsertMenu, isNotepadOpen } = this.props;
+		const { note, edit, elementEditing, theme, toggleInsertMenu, isNotepadOpen, isFullscreen } = this.props;
 		if ((event.target !== this.viewerDiv && event.target !== this.containerDiv)) return;
 
 		if (!note) {
@@ -163,7 +165,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			// Insert a new element
 			toggleInsertMenu!({
 				x: event.clientX,
-				y: event.clientY - 128
+				y: event.clientY - FullScreenService.getOffset(isFullscreen)
 			});
 		} else {
 			edit!('');

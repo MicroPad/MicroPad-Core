@@ -35,6 +35,7 @@ import { cleanHangingAssets } from './util';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from './types/Themes';
+import AppBodyComponent from './containers/AppBodyContainer';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -87,13 +88,13 @@ export function getStorage(): { [name: string]: LocalForage } {
 		<Provider store={store}>
 			<PrintViewOrAppContainerComponent>
 				<HeaderComponent />
-				<div id="body">
+				<AppBodyComponent>
 					<NoteViewerComponent />
 					<NotepadExplorerComponent />
 					<WhatsNewModalComponent />
 					<SyncProErrorComponent />
 					<InsertElementComponent />
-				</div>
+				</ AppBodyComponent>
 			</PrintViewOrAppContainerComponent>
 		</Provider>,
 		document.getElementById('app') as HTMLElement
