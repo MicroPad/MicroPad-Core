@@ -9,6 +9,7 @@ import JupyterInserterComponent from './elements/JupyterInserterComponent';
 import { Note } from 'upad-parse/dist';
 import { ElementArgs, NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';
+import { FullScreenService } from '../../FullscreenService';
 
 export interface IInsertElementComponentProps {
 	note: Note;
@@ -17,6 +18,7 @@ export interface IInsertElementComponentProps {
 	enabled: boolean;
 	fontSize: string;
 	theme: ITheme;
+	isFullScreen: boolean;
 	insert?: (action: InsertElementAction) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
 	edit?: (id: string) => void;
@@ -24,7 +26,7 @@ export interface IInsertElementComponentProps {
 
 export default class InsertElementComponent extends React.Component<IInsertElementComponentProps> {
 	render() {
-		const { note, x, y, enabled, fontSize, theme } = this.props;
+		const { note, x, y, enabled, fontSize, theme, isFullScreen } = this.props;
 		if (!note) return null;
 
 		const elementHeight = 260;
@@ -43,7 +45,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 		if (!noteContainer) return null;
 
 		const insertX = Math.abs(Math.floor(noteContainer.getBoundingClientRect().left)) + x;
-		const insertY = (Math.abs(Math.floor(noteContainer.getBoundingClientRect().top)) + y) - 128;
+		const insertY = (Math.abs(Math.floor(noteContainer.getBoundingClientRect().top)) + y) - FullScreenService.getOffset(isFullScreen);
 
 		const defaultArgs: ElementArgs = {
 			id: '',

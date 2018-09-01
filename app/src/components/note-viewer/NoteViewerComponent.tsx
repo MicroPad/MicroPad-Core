@@ -11,6 +11,8 @@ import ZoomComponent from '../../containers/ZoomContainer';
 import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';
+import { FullScreenService } from '../../FullscreenService';
+import { TOAST_HANDLER } from '../../index';
 
 export interface INoteViewerComponentProps {
 	isLoading: boolean;
@@ -26,7 +28,11 @@ export interface INoteViewerComponentProps {
 	downloadAsset?: (filename: string, uuid: string) => void;
 	updateElement?: (id: string, changes: NoteElement, newAsset?: Blob) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
+	insert?: (element: NoteElement) => void;
 	deleteElement?: (id: string) => void;
+	deleteNotepad?: () => void;
+	makeQuickNotepad?: () => void;
+	makeQuickNote?: () => void;
 }
 
 export default class NoteViewerComponent extends React.Component<INoteViewerComponentProps> {
@@ -56,13 +62,24 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			downloadAsset,
 			elementEditing,
 			theme,
+			isNotepadOpen,
 			edit,
 			updateElement,
-			deleteElement
+			deleteElement,
+			insert
 		} = this.props;
 
+		let backgroundImage: string = '';
+		if (!isNotepadOpen) {
+			backgroundImage = `url(${theme.instructionImage}), `;
+		} else {
+			backgroundImage = 'url(), ';
+		}
+
+		if (!note || note.elements.length === 0) backgroundImage += `url(${theme.backgroundImage})`;
+
 		let styles: CSSProperties = {
-			backgroundImage: (!note || note.elements.length === 0) ? `url(${theme.backgroundImage})` : undefined,
+			backgroundImage: backgroundImage !== 'url(), ' ? backgroundImage : undefined,
 			transition: 'background-image .3s'
 		};
 
@@ -92,10 +109,10 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				search={search!}
 				updateElement={updateElement}
 				downloadAsset={downloadAsset}
-				elementEditing={elementEditing} />
+				elementEditing={elementEditing}
+				isFullscreen={isFullscreen}
+				insert={insert} />
 		));
-
-		if (!isLoading && !!note && elements.length === 0) Materialize.toast('Welcome to your note! Press anywhere on the white area to insert an element.', 8000);
 
 		return (
 			<div
@@ -104,7 +121,6 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				ref={div => this.viewerDiv = div!}
 				onClick={this.handleEmptyClick}
 				onScroll={() => this.scrolling = true}>
-
 				{isLoading && <div id="progress-bar"><ProgressBar className="amber" /></div>}
 				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}>
 					{elements}
@@ -115,7 +131,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	componentDidMount() {
-		const { edit, toggleInsertMenu } = this.props;
+		const { edit, toggleInsertMenu, deleteNotepad } = this.props;
 
 		this.escapeHit$.subscribe(() => edit!(''));
 
@@ -137,10 +153,14 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				console.warn(`This browser doesn't support element.scrollTo`);
 			}
 		}
+
+		if (!newProps.isLoading && (!note || note.elements.length > 0) && !!newProps.note && newProps.note.elements.length === 0) {
+			Materialize.toast('Welcome to your note! Press anywhere on the white area to insert an element.', 8000);
+		}
 	}
 
 	private handleEmptyClick = (event) => {
-		const { note, edit, elementEditing, theme, toggleInsertMenu, isNotepadOpen } = this.props;
+		const { note, edit, elementEditing, theme, toggleInsertMenu, isNotepadOpen, isFullscreen, makeQuickNotepad, makeQuickNote, deleteNotepad } = this.props;
 		if ((event.target !== this.viewerDiv && event.target !== this.containerDiv)) return;
 
 		if (!note) {
@@ -149,11 +169,20 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				const explorer = document.getElementById('notepad-explorer')!;
 				explorer.style.backgroundColor = theme.accent;
 				setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);
+
+				// Create a quick note
+				if (!!makeQuickNote) makeQuickNote();
 			} else {
 				// Flash notepads drop-down
 				const explorer = document.getElementById('notepad-dropdown')!;
 				explorer.style.backgroundColor = theme.accent;
 				setTimeout(() => explorer.style.backgroundColor = null, 150);
+
+				// Create quick notepad
+				if (!!makeQuickNotepad) makeQuickNotepad();
+
+				const guid = TOAST_HANDLER.register(() => deleteNotepad!());
+				Materialize.toast(`Created notebook <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`, 6000);
 			}
 
 			return;
@@ -163,7 +192,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			// Insert a new element
 			toggleInsertMenu!({
 				x: event.clientX,
-				y: event.clientY - 128
+				y: event.clientY - FullScreenService.getOffset(isFullscreen)
 			});
 		} else {
 			edit!('');

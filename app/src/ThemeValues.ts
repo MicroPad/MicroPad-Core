@@ -2,6 +2,8 @@ import { ITheme, ThemeName } from './types/Themes';
 
 const classicBackground = require('./assets/background.png');
 const filledBackground = require('./assets/dark-background.png');
+const instructionImageLight = require('./assets/click-to-make.png');
+const instructionImageDark = require('./assets/click-to-make-dark.png');
 
 export const ThemeValues: { [K in ThemeName]: ITheme } = {
 	Classic: {
@@ -11,7 +13,8 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		text: '#000',
 		links: '#039be5',
 		explorerContent: '#fff',
-		backgroundImage: classicBackground
+		backgroundImage: classicBackground,
+		instructionImage: instructionImageLight
 	},
 	Solarized: {
 		background: '#002b36',
@@ -21,7 +24,8 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		links: '#eee8d5',
 		explorerContent: '#eee8d5',
 		backgroundImage: filledBackground,
-		drawingBackground: '#ffffff30'
+		drawingBackground: '#ffffff30',
+		instructionImage: instructionImageDark
 	},
 	IanPad: {
 		background: '#B9F6CA',
@@ -30,7 +34,8 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		text: '#000',
 		links: '#039be5',
 		explorerContent: '#fff',
-		backgroundImage: filledBackground
+		backgroundImage: filledBackground,
+		instructionImage: instructionImageLight
 	},
 	Midnight: {
 		background: '#212121',
@@ -40,6 +45,7 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		links: '#039be5',
 		explorerContent: '#ddd',
 		backgroundImage: filledBackground,
-		drawingBackground: '#ffffff30'
+		drawingBackground: '#ffffff30',
+		instructionImage: instructionImageDark
 	}
 };

@@ -2,21 +2,14 @@
 	order: 0;
 	width: calc(100vw - 300px);
 	overflow: auto;
+
+	background-position: center center, left top;
+	background-repeat: no-repeat, repeat;
 }
 
 #note-container {
 	transform-origin: 0 0;
 	transform: scale(1);
-}
-
-#note-viewer.empty {
-	/*noinspection CssUnknownTarget*/
-	background-image: url("/assets/background.png");
-}
-
-#note-viewer.empty.dark {
-	/*noinspection CssUnknownTarget*/
-	background-image: url("/assets/dark-background.png");
 }
 
 #progress-bar {

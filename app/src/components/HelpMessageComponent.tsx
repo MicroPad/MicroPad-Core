@@ -34,6 +34,7 @@ export default class HelpMessageComponent extends React.Component<IHelpMessageCo
 			width: '400px',
 			minHeight: '100px',
 			transition: 'background-color .3s',
+			whiteSpace: 'normal'
 		};
 
 		return (
@@ -52,7 +53,7 @@ export default class HelpMessageComponent extends React.Component<IHelpMessageCo
 						width="390px" />
 				}
 
-				<span>(<a style={{ textDecoration: 'underline' }} href="#!" onClick={() => {
+				<br /><span>(<a style={{ textDecoration: 'underline' }} href="#!" onClick={() => {
 					hide!(false);
 					Materialize.toast('You can get the videos to appear again by opening the help notepad', 5000);
 				}}>Don't show me these again</a>)</span>

@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable';
-import { filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
-import { from } from 'rxjs';
+import { concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
@@ -12,10 +12,12 @@ import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { Store } from 'redux';
+import * as Materialize from 'materialize-css/dist/js/materialize';
 
 const loadNote$ = (action$, store) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.loadNote.started)),
+		tap(() => Materialize.Toast.removeAll()),
 		map((action: Action<string>) => [action.payload, { ...(store.getState().notepads.notepad || <INotepadStoreState> {}).item }]),
 		filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
 		map(([ref, notepad]: [string, FlatNotepad]) => notepad.notes[ref]),
@@ -146,6 +148,37 @@ const loadNoteOnMove$ = action$ =>
 		map((payload: MoveNotepadObjectAction) => actions.loadNote.started(payload.objectRef))
 	);
 
+const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+	action$.pipe(
+		isAction(actions.quickMarkdownInsert),
+		map(() => store.getState().currentNote.ref),
+		filter(ref => ref.length > 0 && !!store.getState().notepads.notepad && !!store.getState().notepads.notepad!.item),
+		map(ref => store.getState().notepads.notepad!.item!.notes[ref]),
+		concatMap(note => {
+			const id = 'markdown' + note.elements.filter(e => e.type === 'markdown').length + 1;
+
+			return [
+				actions.insertElement({
+					noteRef: note.internalRef,
+					element: {
+						type: 'markdown',
+						args: {
+							id,
+							x: '10px',
+							y: '10px',
+							width: 'auto',
+							height: 'auto',
+							fontSize: store.getState().meta.defaultFontSize
+						},
+						content: ''
+					}
+				}),
+
+				actions.openEditor(id)
+			];
+		})
+	);
+
 export const noteEpics$ = combineEpics(
 	loadNote$,
 	checkNoteAssets$,
@@ -154,7 +187,8 @@ export const noteEpics$ = combineEpics(
 	reloadNote$,
 	autoLoadNewNote$,
 	closeNoteOnDeletedParent$,
-	loadNoteOnMove$
+	loadNoteOnMove$,
+	quickMarkdownInsert$
 );
 
 function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {

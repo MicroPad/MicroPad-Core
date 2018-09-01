@@ -11,7 +11,7 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState): I
 
 	if (currentNote.ref.length === 0) {
 		breadcrumbs.push(((notepads.notepad || <INotepadStoreState> {}).item || <FlatNotepad> {}).title
-			|| 'Open/Create a notepad using the drop-down or the sidebar to start');
+			|| 'Create a quick notebook below, or open/create a notebook using the drop-down/sidebar to start');
 	} else {
 		const note = notepads.notepad!.item!.notes[currentNote.ref];
 		if (!note) return { themeName: meta.theme, breadcrumbs: ['Error loading note'] };

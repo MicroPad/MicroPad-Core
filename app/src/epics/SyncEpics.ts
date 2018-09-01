@@ -4,7 +4,7 @@ import { actions } from '../actions';
 import { catchError, combineLatest, concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
-import { ASSET_STORAGE, SYNC_STORAGE } from '../index';
+import { ASSET_STORAGE, store as STORE, SYNC_STORAGE, TOAST_HANDLER } from '../index';
 import { DifferenceEngine } from '../DifferenceEngine';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
@@ -96,8 +96,10 @@ export namespace SyncEpics {
 	export const requestDownload$ = action$ =>
 		action$.pipe(
 			isAction(actions.requestSyncDownload),
-			tap((action: Action<string>) =>
-				Materialize.toast(`A newer copy of your notepad is online <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.syncDownload('${action.payload}');">DOWNLOAD</a>`)),
+			tap((action: Action<string>) => {
+				const guid = TOAST_HANDLER.register(() => STORE.dispatch(actions.syncDownload.started(action.payload)));
+				Materialize.toast(`A newer copy of your notepad is online <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">DOWNLOAD</a>`);
+			}),
 			filter(() => false)
 		);
 
