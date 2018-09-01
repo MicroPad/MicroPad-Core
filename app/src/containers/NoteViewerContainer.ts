@@ -11,12 +11,14 @@ import { Note } from 'upad-parse/dist';
 
 let noteRef: string = '';
 let note: Note | null;
+let notepadTitle: string = '';
 
 export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 	noteRef = currentNote.ref;
 
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
+		notepadTitle = notepads.notepad!.item!.title;
 	} else {
 		note = null;
 	}
@@ -59,7 +61,8 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 			noteRef
 		})),
 		makeQuickNotepad: () => dispatch(actions.quickNotepad(undefined)),
-		makeQuickNote: () => dispatch(actions.quickNote.started(undefined))
+		makeQuickNote: () => dispatch(actions.quickNote.started(undefined)),
+		deleteNotepad: () => dispatch(actions.deleteNotepad(notepadTitle))
 	};
 }
 

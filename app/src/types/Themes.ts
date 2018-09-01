@@ -7,6 +7,7 @@ export interface ITheme {
 	text: string;
 	links: string;
 	explorerContent: string;
+	instructionImage: string;
 	backgroundImage?: string;
 	drawingBackground?: string;
 }
