@@ -85,5 +85,6 @@ export const actions = {
 	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON'),
 	closeNote: actionCreator<void>('CLOSE_NOTE'),
 	selectTheme: actionCreator<ThemeName>('SELECT_THEME'),
-	moveNotepadObject: actionCreator<MoveNotepadObjectAction>('MOVE_NOTEPAD_OBJECT')
+	moveNotepadObject: actionCreator<MoveNotepadObjectAction>('MOVE_NOTEPAD_OBJECT'),
+	quickMarkdownInsert: actionCreator<void>('QUICK_MARKDOWN_INSERT')
 };

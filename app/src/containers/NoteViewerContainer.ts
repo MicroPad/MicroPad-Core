@@ -10,13 +10,15 @@ import { ThemeValues } from '../ThemeValues';
 import { Note } from 'upad-parse/dist';
 
 let noteRef: string = '';
-let note: Note;
+let note: Note | null;
 
 export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 	noteRef = currentNote.ref;
 
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
+	} else {
+		note = null;
 	}
 
 	return {
@@ -51,7 +53,7 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 				...element,
 				args: {
 					...element.args,
-					id: `${element.type}${note.elements.filter(e => e.type === element.type).length + 1}`
+					id: `${element.type}${note!.elements.filter(e => e.type === element.type).length + 1}`
 				}
 			},
 			noteRef

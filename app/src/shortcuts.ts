@@ -54,4 +54,10 @@ export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 		e.preventDefault();
 		store.dispatch(actions.getHelp(undefined));
 	});
+
+	// Quick Markdown
+	mousetrap.bind('mod+m', e => {
+		e.preventDefault();
+		store.dispatch(actions.quickMarkdownInsert(undefined));
+	});
 }

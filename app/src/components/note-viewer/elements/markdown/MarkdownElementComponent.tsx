@@ -139,7 +139,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 							ref={input => this.editBox = input!}
 							placeholder="Text (in Markdown)"
 							defaultValue={element.content}
-							onChange={this.onElementEdit} />
+							onChange={this.onElementEdit}
+							autoFocus={true} />
 					}
 				</div>
 			</Resizable>
