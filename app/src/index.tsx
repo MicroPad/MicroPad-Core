@@ -29,13 +29,13 @@ import * as QueryString from 'querystring';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 import { SyncUser } from './types/SyncTypes';
-import * as Materialize from 'materialize-css/dist/js/materialize';
 import { INotepadStoreState } from './types/NotepadTypes';
 import { cleanHangingAssets } from './util';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from './types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
+import ToastEventHandler from './ToastEventHandler';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -64,6 +64,8 @@ export const SYNC_STORAGE = localforage.createInstance({
 	name: 'MicroPad',
 	storeName: 'sync'
 });
+
+export const TOAST_HANDLER = new ToastEventHandler();
 
 export function getStorage(): { [name: string]: LocalForage } {
 	return {
@@ -106,12 +108,6 @@ export function getStorage(): { [name: string]: LocalForage } {
 	await displayWhatsNew();
 
 	notepadDownloadHandler();
-
-	// Handle sync download toast
-	window['syncDownload'] = (syncId: string) => {
-		Materialize.Toast.removeAll();
-		store.dispatch(actions.syncDownload.started(syncId));
-	};
 
 	// Show a warning when closing before notepad save or sync is complete
 	store.subscribe(() => {
