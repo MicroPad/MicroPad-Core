@@ -30,7 +30,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 	private isDragging = false;
 
 	render() {
-		const { element, noteAssets, theme, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
+		const { element, noteAssets, theme, search, downloadAsset, elementEditing, edit, updateElement, isFullscreen } = this.props;
 		if (!theme) return null;
 
 		const isEditing = element.args.id === elementEditing;
@@ -105,7 +105,8 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					elementEditing={elementEditing}
 					updateElement={updateElement}
 					noteAssets={noteAssets}
-					edit={edit} />
+					edit={edit}
+					isFullScreen={isFullscreen!} />
 				);
 				break;
 

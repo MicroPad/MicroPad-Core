@@ -21,7 +21,8 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 		y: currentNote.insertElement.y,
 		enabled: currentNote.insertElement.enabled,
 		fontSize: meta.defaultFontSize,
-		theme: ThemeValues[meta.theme]
+		theme: ThemeValues[meta.theme],
+		isFullScreen: meta.isFullScreen
 	};
 }
 
