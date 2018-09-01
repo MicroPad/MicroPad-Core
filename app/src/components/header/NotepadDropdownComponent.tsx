@@ -7,7 +7,7 @@ import { SYNC_NAME } from '../../types';
 import LoginComponent from '../../containers/LoginContainer';
 import { ISyncState } from '../../reducers/SyncReducer';
 import ManageSyncComponent from '../../containers/ManageSyncContainer';
-import { FlatNotepad } from 'upad-parse/dist';
+import { FlatNotepad, Note } from 'upad-parse/dist';
 
 const NPX_ICON = require('../../assets/npx.png');
 const MD_ICON = require('../../assets/md.svg');
@@ -95,6 +95,11 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 	private createNotepad = async () => {
 		const title = await Dialog.prompt('Notebook/Notepad Title:');
 
-		if (title) this.props.newNotepad!(new FlatNotepad(title));
+		let notepad = new FlatNotepad(title);
+		let section = FlatNotepad.makeFlatSection('Unorganised Notes');
+		let note = new Note('Untitled Note').clone({ parent: section.internalRef });
+		notepad = notepad.addSection(section).addNote(note);
+
+		if (title) this.props.newNotepad!(notepad);
 	}
 }

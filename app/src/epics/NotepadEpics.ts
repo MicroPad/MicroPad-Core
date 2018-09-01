@@ -365,10 +365,16 @@ const quickNotepad$ = (action$: Observable<Action<void>>) =>
 
 			return notepad.addSection(section).addNote(note);
 		}),
+		map(notepad => actions.newNotepad(notepad))
+	);
+
+const autoFillNewNotepads$ = (action$: Observable<Action<FlatNotepad>>) =>
+	action$.pipe(
+		isAction(actions.newNotepad),
+		map(action => action.payload),
 		concatMap((notepad: FlatNotepad) => {
 			const noteRef = Object.values(notepad.notes)[0].internalRef;
 			return [
-				actions.newNotepad(notepad),
 				actions.loadNote.started(noteRef),
 				actions.toggleInsertMenu({
 					enabled: true,
@@ -398,7 +404,8 @@ export const notepadEpics$ = combineEpics(
 	saveNotepadOnCreation$,
 	quickNote$,
 	loadQuickNote$,
-	quickNotepad$
+	quickNotepad$,
+	autoFillNewNotepads$
 );
 
 interface IExportedNotepad {
