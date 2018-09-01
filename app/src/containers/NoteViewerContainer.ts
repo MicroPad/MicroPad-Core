@@ -7,13 +7,14 @@ import {
 } from '../components/note-viewer/NoteViewerComponent';
 import { actions } from '../actions';
 import { ThemeValues } from '../ThemeValues';
+import { Note } from 'upad-parse/dist';
 
 let noteRef: string = '';
+let note: Note;
 
 export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 	noteRef = currentNote.ref;
 
-	let note;
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
 	}
@@ -44,7 +45,17 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 				newAsset
 			})
 		),
-		toggleInsertMenu: opts => dispatch(actions.toggleInsertMenu(opts))
+		toggleInsertMenu: opts => dispatch(actions.toggleInsertMenu(opts)),
+		insert: element => dispatch(actions.insertElement({
+			element: {
+				...element,
+				args: {
+					...element.args,
+					id: `${element.type}${note.elements.filter(e => e.type === element.type).length + 1}`
+				}
+			},
+			noteRef
+		}))
 	};
 }
 

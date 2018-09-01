@@ -27,6 +27,7 @@ export interface INoteViewerComponentProps {
 	downloadAsset?: (filename: string, uuid: string) => void;
 	updateElement?: (id: string, changes: NoteElement, newAsset?: Blob) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
+	insert?: (element: NoteElement) => void;
 	deleteElement?: (id: string) => void;
 }
 
@@ -59,7 +60,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			theme,
 			edit,
 			updateElement,
-			deleteElement
+			deleteElement,
+			insert
 		} = this.props;
 
 		let styles: CSSProperties = {
@@ -94,7 +96,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				updateElement={updateElement}
 				downloadAsset={downloadAsset}
 				elementEditing={elementEditing}
-				isFullscreen={isFullscreen} />
+				isFullscreen={isFullscreen}
+				insert={insert} />
 		));
 
 		if (!isLoading && !!note && elements.length === 0) Materialize.toast('Welcome to your note! Press anywhere on the white area to insert an element.', 8000);

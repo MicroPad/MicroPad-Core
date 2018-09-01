@@ -9,9 +9,10 @@ import { INoteViewerComponentProps } from '../NoteViewerComponent';
 import { Button, Icon, Row } from 'react-materialize';
 import Draggable, { DraggableData } from 'react-draggable';
 import SourcesComponent from '../../../containers/SourcesContainer';
-import { Dialog } from '../../../dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { EditDueDateComponent } from './EditDueDateComponent';
+import { TOAST_HANDLER } from '../../../index';
+import * as Materialize from 'materialize-css/dist/js/materialize';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
@@ -21,6 +22,7 @@ export interface INoteElementComponentProps extends Partial<INoteViewerComponent
 	deleteElement?: (id: string) => void;
 	search?: (query: string) => void;
 	downloadAsset?: (filename: string, uuid: string) => void;
+	insert?: (element: NoteElement) => void;
 }
 
 export default class NoteElementComponent extends React.Component<INoteElementComponentProps> {
@@ -186,11 +188,15 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 	}
 
 	private delete = async () => {
-		const { element, deleteElement, edit } = this.props;
-		if (!await Dialog.confirm('Are you sure you want to delete this element?')) return;
+		const { element, deleteElement, edit, insert } = this.props;
+		if (!deleteElement || !edit || !insert) return;
 
-		deleteElement!(element.args.id);
-		edit!('');
+		deleteElement(element.args.id);
+		edit('');
+
+		// Undo dialog
+		const guid = TOAST_HANDLER.register(() => insert(element));
+		Materialize.toast(`Element Deleted <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`, 6000);
 	}
 
 	private openEditor = event => {
