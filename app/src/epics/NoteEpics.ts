@@ -12,10 +12,12 @@ import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { Store } from 'redux';
+import * as Materialize from 'materialize-css/dist/js/materialize';
 
 const loadNote$ = (action$, store) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.loadNote.started)),
+		tap(() => Materialize.Toast.removeAll()),
 		map((action: Action<string>) => [action.payload, { ...(store.getState().notepads.notepad || <INotepadStoreState> {}).item }]),
 		filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
 		map(([ref, notepad]: [string, FlatNotepad]) => notepad.notes[ref]),
