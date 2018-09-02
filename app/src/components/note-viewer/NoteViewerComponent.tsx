@@ -13,6 +13,7 @@ import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';
 import { FullScreenService } from '../../FullscreenService';
 import { TOAST_HANDLER } from '../../index';
+import { generateGuid } from '../../util';
 
 export interface INoteViewerComponentProps {
 	isLoading: boolean;
@@ -120,7 +121,12 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				style={styles}
 				ref={div => this.viewerDiv = div!}
 				onClick={this.handleEmptyClick}
-				onScroll={() => this.scrolling = true}>
+				onScroll={() => this.scrolling = true}
+				onDrop={event => this.handleFileDrop(event as any)}
+				onDragOver={e => {
+					e.stopPropagation();
+					e.preventDefault();
+				}}>
 				{isLoading && <div id="progress-bar"><ProgressBar className="amber" /></div>}
 				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}>
 					{elements}
@@ -131,7 +137,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	componentDidMount() {
-		const { edit, toggleInsertMenu, deleteNotepad } = this.props;
+		const { edit, toggleInsertMenu } = this.props;
 
 		this.escapeHit$.subscribe(() => edit!(''));
 
@@ -197,5 +203,59 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		} else {
 			edit!('');
 		}
+	}
+
+	private handleFileDrop = (event: DragEvent) => {
+		event.preventDefault();
+
+		const { note, isFullscreen } = this.props;
+		if (!note) return;
+
+		const x = event.clientX;
+		const y = event.clientY - FullScreenService.getOffset(isFullscreen);
+
+		if (!!event.dataTransfer.items) {
+			Array.from(event.dataTransfer.items)
+				.filter(item => item.kind === 'file')
+				.map(file => file.getAsFile())
+				.filter(Boolean)
+				.forEach((file: File) => this.insertFileFromDrag(file, x, y));
+
+			event.dataTransfer.items.clear();
+		} else {
+			Array.from(event.dataTransfer.files)
+				.forEach(file => this.insertFileFromDrag(file, x, y));
+
+			event.dataTransfer.clearData();
+		}
+	}
+
+	private insertFileFromDrag = (file: File, x: number, y: number) => {
+		const { insert, note, isFullscreen, updateElement } = this.props;
+		if (!insert || !note || !updateElement) return;
+
+		const insertX = Math.abs(Math.floor(this.containerDiv.getBoundingClientRect().left)) + x;
+		const insertY = (Math.abs(Math.floor(this.containerDiv.getBoundingClientRect().top)) + y) - FullScreenService.getOffset(isFullscreen);
+
+		const ext = file.name.split('.').pop()!;
+		const type = ['png', 'jpeg', 'jpg', 'gif'].includes(ext) ? 'image' : 'file';
+
+		const id = type + note.elements.filter(e => e.type === type).length + 1;
+		const element: NoteElement = {
+			type,
+			content: 'AS',
+			args: {
+				id,
+				x: insertX + 'px',
+				y: insertY + 'px',
+				width: 'auto',
+				height: 'auto',
+				ext: generateGuid(),
+				filename: file.name
+			}
+		};
+
+		insert(element);
+		updateElement(id, element, file);
 	}
 }
