@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../actions';
-import { catchError, combineLatest, concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { catchError, combineLatest, concatMap, filter, first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
 import { ASSET_STORAGE, store as STORE, SYNC_STORAGE, TOAST_HANDLER } from '../index';
@@ -9,7 +9,7 @@ import { DifferenceEngine } from '../DifferenceEngine';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
 import { AddToSyncAction, NotepadToSyncNotepadAction, SyncAction, UploadAssetAction } from '../types/ActionTypes';
-import { EMPTY, from, of } from 'rxjs';
+import { BehaviorSubject, EMPTY, from, of } from 'rxjs';
 import { parse } from 'date-fns';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
@@ -19,6 +19,8 @@ import { FlatNotepad } from 'upad-parse/dist';
 import * as stringify from 'json-stringify-safe';
 
 export namespace SyncEpics {
+	export const uploadCount$ = new BehaviorSubject<number>(0);
+
 	export const persistOnLogin$ = action$ =>
 		action$.pipe(
 			isAction(actions.syncLogin.done),
@@ -107,7 +109,7 @@ export namespace SyncEpics {
 		action$.pipe(
 			isAction(actions.syncDownload.started),
 			map((action: Action<string>) => action.payload),
-			switchMap((syncId: string) =>
+			concatMap((syncId: string) =>
 				DifferenceEngine.SyncService.downloadNotepad(syncId).pipe(
 					switchMap((remoteNotepad: ISyncedNotepad) => {
 						let localNotepad = (((<IStoreState> store.getState()).notepads || <INotepadStoreState> {}).notepad || <INotepadStoreState> {}).item;
@@ -167,6 +169,7 @@ export namespace SyncEpics {
 	export const upload$ = (action$, store) =>
 		action$.pipe(
 			isAction(actions.syncUpload.started),
+			tap(() => uploadCount$.next(uploadCount$.getValue() + 1)),
 			map((action: Action<SyncAction>) => action.payload),
 			map((payload: SyncAction) => [payload, (<IStoreState> store.getState()).sync.user]),
 			filter(([payload, user]: [SyncAction, SyncUser]) => !!payload && !!user),
@@ -192,7 +195,15 @@ export namespace SyncEpics {
 								)()))
 							)
 					),
-					map(() => actions.syncUpload.done({ params: {} as SyncAction, result: undefined })),
+					switchMap(() =>
+						uploadCount$.pipe(
+							first(),
+							map(n => n - 1),
+							tap(n => uploadCount$.next(n)),
+							filter(n => n === 0),
+							map(() => actions.syncUpload.done({ params: {} as SyncAction, result: undefined }))
+						)
+					),
 					catchError((error): Observable<Action<any>> => {
 						if (error === 'too many assets') {
 							return of(actions.syncProError(undefined));
