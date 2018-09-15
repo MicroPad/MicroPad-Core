@@ -12,6 +12,7 @@ import Resizable from 're-resizable';
 import { Dialog } from '../../../../dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
+import Twemoji from 'twemoji/2/twemoji.amd';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -120,7 +121,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 							id={`${element.args.id}-iframe`}
 							style={iframeStyle}
 							ref={iframe => this.iframe = iframe!}
-							srcDoc={MarkDownViewer.getHtml(element.args.id, theme)}
+							srcDoc={MarkDownViewer.getHtml(element.args.id, theme, element.args.fontSize)}
 							sandbox="allow-scripts allow-popups" />
 					}
 
@@ -236,6 +237,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private generateHtml = (element: NoteElement): Promise<string> => {
 		return new Promise<string>(resolve => {
 			let html = this.converter.makeHtml(element.content);
+			if (navigator.onLine) html = Twemoji.parse(html, (icon, opts) => `https://twemoji.maxcdn.com/2/svg/${icon}.svg`);
 			resolve(html);
 		});
 	}
