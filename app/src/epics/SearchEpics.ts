@@ -1,9 +1,9 @@
 import { combineEpics } from 'redux-observable';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { Notepad, Section, Translators } from 'upad-parse/dist';
+import { FlatNotepad, Translators } from 'upad-parse/dist';
 import { HashTagSearchResult, HashTagSearchResults } from '../reducers/SearchReducer';
 
 export namespace SearchEpics {
@@ -11,14 +11,15 @@ export namespace SearchEpics {
 		action$.pipe(
 			filter((action: Action<string>) => isType(action, actions.search)),
 			map((action: Action<string>) => action.payload),
+			debounceTime(100),
 			switchMap((query: string) => from((async () => {
 				if (query.length <= 1 || query.substring(0, 1) !== '#') return actions.displayHashTagSearchResults({});
 
 				// Get all the notepads we have saved
-				const notepads: Notepad[] = [];
+				const notepads: FlatNotepad[] = [];
 				await getStorage().notepadStorage.iterate((json: string) => {
 					try {
-						notepads.push(Translators.Json.toNotepadFromNotepad(json));
+						notepads.push(Translators.Json.toNotepadFromNotepad(json).flatten());
 					} catch (e) {
 						console.warn(`Couldn't parse notepad: ${e}`);
 					}
@@ -33,7 +34,7 @@ export namespace SearchEpics {
 							.map(note => {
 								return {
 									title: note.title,
-									parentTitle: (note.parent as Section).title,
+									parentTitle: notepad.sections[note.parent as string].title,
 									noteRef: note.internalRef
 								} as HashTagSearchResult;
 							})
