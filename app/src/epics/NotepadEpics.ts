@@ -18,7 +18,7 @@ import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
 import * as JSZip from 'jszip';
-import { generateGuid, isAction } from '../util';
+import { fixFileName, generateGuid, isAction } from '../util';
 import { Dialog } from '../dialogs';
 import { ISyncedNotepad, SyncedNotepadList, SyncUser } from '../types/SyncTypes';
 import { Asset, FlatNotepad, Note, Notepad, Translators } from 'upad-parse/dist';
@@ -150,7 +150,7 @@ const exportNotepad$ = (action$, store) =>
 		),
 		tap((exportedNotepad: IExportedNotepad) => {
 			const blob = new Blob([exportedNotepad.content], { type: 'text/xml;charset=utf-8' });
-			saveAs(blob, `${exportedNotepad.title}.npx`);
+			saveAs(blob, `${fixFileName(exportedNotepad.title)}.npx`);
 		}),
 		filter(() => false)
 	);
@@ -182,7 +182,7 @@ const exportAll$ = (action$, store) =>
 
 			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
 				const blob: Blob = new Blob([exportedNotepad.content], { type: 'text/xml;charset=utf-8' });
-				zip.file(`${exportedNotepad.title}.npx`, blob);
+				zip.file(`${fixFileName(exportedNotepad.title)}.npx`, blob);
 			});
 
 			zip.generateAsync({
@@ -223,7 +223,7 @@ const exportAllToMarkdown$ = (action$, store) =>
 			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
 				(<MarkdownNote[]> exportedNotepad.content).forEach(mdNote =>
 					zip.file(
-						`${exportedNotepad.title}/${mdNote.title}.md`,
+						`${fixFileName(exportedNotepad.title)}/${fixFileName(mdNote.title)}.md`,
 						new Blob([mdNote.md], { type: 'text/markdown;charset=utf-8' })
 					)
 				);
