@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
+import { filter, map, switchMap } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
@@ -11,7 +11,6 @@ export namespace SearchEpics {
 		action$.pipe(
 			filter((action: Action<string>) => isType(action, actions.search)),
 			map((action: Action<string>) => action.payload),
-			debounceTime(100),
 			switchMap((query: string) => from((async () => {
 				if (query.length <= 1 || query.substring(0, 1) !== '#') return actions.displayHashTagSearchResults({});
 
