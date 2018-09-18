@@ -5,10 +5,11 @@ import { FlatNotepad, Note } from 'upad-parse/dist';
 import { Subscription } from 'rxjs/Subscription';
 import { fromEvent } from 'rxjs';
 import { HashTagSearchResult, HashTagSearchResults } from '../../reducers/SearchReducer';
-import { RestoreJsonNotepadAndLoadNoteAction } from '../../types/ActionTypes';
+import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../../types/ActionTypes';
 
 export interface ISearchComponentProps {
 	notepad?: FlatNotepad;
+	indices: SearchIndices;
 	hashTagResults: HashTagSearchResults;
 	query: string;
 	loadNote?: (ref: string) => void;
@@ -22,16 +23,20 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	private triggerClickedSub: Subscription;
 
 	render() {
-		const { notepad, query, hashTagResults } = this.props;
+		const { notepad, query, hashTagResults, indices } = this.props;
 
 		this.autoCompleteOptions = {};
 		this.mappedNotesToOptions = [];
 
 		if (!!notepad) {
-			notepad.search('').forEach((note: Note, i: number) => {
-				this.autoCompleteOptions[`${i + 1}. ${notepad.sections[note.parent as string].title} > ${note.title}`] = null;
-				this.mappedNotesToOptions[i] = note;
-			});
+			const index = indices.find(idx => idx.notepad.title === notepad.title);
+			if (!!index) {
+				console.log(index.trie);
+				notepad.search(index.trie, '').forEach((note: Note, i: number) => {
+					this.autoCompleteOptions[`${i + 1}. ${notepad.sections[note.parent as string].title} > ${note.title}`] = null;
+					this.mappedNotesToOptions[i] = note;
+				});
+			}
 		}
 
 		return (

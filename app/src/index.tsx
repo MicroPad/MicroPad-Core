@@ -81,6 +81,7 @@ export function getStorage(): { [name: string]: LocalForage } {
 
 	if ((window as any).isElectron) store.dispatch(actions.checkVersion(undefined));
 	store.dispatch(actions.getNotepadList.started(undefined));
+	store.dispatch(actions.indexNotepads.started(undefined));
 
 	enableKeyboardShortcuts(store);
 	registerServiceWorker();
