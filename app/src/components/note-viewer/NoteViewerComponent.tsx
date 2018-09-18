@@ -72,7 +72,11 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 
 		let backgroundImage: string = '';
 		if (!isNotepadOpen) {
-			backgroundImage = `url(${theme.instructionImage}), `;
+			backgroundImage = `url(${theme.instructionImages.notepad}), `;
+		} else if (isNotepadOpen && !note) {
+			backgroundImage = `url(${theme.instructionImages.note}), `;
+		} else if (isNotepadOpen && !!note && note.elements.length === 0) {
+			backgroundImage = `url(${theme.instructionImages.element}), `;
 		} else {
 			backgroundImage = 'url(), ';
 		}
