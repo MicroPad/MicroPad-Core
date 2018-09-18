@@ -237,7 +237,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private generateHtml = (element: NoteElement): Promise<string> => {
 		return new Promise<string>(resolve => {
 			let html = this.converter.makeHtml(element.content);
-			if (navigator.onLine && !(window as any).isElectron) html = Twemoji.parse(html, icon => require(`twemoji/2/svg/${icon}.svg`));
+			if (navigator.onLine || (window as any).isElectron) html = Twemoji.parse(html, icon => require(`twemoji/2/svg/${icon}.svg`));
 			resolve(html);
 		});
 	}
