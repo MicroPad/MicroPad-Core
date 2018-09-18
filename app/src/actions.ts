@@ -9,6 +9,7 @@ import {
 	NewNotepadObjectAction,
 	NotepadToSyncNotepadAction,
 	RestoreJsonNotepadAndLoadNoteAction,
+	SearchIndices,
 	SyncAction,
 	UpdateBibliographyAction,
 	UpdateElementAction
@@ -41,6 +42,7 @@ export const actions = {
 	deleteFromSync: actionCreator.async<string, void, any>('SYNC_DELETE'),
 	addToSync: actionCreator.async<AddToSyncAction, string, any>('SYNC_CREATE'),
 	quickNote: actionCreator.async<void, string, void>('QUICK_NOTE'),
+	indexNotepads: actionCreator.async<void, SearchIndices, any>('INDEX_NOTEPADS'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),

@@ -29,6 +29,10 @@ export function readFileInputEventAsText(event: SyntheticEvent<HTMLInputElement>
 	});
 }
 
+export function fixFileName(filename: string) {
+	return filename.replace(/[<>:;,?"*|\/\\]+/g, '_');
+}
+
 // Thanks to https://stackoverflow.com/a/105074
 export function generateGuid(): string {
 	function s4() {

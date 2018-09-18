@@ -1,7 +1,7 @@
 import { ISyncedNotepad, SyncUser } from './SyncTypes';
 import { Action } from 'redux-typescript-actions';
 import { NoteElement, Source } from 'upad-parse/dist/Note';
-import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
+import { FlatNotepad, Note, Notepad, Trie } from 'upad-parse/dist';
 
 export type UpdateElementAction = {
 	noteRef: string;
@@ -65,3 +65,7 @@ export type MoveNotepadObjectAction = {
 	objectRef: string;
 	newParent: string;
 };
+
+export type SearchIndex = { notepad: FlatNotepad, trie: Trie };
+
+export type SearchIndices = SearchIndex[];
