@@ -31,7 +31,6 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 		if (!!notepad) {
 			const index = indices.find(idx => idx.notepad.title === notepad.title);
 			if (!!index) {
-				console.log(index.trie);
 				notepad.search(index.trie, '').forEach((note: Note, i: number) => {
 					this.autoCompleteOptions[`${i + 1}. ${notepad.sections[note.parent as string].title} > ${note.title}`] = null;
 					this.mappedNotesToOptions[i] = note;

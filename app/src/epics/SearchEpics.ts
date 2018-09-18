@@ -40,7 +40,6 @@ export namespace SearchEpics {
 
 				// Create a data structure with each notepad being the key to all the results for that hashtag's search
 				const results: HashTagSearchResults = {};
-				console.log(store.getState().search.indices);
 				store.getState().search.indices
 					.forEach(index =>
 						index.notepad.search(index.trie, query)
