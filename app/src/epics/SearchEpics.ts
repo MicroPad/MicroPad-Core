@@ -1,5 +1,4 @@
 // @ts-ignore
-import SearchWorker from '!workerize-loader!../SearchWorker.js';
 
 import { combineEpics } from 'redux-observable';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
@@ -11,11 +10,10 @@ import { IStoreState } from '../types';
 import { Store } from 'redux';
 import { SearchIndices } from '../types/ActionTypes';
 import { isAction } from '../util';
+import { indexNotepads } from '../SearchWorker';
 
 export namespace SearchEpics {
-	const IndexThread = new SearchWorker() as { indexNotepads: (indices: SearchIndices) => Promise<SearchIndices> };
-
-	export const refreshIndicies = (action$, store: Store<IStoreState>) =>
+	export const refreshIndices = action$ =>
 		action$.pipe(
 			isAction(actions.saveNotepad.done),
 			map(() => actions.indexNotepads.started(undefined))
@@ -26,14 +24,14 @@ export namespace SearchEpics {
 			isAction(actions.indexNotepads.started),
 			map(() => store.getState().search.indices),
 			switchMap((indices: SearchIndices) =>
-				from(IndexThread.indexNotepads(indices)).pipe(
+				from(indexNotepads(indices)).pipe(
 					map(newIndices => actions.indexNotepads.done({ params: undefined, result: newIndices })),
 					catchError(err => of(actions.indexNotepads.failed({ params: undefined, error: err })))
 				)
 			)
 		);
 
-	export const search$ = (action$, store: Store<IStoreState>, { getStorage }: { getStorage: () => { [name: string]: LocalForage } }) =>
+	export const search$ = (action$, store: Store<IStoreState>) =>
 		action$.pipe(
 			filter((action: Action<string>) => isType(action, actions.search)),
 			map((action: Action<string>) => action.payload),
@@ -42,6 +40,7 @@ export namespace SearchEpics {
 
 				// Create a data structure with each notepad being the key to all the results for that hashtag's search
 				const results: HashTagSearchResults = {};
+				console.log(store.getState().search.indices);
 				store.getState().search.indices
 					.forEach(index =>
 						index.notepad.search(index.trie, query)
@@ -64,7 +63,7 @@ export namespace SearchEpics {
 		);
 
 	export const searchEpics$ = combineEpics(
-		refreshIndicies,
+		refreshIndices,
 		indexNotepads$,
 		search$
 	);

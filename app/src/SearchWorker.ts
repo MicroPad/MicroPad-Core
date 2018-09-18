@@ -1,14 +1,15 @@
-import * as localforage from "localforage";
-import { Translators, Trie } from "upad-parse/dist";
+import * as localforage from 'localforage';
+import { FlatNotepad, Translators, Trie } from 'upad-parse/dist';
+import { SearchIndices } from './types/ActionTypes';
 
-export async function indexNotepads(indices) {
+export async function indexNotepads(indices: SearchIndices) {
 	const NOTEPAD_STORAGE = localforage.createInstance({
 		name: 'MicroPad',
 		storeName: 'notepads'
 	});
 	await NOTEPAD_STORAGE.ready();
 
-	const notepads = [];
+	const notepads: FlatNotepad[] = [];
 	await NOTEPAD_STORAGE.iterate((json) => {
 		try {
 			notepads.push(Translators.Json.toFlatNotepadFromNotepad(json));
