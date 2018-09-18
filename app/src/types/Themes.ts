@@ -7,7 +7,11 @@ export interface ITheme {
 	text: string;
 	links: string;
 	explorerContent: string;
-	instructionImage: string;
+	instructionImages: {
+		notepad: string;
+		note: string;
+		element: string;
+	};
 	backgroundImage?: string;
 	drawingBackground?: string;
 }

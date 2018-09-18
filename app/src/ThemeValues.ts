@@ -4,6 +4,10 @@ const classicBackground = require('./assets/background.png');
 const filledBackground = require('./assets/dark-background.png');
 const instructionImageLight = require('./assets/click-to-make.png');
 const instructionImageDark = require('./assets/click-to-make-dark.png');
+const noteInstructionsLight = require('./assets/click-to-make-open.png');
+const noteInstructionsDark = require('./assets/click-to-make-open-dark.png');
+const elementInstructionsLight = require('./assets/click-to-insert.png');
+const elementInstructionsDark = require('./assets/click-to-insert-dark.png');
 
 export const ThemeValues: { [K in ThemeName]: ITheme } = {
 	Classic: {
@@ -14,7 +18,11 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		links: '#039be5',
 		explorerContent: '#fff',
 		backgroundImage: classicBackground,
-		instructionImage: instructionImageLight
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
 	},
 	Solarized: {
 		background: '#002b36',
@@ -25,7 +33,11 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		explorerContent: '#eee8d5',
 		backgroundImage: filledBackground,
 		drawingBackground: '#ffffff30',
-		instructionImage: instructionImageDark
+		instructionImages: {
+			notepad: instructionImageDark,
+			note: noteInstructionsDark,
+			element: elementInstructionsDark
+		}
 	},
 	IanPad: {
 		background: '#B9F6CA',
@@ -35,7 +47,11 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		links: '#039be5',
 		explorerContent: '#fff',
 		backgroundImage: filledBackground,
-		instructionImage: instructionImageLight
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
 	},
 	Midnight: {
 		background: '#212121',
@@ -46,6 +62,10 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		explorerContent: '#ddd',
 		backgroundImage: filledBackground,
 		drawingBackground: '#ffffff30',
-		instructionImage: instructionImageDark
+		instructionImages: {
+			notepad: instructionImageDark,
+			note: noteInstructionsDark,
+			element: elementInstructionsDark
+		}
 	}
 };
