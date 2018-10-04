@@ -41,5 +41,20 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		explorerContent: '#ddd',
 		backgroundImage: filledBackground,
 		drawingBackground: '#ffffff30'
+	},
+	Purple: {
+		background: '#fff',
+		accent: '#ffcc00',
+		chrome: '#3d0066',
+		text: '#fff',
+		links: '#039be5',
+		explorerContent: '#fff',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
 	}
+
 };
