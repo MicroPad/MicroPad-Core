@@ -72,7 +72,7 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		background: '#fff',
 		accent: '#ffcc00',
 		chrome: '#3d0066',
-		text: '#fff',
+		text: '#000',
 		links: '#039be5',
 		explorerContent: '#fff',
 		backgroundImage: filledBackground,
