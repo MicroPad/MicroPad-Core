@@ -67,5 +67,20 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 			note: noteInstructionsDark,
 			element: elementInstructionsDark
 		}
+	},
+	Purple: {
+		background: '#fff',
+		accent: '#ffcc00',
+		chrome: '#3d0066',
+		text: '#fff',
+		links: '#039be5',
+		explorerContent: '#fff',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
 	}
+
 };
