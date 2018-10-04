@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { Autocomplete, Collection, CollectionItem, Icon, Modal, NavItem, Row } from 'react-materialize';
+import { Collection, CollectionItem, Icon, Input, Modal, NavItem, Row } from 'react-materialize';
 import { shareReplay } from 'rxjs/operators';
-import { FlatNotepad, Note } from 'upad-parse/dist';
+import { FlatNotepad } from 'upad-parse/dist';
 import { Subscription } from 'rxjs/Subscription';
 import { fromEvent } from 'rxjs';
 import { HashTagSearchResult, HashTagSearchResults } from '../../reducers/SearchReducer';
-import { RestoreJsonNotepadAndLoadNoteAction } from '../../types/ActionTypes';
+import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../../types/ActionTypes';
 
 export interface ISearchComponentProps {
 	notepad?: FlatNotepad;
+	indices: SearchIndices;
 	hashTagResults: HashTagSearchResults;
 	query: string;
 	loadNote?: (ref: string) => void;
@@ -17,21 +18,33 @@ export interface ISearchComponentProps {
 }
 
 export default class SearchComponent extends React.Component<ISearchComponentProps> {
-	private mappedNotesToOptions: Note[];
-	private autoCompleteOptions: object;
+	private searchInput: Input;
+	private results: JSX.Element[];
 	private triggerClickedSub: Subscription;
 
 	render() {
-		const { notepad, query, hashTagResults } = this.props;
+		const { notepad, query, hashTagResults, indices } = this.props;
 
-		this.autoCompleteOptions = {};
-		this.mappedNotesToOptions = [];
+		this.results = [];
 
 		if (!!notepad) {
-			notepad.search('').forEach((note: Note, i: number) => {
-				this.autoCompleteOptions[`${i + 1}. ${notepad.sections[note.parent as string].title} > ${note.title}`] = null;
-				this.mappedNotesToOptions[i] = note;
-			});
+			const index = indices.find(idx => idx.notepad.title === notepad.title);
+			if (!!index) {
+				const results = new Set(
+					query.split(' ')
+						.filter(word => word.length > 0)
+						.map(word => notepad.search(index.trie, word))
+						.reduce((acc, val) => acc.concat(val), [])
+				);
+
+				this.results = Array.from(results)
+					.sort((a, b) => Math.abs(query.length - a.title.length) - Math.abs(query.length - b.title.length))
+					.map((note) => (
+						<option key={note.internalRef} data-value={note.internalRef}>
+							{notepad.sections[note.parent as string].title} > {note.title}
+						</option>
+					));
+			}
 		}
 
 		return (
@@ -40,14 +53,18 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 				header="Search Notepad"
 				trigger={<NavItem id={`search-button`} href="#!"><Icon left={true}>search</Icon> Search</NavItem>}>
 				<Row>
-					<Autocomplete
-						id="search-input"
+					<Input
+						list="search-results"
+						ref={e => this.searchInput = e!}
 						s={12}
-						title={`Search by ${(!!notepad && `note title or a`) || ''} hashtag`}
+						label={`Search by ${(!!notepad && `note title or a`) || ''} hashtag`}
 						onChange={this.onInput}
 						value={query}
-						onAutocomplete={this.loadNoteFromInput}
-						data={this.autoCompleteOptions} />
+						data-lpignore="true" />
+
+					<datalist id="search-results">
+						{this.results}
+					</datalist>
 				</Row>
 
 				{
@@ -86,10 +103,10 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 				shareReplay()
 			)
 			.subscribe(() => {
-				const input = document.getElementById('search-input');
+				const input = this.searchInput;
 				if (!input) return;
 
-				setTimeout(() => input.focus(), 0);
+				setTimeout(() => input.input.focus(), 0);
 			});
 	}
 
@@ -99,16 +116,27 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 
 	private onInput = (event, value: string) => {
 		const { search } = this.props;
-		search!(value);
+		if (!search) return;
+
+		const result = this.results
+			.map(e => e.props)
+			.find(e => e.children.join('') === value);
+
+		if (!!result) {
+			this.loadNoteFromInput(result['data-value']);
+			return;
+		}
+
+		search(value);
 	}
 
-	private loadNoteFromInput = (value: string) => {
+	private loadNoteFromInput = (ref: string) => {
 		const { loadNote, search } = this.props;
-		const index: number = parseInt(value.split('.')[0], 10) - 1;
+		if (!loadNote || !search) return;
 
 		this.closeModal();
-		setTimeout(() => search!(''), 10);
-		loadNote!(this.mappedNotesToOptions[index].internalRef);
+		setTimeout(() => search(''), 10);
+		loadNote(ref);
 	}
 
 	private generateHashTagSearchResultList = (notepadTitle: string, results: HashTagSearchResult[]): JSX.Element | null => {

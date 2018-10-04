@@ -6,6 +6,7 @@ import { isType } from 'redux-typescript-actions';
 import * as stringify from 'json-stringify-safe';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { FlatNotepad, Note } from 'upad-parse/dist';
+import { format } from 'date-fns';
 
 export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 	public readonly key: string = 'notepads';
@@ -373,6 +374,33 @@ export class NotepadsReducer implements IReducer<INotepadsStoreState> {
 								return items;
 							}, {})
 					})
+				}
+			};
+		} else if (isType(action, actions.quickNote.done)) {
+			if (!state.notepad || !state.notepad.item) return state;
+			let notepad = state.notepad.item;
+
+			// Ensure we have a section for the quick note to go in
+			const parent: FlatSection | undefined = Object.values(notepad.sections)
+				.find(section => section.title === 'Unorganised Notes' && !section.parentRef);
+
+			let newParent: FlatSection | undefined;
+			if (!parent) newParent = FlatNotepad.makeFlatSection('Unorganised Notes');
+
+			if (!parent && !!newParent) notepad = notepad.addSection(newParent);
+
+			// Make the quick note
+			const ref = action.payload.result;
+			const note = new Note(format(new Date(), 'dddd, D MMMM YYYY h:mm:ss A')).clone({
+				internalRef: ref,
+				parent: (parent || newParent!).internalRef
+			});
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad,
+					item: notepad.addNote(note).modified()
 				}
 			};
 		}

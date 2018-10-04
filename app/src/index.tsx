@@ -30,12 +30,13 @@ import * as QueryString from 'querystring';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 import { SyncUser } from './types/SyncTypes';
-import * as Materialize from 'materialize-css/dist/js/materialize';
 import { INotepadStoreState } from './types/NotepadTypes';
 import { cleanHangingAssets } from './util';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from './types/Themes';
+import AppBodyComponent from './containers/AppBodyContainer';
+import ToastEventHandler from './ToastEventHandler';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -65,6 +66,8 @@ export const SYNC_STORAGE = localforage.createInstance({
 	storeName: 'sync'
 });
 
+export const TOAST_HANDLER = new ToastEventHandler();
+
 export function getStorage(): { [name: string]: LocalForage } {
 	return {
 		notepadStorage: NOTEPAD_STORAGE,
@@ -79,6 +82,7 @@ export function getStorage(): { [name: string]: LocalForage } {
 
 	if ((window as any).isElectron) store.dispatch(actions.checkVersion(undefined));
 	store.dispatch(actions.getNotepadList.started(undefined));
+	store.dispatch(actions.indexNotepads.started(undefined));
 
 	enableKeyboardShortcuts(store);
 	registerServiceWorker();
@@ -88,13 +92,13 @@ export function getStorage(): { [name: string]: LocalForage } {
 		<Provider store={store}>
 			<PrintViewOrAppContainerComponent>
 				<HeaderComponent />
-				<div id="body">
+				<AppBodyComponent>
 					<NoteViewerComponent />
 					<NotepadExplorerComponent />
 					<WhatsNewModalComponent />
 					<SyncProErrorComponent />
 					<InsertElementComponent />
-				</div>
+				</ AppBodyComponent>
 			</PrintViewOrAppContainerComponent>
 		</Provider>,
 		document.getElementById('app') as HTMLElement
@@ -106,12 +110,6 @@ export function getStorage(): { [name: string]: LocalForage } {
 	await displayWhatsNew();
 
 	notepadDownloadHandler();
-
-	// Handle sync download toast
-	window['syncDownload'] = (syncId: string) => {
-		Materialize.Toast.removeAll();
-		store.dispatch(actions.syncDownload.started(syncId));
-	};
 
 	// Show a warning when closing before notepad save or sync is complete
 	store.subscribe(() => {

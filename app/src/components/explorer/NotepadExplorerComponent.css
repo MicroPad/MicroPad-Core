@@ -3,12 +3,14 @@
 	padding: 5px;
 	width: 300px;
 	overflow: auto;
+	white-space: nowrap;
 
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	z-index: 10;
 }
 
 #notepad-explorer .due-date-list {

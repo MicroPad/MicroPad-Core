@@ -49,7 +49,7 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 					<NavItem href="#!" onClick={getHelp}><Icon left={true}>help_outline</Icon> Help</NavItem>
 					{isFullScreen && <NavItem href="#!" onClick={flipFullScreenState}><Icon left={true}>fullscreen_exit</Icon> Exit Full Screen</NavItem>}
 				</Navbar>
-				<NotepadBreadcrumbs />
+				{!isFullScreen && <NotepadBreadcrumbs />}
 			</header>
 		);
 	}

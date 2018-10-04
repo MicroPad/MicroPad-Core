@@ -25,7 +25,8 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 			return (
 				<LoginComponent trigger={
 					<strong><a href="#!" style={{
-						textDecoration: 'underline'
+						textDecoration: 'underline',
+						whiteSpace: 'normal'
 					}}>Connect to {SYNC_NAME} to have this notepad on all of your devices</a></strong>
 				} />
 			);

@@ -5,6 +5,7 @@ import { trim } from './trim-canvas';
 import Resizable from 're-resizable';
 import { Input, Row } from 'react-materialize';
 import * as stringify from 'json-stringify-safe';
+import { FullScreenService } from '../../../../FullscreenService';
 
 type Touch = {
 	identifier: number;
@@ -26,7 +27,11 @@ const rainbow = [
 	'#760089'
 ];
 
-export default class DrawingElementComponent extends React.Component<INoteElementComponentProps> {
+export interface IDrawingElementComponentProps extends INoteElementComponentProps {
+	isFullScreen: boolean;
+}
+
+export default class DrawingElementComponent extends React.Component<IDrawingElementComponentProps> {
 	private imageElement: HTMLImageElement;
 	private hasTrimmed: boolean;
 
@@ -222,13 +227,13 @@ export default class DrawingElementComponent extends React.Component<INoteElemen
 	}
 
 	private getRealPosition = (touch: Touch): Position => {
-		const { element } = this.props;
+		const { element, isFullScreen } = this.props;
 
 		const noteViewer = document.getElementById('note-viewer')!;
 
 		const canvasOffset = {
 			left: parseInt(element.args.x, 10) - noteViewer.scrollLeft,
-			top: (parseInt(element.args.y, 10) + 128) - noteViewer.scrollTop
+			top: (parseInt(element.args.y, 10) + FullScreenService.getOffset(isFullScreen)) - noteViewer.scrollTop
 		};
 
 		const scale = parseFloat(document.getElementById('note-container')!.style.transform!.split('(')[1].slice(0, -1));

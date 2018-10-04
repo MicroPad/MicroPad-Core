@@ -9,6 +9,7 @@ import {
 	NewNotepadObjectAction,
 	NotepadToSyncNotepadAction,
 	RestoreJsonNotepadAndLoadNoteAction,
+	SearchIndices,
 	SyncAction,
 	UpdateBibliographyAction,
 	UpdateElementAction
@@ -40,6 +41,8 @@ export const actions = {
 	syncUpload: actionCreator.async<SyncAction, void, any>('SYNC_UPLOAD'),
 	deleteFromSync: actionCreator.async<string, void, any>('SYNC_DELETE'),
 	addToSync: actionCreator.async<AddToSyncAction, string, any>('SYNC_CREATE'),
+	quickNote: actionCreator.async<void, string, void>('QUICK_NOTE'),
+	indexNotepads: actionCreator.async<void, SearchIndices, any>('INDEX_NOTEPADS'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
@@ -85,5 +88,7 @@ export const actions = {
 	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON'),
 	closeNote: actionCreator<void>('CLOSE_NOTE'),
 	selectTheme: actionCreator<ThemeName>('SELECT_THEME'),
-	moveNotepadObject: actionCreator<MoveNotepadObjectAction>('MOVE_NOTEPAD_OBJECT')
+	moveNotepadObject: actionCreator<MoveNotepadObjectAction>('MOVE_NOTEPAD_OBJECT'),
+	quickMarkdownInsert: actionCreator<void>('QUICK_MARKDOWN_INSERT'),
+	quickNotepad: actionCreator<void>('QUICK_NOTEPAD')
 };

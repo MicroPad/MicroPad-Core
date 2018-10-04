@@ -2,10 +2,12 @@ import { IReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
+import { SearchIndices } from '../types/ActionTypes';
 
 export interface ISearchState {
 	hashTagResults: HashTagSearchResults;
 	query: string;
+	indices: SearchIndices;
 }
 
 export type HashTagSearchResult = {
@@ -20,7 +22,8 @@ export class SearchReducer implements IReducer<ISearchState> {
 	public readonly key: string = 'search';
 	public readonly initialState: ISearchState = {
 		hashTagResults: {},
-		query: ''
+		query: '',
+		indices: []
 	};
 
 	public reducer(state: ISearchState, action: Action): ISearchState {
@@ -37,6 +40,11 @@ export class SearchReducer implements IReducer<ISearchState> {
 			return {
 				...state,
 				hashTagResults: action.payload
+			};
+		} else if (isType(action, actions.indexNotepads.done)) {
+			return {
+				...state,
+				indices: action.payload.result
 			};
 		}
 

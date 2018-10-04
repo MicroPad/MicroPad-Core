@@ -3,7 +3,7 @@ import MathJax from '!raw-loader!../../../../assets/MathJax.js';
 import { ITheme } from '../../../../types/Themes';
 
 export namespace MarkDownViewer {
-	export const getHtml = (id: string, theme: ITheme, initialContent?: string, doInitialMathJaxRender?: boolean): string => `<!DOCTYPE html>
+	export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): string => `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
@@ -98,6 +98,13 @@ export namespace MarkDownViewer {
 			display: none;
 		}
 		
+		.emoji {
+			height: ${parseInt(fontSize, 10) * 1.5}px;
+			width: ${parseInt(fontSize, 10) * 1.5}px;
+			margin-left: ${parseInt(fontSize, 10) * 0.1}px;
+			margin-right: ${parseInt(fontSize, 10) * 0.1}px;
+		}
+		
 		@media print {
 			html, body, #content {
 				margin: 0;
@@ -125,13 +132,13 @@ export namespace MarkDownViewer {
 				delimiters: [['===', '==='], ["''", "''"]]
 			},
 			showMathMenu: false,
-			skipStartupTypeset: ${(!doInitialMathJaxRender) ? 'true' : 'false'}
+			skipStartupTypeset: 'true'
 		});
 	</script>
 	<script>${MathJax}</script>
 </head>
 <body>
-<div id="content">${(!!initialContent) ? initialContent : ''}</div>
+<div id="content"></div>
 
 <script>
 	var content = document.getElementById('content');
