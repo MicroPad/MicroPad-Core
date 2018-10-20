@@ -52,7 +52,7 @@
 		"semver": "^5.5.0",
 		"showdown": "^1.8.6",
 		"twemoji": "^11.0.1",
-		"upad-parse": "4.0.3",
+		"upad-parse": "4.0.5",
 		"vex-dialog": "^1.1.0",
 		"vex-js": "^4.1.0"
 	},
