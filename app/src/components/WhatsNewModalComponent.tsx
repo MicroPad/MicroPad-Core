@@ -21,6 +21,7 @@ export default class WhatsNewModalComponent extends React.Component {
 			<ModalAsync promise={this.getHtml()} then={note =>
 				<Modal
 					trigger={<a id="whats-new-modal-trigger" href="#!" />}
+					fixedFooter={true}
 					header={note.title}>
 					<div id="markdown-help" dangerouslySetInnerHTML={{
 						__html: note.html
