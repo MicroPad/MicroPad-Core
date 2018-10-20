@@ -62,8 +62,10 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						value={query}
 						data-lpignore="true" />
 
-					<datalist id="search-results">
-						{this.results}
+					<datalist id="search-results" key={`results-${query}`}>
+						<select>
+							{this.results}
+						</select>
 					</datalist>
 				</Row>
 
