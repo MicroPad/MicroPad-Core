@@ -32,6 +32,8 @@ export interface IDrawingElementComponentProps extends INoteElementComponentProp
 }
 
 export default class DrawingElementComponent extends React.Component<IDrawingElementComponentProps> {
+	private readonly supportsPointerEvents = typeof window.onpointerdown === 'object';
+
 	private imageElement: HTMLImageElement;
 	private hasTrimmed: boolean;
 
@@ -93,6 +95,8 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 						<Input label="Erase Mode" type="checkbox" className="filled-in" onChange={(e, v) => this.isErasing = v} />
 						<Input label={<a target="_blank" rel="nofollow noreferrer" href="https://pride.codes">Rainbow Mode</a>} type="checkbox" className="filled-in" onChange={(e, v) => this.isRainbow = v} />
 					</Row>
+
+					{!this.supportsPointerEvents && <p><em>Your browser seems to not support pointer events. Drawing may not work.</em></p>}
 				</div>
 			);
 		}
