@@ -21,6 +21,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	private searchInput: Input;
 	private results: JSX.Element[];
 	private triggerClickedSub: Subscription;
+	private readonly supportsDataElement = !!window['HTMLDataListElement'];
 
 	render() {
 		const { notepad, query, hashTagResults, indices } = this.props;
@@ -39,11 +40,23 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 
 				this.results = Array.from(results)
 					.sort((a, b) => Math.abs(query.length - a.title.length) - Math.abs(query.length - b.title.length))
-					.map((note) => (
-						<option key={note.internalRef} data-value={note.internalRef}>
-							{notepad.sections[note.parent as string].title} > {note.title}
-						</option>
-					));
+					.map((note) => {
+						if (this.supportsDataElement) {
+							return (
+								<option key={note.internalRef} data-value={note.internalRef}>
+									{notepad.sections[note.parent as string].title} > {note.title}
+								</option>
+							);
+						}
+
+						return (
+							<li key={note.internalRef} data-value={note.internalRef}>
+								<a href="#!" onClick={() => this.loadNoteFromInput(note.internalRef)}>
+									{notepad.sections[note.parent as string].title} > {note.title}
+								</a>
+							</li>
+						);
+					});
 			}
 		}
 
@@ -60,12 +73,25 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						label={`Search by ${(!!notepad && `note title or a`) || ''} hashtag`}
 						onChange={this.onInput}
 						value={query}
+						autoComplete="off"
 						data-lpignore="true" />
 
-					<datalist id="search-results">
-						{this.results}
-					</datalist>
+					{
+						this.supportsDataElement
+						&& <datalist id="search-results" key={`results-${query}`}>
+							{this.results}
+						</datalist>
+					}
 				</Row>
+
+				{
+					// General search results for browsers that don't support <datalist>
+					!this.supportsDataElement
+					&& <div>
+						<ul className="browser-default">{this.results}</ul>
+						<em>Searching in basic mode. You can try a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noreferrer">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="nofollow noreferrer">Mozilla Firefox</a>.</em>
+					</div>
+				}
 
 				{
 					// Display results for the current notepad first
@@ -118,9 +144,12 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 		const { search } = this.props;
 		if (!search) return;
 
-		const result = this.results
-			.map(e => e.props)
-			.find(e => e.children.join('') === value);
+		let result;
+		if (this.supportsDataElement) {
+			result = this.results
+				.map(e => e.props)
+				.find(e => e.children.join('') === value);
+		}
 
 		if (!!result) {
 			this.loadNoteFromInput(result['data-value']);
