@@ -63,6 +63,16 @@ export default class MarkdownHelpComponent extends React.Component {
 			];
 		});
 
+		extension('colour', {
+			type: 'listener',
+			listeners: {
+				'images.after': (event, text: string) =>
+					text.replace(/c\[([^\]]+)]\(([^)]+)\)/gi, (match, content, colour) =>
+						`<span style="color: ${colour}">${content}</span>`
+					)
+			}
+		} as any);
+
 		const html = new Converter({
 			parseImgDimensions: true,
 			simplifiedAutoLink: true,
@@ -71,7 +81,7 @@ export default class MarkdownHelpComponent extends React.Component {
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			emoji: true,
-			extensions: ['mock']
+			extensions: ['mock', 'colour']
 		} as IShowdownOpts)
 			.makeHtml(mdGuideNote.elements[0].content)
 			.split('<ul>').join('<ul class="browser-default">')

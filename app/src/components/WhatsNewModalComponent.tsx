@@ -2,7 +2,7 @@
 import helpNpx from '!raw-loader!../assets/Help.npx';
 
 import * as React from 'react';
-import { Converter } from 'showdown';
+import { Converter, extension } from 'showdown';
 import { IShowdownOpts } from './note-viewer/elements/markdown/MarkdownElementComponent';
 import { Modal } from 'react-materialize';
 import Async, { Props as AsyncProps } from 'react-promise';
@@ -34,6 +34,16 @@ export default class WhatsNewModalComponent extends React.Component {
 	private getHtml: () => Promise<WhatsNewNote> = async () => {
 		const whatsNewNote = (await Translators.Xml.toNotepadFromNpx(helpNpx)).sections[0].notes[2];
 
+		extension('colour', {
+			type: 'listener',
+			listeners: {
+				'images.after': (event, text: string) =>
+					text.replace(/c\[([^\]]+)]\(([^)]+)\)/gi, (match, content, colour) =>
+						`<span style="color: ${colour}">${content}</span>`
+					)
+			}
+		} as any);
+
 		const html = new Converter({
 			parseImgDimensions: true,
 			simplifiedAutoLink: true,
@@ -41,7 +51,8 @@ export default class WhatsNewModalComponent extends React.Component {
 			tables: true,
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
-			emoji: true
+			emoji: true,
+			extensions: ['colour']
 		} as IShowdownOpts)
 			.makeHtml(whatsNewNote.elements[0].content)
 			.split('<ul>').join('<ul class="browser-default">')
