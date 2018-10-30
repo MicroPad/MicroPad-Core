@@ -49,7 +49,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			emoji: true,
-			extensions: ['maths', 'quick-maths', 'graphs', 'hashtags']
+			extensions: ['maths', 'quick-maths', 'graphs', 'hashtags', 'colour']
 		} as IShowdownOpts);
 
 		this.updateWithDebounce = this.createUpdateWithDebounce();
@@ -301,7 +301,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				{
 					type: 'lang',
 					regex: /===([^]+?)===/gi,
-					replace: function(s: string, match: string) {
+					replace: function(s: string, match: number) {
 						matches.push('===' + match + '===');
 						let n = matches.length - 1;
 						return '%ASCIIMATHPLACEHOLDER1' + n + 'ENDASCIIMATHPLACEHOLDER1%';
@@ -328,7 +328,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				{
 					type: 'lang',
 					regex: /''([^]+?)''/gi,
-					replace: function(s: string, match: string) {
+					replace: function(s: string, match: number) {
 						matches.push(`''${match}''`);
 						let n = matches.length - 1;
 						return '%PLACEHOLDER4' + n + 'ENDPLACEHOLDER4%';
@@ -355,17 +355,17 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				{
 					type: 'lang',
 					regex: /(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi,
-					replace: function(s: string, match: string) {
+					replace: function(s: string) {
 						matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
-						var n = matches.length - 1;
+						let n = matches.length - 1;
 						return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
 					}
 				},
 				{
 					type: 'output',
 					filter: function(text: string) {
-						for (var i = 0; i < matches.length; ++i) {
-							var pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
+						for (let i = 0; i < matches.length; ++i) {
+							const pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
 							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 						}
 						// reset array
@@ -382,17 +382,17 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				{
 					type: 'lang',
 					regex: /(^|\s)(#[a-z\d-]+)/gi,
-					replace: function(s: string, match: string) {
+					replace: function(s: string) {
 						matches.push(`<a href="javascript:void(0);" onclick="searchHashtag(\'#${s.split('#')[1]}\');">${s}</a>`);
-						var n = matches.length - 1;
+						const n = matches.length - 1;
 						return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
 					}
 				},
 				{
 					type: 'output',
 					filter: function(text: string) {
-						for (var i = 0; i < matches.length; ++i) {
-							var pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
+						for (let i = 0; i < matches.length; ++i) {
+							const pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
 							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 						}
 						// reset array
@@ -402,5 +402,15 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				}
 			];
 		});
+
+		extension('colour', {
+			type: 'listener',
+			listeners: {
+				'images.after': (event, text: string) =>
+					text.replace(/c\[([^\]]+)]\(([^)]+)\)/gi, (match, content, colour) =>
+						`<span style="color: ${colour}">${content}</span>`
+					)
+			}
+		} as any);
 	}
 }
