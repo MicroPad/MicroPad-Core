@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable';
-import { concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
-import { from, Observable } from 'rxjs';
+import { catchError, concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { from, Observable, of } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
@@ -81,12 +81,15 @@ const binaryElementUpdate$ = action$ =>
 		isAction(actions.updateElement),
 		map((action: Action<UpdateElementAction>) => action.payload),
 		filter((params: UpdateElementAction) => !!params.newAsset),
-		switchMap((params: UpdateElementAction) =>
-			from(
-				ASSET_STORAGE.setItem(params.element.args.ext || generateGuid(), params.newAsset)
-					.then(() => [params, params.element.args.ext || generateGuid()])
-			)
-		),
+		switchMap((params: UpdateElementAction) => {
+			const key = params.element.args.ext || generateGuid();
+			return from(
+				ASSET_STORAGE.setItem(key, params.newAsset)
+					.then(() => {
+						return [params, key];
+					})
+			);
+		}),
 		mergeMap(([params, guid]: [UpdateElementAction, string]) => [
 			actions.trackAsset(guid),
 			actions.updateElement({
@@ -155,7 +158,7 @@ const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IS
 		filter(ref => ref.length > 0 && !!store.getState().notepads.notepad && !!store.getState().notepads.notepad!.item),
 		map(ref => store.getState().notepads.notepad!.item!.notes[ref]),
 		concatMap(note => {
-			const id = 'markdown' + note.elements.filter(e => e.type === 'markdown').length + 1;
+			const id = `markdown${note.elements.filter(e => e.type === 'markdown').length + 1}`;
 
 			return [
 				actions.insertElement({
@@ -179,6 +182,47 @@ const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IS
 		})
 	);
 
+const imagePasted$ = (action$: Observable<Action<string>>, store: Store<IStoreState>) =>
+	action$.pipe(
+		isAction(actions.imagePasted.started),
+		filter(() => store.getState().currentNote.ref.length > 0),
+		map(action => action.payload),
+		switchMap(imageUrl =>
+			from(fetch(imageUrl).then(res => res.blob())).pipe(
+				concatMap(image => {
+					const note = store.getState().notepads.notepad!.item!.notes[store.getState().currentNote.ref];
+					const id = `image${note.elements.filter(e => e.type === 'image').length + 1}`;
+					const element: NoteElement = {
+						type: 'image',
+						args: {
+							id,
+							x: '10px',
+							y: '10px',
+							width: 'auto',
+							height: 'auto',
+						},
+						content: 'AS'
+					};
+
+					return [
+						actions.insertElement({
+							noteRef: store.getState().currentNote.ref,
+							element
+						}),
+
+						actions.updateElement({
+							element,
+							noteRef: store.getState().currentNote.ref,
+							elementId: id,
+							newAsset: image
+						})
+					];
+				}),
+				catchError(error => of(actions.imagePasted.failed({ params: '', error })))
+			)
+		)
+	);
+
 export const noteEpics$ = combineEpics(
 	loadNote$,
 	checkNoteAssets$,
@@ -188,7 +232,8 @@ export const noteEpics$ = combineEpics(
 	autoLoadNewNote$,
 	closeNoteOnDeletedParent$,
 	loadNoteOnMove$,
-	quickMarkdownInsert$
+	quickMarkdownInsert$,
+	imagePasted$
 );
 
 function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {

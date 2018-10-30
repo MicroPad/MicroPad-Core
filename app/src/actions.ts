@@ -43,6 +43,7 @@ export const actions = {
 	addToSync: actionCreator.async<AddToSyncAction, string, any>('SYNC_CREATE'),
 	quickNote: actionCreator.async<void, string, void>('QUICK_NOTE'),
 	indexNotepads: actionCreator.async<void, SearchIndices, any>('INDEX_NOTEPADS'),
+	imagePasted: actionCreator.async<string, void, Error>('IMAGE_PASTED'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
