@@ -27,6 +27,7 @@ import NotepadExplorerComponent from './containers/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './shortcuts';
 import * as QueryString from 'querystring';
+import * as PasteImage from 'paste-image';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 import { SyncUser } from './types/SyncTypes';
@@ -111,6 +112,8 @@ export function getStorage(): { [name: string]: LocalForage } {
 
 	notepadDownloadHandler();
 
+	pasteWatcher();
+
 	// Show a warning when closing before notepad save or sync is complete
 	store.subscribe(() => {
 		const isSaving = store.getState().notepads.isLoading || (store.getState().notepads.notepad || {} as INotepadStoreState).isLoading;
@@ -177,4 +180,10 @@ async function displayWhatsNew() {
 function notepadDownloadHandler() {
 	const downloadNotepadUrl = QueryString.parse(location.search.slice(1)).download;
 	if (!!downloadNotepadUrl && typeof downloadNotepadUrl === 'string') store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
+}
+
+function pasteWatcher() {
+	PasteImage.on('paste-image', async (image: HTMLImageElement) => {
+		store.dispatch(actions.imagePasted.started(image.src));
+	});
 }
