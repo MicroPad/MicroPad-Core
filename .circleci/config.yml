@@ -60,9 +60,10 @@ jobs:
           paths:
             - app/node_modules/
 
-      - run: cd app && yarn build
+      - run: cd app && yarn build && tar cfJ micropad.tar.xz build/*
       - store_artifacts:
-          path: app/build
+          path: app/micropad.tar.xz
+          destination: micropad.tar.xz
       - persist_to_workspace:
           root: app/
           paths:
