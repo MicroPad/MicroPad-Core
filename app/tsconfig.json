@@ -1,11 +1,11 @@
 {
-  "compilerOptions": {
+	"compilerOptions": {
 	"outDir": "build/dist",
 	"module": "esnext",
 	"target": "es5",
 	"lib": [
-	  "es2017",
-	  "dom"
+		"es2017",
+		"dom"
 	],
 	"sourceMap": true,
 	"allowJs": true,
@@ -20,14 +20,16 @@
 	"suppressImplicitAnyIndexErrors": true,
 	"noUnusedLocals": false,
 	"baseUrl": "."
-  },
-  "exclude": [
-	"node_modules",
-	"build",
-	"scripts",
-	"acceptance-tests",
-	"webpack",
-	"jest",
-	"src/setupTests.ts"
-  ]
+	},
+	"exclude": [
+		"node_modules",
+		"build",
+		"scripts",
+		"acceptance-tests",
+		"webpack",
+		"jest",
+		"src/setupTests.ts",
+		"public/",
+		"config-overrides.js"
+	]
 }
