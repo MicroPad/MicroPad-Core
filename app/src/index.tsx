@@ -13,7 +13,7 @@ import './theme-styles/Purple.css';
 /* JS Imports */
 import * as React from 'react';
 import registerServiceWorker from './registerServiceWorker';
-import { APP_NAME, IStoreState, MICROPAD_URL } from './types';
+import { APP_NAME, IAppWindow, IStoreState, MICROPAD_URL } from './types';
 import { applyMiddleware, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
@@ -81,7 +81,7 @@ export function getStorage(): { [name: string]: LocalForage } {
 	if (!await compatibilityCheck()) return;
 	await hydrateStoreFromLocalforage();
 
-	if ((window as any).isElectron) store.dispatch(actions.checkVersion(undefined));
+	if ((window as IAppWindow).isElectron) store.dispatch(actions.checkVersion(undefined));
 	store.dispatch(actions.getNotepadList.started(undefined));
 	store.dispatch(actions.indexNotepads.started(undefined));
 

@@ -17,6 +17,10 @@ export interface IStoreState {
 	readonly sync: ISyncState;
 }
 
+export interface IAppWindow extends Window {
+	isElectron: boolean;
+}
+
 export const APP_NAME = 'µPad';
 export const SYNC_NAME = 'µSync';
 export const MICROPAD_URL = 'https://getmicropad.com';

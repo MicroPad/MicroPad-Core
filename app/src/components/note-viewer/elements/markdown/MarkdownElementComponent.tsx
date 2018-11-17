@@ -2,7 +2,7 @@ import * as React from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
 import { MarkDownViewer } from './MarkdownViewerHtml';
-import { UNSUPPORTED_MESSAGE } from '../../../../types';
+import { IAppWindow, UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
@@ -237,7 +237,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private generateHtml = (element: NoteElement): Promise<string> => {
 		return new Promise<string>(resolve => {
 			let html = this.converter.makeHtml(element.content);
-			if (navigator.onLine || (window as any).isElectron) html = Twemoji.parse(html, icon => require(`twemoji/2/svg/${icon}.svg`));
+			if (navigator.onLine || (window as IAppWindow).isElectron) html = Twemoji.parse(html, icon => require(`twemoji/2/svg/${icon}.svg`));
 			resolve(html);
 		});
 	}
@@ -264,7 +264,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					newWindow.opener = null;
 					newWindow.focus();
 				} else {
-					if (!(window as any).isElectron) Dialog.alert('Your browser blocked opening the link');
+					if (!(window as IAppWindow).isElectron) Dialog.alert('Your browser blocked opening the link');
 				}
 				break;
 
