@@ -7,21 +7,21 @@ export interface IPrintStoreState {
 }
 
 export class PrintReducer extends MicroPadReducer<IPrintStoreState> {
-	readonly key: string = 'print';
+	readonly key = 'print';
 	readonly initialState: IPrintStoreState = {};
 
 	constructor() {
 		super();
 
-		this.handle(actions.print.done, (state, action) => {
+		this.handle((state, action) => {
 			return {
 				...state,
 				elementToPrint: action.payload.result
 			};
-		});
+		}, actions.print.done);
 
-		this.handle(actions.clearPrintView, () => {
+		this.handle(() => {
 			return { ...this.initialState };
-		});
+		}, actions.clearPrintView);
 	}
 }

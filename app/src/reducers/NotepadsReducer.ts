@@ -9,7 +9,7 @@ import { FlatNotepad, Note } from 'upad-parse/dist';
 import { format } from 'date-fns';
 
 export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
-	public readonly key: string = 'notepads';
+	public readonly key = 'notepads';
 	public readonly initialState: INotepadsStoreState = {
 		isLoading: false
 	};

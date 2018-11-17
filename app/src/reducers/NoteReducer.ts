@@ -18,7 +18,7 @@ export interface ICurrentNoteState {
 }
 
 export class NoteReducer extends MicroPadReducer<ICurrentNoteState> {
-	public readonly key: string = 'currentNote';
+	public readonly key = 'currentNote';
 	public readonly initialState: ICurrentNoteState = {
 		isLoading: false,
 		ref: '',

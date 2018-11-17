@@ -10,7 +10,7 @@ export interface IExplorerState {
 }
 
 export class ExplorerReducer extends MicroPadReducer<IExplorerState> {
-	public readonly key: string = 'explorer';
+	public readonly key = 'explorer';
 	public readonly initialState: IExplorerState = {
 		openSections: []
 	};

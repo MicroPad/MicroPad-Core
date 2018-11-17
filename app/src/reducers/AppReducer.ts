@@ -27,7 +27,7 @@ export interface IVersion {
 const { major, minor, patch } = parse(version) || { major: 0, minor: 0, patch: 0 };
 
 export class AppReducer extends MicroPadReducer<IAppStoreState> {
-	public readonly key: string = 'app';
+	public readonly key = 'app';
 	public readonly initialState: IAppStoreState = {
 		version: {
 			major,

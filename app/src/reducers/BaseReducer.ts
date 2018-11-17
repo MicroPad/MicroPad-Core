@@ -21,13 +21,11 @@ export const REDUCERS: Array<MicroPadReducer<any>> = [
 	new SyncReducer()
 ];
 
-export class BaseReducer extends MicroPadReducer<IStoreState> {
+export class BaseReducer {
 	public readonly initialState: IStoreState;
-	public readonly key: string = '';
+	public readonly key = '';
 
 	constructor() {
-		super();
-
 		const initialState = {};
 		REDUCERS.forEach(reducer => initialState[reducer.key] = reducer.initialState);
 		this.initialState = Object.freeze(initialState as IStoreState);
