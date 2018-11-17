@@ -8,6 +8,12 @@
 	padding: 5px;
 	font-family: "Roboto", sans-serif;
 	line-height: 1.5;
+
+	cursor: auto;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
 }
 
 #markdown-help blockquote {
