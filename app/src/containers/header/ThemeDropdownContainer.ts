@@ -3,13 +3,13 @@ import {
 	default as ThemeDropdownComponent,
 	IThemeDropdownComponentProps
 } from '../../components/header/ThemeDropdownComponent';
-import { connect, Dispatch } from 'react-redux';
-import { Action } from 'redux';
+import { connect } from 'react-redux';
+import { Action, Dispatch } from 'redux';
 import { actions } from '../../actions';
 
-export function mapStateToProps({ meta }: IStoreState) {
+export function mapStateToProps({ app }: IStoreState) {
 	return {
-		selectedTheme: meta.theme
+		selectedTheme: app.theme
 	} as IThemeDropdownComponentProps;
 }
 

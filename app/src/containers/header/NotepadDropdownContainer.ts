@@ -1,8 +1,8 @@
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { IStoreState } from '../../types';
 import NotepadDropdownComponent, { INotepadDropdownProps } from '../../components/header/NotepadDropdownComponent';
 import { actions } from '../../actions';
-import { Action } from 'redux';
+import { Action, Dispatch } from 'redux';
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepadDropdownProps> {
 	return {

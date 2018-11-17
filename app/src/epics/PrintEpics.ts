@@ -45,7 +45,7 @@ export namespace PrintEpics {
 					id: 'markdown1_print',
 					width: 'auto',
 					height: 'auto',
-					fontSize: (<IStoreState> store.getState()).meta.defaultFontSize,
+					fontSize: (<IStoreState> store.getState()).app.defaultFontSize,
 					x: '0px',
 					y: '0px'
 				},
