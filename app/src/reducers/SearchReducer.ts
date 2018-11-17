@@ -18,7 +18,7 @@ export type HashTagSearchResult = {
 
 export type HashTagSearchResults = { [notepadTitle: string]: HashTagSearchResult[] };
 
-export class SearchReducer implements MicroPadReducer<ISearchState> {
+export class SearchReducer extends MicroPadReducer<ISearchState> {
 	public readonly key: string = 'search';
 	public readonly initialState: ISearchState = {
 		hashTagResults: {},

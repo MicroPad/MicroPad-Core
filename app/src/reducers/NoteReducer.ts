@@ -17,7 +17,7 @@ export interface ICurrentNoteState {
 	insertElement: IInsertElementState;
 }
 
-export class NoteReducer implements MicroPadReducer<ICurrentNoteState> {
+export class NoteReducer extends MicroPadReducer<ICurrentNoteState> {
 	public readonly key: string = 'currentNote';
 	public readonly initialState: ICurrentNoteState = {
 		isLoading: false,

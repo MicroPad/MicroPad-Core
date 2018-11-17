@@ -10,7 +10,7 @@ export interface ISyncState {
 	isLoading: boolean;
 }
 
-export class SyncReducer implements MicroPadReducer<ISyncState> {
+export class SyncReducer extends MicroPadReducer<ISyncState> {
 	public readonly key: string = 'sync';
 	public readonly initialState: ISyncState = {
 		isLoading: false
