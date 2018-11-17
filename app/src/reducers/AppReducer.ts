@@ -1,11 +1,12 @@
+// @ts-ignore
+import { version } from '../../package.json';
+
 import { Action } from 'redux';
 import { MicroPadReducer } from '../types/ReducerType';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { ThemeName } from '../types/Themes';
 import { parse } from 'semver';
-// @ts-ignore
-import appPackage from '../../package.json';
 
 export interface IAppStoreState {
 	version: IVersion;
@@ -23,7 +24,7 @@ export interface IVersion {
 	status: 'dev' | 'alpha' | 'beta' | 'stable';
 }
 
-const { major, minor, patch } = parse(appPackage.version) || { major: 0, minor: 0, patch: 0 };
+const { major, minor, patch } = parse(version) || { major: 0, minor: 0, patch: 0 };
 
 export class AppReducer implements MicroPadReducer<IAppStoreState> {
 	public readonly key: string = 'app';
