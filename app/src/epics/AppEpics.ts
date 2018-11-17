@@ -6,14 +6,14 @@ import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
 import * as localforage from 'localforage';
 import { Action, Success } from 'redux-typescript-actions';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
-import { IVersion } from '../types/MetaTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { FlatNotepad } from 'upad-parse/dist';
 import { EMPTY } from 'rxjs';
 import { lt as versionLessThan } from 'semver';
 import { ThemeName } from '../types/Themes';
+import { IVersion } from '../reducers/AppReducer';
 
-export namespace MetaEpics {
+export namespace AppEpics {
 	export const closeDrawingEditorOnZoom$ = (action$, store) =>
 		action$.pipe(
 			isAction(actions.updateZoomLevel),
@@ -42,7 +42,7 @@ export namespace MetaEpics {
 		action$.pipe(
 			isAction(actions.checkVersion),
 			map(() => store.getState()),
-			map((state: IStoreState) => state.meta.version),
+			map((state: IStoreState) => state.app.version),
 			map((version: IVersion) => `${version.major}.${version.minor}.${version.patch}`),
 			switchMap((version: string) =>
 				ajax({
@@ -75,7 +75,7 @@ export namespace MetaEpics {
 			filter(() => false)
 		);
 
-	export const metaEpics$ = combineEpics(
+	export const appEpics$ = combineEpics(
 		closeDrawingEditorOnZoom$,
 		saveHelpPreference$,
 		revertHelpPrefOnHelpLoad$,

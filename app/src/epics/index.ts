@@ -6,7 +6,7 @@ import { notepadEpics$ } from './NotepadEpics';
 import { storageEpics$ } from './StorageEpics';
 import { noteEpics$ } from './NoteEpics';
 import { ExplorerEpics } from './ExplorerEpics';
-import { MetaEpics } from './MetaEpics';
+import { AppEpics } from './AppEpics';
 import { PrintEpics } from './PrintEpics';
 import { SyncEpics } from './SyncEpics';
 import { HelpEpics } from './HelpEpics';
@@ -21,7 +21,7 @@ const baseEpic$ = combineEpics(
 	SearchEpics.searchEpics$,
 	noteEpics$,
 	ExplorerEpics.explorerEpics$,
-	MetaEpics.metaEpics$,
+	AppEpics.appEpics$,
 	PrintEpics.printEpics$,
 	SyncEpics.syncEpics$
 );

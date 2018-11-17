@@ -30,7 +30,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 
 		if (!!notepad) {
 			const index = indices.find(idx => idx.notepad.title === notepad.title);
-			if (!!index) {
+			if (!!index && query.charAt(0) !== '#') {
 				const results = new Set(
 					query.split(' ')
 						.filter(word => word.length > 0)
