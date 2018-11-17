@@ -171,7 +171,7 @@ const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IS
 							y: '10px',
 							width: 'auto',
 							height: 'auto',
-							fontSize: store.getState().meta.defaultFontSize
+							fontSize: store.getState().app.defaultFontSize
 						},
 						content: ''
 					}

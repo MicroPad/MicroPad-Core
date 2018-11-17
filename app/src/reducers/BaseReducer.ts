@@ -3,16 +3,16 @@ import { IStoreState } from '../types';
 import { Action } from 'redux';
 import * as deepFreeze from 'deep-freeze';
 import { isDev } from '../util';
-import { MetaReducer } from './MetaReducer';
 import { NotepadsReducer } from './NotepadsReducer';
 import { NoteReducer } from './NoteReducer';
 import { ExplorerReducer } from './ExplorerReducer';
 import { SearchReducer } from './SearchReducer';
 import { PrintReducer } from './PrintReducer';
 import { SyncReducer } from './SyncReducer';
+import { AppReducer } from './AppReducer';
 
 export const REDUCERS: Array<MicroPadReducer<any>> = [
-	new MetaReducer(),
+	new AppReducer(),
 	new NotepadsReducer(),
 	new NoteReducer(),
 	new ExplorerReducer(),

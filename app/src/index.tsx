@@ -152,7 +152,7 @@ async function compatibilityCheck(): Promise<boolean> {
 			<div style={{ margin: '10px' }}>
 				<h1>Bad news 😢</h1>
 				<p>
-					Your web-browser doesn't support important security features required for {APP_NAME} v{store.getState().meta.version.major} to function.<br />
+					Your web-browser doesn't support important security features required for {APP_NAME} v{store.getState().app.version.major} to function.<br />
 					Try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noreferrer">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="nofollow noreferrer">Mozilla Firefox</a>.
 				</p>
 				<p>
@@ -168,7 +168,7 @@ async function compatibilityCheck(): Promise<boolean> {
 }
 
 async function displayWhatsNew() {
-	const minorVersion = store.getState().meta.version.minor;
+	const minorVersion = store.getState().app.version.minor;
 	const oldMinorVersion = await localforage.getItem('oldMinorVersion');
 	if (minorVersion === oldMinorVersion) return;
 

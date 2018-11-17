@@ -9,12 +9,12 @@ import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 import { ThemeValues } from '../ThemeValues';
 
-export function mapStateToProps({ meta }: IStoreState, { message, video }: IHelpMessageComponentLocalProps) {
+export function mapStateToProps({ app }: IStoreState, { message, video }: IHelpMessageComponentLocalProps) {
 	return {
 		message,
 		video,
-		show: meta.showHelp,
-		theme: ThemeValues[meta.theme]
+		show: app.showHelp,
+		theme: ThemeValues[app.theme]
 	};
 }
 

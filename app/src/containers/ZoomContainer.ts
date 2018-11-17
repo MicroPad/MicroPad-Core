@@ -5,9 +5,9 @@ import { actions } from '../actions';
 import { IStoreState } from '../types';
 import { ThemeValues } from '../ThemeValues';
 
-function mapStateToProps({ meta }: IStoreState) {
+function mapStateToProps({ app }: IStoreState) {
 	return {
-		theme: ThemeValues[meta.theme]
+		theme: ThemeValues[app.theme]
 	};
 }
 

@@ -13,7 +13,7 @@ let noteRef: string = '';
 let note: Note | null;
 let notepadTitle: string = '';
 
-export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
+export function mapStateToProps({ notepads, currentNote, app }: IStoreState) {
 	noteRef = currentNote.ref;
 
 	if (currentNote.ref.length !== 0) {
@@ -24,14 +24,14 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 	}
 
 	return {
-		isFullscreen: meta.isFullScreen,
-		zoom: meta.zoom,
+		isFullscreen: app.isFullScreen,
+		zoom: app.zoom,
 		note,
 		noteAssets: currentNote.assetUrls,
 		elementEditing: currentNote.elementEditing,
 		isNotepadOpen: !!notepads.notepad && !!notepads.notepad.item,
 		isLoading: currentNote.isLoading || notepads.isLoading || (!!notepads.notepad && notepads.notepad.isLoading),
-		theme: ThemeValues[meta.theme]
+		theme: ThemeValues[app.theme]
 	} as INoteViewerComponentProps;
 }
 

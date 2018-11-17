@@ -9,7 +9,7 @@ import { actions } from '../actions';
 import { Note } from 'upad-parse/dist';
 import { ThemeValues } from '../ThemeValues';
 
-export function mapStateToProps({ notepads, currentNote, print, meta }: IStoreState) {
+export function mapStateToProps({ notepads, currentNote, print, app }: IStoreState) {
 	let note: Note | undefined = undefined;
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
@@ -18,8 +18,8 @@ export function mapStateToProps({ notepads, currentNote, print, meta }: IStoreSt
 	return <IPrintViewComponentProps & IAppProps> {
 		note,
 		printElement: print.elementToPrint,
-		theme: ThemeValues[meta.theme],
-		themeName: meta.theme
+		theme: ThemeValues[app.theme],
+		themeName: app.theme
 	};
 }
 

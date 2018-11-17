@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { IMetaStoreState } from './MetaTypes';
 import { INotepadsStoreState } from './NotepadTypes';
 import { IExplorerState } from '../reducers/ExplorerReducer';
 import { ISearchState } from '../reducers/SearchReducer';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
 import { IPrintStoreState } from '../reducers/PrintReducer';
 import { ISyncState } from '../reducers/SyncReducer';
+import { IAppStoreState } from '../reducers/AppReducer';
 
 export interface IStoreState {
-	readonly meta: IMetaStoreState;
+	readonly app: IAppStoreState;
 	readonly notepads: INotepadsStoreState;
 	readonly currentNote: ICurrentNoteState;
 	readonly explorer: IExplorerState;

@@ -5,12 +5,12 @@ import HeaderComponent, { IHeaderComponentProps } from '../../components/header/
 import { IStoreState } from '../../types';
 import { ThemeValues } from '../../ThemeValues';
 
-export function mapStateToProps({ notepads, meta, sync }: IStoreState) {
+export function mapStateToProps({ notepads, app, sync }: IStoreState) {
 	return {
 		notepad: notepads.notepad,
 		isSyncing: sync.isLoading,
-		isFullScreen: meta.isFullScreen,
-		theme: ThemeValues[meta.theme]
+		isFullScreen: app.isFullScreen,
+		theme: ThemeValues[app.theme]
 	};
 }
 

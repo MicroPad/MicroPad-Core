@@ -7,9 +7,9 @@ import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
 import { actions } from '../../actions';
 
-export function mapStateToProps({ meta }: IStoreState) {
+export function mapStateToProps({ app }: IStoreState) {
 	return {
-		selectedTheme: meta.theme
+		selectedTheme: app.theme
 	} as IThemeDropdownComponentProps;
 }
 
