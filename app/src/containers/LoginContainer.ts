@@ -4,8 +4,8 @@ import {
 	ILoginComponentLocalProps,
 	ILoginComponentProps
 } from '../components/sync/LoginComponent';
-import { Action } from 'redux';
-import { connect, Dispatch } from 'react-redux';
+import { Action, Dispatch } from 'redux';
+import { connect } from 'react-redux';
 import { actions } from '../actions';
 
 export function mapStateToProps({ sync }: IStoreState, { trigger, manageTrigger }: ILoginComponentLocalProps) {

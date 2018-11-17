@@ -1,5 +1,5 @@
-import { Action } from 'redux';
-import { connect, Dispatch } from 'react-redux';
+import { Action, Dispatch } from 'redux';
+import { connect } from 'react-redux';
 import { actions } from '../../actions';
 import HeaderComponent, { IHeaderComponentProps } from '../../components/header/HeaderComponent';
 import { IStoreState } from '../../types';

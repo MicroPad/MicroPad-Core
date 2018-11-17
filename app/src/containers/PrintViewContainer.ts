@@ -1,10 +1,10 @@
 import { IStoreState } from '../types';
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import PrintViewOrAppContainerComponent, {
 	IAppProps,
 	IPrintViewComponentProps
 } from '../components/printing/PrintViewOrAppContainerComponent';
-import { Action } from 'redux';
+import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 import { Note } from 'upad-parse/dist';
 import { ThemeValues } from '../ThemeValues';

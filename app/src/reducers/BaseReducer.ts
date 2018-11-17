@@ -1,4 +1,4 @@
-import { IReducer } from '../types/ReducerType';
+import { MicroPadReducer } from '../types/ReducerType';
 import { IStoreState } from '../types';
 import { Action } from 'redux';
 import * as deepFreeze from 'deep-freeze';
@@ -11,7 +11,7 @@ import { SearchReducer } from './SearchReducer';
 import { PrintReducer } from './PrintReducer';
 import { SyncReducer } from './SyncReducer';
 
-export const REDUCERS: Array<IReducer<any>> = [
+export const REDUCERS: Array<MicroPadReducer<any>> = [
 	new MetaReducer(),
 	new NotepadsReducer(),
 	new NoteReducer(),
@@ -21,7 +21,7 @@ export const REDUCERS: Array<IReducer<any>> = [
 	new SyncReducer()
 ];
 
-export class BaseReducer implements IReducer<IStoreState> {
+export class BaseReducer implements MicroPadReducer<IStoreState> {
 	public readonly initialState: IStoreState;
 	public readonly key: string = '';
 

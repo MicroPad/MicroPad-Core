@@ -1,4 +1,4 @@
-import { IReducer } from '../types/ReducerType';
+import { MicroPadReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
@@ -18,7 +18,7 @@ export type HashTagSearchResult = {
 
 export type HashTagSearchResults = { [notepadTitle: string]: HashTagSearchResult[] };
 
-export class SearchReducer implements IReducer<ISearchState> {
+export class SearchReducer implements MicroPadReducer<ISearchState> {
 	public readonly key: string = 'search';
 	public readonly initialState: ISearchState = {
 		hashTagResults: {},

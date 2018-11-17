@@ -4,8 +4,8 @@ import {
 	IHelpMessageComponentLocalProps,
 	IHelpMessageComponentProps
 } from '../components/HelpMessageComponent';
-import { connect, Dispatch } from 'react-redux';
-import { Action } from 'redux';
+import { connect } from 'react-redux';
+import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 import { ThemeValues } from '../ThemeValues';
 

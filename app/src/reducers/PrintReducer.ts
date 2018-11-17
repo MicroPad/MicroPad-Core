@@ -1,4 +1,4 @@
-import { IReducer } from '../types/ReducerType';
+import { MicroPadReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
@@ -8,7 +8,7 @@ export interface IPrintStoreState {
 	elementToPrint?: NoteElement;
 }
 
-export class PrintReducer implements IReducer<IPrintStoreState> {
+export class PrintReducer implements MicroPadReducer<IPrintStoreState> {
 	readonly key: string = 'print';
 	readonly initialState: IPrintStoreState = {};
 

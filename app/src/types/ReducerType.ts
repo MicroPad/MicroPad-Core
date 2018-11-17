@@ -1,7 +1,7 @@
-import { Reducer } from 'redux';
+import { Action } from 'redux';
 
-export interface IReducer<T> {
-	readonly key: string;
-	readonly initialState: T;
-	reducer: Reducer<T>;
+export abstract class MicroPadReducer<T> {
+	public readonly key: string;
+	public readonly initialState: T;
+	public abstract reducer(state: T, action: Action): T;
 }

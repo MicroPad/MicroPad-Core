@@ -1,10 +1,10 @@
 import { IMetaStoreState } from '../types/MetaTypes';
 import { Action } from 'redux';
-import { IReducer } from '../types/ReducerType';
+import { MicroPadReducer } from '../types/ReducerType';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 
-export class MetaReducer implements IReducer<IMetaStoreState> {
+export class MetaReducer implements MicroPadReducer<IMetaStoreState> {
 	public readonly key: string = 'meta';
 	public readonly initialState: IMetaStoreState = {
 		version: {

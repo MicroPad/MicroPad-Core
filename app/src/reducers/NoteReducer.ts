@@ -1,4 +1,4 @@
-import { IReducer } from '../types/ReducerType';
+import { MicroPadReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
@@ -17,7 +17,7 @@ export interface ICurrentNoteState {
 	insertElement: IInsertElementState;
 }
 
-export class NoteReducer implements IReducer<ICurrentNoteState> {
+export class NoteReducer implements MicroPadReducer<ICurrentNoteState> {
 	public readonly key: string = 'currentNote';
 	public readonly initialState: ICurrentNoteState = {
 		isLoading: false,

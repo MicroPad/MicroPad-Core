@@ -1,4 +1,4 @@
-import { IReducer } from '../types/ReducerType';
+import { MicroPadReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { actions } from '../actions';
@@ -8,7 +8,7 @@ import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { FlatNotepad, Note } from 'upad-parse/dist';
 import { format } from 'date-fns';
 
-export class NotepadsReducer implements IReducer<INotepadsStoreState> {
+export class NotepadsReducer implements MicroPadReducer<INotepadsStoreState> {
 	public readonly key: string = 'notepads';
 	public readonly initialState: INotepadsStoreState = {
 		isLoading: false
