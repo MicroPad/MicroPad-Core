@@ -156,7 +156,7 @@ async function compatibilityCheck(): Promise<boolean> {
 					Try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noreferrer">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="nofollow noreferrer">Mozilla Firefox</a>.
 				</p>
 				<p>
-					You can always use the old {APP_NAME} <a href="https://getmicropad.com/web">here</a>.
+					You can always get the downloadable version of {APP_NAME} <a href="https://getmicropad.com/#download">here</a>.
 				</p>
 			</div>,
 			document.getElementById('app') as HTMLElement
