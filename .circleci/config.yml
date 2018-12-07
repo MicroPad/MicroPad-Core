@@ -40,12 +40,10 @@ jobs:
       - run: cd app && yarn lint
       - run: cd app && yarn test
 
-  deploy:
+  build:
     docker:
       - image: circleci/node:10.4
-
     working_directory: ~/repo
-
     steps:
       - checkout
 
@@ -56,7 +54,6 @@ jobs:
             - yarn-packages-{{ .Branch }}
             - yarn-packages-master
             - yarn-packages-
-
       - run: cd app && yarn
 
       - save_cache:
@@ -65,8 +62,24 @@ jobs:
           paths:
             - app/node_modules/
 
-      - run: cd app && yarn build
+      - run: cd app && yarn build && tar cfJ micropad.tar.xz build/*
+      - store_artifacts:
+          path: app/micropad.tar.xz
+          destination: micropad.tar.xz
+      - persist_to_workspace:
+          root: app/
+          paths:
+            - build/*
 
+  deploy:
+    docker:
+      - image: circleci/node:10.4
+
+    working_directory: ~/repo
+
+    steps:
+      - attach_workspace:
+          at: ~/repo/app
       - run: sudo apt install rsync
 
       - run: rsync -aue "ssh -p 1276 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" app/build/* $SSH_PATH
@@ -76,9 +89,11 @@ workflows:
   test-and-deploy:
     jobs:
       - test
+      - build
       - deploy:
           requires:
             - test
+            - build
           filters:
             branches:
               only: master
