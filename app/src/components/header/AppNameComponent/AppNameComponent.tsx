@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { IVersion } from '../../../types/MetaTypes';
 import { APP_NAME } from '../../../types';
 import './AppNameComponent.css';
+import { IVersion } from '../../../reducers/AppReducer';
 
 export default class AppNameComponent extends React.Component<IVersion> {
 	private readonly statusToSymbol = {

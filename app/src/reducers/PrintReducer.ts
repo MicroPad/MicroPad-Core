@@ -1,6 +1,4 @@
-import { IReducer } from '../types/ReducerType';
-import { Action } from 'redux';
-import { isType } from 'redux-typescript-actions';
+import { MicroPadReducer } from '../types/ReducerType';
 import { actions } from '../actions';
 import { NoteElement } from 'upad-parse/dist/Note';
 
@@ -8,21 +6,22 @@ export interface IPrintStoreState {
 	elementToPrint?: NoteElement;
 }
 
-export class PrintReducer implements IReducer<IPrintStoreState> {
-	readonly key: string = 'print';
+export class PrintReducer extends MicroPadReducer<IPrintStoreState> {
+	readonly key = 'print';
 	readonly initialState: IPrintStoreState = {};
 
-	public reducer(state: IPrintStoreState, action: Action): IPrintStoreState {
-		if (isType(action, actions.print.done)) {
+	constructor() {
+		super();
+
+		this.handle((state, action) => {
 			return {
 				...state,
 				elementToPrint: action.payload.result
 			};
-		} else if (isType(action, actions.clearPrintView)) {
+		}, actions.print.done);
+
+		this.handle(() => {
 			return { ...this.initialState };
-		}
-
-		return state;
+		}, actions.clearPrintView);
 	}
-
 }

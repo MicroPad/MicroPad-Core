@@ -1,6 +1,6 @@
 import { IStoreState } from '../types';
-import { connect, Dispatch } from 'react-redux';
-import { Action } from 'redux';
+import { connect } from 'react-redux';
+import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 import {
 	default as InsertElementComponent,
@@ -9,7 +9,7 @@ import {
 import { Note } from 'upad-parse/dist';
 import { ThemeValues } from '../ThemeValues';
 
-export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
+export function mapStateToProps({ notepads, currentNote, app }: IStoreState) {
 	let note = <Note> {};
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
@@ -20,9 +20,9 @@ export function mapStateToProps({ notepads, currentNote, meta }: IStoreState) {
 		x: currentNote.insertElement.x,
 		y: currentNote.insertElement.y,
 		enabled: currentNote.insertElement.enabled,
-		fontSize: meta.defaultFontSize,
-		theme: ThemeValues[meta.theme],
-		isFullScreen: meta.isFullScreen
+		fontSize: app.defaultFontSize,
+		theme: ThemeValues[app.theme],
+		isFullScreen: app.isFullScreen
 	};
 }
 

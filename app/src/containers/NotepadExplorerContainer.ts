@@ -1,14 +1,14 @@
 import { IStoreState } from '../types';
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import NotepadExplorerComponent, { INotepadExplorerComponentProps } from '../components/explorer/NotepadExplorerComponent';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
-import { Action } from 'redux';
+import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 import { FlatNotepad, Note } from 'upad-parse/dist';
 import { ThemeValues } from '../ThemeValues';
 
 let notepad: FlatNotepad | undefined;
-export function mapStateToProps({ notepads, explorer, meta, currentNote }: IStoreState) {
+export function mapStateToProps({ notepads, explorer, app, currentNote }: IStoreState) {
 	let note: Note | undefined = undefined;
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
@@ -19,9 +19,9 @@ export function mapStateToProps({ notepads, explorer, meta, currentNote }: IStor
 	return {
 		notepad: (!!notepad) ? notepad.toNotepad() : undefined,
 		openSections: explorer.openSections,
-		isFullScreen: meta.isFullScreen,
+		isFullScreen: app.isFullScreen,
 		openNote: note,
-		theme: ThemeValues[meta.theme]
+		theme: ThemeValues[app.theme]
 	};
 }
 

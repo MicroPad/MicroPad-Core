@@ -1,6 +1,6 @@
 {
 	"name": "micropad",
-	"version": "3.12.0",
+	"version": "3.12.4",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/MicroPad/Web.git"
@@ -15,6 +15,9 @@
 		"start": "react-app-rewired start --scripts-version react-scripts-ts",
 		"build": "react-app-rewired build --scripts-version react-scripts-ts",
 		"test": "react-app-rewired test --scripts-version react-scripts-ts --env=jsdom",
+		"check-syntax": "yarn tsc --noEmit --p ./tsconfig.test.json",
+		"lint": "yarn tslint --config tslint.json --project tsconfig.prod.json",
+		"fixlint": "yarn tslint --config tslint.json --project tsconfig.prod.json --fix",
 		"eject": "react-scripts-ts eject"
 	},
 	"dependencies": {
@@ -33,9 +36,9 @@
 		"paste-image": "^0.0.3",
 		"query-string": "^6.0.0",
 		"re-resizable": "^4.4.8",
-		"react": "^16.2.0",
+		"react": "^16.6.3",
 		"react-async-script": "^0.9.1",
-		"react-dom": "^16.3.2",
+		"react-dom": "^16.6.3",
 		"react-draggable": "^3.0.5",
 		"react-google-recaptcha": "^0.11.1",
 		"react-materialize": "^2.1.2",
@@ -50,10 +53,10 @@
 		"rxjs": "^6.2.1",
 		"rxjs-compat": "^6.2.1",
 		"save-as": "^0.1.8",
-		"semver": "^5.5.0",
+		"semver": "^5.6.0",
 		"showdown": "^1.8.6",
 		"twemoji": "^11.0.1",
-		"upad-parse": "4.0.5",
+		"upad-parse": "^4.0.6",
 		"vex-dialog": "^1.1.0",
 		"vex-js": "^4.1.0"
 	},
@@ -67,10 +70,10 @@
 		"@types/mousetrap": "^1.6.0",
 		"@types/node": "^9.4.0",
 		"@types/query-string": "^5.1.0",
-		"@types/react": "^16.0.36",
-		"@types/react-dom": "^16.0.3",
+		"@types/react": "^16.7.6",
+		"@types/react-dom": "^16.0.9",
 		"@types/react-google-recaptcha": "^0.9.1",
-		"@types/react-redux": "^5.0.14",
+		"@types/react-redux": "^6.0.9",
 		"@types/semver": "^5.5.0",
 		"@types/showdown": "^1.7.3",
 		"enzyme": "^3.3.0",
@@ -82,6 +85,7 @@
 		"react-app-rewired": "^1.5.2",
 		"redux-mock-store": "^1.5.3",
 		"sinon": "^5.0.7",
+		"tslint": "^5.11.0",
 		"typescript": "^2.8.3",
 		"workerize-loader": "^1.0.3"
 	},

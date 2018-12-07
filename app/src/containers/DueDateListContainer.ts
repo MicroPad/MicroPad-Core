@@ -1,8 +1,8 @@
 import { IStoreState } from '../types';
 import DueDateListComponent, { DueItem, IDueDateListComponentProps } from '../components/explorer/DueDateListComponent';
 import { INotepadStoreState } from '../types/NotepadTypes';
-import { connect, Dispatch } from 'react-redux';
-import { Action } from 'redux';
+import { connect } from 'react-redux';
+import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 
 export function mapStateToProps({ notepads }: IStoreState): IDueDateListComponentProps {

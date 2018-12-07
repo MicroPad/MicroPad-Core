@@ -1,16 +1,38 @@
-import { IMetaStoreState } from '../types/MetaTypes';
+// @ts-ignore
+import { version } from '../../package.json';
+
 import { Action } from 'redux';
-import { IReducer } from '../types/ReducerType';
+import { MicroPadReducer } from '../types/ReducerType';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
+import { ThemeName } from '../types/Themes';
+import { parse } from 'semver';
 
-export class MetaReducer implements IReducer<IMetaStoreState> {
-	public readonly key: string = 'meta';
-	public readonly initialState: IMetaStoreState = {
+export interface IAppStoreState {
+	version: IVersion;
+	isFullScreen: boolean;
+	defaultFontSize: string;
+	zoom: number;
+	showHelp: boolean;
+	theme: ThemeName;
+}
+
+export interface IVersion {
+	major: number;
+	minor: number;
+	patch: number;
+	status: 'dev' | 'alpha' | 'beta' | 'stable';
+}
+
+const { major, minor, patch } = parse(version) || { major: 0, minor: 0, patch: 0 };
+
+export class AppReducer extends MicroPadReducer<IAppStoreState> {
+	public readonly key = 'app';
+	public readonly initialState: IAppStoreState = {
 		version: {
-			major: 3,
-			minor: 12,
-			patch: 0,
+			major,
+			minor,
+			patch,
 			status: 'beta'
 		},
 		isFullScreen: false,
@@ -20,7 +42,7 @@ export class MetaReducer implements IReducer<IMetaStoreState> {
 		theme: 'Classic'
 	};
 
-	public reducer(state: IMetaStoreState, action: Action): IMetaStoreState {
+	public reducer(state: IAppStoreState, action: Action): IAppStoreState {
 		if (isType(action, actions.flipFullScreenState)) {
 			return {
 				...state,

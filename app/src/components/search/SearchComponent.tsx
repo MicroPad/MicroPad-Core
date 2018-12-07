@@ -21,7 +21,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	private searchInput: Input;
 	private results: JSX.Element[];
 	private triggerClickedSub: Subscription;
-	private readonly supportsDataElement = !!window['HTMLDataListElement'];
+	private readonly supportsDataElement = !!window['HTMLDataListElement'] && !(!!window['isElectron'] && window.navigator.platform === 'MacIntel');
 
 	render() {
 		const { notepad, query, hashTagResults, indices } = this.props;
@@ -30,7 +30,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 
 		if (!!notepad) {
 			const index = indices.find(idx => idx.notepad.title === notepad.title);
-			if (!!index) {
+			if (!!index && query.charAt(0) !== '#') {
 				const results = new Set(
 					query.split(' ')
 						.filter(word => word.length > 0)

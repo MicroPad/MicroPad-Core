@@ -2,9 +2,9 @@ import { IStoreState } from '../types';
 import AppBodyComponent, { IAppBodyComponentProps } from '../components/AppBodyComponent';
 import { connect } from 'react-redux';
 
-export function mapStateToProps({ meta }: IStoreState): IAppBodyComponentProps {
+export function mapStateToProps({ app }: IStoreState): IAppBodyComponentProps {
 	return {
-		isFullScreen: meta.isFullScreen
+		isFullScreen: app.isFullScreen
 	};
 }
 

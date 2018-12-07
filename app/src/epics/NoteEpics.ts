@@ -158,7 +158,9 @@ const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IS
 		filter(ref => ref.length > 0 && !!store.getState().notepads.notepad && !!store.getState().notepads.notepad!.item),
 		map(ref => store.getState().notepads.notepad!.item!.notes[ref]),
 		concatMap(note => {
-			const id = `markdown${note.elements.filter(e => e.type === 'markdown').length + 1}`;
+			let count = note.elements.filter(e => e.type === 'markdown').length + 1;
+			let id = `markdown${count}`;
+			while (note.elements.some(e => e.args.id === id)) id = `markdown${++count}`;
 
 			return [
 				actions.insertElement({
@@ -171,7 +173,7 @@ const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IS
 							y: '10px',
 							width: 'auto',
 							height: 'auto',
-							fontSize: store.getState().meta.defaultFontSize
+							fontSize: store.getState().app.defaultFontSize
 						},
 						content: ''
 					}

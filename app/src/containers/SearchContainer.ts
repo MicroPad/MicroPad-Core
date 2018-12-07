@@ -1,7 +1,7 @@
 import { IStoreState } from '../types';
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
-import { Action } from 'redux';
+import { Action, Dispatch } from 'redux';
 import { default as SearchComponent, ISearchComponentProps } from '../components/search/SearchComponent';
 import { actions } from '../actions';
 
