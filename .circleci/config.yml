@@ -111,7 +111,7 @@ workflows:
             tags:
               only: /^v.*/
             branches:
-              only: master
+              ignore: /.*/
       - deploy:
           requires:
             - test
