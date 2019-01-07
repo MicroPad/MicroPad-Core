@@ -101,8 +101,14 @@ workflows:
   version: 2
   test-and-deploy:
     jobs:
-      - test
-      - build
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+      - build:
+          filters:
+            tags:
+              only: /^v.*/
       - publish-github-release:
           requires:
             - test
