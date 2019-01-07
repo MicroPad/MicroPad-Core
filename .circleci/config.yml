@@ -84,12 +84,34 @@ jobs:
 
       - run: rsync -aue "ssh -p 1276 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" app/build/* $SSH_PATH
 
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.12
+
+    steps:
+      - attach_workspace:
+          at: ~/repo/app
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=${CIRCLE_TAG}
+            ghr -t ${GH_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} micropad.tar.xz
+
 workflows:
   version: 2
   test-and-deploy:
     jobs:
       - test
       - build
+      - publish-github-release:
+          requires:
+            - test
+            - build
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^v.*/
       - deploy:
           requires:
             - test
