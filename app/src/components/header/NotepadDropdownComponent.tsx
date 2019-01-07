@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Col, Dropdown, Icon, Modal, NavItem, Row } from 'react-materialize';
+import { Col, Dropdown, Icon, Modal, NavItem, ProgressBar, Row } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
 import { generateGuid } from '../../util';
 import { Dialog } from '../../dialogs';
@@ -13,6 +13,7 @@ const NPX_ICON = require('../../assets/npx.png');
 const MD_ICON = require('../../assets/md.svg');
 
 export interface INotepadDropdownProps {
+	isExporting: boolean;
 	notepadTitles?: string[];
 	syncState: ISyncState;
 	openNotepadFromStorage?: (title: string) => void;
@@ -59,6 +60,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 								<img src={MD_ICON} style={iconStyles} title="Export notepads as a zip archive of markdown files" />
 								<p style={{textAlign: 'center'}}>Export notepads as a zip archive of markdown files</p>
 							</Col>
+							{this.props.isExporting && <ProgressBar className="amber" />}
 						</Row>
 					</Modal>
 

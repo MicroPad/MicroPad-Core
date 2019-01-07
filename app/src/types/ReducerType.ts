@@ -4,8 +4,8 @@ import { IStoreState } from './index';
 export type ReducerHandler<S, A> = (state: S, action: Action<A>) => S;
 
 export abstract class MicroPadReducer<S> {
-	public readonly key: keyof IStoreState;
-	public readonly initialState: S;
+	public abstract readonly key: keyof IStoreState;
+	public abstract readonly initialState: S;
 	private handlers: { [actionType: string]: ReducerHandler<S, any> } = {};
 
 	public reducer(state: S, action: Action<any>): S {

@@ -157,7 +157,7 @@ const exportNotepad$ = (action$, store) =>
 
 const exportAll$ = (action$, store) =>
 	action$.pipe(
-		filter((action: Action<void>) => isType(action, actions.exportAll)),
+		filter((action: Action<void>) => isType(action, actions.exportAll.started)),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads),
 		filter(Boolean),
@@ -177,7 +177,7 @@ const exportAll$ = (action$, store) =>
 
 			return from(Promise.all(pendingXml));
 		}),
-		tap((exportNotepads: IExportedNotepad[]) => {
+		switchMap((exportNotepads: IExportedNotepad[]) => {
 			const zip: JSZip = new JSZip();
 
 			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
@@ -185,19 +185,19 @@ const exportAll$ = (action$, store) =>
 				zip.file(`${fixFileName(exportedNotepad.title)}.npx`, blob);
 			});
 
-			zip.generateAsync({
+			return from(zip.generateAsync({
 				type: 'blob',
 				compression: 'DEFLATE'
-			}).then((blob: Blob) => {
-				saveAs(blob, `notepads.zip`);
-			});
-		}),
-		filter(() => false)
+			})).pipe(
+				map((zipBlob: Blob) => actions.exportAll.done({ params: undefined, result: zipBlob })),
+				catchError(err => of(actions.exportAll.failed({ params: undefined, error: err })))
+			);
+		})
 	);
 
 const exportAllToMarkdown$ = (action$, store) =>
 	action$.pipe(
-		filter((action: Action<void>) => isType(action, actions.exportToMarkdown)),
+		filter((action: Action<void>) => isType(action, actions.exportToMarkdown.started)),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads),
 		filter(Boolean),
@@ -217,7 +217,7 @@ const exportAllToMarkdown$ = (action$, store) =>
 
 			return from(Promise.all(pendingContent));
 		}),
-		tap((exportNotepads: IExportedNotepad[]) => {
+		switchMap((exportNotepads: IExportedNotepad[]) => {
 			const zip: JSZip = new JSZip();
 
 			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
@@ -229,13 +229,21 @@ const exportAllToMarkdown$ = (action$, store) =>
 				);
 			});
 
-			zip.generateAsync({
+			return from(zip.generateAsync({
 				type: 'blob',
 				compression: 'DEFLATE'
-			}).then((blob: Blob) => {
-				saveAs(blob, `notepads.zip`);
-			});
-		}),
+			})).pipe(
+				map((zipBlob: Blob) => actions.exportAll.done({ params: undefined, result: zipBlob })),
+				catchError(err => of(actions.exportAll.failed({ params: undefined, error: err })))
+			);
+		})
+	);
+
+const exportAllDone$ = (action$: Observable<Action<Success<void, Blob>>>) =>
+	action$.pipe(
+		isAction(actions.exportAll.done, actions.exportToMarkdown.done),
+		map((action: Action<Success<void, Blob>>) => action.payload.result),
+		tap(zip => saveAs(zip, `notepads.zip`)),
 		filter(() => false)
 	);
 
@@ -392,6 +400,7 @@ export const notepadEpics$ = combineEpics(
 	restoreJsonNotepadAndLoadNote$,
 	exportNotepad$,
 	exportAll$,
+	exportAllDone$,
 	renameNotepad$,
 	saveNotepadOnRenameOrNew$,
 	exportAllToMarkdown$,
