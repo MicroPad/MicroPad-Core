@@ -70,6 +70,7 @@ jobs:
           root: app/
           paths:
             - build/*
+            - micropad.tar.xz
 
   deploy:
     docker:
@@ -95,14 +96,20 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             VERSION=${CIRCLE_TAG}
-            ghr -t ${GH_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} micropad.tar.xz
+            ghr -t ${GH_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ~/repo/app/micropad.tar.xz
 
 workflows:
   version: 2
   test-and-deploy:
     jobs:
-      - test
-      - build
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+      - build:
+          filters:
+            tags:
+              only: /^v.*/
       - publish-github-release:
           requires:
             - test
