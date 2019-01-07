@@ -8,14 +8,15 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepad
 	return {
 		openNotepadFromStorage: (title: string) => dispatch(actions.openNotepadFromStorage.started(title)),
 		newNotepad: notepad => dispatch(actions.newNotepad(notepad)),
-		exportAll: () => dispatch(actions.exportAll(undefined)),
-		exportToMarkdown: () => dispatch(actions.exportToMarkdown(undefined)),
+		exportAll: () => dispatch(actions.exportAll.started(undefined)),
+		exportToMarkdown: () => dispatch(actions.exportToMarkdown.started(undefined)),
 		downloadNotepad: syncId => dispatch(actions.syncDownload.started(syncId))
 	};
 }
 
-export function mapStateToProps({ notepads, sync }: IStoreState) {
+export function mapStateToProps({ notepads, sync, isExporting }: IStoreState) {
 	return {
+		isExporting: isExporting.isLoading,
 		notepadTitles: notepads.savedNotepadTitles,
 		syncState: sync
 	};

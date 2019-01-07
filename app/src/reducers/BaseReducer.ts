@@ -2,6 +2,7 @@ import { MicroPadReducer } from '../types/ReducerType';
 import { IStoreState } from '../types';
 import * as deepFreeze from 'deep-freeze';
 import { isDev } from '../util';
+import { Action } from 'redux-typescript-actions';
 import { NotepadsReducer } from './NotepadsReducer';
 import { NoteReducer } from './NoteReducer';
 import { ExplorerReducer } from './ExplorerReducer';
@@ -9,7 +10,7 @@ import { SearchReducer } from './SearchReducer';
 import { PrintReducer } from './PrintReducer';
 import { SyncReducer } from './SyncReducer';
 import { AppReducer } from './AppReducer';
-import { Action } from 'redux-typescript-actions';
+import { IsExportingReducer } from './IsExportingReducer';
 
 export const REDUCERS: Array<MicroPadReducer<any>> = [
 	new AppReducer(),
@@ -18,7 +19,8 @@ export const REDUCERS: Array<MicroPadReducer<any>> = [
 	new ExplorerReducer(),
 	new SearchReducer(),
 	new PrintReducer(),
-	new SyncReducer()
+	new SyncReducer(),
+	new IsExportingReducer()
 ];
 
 export class BaseReducer {
