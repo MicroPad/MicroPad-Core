@@ -6,6 +6,7 @@ import { ICurrentNoteState } from '../reducers/NoteReducer';
 import { IPrintStoreState } from '../reducers/PrintReducer';
 import { ISyncState } from '../reducers/SyncReducer';
 import { IAppStoreState } from '../reducers/AppReducer';
+import { IsExportingState } from '../reducers/IsExportingReducer';
 
 export interface IStoreState {
 	readonly app: IAppStoreState;
@@ -15,6 +16,7 @@ export interface IStoreState {
 	readonly search: ISearchState;
 	readonly print: IPrintStoreState;
 	readonly sync: ISyncState;
+	readonly isExporting: IsExportingState;
 }
 
 export interface IAppWindow extends Window {

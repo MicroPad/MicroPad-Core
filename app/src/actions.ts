@@ -44,6 +44,8 @@ export const actions = {
 	quickNote: actionCreator.async<void, string, void>('QUICK_NOTE'),
 	indexNotepads: actionCreator.async<void, SearchIndices, any>('INDEX_NOTEPADS'),
 	imagePasted: actionCreator.async<string, void, Error>('IMAGE_PASTED'),
+	exportAll: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS'),
+	exportToMarkdown: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS_TO_MD'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
@@ -51,8 +53,6 @@ export const actions = {
 	flipFullScreenState: actionCreator<void>('FLIP_FULL_SCREEN'),
 	deleteNotepad: actionCreator<string>('DELETE_NOTEPAD'),
 	exportNotepad: actionCreator<void>('EXPORT_NOTEPAD'),
-	exportAll: actionCreator<void>('EXPORT_ALL_NOTEPADS'),
-	exportToMarkdown: actionCreator<void>('EXPORT_ALL_NOTEPADS_TO_MD'),
 	expandSection: actionCreator<string>('OPEN_SECTION'),
 	collapseSelection: actionCreator<string>('CLOSE_SECTION'),
 	search: actionCreator<string>('SEARCH'),
