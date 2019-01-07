@@ -108,10 +108,10 @@ workflows:
             - test
             - build
           filters:
-            branches:
-              only: master
             tags:
               only: /^v.*/
+            branches:
+              only: master
       - deploy:
           requires:
             - test
