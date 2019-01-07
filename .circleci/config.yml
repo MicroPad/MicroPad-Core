@@ -70,6 +70,7 @@ jobs:
           root: app/
           paths:
             - build/*
+            - micropad.tar.xz
 
   deploy:
     docker:
