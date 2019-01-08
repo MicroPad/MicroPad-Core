@@ -172,7 +172,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 		if (this.isDragging) event.preventDefault();
 	}
 
-	private handleDrag = (event: Event, data: DraggableData) => {
+	private handleDrag = (_: any, data: DraggableData) => {
 		const { element, updateElement } = this.props;
 		if (data.x < 0) data.x = 0;
 		if (data.y < 0) data.y = 0;
