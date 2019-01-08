@@ -76,7 +76,7 @@ export default class UploadNotepadsComponent extends React.Component<IUploadNote
 			const file = event.currentTarget.files![0];
 			const reader = new FileReader();
 
-			reader.onload = () => resolve(reader.result);
+			reader.onload = () => resolve(reader.result as ArrayBuffer);
 
 			reader.readAsArrayBuffer(file);
 		});
