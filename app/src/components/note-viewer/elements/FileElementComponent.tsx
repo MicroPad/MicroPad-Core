@@ -67,7 +67,7 @@ export default class FileElementComponent extends React.Component<IFileElementCo
 			if (!file) reject();
 			const reader = new FileReader();
 
-			reader.onload = () => resolve([reader.result, file.name]);
+			reader.onload = () => resolve([reader.result as string, file.name as string]);
 
 			reader.readAsDataURL(file);
 		});

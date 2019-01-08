@@ -23,7 +23,7 @@ export function readFileInputEventAsText(event: SyntheticEvent<HTMLInputElement>
 		const file = event.currentTarget.files![0];
 		const reader = new FileReader();
 
-		reader.onload = () => resolve(reader.result);
+		reader.onload = () => resolve(reader.result as string);
 
 		reader.readAsText(file);
 	});
@@ -45,7 +45,7 @@ export function getAsBase64(blob: Blob): Promise<string> {
 	return new Promise<string>(resolve => {
 		try {
 			const reader = new FileReader();
-			reader.onload = event => resolve(event.target!.result);
+			reader.onload = event => resolve((event.target as any).result);
 			reader.readAsDataURL(blob);
 		} catch (e) {
 			console.warn(e);
