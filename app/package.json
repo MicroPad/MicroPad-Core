@@ -86,7 +86,7 @@
 		"redux-mock-store": "^1.5.3",
 		"sinon": "^5.0.7",
 		"tslint": "^5.11.0",
-		"typescript": "^2.8.3",
+		"typescript": "^3.2.2",
 		"workerize-loader": "^1.0.3"
 	},
 	"keywords": [

@@ -149,7 +149,7 @@ const exportNotepad$ = (action$, store) =>
 			from(getNotepadXmlWithAssets(notepad.toNotepad()))
 		),
 		tap((exportedNotepad: IExportedNotepad) => {
-			const blob = new Blob([exportedNotepad.content], { type: 'text/xml;charset=utf-8' });
+			const blob = new Blob([exportedNotepad.content as BlobPart], { type: 'text/xml;charset=utf-8' });
 			saveAs(blob, `${fixFileName(exportedNotepad.title)}.npx`);
 		}),
 		filter(() => false)
@@ -181,7 +181,7 @@ const exportAll$ = (action$, store) =>
 			const zip: JSZip = new JSZip();
 
 			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
-				const blob: Blob = new Blob([exportedNotepad.content], { type: 'text/xml;charset=utf-8' });
+				const blob: Blob = new Blob([exportedNotepad.content as string], { type: 'text/xml;charset=utf-8' });
 				zip.file(`${fixFileName(exportedNotepad.title)}.npx`, blob);
 			});
 

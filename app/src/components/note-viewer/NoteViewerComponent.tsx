@@ -218,7 +218,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		const x = event.clientX;
 		const y = event.clientY - FullScreenService.getOffset(isFullscreen);
 
-		if (!!event.dataTransfer.items) {
+		if (!!event.dataTransfer && !!event.dataTransfer.items) {
 			Array.from(event.dataTransfer.items)
 				.filter(item => item.kind === 'file')
 				.map(file => file.getAsFile())
@@ -226,7 +226,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				.forEach((file: File) => this.insertFileFromDrag(file, x, y));
 
 			event.dataTransfer.items.clear();
-		} else {
+		} else if (!!event.dataTransfer && !!event.dataTransfer.files) {
 			Array.from(event.dataTransfer.files)
 				.forEach(file => this.insertFileFromDrag(file, x, y));
 

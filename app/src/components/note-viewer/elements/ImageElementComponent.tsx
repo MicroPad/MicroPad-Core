@@ -82,7 +82,7 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 			if (!file) reject();
 			const reader = new FileReader();
 
-			reader.onload = () => resolve(reader.result);
+			reader.onload = () => resolve(reader.result as string);
 
 			reader.readAsDataURL(file);
 		});
