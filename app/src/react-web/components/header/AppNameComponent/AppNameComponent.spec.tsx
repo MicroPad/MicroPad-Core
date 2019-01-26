@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as enzyme from 'enzyme';
 import AppNameComponent from './AppNameComponent';
 import { APP_NAME } from '../../../types';
+import '../../../setupTests';
 
 describe(`version number tests`, () => {
 	const statusToSymbol = {
