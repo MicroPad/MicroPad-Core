@@ -1,5 +1,5 @@
 import { Action, ActionCreator } from 'redux-typescript-actions';
-import { IStoreState } from './index';
+import { IStoreState } from '.';
 
 export type ReducerHandler<S, A> = (state: S, action: Action<A>) => S;
 

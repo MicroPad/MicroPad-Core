@@ -14,7 +14,7 @@ import {
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
-import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
+import { ASSET_STORAGE, NOTEPAD_STORAGE } from '..';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
 import * as JSZip from 'jszip';

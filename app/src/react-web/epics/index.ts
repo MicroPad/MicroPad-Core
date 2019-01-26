@@ -11,7 +11,7 @@ import { PrintEpics } from './PrintEpics';
 import { SyncEpics } from './SyncEpics';
 import { HelpEpics } from './HelpEpics';
 import { SearchEpics } from './SearchEpics';
-import { getStorage } from '../index';
+import { getStorage } from '..';
 import { Action } from 'redux-typescript-actions';
 
 const baseEpic$ = combineEpics(

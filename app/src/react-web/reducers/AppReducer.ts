@@ -1,5 +1,5 @@
 // @ts-ignore
-import { version } from '../../package.json';
+import { version } from '../../../package.json';
 
 import { Action } from 'redux';
 import { MicroPadReducer } from '../types/ReducerType';

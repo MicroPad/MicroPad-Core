@@ -4,7 +4,7 @@ import { actions } from '../actions';
 import { filter, map, switchMap } from 'rxjs/operators';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';
-import { ASSET_STORAGE } from '../index';
+import { ASSET_STORAGE } from '..';
 import { trim } from '../components/note-viewer/elements/drawing/trim-canvas';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist';
 import { MarkdownNote, NoteElement } from 'upad-parse/dist/Note';

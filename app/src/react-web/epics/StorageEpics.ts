@@ -3,7 +3,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, map, mergeMap, 
 import { Action, isType } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { INotepadStoreState } from '../types/NotepadTypes';
-import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../index';
+import { ASSET_STORAGE, NOTEPAD_STORAGE } from '..';
 import { IStoreState } from '../types';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
 import * as localforage from 'localforage';

@@ -4,7 +4,7 @@ import { actions } from '../actions';
 import { catchError, combineLatest, concatMap, filter, first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
-import { ASSET_STORAGE, store as STORE, SYNC_STORAGE, TOAST_HANDLER } from '../index';
+import { ASSET_STORAGE, store as STORE, SYNC_STORAGE, TOAST_HANDLER } from '..';
 import { DifferenceEngine } from '../DifferenceEngine';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../types';

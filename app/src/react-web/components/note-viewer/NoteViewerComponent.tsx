@@ -12,7 +12,7 @@ import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';
 import { FullScreenService } from '../../FullscreenService';
-import { TOAST_HANDLER } from '../../index';
+import { TOAST_HANDLER } from '../..';
 import { generateGuid } from '../../util';
 
 export interface INoteViewerComponentProps {

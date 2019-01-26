@@ -6,7 +6,7 @@ import { actions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { dataURItoBlob, generateGuid, isAction } from '../util';
 import saveAs from 'save-as';
-import { ASSET_STORAGE } from '../index';
+import { ASSET_STORAGE } from '..';
 import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';

@@ -11,7 +11,7 @@ import Draggable, { DraggableData } from 'react-draggable';
 import SourcesComponent from '../../../containers/SourcesContainer';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { EditDueDateComponent } from './EditDueDateComponent';
-import { TOAST_HANDLER } from '../../../index';
+import { TOAST_HANDLER } from '../../..';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
