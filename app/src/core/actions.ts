@@ -51,6 +51,8 @@ export const actions = {
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
 	newNotepad: actionCreator<FlatNotepad>('NEW_NOTEPAD'),
 	flipFullScreenState: actionCreator<void>('FLIP_FULL_SCREEN'),
+	exitFullScreen: actionCreator<void>('EXIT_FULL_SCREEN'),
+	openBreadcrumb: actionCreator<string>('OPEN_BREADCRUMB'),
 	deleteNotepad: actionCreator<string>('DELETE_NOTEPAD'),
 	exportNotepad: actionCreator<void>('EXPORT_NOTEPAD'),
 	expandSection: actionCreator<string>('OPEN_SECTION'),
@@ -91,5 +93,6 @@ export const actions = {
 	selectTheme: actionCreator<ThemeName>('SELECT_THEME'),
 	moveNotepadObject: actionCreator<MoveNotepadObjectAction>('MOVE_NOTEPAD_OBJECT'),
 	quickMarkdownInsert: actionCreator<void>('QUICK_MARKDOWN_INSERT'),
-	quickNotepad: actionCreator<void>('QUICK_NOTEPAD')
+	quickNotepad: actionCreator<void>('QUICK_NOTEPAD'),
+	flashExplorer: actionCreator<void>('FLASH_EXPLORER')
 };

@@ -48,6 +48,11 @@ export class AppReducer extends MicroPadReducer<IAppStoreState> {
 				...state,
 				isFullScreen: !state.isFullScreen
 			};
+		} else if (isType(action, actions.exitFullScreen)) {
+			return {
+				...state,
+				isFullScreen: false
+			};
 		} else if (isType(action, actions.updateDefaultFontSize)) {
 			return {
 				...state,
