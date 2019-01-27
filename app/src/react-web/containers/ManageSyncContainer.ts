@@ -2,7 +2,7 @@ import { IStoreState } from '../../core/types';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
 import { default as ManageSyncComponent, IManageSyncComponentProps } from '../components/sync/ManageSyncComponent';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 
 export function mapStateToProps({ sync }: IStoreState) {
 	return {

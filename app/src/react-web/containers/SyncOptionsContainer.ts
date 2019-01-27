@@ -3,7 +3,7 @@ import { INotepadsStoreState, INotepadStoreState } from '../../core/types/Notepa
 import { default as SyncOptionsComponent, ISyncOptionsComponentProps } from '../components/sync/SyncOptionsComponent';
 import { Action, Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 
 export function mapStateToProps({ notepads, sync }: IStoreState) {
 	return {

@@ -5,7 +5,7 @@ import PrintViewOrAppContainerComponent, {
 	IPrintViewComponentProps
 } from '../components/printing/PrintViewOrAppContainerComponent';
 import { Action, Dispatch } from 'redux';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { Note } from 'upad-parse/dist';
 import { ThemeValues } from '../ThemeValues';
 

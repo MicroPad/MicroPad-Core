@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { catchError, combineLatest, concatMap, filter, first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../../core/types/SyncTypes';

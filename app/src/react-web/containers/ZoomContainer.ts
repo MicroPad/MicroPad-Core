@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import ZoomComponent, { IZoomComponentProps } from '../components/note-viewer/ZoomComponent';
 import { Action, Dispatch } from 'redux';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { IStoreState } from '../../core/types';
 import { ThemeValues } from '../ThemeValues';
 

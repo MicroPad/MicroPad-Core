@@ -1,7 +1,7 @@
 import { Store } from 'redux';
 import { IStoreState } from '../core/types';
 import * as mousetrap from 'mousetrap';
-import { actions } from './actions';
+import { actions } from '../core/actions';
 import { INotepadStoreState } from '../core/types/NotepadTypes';
 
 export function enableKeyboardShortcuts(store: Store<IStoreState>) {

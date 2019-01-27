@@ -4,7 +4,7 @@ import { combineEpics } from 'redux-observable';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 import { from, of } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { HashTagSearchResult, HashTagSearchResults } from '../../core/reducers/SearchReducer';
 import { IStoreState } from '../../core/types';
 import { Store } from 'redux';

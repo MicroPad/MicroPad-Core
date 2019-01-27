@@ -1,6 +1,6 @@
 import { SearchEpics } from '../SearchEpics';
 import { ActionsObservable } from 'redux-observable';
-import { actions } from '../../actions';
+import { actions } from '../../../core/actions';
 import { ineeda } from 'ineeda';
 import { Action } from 'redux-typescript-actions';
 import { ElementArgs } from 'upad-parse/dist/Note';

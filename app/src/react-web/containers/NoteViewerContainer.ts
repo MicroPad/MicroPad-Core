@@ -5,7 +5,7 @@ import {
 	default as NoteViewerComponent,
 	INoteViewerComponentProps
 } from '../components/note-viewer/NoteViewerComponent';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { ThemeValues } from '../ThemeValues';
 import { Note } from 'upad-parse/dist';
 

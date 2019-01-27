@@ -2,7 +2,7 @@ import { combineEpics } from 'redux-observable';
 import { catchError, concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import { dataURItoBlob, generateGuid, isAction } from '../util';
 import saveAs from 'save-as';

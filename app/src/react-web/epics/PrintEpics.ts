@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable';
 import { dataURItoBlob, isAction } from '../util';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { filter, map, switchMap } from 'rxjs/operators';
 import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import { IStoreState } from '../../core/types';

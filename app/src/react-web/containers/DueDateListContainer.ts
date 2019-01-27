@@ -3,7 +3,7 @@ import DueDateListComponent, { DueItem, IDueDateListComponentProps } from '../co
 import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 
 export function mapStateToProps({ notepads }: IStoreState): IDueDateListComponentProps {
 	const notepad = (notepads.notepad || {} as INotepadStoreState).item;

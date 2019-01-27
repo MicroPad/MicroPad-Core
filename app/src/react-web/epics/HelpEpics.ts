@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
 import { filter, map } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 
 export namespace HelpEpics {
 	export const getHelp$ = (action$, store, { helpNpx }) =>

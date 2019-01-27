@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { APP_NAME, IStoreState, MICROPAD_URL } from '../../core/types';
 import * as localforage from 'localforage';

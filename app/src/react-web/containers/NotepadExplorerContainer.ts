@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import NotepadExplorerComponent, { INotepadExplorerComponentProps } from '../components/explorer/NotepadExplorerComponent';
 import { INotepadsStoreState, INotepadStoreState } from '../../core/types/NotepadTypes';
 import { Action, Dispatch } from 'redux';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { FlatNotepad, Note } from 'upad-parse/dist';
 import { ThemeValues } from '../ThemeValues';
 

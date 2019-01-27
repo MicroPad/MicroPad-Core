@@ -1,7 +1,7 @@
 import { IStoreState } from '../../core/types';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import {
 	default as InsertElementComponent,
 	IInsertElementComponentProps

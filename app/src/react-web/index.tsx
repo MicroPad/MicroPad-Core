@@ -20,7 +20,7 @@ import { epicMiddleware } from './epics';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import * as localforage from 'localforage';
 import * as ReactDOM from 'react-dom';
-import { actions } from './actions';
+import { actions } from '../core/actions';
 import { Provider } from 'react-redux';
 import HeaderComponent from './containers/header/HeaderContainer';
 import NotepadExplorerComponent from './containers/NotepadExplorerContainer';

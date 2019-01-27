@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
 import { filter, map } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import { isAction } from '../util';
 import { NewNotepadObjectAction } from '../../core/types/ActionTypes';

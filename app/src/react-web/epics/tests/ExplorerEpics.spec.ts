@@ -1,7 +1,7 @@
 import { ActionsObservable, createEpicMiddleware } from 'redux-observable';
 import configureStore from 'redux-mock-store';
 import { ExplorerEpics } from '../ExplorerEpics';
-import { actions } from '../../actions';
+import { actions } from '../../../core/actions';
 import { cold } from 'jest-marbles';
 import { IStoreState } from '../../../core/types';
 import { ineeda } from 'ineeda';

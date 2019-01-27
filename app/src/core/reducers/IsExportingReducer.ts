@@ -1,5 +1,5 @@
 import { MicroPadReducer } from '../types/ReducerType';
-import { actions } from '../../react-web/actions';
+import { actions } from '../actions';
 
 export type IsExportingState = {
 	isLoading: boolean;
