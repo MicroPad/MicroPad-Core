@@ -1,14 +1,20 @@
 import * as React from 'react';
 import { CSSProperties } from 'react';
 import './NotepadBreadcrumbsComponent.css';
-import { Breadcrumb, MenuItem } from 'react-materialize';
+import { Breadcrumb as MaterialBreadcrumb, MenuItem, Dropdown, NavItem } from 'react-materialize';
 import { generateGuid } from '../../../util';
 import { ThemeName } from '../../../../core/types/Themes';
 
+export type Breadcrumb = {
+	text: string;
+	ref?: string;
+};
+
 export interface INotepadBreadcrumbsProps {
 	themeName: ThemeName;
-	breadcrumbs: string[];
+	breadcrumbs: Breadcrumb[];
 	noteTime?: string;
+	focusItem?: (ref?: string) => void;
 }
 
 export default class NotepadBreadcrumbsComponent extends React.Component<INotepadBreadcrumbsProps> {
@@ -19,7 +25,7 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 	};
 
 	render() {
-		const { themeName, breadcrumbs, noteTime } = this.props;
+		const { themeName, breadcrumbs, noteTime, focusItem } = this.props;
 
 		const breadcrumbStyle: CSSProperties = {
 			position: 'fixed',
@@ -28,18 +34,18 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 		};
 
 		const crumbs: JSX.Element[] = [];
-		(breadcrumbs || []).forEach((title: string, i: number) =>
+		(breadcrumbs || []).forEach((crumb: Breadcrumb, i: number) =>
 			crumbs.push(
-				<MenuItem key={generateGuid()}>
-					{title} {i === breadcrumbs.length - 1 && !!noteTime && <span style={this.timeStyle}>{noteTime}</span>}
+				<MenuItem key={generateGuid()} href="#!" onClick={() => !!focusItem && focusItem(crumb.ref)}>
+					{crumb.text} {i === breadcrumbs.length - 1 && !!noteTime && <span style={this.timeStyle}>{noteTime}</span>}
 				</MenuItem>
 			));
 
 		return (
 			<div id="breadcrumb-holder" style={breadcrumbStyle}>
-				<Breadcrumb className={themeName}>
+				<MaterialBreadcrumb className={themeName}>
 					{crumbs}
-				</Breadcrumb>
+				</MaterialBreadcrumb>
 			</div>
 		);
 	}
