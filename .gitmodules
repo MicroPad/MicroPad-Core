@@ -1,3 +1,0 @@
-[submodule "parser"]
-	path = parser
-	url = git@github.com:MicroPad/Web-Parser.git
