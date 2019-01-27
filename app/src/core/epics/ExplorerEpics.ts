@@ -1,13 +1,16 @@
 import { combineEpics } from 'redux-observable';
-import { filter, map } from 'rxjs/operators';
+import { concatMap, filter, map, startWith, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { isAction } from '../../react-web/util';
 import { NewNotepadObjectAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
-import { FlatNotepad } from 'upad-parse/dist';
+import { FlatNotepad, Note } from 'upad-parse/dist';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
+import { Observable } from 'rxjs';
+import { Store } from 'redux';
+import { ThemeValues } from '../../react-web/ThemeValues';
 
 export namespace ExplorerEpics {
 	export const expandAll$ = (action$, store) =>
@@ -36,8 +39,49 @@ export namespace ExplorerEpics {
 			map((newSection: FlatSection) => actions.expandSection(newSection.internalRef))
 		);
 
+	export const openBreadcrumb$ = (action$: Observable<Action<string>>, store: Store<IStoreState>) =>
+		action$.pipe(
+			isAction(actions.openBreadcrumb),
+			map(action => action.payload),
+			filter(() => !!store.getState().notepads.notepad && !!store.getState().notepads.notepad!.item),
+			map((ref: string) =>
+				store.getState().notepads.notepad!.item!.notes[ref]
+				|| store.getState().notepads.notepad!.item!.sections[ref]
+			),
+			map((notepadObj: FlatSection | Note) => {
+				const notepad = store.getState().notepads.notepad!.item!;
+				return [...notepad.pathFrom(notepadObj).slice(1), notepadObj];
+			}),
+			concatMap((path: Array<FlatSection | Note>) =>
+				[
+					actions.exitFullScreen(),
+					actions.collapseAllExplorer(),
+					...path
+						.filter(obj => !(obj as Note).parent)
+						.map(section => actions.expandSection(section.internalRef)),
+					actions.flashExplorer()
+				]
+			),
+			tap(a => console.log(a))
+		);
+
+	export const flashExplorer$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+		action$.pipe(
+			isAction(actions.flashExplorer),
+			tap(() => {
+				const theme = ThemeValues[store.getState().app.theme];
+				const explorer = document.getElementById('notepad-explorer')!;
+
+				explorer.style.backgroundColor = theme.accent;
+				setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);
+			}),
+			filter(() => false)
+		);
+
 	export const explorerEpics$ = combineEpics(
 		expandAll$,
-		autoLoadNewSection$
+		autoLoadNewSection$,
+		openBreadcrumb$,
+		flashExplorer$
 	);
 }

@@ -36,7 +36,7 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 		const crumbs: JSX.Element[] = [];
 		(breadcrumbs || []).forEach((crumb: Breadcrumb, i: number) =>
 			crumbs.push(
-				<MenuItem key={generateGuid()} href="#!" onClick={() => !!focusItem && focusItem(crumb.ref)}>
+				<MenuItem key={generateGuid()} href={!!crumb.ref ? '#!' : undefined} onClick={() => !!focusItem && focusItem(crumb.ref)}>
 					{crumb.text} {i === breadcrumbs.length - 1 && !!noteTime && <span style={this.timeStyle}>{noteTime}</span>}
 				</MenuItem>
 			));
