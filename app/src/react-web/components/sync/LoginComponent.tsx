@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, Input, Modal, NavItem } from 'react-materialize';
-import { APP_NAME, MICROPAD_URL, SYNC_NAME } from '../../types';
-import { SyncUser } from '../../types/SyncTypes';
+import { APP_NAME, MICROPAD_URL, SYNC_NAME } from '../../../core/types';
+import { SyncUser } from '../../../core/types/SyncTypes';
 import { Dialog } from '../../dialogs';
 
 export interface ILoginComponentProps {

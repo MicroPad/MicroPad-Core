@@ -3,11 +3,11 @@ import { CSSProperties } from 'react';
 import AppNameComponent from '../../containers/header/AppNameContainer';
 import { Dropdown, Icon, Navbar, NavItem } from 'react-materialize';
 import NotepadDropdownComponent from '../../containers/header/NotepadDropdownContainer';
-import { INotepadStoreState } from '../../types/NotepadTypes';
+import { INotepadStoreState } from '../../../core/types/NotepadTypes';
 import NotepadBreadcrumbs from '../../containers/header/NotepadBreadcrumbsContainer';
 import SearchComponent from '../../containers/SearchContainer';
 import ThemeDropdownComponent from '../../containers/header/ThemeDropdownContainer';
-import { ITheme } from '../../types/Themes';
+import { ITheme } from '../../../core/types/Themes';
 
 export interface IHeaderComponentProps {
 	isFullScreen: boolean;

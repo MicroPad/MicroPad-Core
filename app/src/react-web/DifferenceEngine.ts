@@ -2,9 +2,9 @@
 import SyncWorker from '!workerize-loader!./SyncWorker.js';
 
 import { Observable } from 'rxjs';
-import { MICROPAD_URL } from './types';
+import { MICROPAD_URL } from '../core/types';
 import { map, retry } from 'rxjs/operators';
-import { AssetList, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from './types/SyncTypes';
+import { AssetList, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from '../core/types/SyncTypes';
 import { parse } from 'date-fns';
 import { Base64 } from 'js-base64';
 import * as QueryString from 'querystring';

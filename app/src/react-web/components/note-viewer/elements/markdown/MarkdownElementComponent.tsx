@@ -2,7 +2,7 @@ import * as React from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
 import { MarkDownViewer } from './MarkdownViewerHtml';
-import { IAppWindow, UNSUPPORTED_MESSAGE } from '../../../../types';
+import { IAppWindow, UNSUPPORTED_MESSAGE } from '../../../../../core/types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
@@ -11,7 +11,7 @@ import MarkdownHelpComponent from './MarkdownHelpComponent';
 import Resizable from 're-resizable';
 import { Dialog } from '../../../../dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { ITheme } from '../../../../types/Themes';
+import { ITheme } from '../../../../../core/types/Themes';
 import Twemoji from 'twemoji/2/twemoji.amd';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {

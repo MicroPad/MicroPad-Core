@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
-import { IStoreState } from '../../types';
+import { IStoreState } from '../../../core/types';
 import NotepadBreadcrumbsComponent, { INotepadBreadcrumbsProps } from '../../components/header/NotepadBreadcrumbsComponent/NotepadBreadcrumbsComponent';
-import { INotepadStoreState } from '../../types/NotepadTypes';
+import { INotepadStoreState } from '../../../core/types/NotepadTypes';
 import { format } from 'date-fns';
 import { FlatNotepad } from 'upad-parse/dist';
 

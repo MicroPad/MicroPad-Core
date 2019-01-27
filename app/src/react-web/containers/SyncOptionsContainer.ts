@@ -1,9 +1,9 @@
-import { IStoreState } from '../types';
-import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
+import { IStoreState } from '../../core/types';
+import { INotepadsStoreState, INotepadStoreState } from '../../core/types/NotepadTypes';
 import { default as SyncOptionsComponent, ISyncOptionsComponentProps } from '../components/sync/SyncOptionsComponent';
 import { Action, Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 
 export function mapStateToProps({ notepads, sync }: IStoreState) {
 	return {

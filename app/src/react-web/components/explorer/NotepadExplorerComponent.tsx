@@ -1,18 +1,18 @@
 import * as React from 'react';
 import { CSSProperties } from 'react';
 import './NotepadExplorerComponent.css';
-import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
+import { IRenameNotepadObjectAction } from '../../../core/types/NotepadTypes';
 import { Icon } from 'react-materialize';
 import TreeView from 'react-treeview';
 import { generateGuid } from '../../util';
 import ExplorerOptionsComponent from './ExplorerOptionsComponent';
-import { NewNotepadObjectAction } from '../../types/ActionTypes';
+import { NewNotepadObjectAction } from '../../../core/types/ActionTypes';
 import HelpMessageComponent from '../../containers/HelpMessageContainer';
 import { Dialog } from '../../dialogs';
 import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
 import { Note, Notepad, Parent, Section } from 'upad-parse/dist';
-import { ITheme } from '../../types/Themes';
-import { NEW_SECTION_HELP, OPEN_NOTE_HELP, OPEN_NOTEPAD_HELP } from '../../types';
+import { ITheme } from '../../../core/types/Themes';
+import { NEW_SECTION_HELP, OPEN_NOTE_HELP, OPEN_NOTEPAD_HELP } from '../../../core/types';
 import DueDateListComponent from '../../containers/DueDateListContainer';
 
 export interface INotepadExplorerComponentProps {

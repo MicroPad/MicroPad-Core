@@ -3,9 +3,9 @@ import { Col, Dropdown, Icon, Modal, NavItem, ProgressBar, Row } from 'react-mat
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
 import { generateGuid } from '../../util';
 import { Dialog } from '../../dialogs';
-import { SYNC_NAME } from '../../types';
+import { SYNC_NAME } from '../../../core/types';
 import LoginComponent from '../../containers/LoginContainer';
-import { ISyncState } from '../../reducers/SyncReducer';
+import { ISyncState } from '../../../core/reducers/SyncReducer';
 import ManageSyncComponent from '../../containers/ManageSyncContainer';
 import { FlatNotepad, Note } from 'upad-parse/dist';
 

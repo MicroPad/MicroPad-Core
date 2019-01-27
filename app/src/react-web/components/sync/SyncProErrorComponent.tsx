@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, Modal } from 'react-materialize';
-import { MICROPAD_URL, SYNC_NAME } from '../../types';
+import { MICROPAD_URL, SYNC_NAME } from '../../../core/types';
 
 export const SyncProErrorComponent = () => (
 	<Modal

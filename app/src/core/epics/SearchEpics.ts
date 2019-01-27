@@ -9,11 +9,11 @@ import { HashTagSearchResult, HashTagSearchResults } from '../reducers/SearchRed
 import { IStoreState } from '../types';
 import { Store } from 'redux';
 import { SearchIndices } from '../types/ActionTypes';
-import { isAction } from '../util';
-import { indexNotepads } from '../SearchWorker';
+import { isAction } from '../../react-web/util';
+import { indexNotepads } from '../../react-web/SearchWorker';
 
 export namespace SearchEpics {
-	export const refreshIndices = action$ =>
+	export const refreshIndices$ = action$ =>
 		action$.pipe(
 			isAction(actions.saveNotepad.done),
 			map(() => actions.indexNotepads.started(undefined))
@@ -62,7 +62,7 @@ export namespace SearchEpics {
 		);
 
 	export const searchEpics$ = combineEpics(
-		refreshIndices,
+		refreshIndices$,
 		indexNotepads$,
 		search$
 	);

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { ITheme } from '../../../types/Themes';
+import { ITheme } from '../../../../core/types/Themes';
 import { distanceInWordsStrict, format } from 'date-fns';
 
 export const DueInMessageComponent = (props: { dueDate: Date }) => {

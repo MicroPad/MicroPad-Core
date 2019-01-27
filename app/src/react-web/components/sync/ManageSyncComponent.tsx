@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { ISyncState } from '../../reducers/SyncReducer';
+import { ISyncState } from '../../../core/reducers/SyncReducer';
 import { Modal, NavItem } from 'react-materialize';
-import { MICROPAD_URL, SYNC_NAME } from '../../types';
+import { MICROPAD_URL, SYNC_NAME } from '../../../core/types';
 
 export interface IManageSyncComponentProps {
 	syncState: ISyncState;

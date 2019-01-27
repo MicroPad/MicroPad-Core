@@ -3,7 +3,7 @@ import { filter, map } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
-import { isAction } from '../util';
+import { isAction } from '../../react-web/util';
 import { NewNotepadObjectAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { FlatNotepad } from 'upad-parse/dist';

@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { InsertElementAction } from '../../types/ActionTypes';
+import { InsertElementAction } from '../../../core/types/ActionTypes';
 import './elements/NoteElementComponent.css';
 import './InsertElementComponent.css';
-import { IInsertElementState } from '../../reducers/NoteReducer';
+import { IInsertElementState } from '../../../core/reducers/NoteReducer';
 import { generateGuid } from 'src/react-web/util';
 import { Icon } from 'react-materialize';
 import JupyterInserterComponent from './elements/JupyterInserterComponent';
 import { Note } from 'upad-parse/dist';
 import { ElementArgs, NoteElement } from 'upad-parse/dist/Note';
-import { ITheme } from '../../types/Themes';
+import { ITheme } from '../../../core/types/Themes';
 import { FullScreenService } from '../../FullscreenService';
 
 export interface IInsertElementComponentProps {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { isMobile } from '../../util';
 import { Button, Icon } from 'react-materialize';
-import { ITheme } from '../../types/Themes';
+import { ITheme } from '../../../core/types/Themes';
 
 export interface IZoomComponentProps {
 	update: (newZoom: number) => void;

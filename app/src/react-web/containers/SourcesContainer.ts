@@ -1,8 +1,8 @@
-import { IStoreState } from '../types';
+import { IStoreState } from '../../core/types';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
 import SourcesComponent, { ISourcesComponent } from '../components/note-viewer/SourcesComponent';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { Note } from 'upad-parse/dist';
 
 let noteRef: string = '';

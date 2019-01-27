@@ -5,12 +5,12 @@ import { combineEpics, createEpicMiddleware } from 'redux-observable';
 import { notepadEpics$ } from './NotepadEpics';
 import { storageEpics$ } from './StorageEpics';
 import { noteEpics$ } from './NoteEpics';
-import { ExplorerEpics } from './ExplorerEpics';
+import { ExplorerEpics } from '../../core/epics/ExplorerEpics';
 import { AppEpics } from './AppEpics';
 import { PrintEpics } from './PrintEpics';
 import { SyncEpics } from './SyncEpics';
 import { HelpEpics } from './HelpEpics';
-import { SearchEpics } from './SearchEpics';
+import { SearchEpics } from '../../core/epics/SearchEpics';
 import { getStorage } from '..';
 import { Action } from 'redux-typescript-actions';
 

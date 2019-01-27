@@ -1,7 +1,7 @@
 import { MicroPadReducer } from '../types/ReducerType';
 import { IStoreState } from '../types';
 import * as deepFreeze from 'deep-freeze';
-import { isDev } from '../util';
+import { isDev } from '../../react-web/util';
 import { Action } from 'redux-typescript-actions';
 import { NotepadsReducer } from './NotepadsReducer';
 import { NoteReducer } from './NoteReducer';

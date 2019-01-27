@@ -1,7 +1,7 @@
 import { ActionsObservable } from 'redux-observable';
 import { HelpEpics } from '../HelpEpics';
 import { cold } from 'jest-marbles';
-import { actions } from '../../actions';
+import { actions } from '../../../core/actions';
 
 describe('getHelp$', () => {
 	it(`should dispatch PARSE_NPX_STARTED with the help notepad's xml`, () => {

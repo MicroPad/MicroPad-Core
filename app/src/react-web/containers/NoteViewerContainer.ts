@@ -1,11 +1,11 @@
-import { IStoreState } from '../types';
+import { IStoreState } from '../../core/types';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
 import {
 	default as NoteViewerComponent,
 	INoteViewerComponentProps
 } from '../components/note-viewer/NoteViewerComponent';
-import { actions } from '../actions';
+import { actions } from '../../core/actions';
 import { ThemeValues } from '../ThemeValues';
 import { Note } from 'upad-parse/dist';
 

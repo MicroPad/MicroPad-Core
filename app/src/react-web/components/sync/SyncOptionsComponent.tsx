@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { ISyncState } from '../../reducers/SyncReducer';
-import { SYNC_NAME } from '../../types';
-import { ISyncedNotepad, SyncUser } from '../../types/SyncTypes';
+import { ISyncState } from '../../../core/reducers/SyncReducer';
+import { SYNC_NAME } from '../../../core/types';
+import { ISyncedNotepad, SyncUser } from '../../../core/types/SyncTypes';
 import { DifferenceEngine } from '../../DifferenceEngine';
 import { Dialog } from '../../dialogs';
 import LoginComponent from '../../containers/LoginContainer';

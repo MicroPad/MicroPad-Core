@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import UploadNotepadsComponent, { IUploadNotepadsComponentProps } from '../../components/header/UploadNotepadsComponent/UploadNotepadsComponent';
 import { Action, Dispatch } from 'redux';
-import { actions } from '../../actions';
+import { actions } from '../../../core/actions';
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 	return {

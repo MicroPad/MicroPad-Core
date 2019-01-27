@@ -3,7 +3,7 @@ import './PrintViewComponent.css';
 import MarkdownElementComponent from '../note-viewer/elements/markdown/MarkdownElementComponent';
 import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { ITheme } from '../../types/Themes';
+import { ITheme } from '../../../core/types/Themes';
 import { ThemeValues } from '../../ThemeValues';
 
 export interface IPrintViewComponentProps {
