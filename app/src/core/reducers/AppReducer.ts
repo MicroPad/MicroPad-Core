@@ -4,7 +4,7 @@ import { version } from '../../../package.json';
 import { Action } from 'redux';
 import { MicroPadReducer } from '../types/ReducerType';
 import { isType } from 'redux-typescript-actions';
-import { actions } from '../actions';
+import { actions } from '../../react-web/actions';
 import { ThemeName } from '../types/Themes';
 import { parse } from 'semver';
 

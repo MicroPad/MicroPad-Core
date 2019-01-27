@@ -2,7 +2,7 @@ import * as React from 'react';
 import { CSSProperties } from 'react';
 import { isMobile } from '../util';
 import * as Materialize from 'materialize-css/dist/js/materialize';
-import { ITheme } from '../types/Themes';
+import { ITheme } from '../../core/types/Themes';
 
 export interface IHelpMessageComponentProps {
 	show: boolean;

@@ -4,7 +4,7 @@ import { INoteElementComponentProps } from './NoteElementComponent';
 import { Button, Row } from 'react-materialize';
 import { dataURItoBlob } from '../../../util';
 import { Dialog } from '../../../dialogs';
-import { ITheme } from '../../../types/Themes';
+import { ITheme } from '../../../../core/types/Themes';
 
 export interface IFileElementComponent extends INoteElementComponentProps {
 	downloadAsset: (filename: string, uuid: string) => void;

@@ -1,4 +1,4 @@
-import { ITheme, ThemeName } from './types/Themes';
+import { ITheme, ThemeName } from '../core/types/Themes';
 
 const classicBackground = require('./assets/background.png');
 const filledBackground = require('./assets/dark-background.png');

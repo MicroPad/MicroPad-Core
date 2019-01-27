@@ -1,4 +1,4 @@
-import { IStoreState } from '../types';
+import { IStoreState } from '../../core/types';
 import AppBodyComponent, { IAppBodyComponentProps } from '../components/AppBodyComponent';
 import { connect } from 'react-redux';
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
+import { IRenameNotepadObjectAction } from '../../../core/types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
-import { APP_NAME } from '../../types';
+import { APP_NAME } from '../../../core/types';
 import { Dialog } from 'src/react-web/dialogs';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';

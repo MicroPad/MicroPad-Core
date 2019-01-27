@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { IStoreState } from '../../types';
+import { IStoreState } from '../../../core/types';
 import NotepadDropdownComponent, { INotepadDropdownProps } from '../../components/header/NotepadDropdownComponent';
 import { actions } from '../../actions';
 import { Action, Dispatch } from 'redux';

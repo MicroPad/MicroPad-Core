@@ -1,5 +1,5 @@
 import actionCreatorFactory from 'redux-typescript-actions';
-import { IRenameNotepadObjectAction } from './types/NotepadTypes';
+import { IRenameNotepadObjectAction } from '../core/types/NotepadTypes';
 import {
 	AddToSyncAction,
 	DeleteElementAction,
@@ -13,13 +13,13 @@ import {
 	SyncAction,
 	UpdateBibliographyAction,
 	UpdateElementAction
-} from './types/ActionTypes';
-import { IInsertElementState } from './reducers/NoteReducer';
-import { SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
+} from '../core/types/ActionTypes';
+import { IInsertElementState } from '../core/reducers/NoteReducer';
+import { SyncedNotepadList, SyncLoginRequest, SyncUser } from '../core/types/SyncTypes';
 import { FlatNotepad, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { HashTagSearchResults } from './reducers/SearchReducer';
-import { ThemeName } from './types/Themes';
+import { HashTagSearchResults } from '../core/reducers/SearchReducer';
+import { ThemeName } from '../core/types/Themes';
 
 const actionCreator = actionCreatorFactory();
 

@@ -13,19 +13,19 @@ import {
 } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
-import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
+import { INotepadsStoreState, INotepadStoreState } from '../../core/types/NotepadTypes';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '..';
-import { IStoreState } from '../types';
+import { IStoreState } from '../../core/types';
 import saveAs from 'save-as';
 import * as JSZip from 'jszip';
 import { fixFileName, generateGuid, isAction } from '../util';
 import { Dialog } from '../dialogs';
-import { ISyncedNotepad, SyncedNotepadList, SyncUser } from '../types/SyncTypes';
+import { ISyncedNotepad, SyncedNotepadList, SyncUser } from '../../core/types/SyncTypes';
 import { Asset, FlatNotepad, Note, Notepad, Translators } from 'upad-parse/dist';
 import { MarkdownNote } from 'upad-parse/dist/Note';
 import { from, Observable, of } from 'rxjs';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
-import { RestoreJsonNotepadAndLoadNoteAction } from '../types/ActionTypes';
+import { RestoreJsonNotepadAndLoadNoteAction } from '../../core/types/ActionTypes';
 import { Store } from 'redux';
 import { format } from 'date-fns';
 

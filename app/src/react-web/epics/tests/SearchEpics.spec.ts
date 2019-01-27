@@ -5,8 +5,8 @@ import { ineeda } from 'ineeda';
 import { Action } from 'redux-typescript-actions';
 import { ElementArgs } from 'upad-parse/dist/Note';
 import { FlatNotepad, Note, Trie } from 'upad-parse/dist';
-import { HashTagSearchResults } from '../../reducers/SearchReducer';
-import { IStoreState } from '../../types';
+import { HashTagSearchResults } from '../../../core/reducers/SearchReducer';
+import { IStoreState } from '../../../core/types';
 import { Store } from 'redux';
 
 describe('search$', () => {

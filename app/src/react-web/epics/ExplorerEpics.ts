@@ -2,10 +2,10 @@ import { combineEpics } from 'redux-observable';
 import { filter, map } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { INotepadStoreState } from '../types/NotepadTypes';
+import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import { isAction } from '../util';
-import { NewNotepadObjectAction } from '../types/ActionTypes';
-import { IStoreState } from '../types';
+import { NewNotepadObjectAction } from '../../core/types/ActionTypes';
+import { IStoreState } from '../../core/types';
 import { FlatNotepad } from 'upad-parse/dist';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 

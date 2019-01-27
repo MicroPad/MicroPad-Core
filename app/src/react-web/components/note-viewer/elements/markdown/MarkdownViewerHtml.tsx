@@ -1,6 +1,6 @@
 // @ts-ignore
 import MathJax from '!raw-loader!../../../../assets/MathJax.js';
-import { ITheme } from '../../../../types/Themes';
+import { ITheme } from '../../../../../core/types/Themes';
 
 export namespace MarkDownViewer {
 	export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): string => `<!DOCTYPE html>

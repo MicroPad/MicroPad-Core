@@ -5,10 +5,10 @@ import { catchError, filter, map, switchMap } from 'rxjs/operators';
 import { from, of } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { HashTagSearchResult, HashTagSearchResults } from '../reducers/SearchReducer';
-import { IStoreState } from '../types';
+import { HashTagSearchResult, HashTagSearchResults } from '../../core/reducers/SearchReducer';
+import { IStoreState } from '../../core/types';
 import { Store } from 'redux';
-import { SearchIndices } from '../types/ActionTypes';
+import { SearchIndices } from '../../core/types/ActionTypes';
 import { isAction } from '../util';
 import { indexNotepads } from '../SearchWorker';
 

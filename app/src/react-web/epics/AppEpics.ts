@@ -2,7 +2,7 @@ import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../actions';
 import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
-import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
+import { APP_NAME, IStoreState, MICROPAD_URL } from '../../core/types';
 import * as localforage from 'localforage';
 import { Action, Success } from 'redux-typescript-actions';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
@@ -10,8 +10,8 @@ import * as Materialize from 'materialize-css/dist/js/materialize';
 import { FlatNotepad } from 'upad-parse/dist';
 import { EMPTY } from 'rxjs';
 import { lt as versionLessThan } from 'semver';
-import { ThemeName } from '../types/Themes';
-import { IVersion } from '../reducers/AppReducer';
+import { ThemeName } from '../../core/types/Themes';
+import { IVersion } from '../../core/reducers/AppReducer';
 
 export namespace AppEpics {
 	export const closeDrawingEditorOnZoom$ = (action$, store) =>

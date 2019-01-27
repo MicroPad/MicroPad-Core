@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button, Icon } from 'react-materialize';
 import './RecordingElementComponent.css';
 import { IFileElementComponent } from './FileElementComponent';
-import { BAD_BROWSER_AUDIO } from '../../../types';
+import { BAD_BROWSER_AUDIO } from '../../../../core/types';
 import Recorder from 'opus-recorder';
 
 export default class RecordingElementComponent extends React.Component<IFileElementComponent> {

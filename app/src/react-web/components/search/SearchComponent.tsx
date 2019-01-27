@@ -4,8 +4,8 @@ import { shareReplay } from 'rxjs/operators';
 import { FlatNotepad } from 'upad-parse/dist';
 import { Subscription } from 'rxjs/Subscription';
 import { fromEvent } from 'rxjs';
-import { HashTagSearchResult, HashTagSearchResults } from '../../reducers/SearchReducer';
-import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../../types/ActionTypes';
+import { HashTagSearchResult, HashTagSearchResults } from '../../../core/reducers/SearchReducer';
+import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../../../core/types/ActionTypes';
 
 export interface ISearchComponentProps {
 	notepad?: FlatNotepad;

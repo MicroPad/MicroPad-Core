@@ -3,7 +3,7 @@ import { CSSProperties } from 'react';
 import './NotepadBreadcrumbsComponent.css';
 import { Breadcrumb, MenuItem } from 'react-materialize';
 import { generateGuid } from '../../../util';
-import { ThemeName } from '../../../types/Themes';
+import { ThemeName } from '../../../../core/types/Themes';
 
 export interface INotepadBreadcrumbsProps {
 	themeName: ThemeName;

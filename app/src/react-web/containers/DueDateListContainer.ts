@@ -1,6 +1,6 @@
-import { IStoreState } from '../types';
+import { IStoreState } from '../../core/types';
 import DueDateListComponent, { DueItem, IDueDateListComponentProps } from '../components/explorer/DueDateListComponent';
-import { INotepadStoreState } from '../types/NotepadTypes';
+import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';

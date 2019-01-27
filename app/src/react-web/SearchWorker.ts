@@ -1,6 +1,6 @@
 import * as localforage from 'localforage';
 import { FlatNotepad, Translators, Trie } from 'upad-parse/dist';
-import { SearchIndices } from './types/ActionTypes';
+import { SearchIndices } from '../core/types/ActionTypes';
 
 export async function indexNotepads(indices: SearchIndices) {
 	const NOTEPAD_STORAGE = localforage.createInstance({

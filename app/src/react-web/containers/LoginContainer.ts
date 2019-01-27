@@ -1,4 +1,4 @@
-import { IStoreState } from '../types';
+import { IStoreState } from '../../core/types';
 import {
 	default as LoginComponent,
 	ILoginComponentLocalProps,

@@ -3,9 +3,9 @@ import configureStore from 'redux-mock-store';
 import { ExplorerEpics } from '../ExplorerEpics';
 import { actions } from '../../actions';
 import { cold } from 'jest-marbles';
-import { IStoreState } from '../../types';
+import { IStoreState } from '../../../core/types';
 import { ineeda } from 'ineeda';
-import { NewNotepadObjectAction } from '../../types/ActionTypes';
+import { NewNotepadObjectAction } from '../../../core/types/ActionTypes';
 import { FlatNotepad } from 'upad-parse/dist';
 
 const epic = createEpicMiddleware(ExplorerEpics.explorerEpics$);

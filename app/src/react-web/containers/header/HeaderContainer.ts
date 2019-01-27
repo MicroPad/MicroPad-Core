@@ -2,7 +2,7 @@ import { Action, Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from '../../actions';
 import HeaderComponent, { IHeaderComponentProps } from '../../components/header/HeaderComponent';
-import { IStoreState } from '../../types';
+import { IStoreState } from '../../../core/types';
 import { ThemeValues } from '../../ThemeValues';
 
 export function mapStateToProps({ notepads, app, sync }: IStoreState) {

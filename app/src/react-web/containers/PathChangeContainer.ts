@@ -1,5 +1,5 @@
-import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
-import { IStoreState } from '../types';
+import { INotepadsStoreState, INotepadStoreState } from '../../core/types/NotepadTypes';
+import { IStoreState } from '../../core/types';
 import { connect } from 'react-redux';
 import PathChangeComponent, { IPathChangeComponentProps } from '../components/explorer/PathChangeComponent';
 import { Action, Dispatch } from 'redux';

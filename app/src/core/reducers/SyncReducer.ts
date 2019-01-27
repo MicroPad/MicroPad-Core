@@ -2,7 +2,7 @@ import { SyncedNotepadList, SyncUser } from '../types/SyncTypes';
 import { MicroPadReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
-import { actions } from '../actions';
+import { actions } from '../../react-web/actions';
 
 export interface ISyncState {
 	user?: SyncUser;

@@ -1,8 +1,8 @@
 import { Store } from 'redux';
-import { IStoreState } from './types';
+import { IStoreState } from '../core/types';
 import * as mousetrap from 'mousetrap';
 import { actions } from './actions';
-import { INotepadStoreState } from './types/NotepadTypes';
+import { INotepadStoreState } from '../core/types/NotepadTypes';
 
 export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 	// Fullscreen

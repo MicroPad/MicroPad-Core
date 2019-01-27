@@ -1,5 +1,5 @@
-import { IStoreState } from '../types';
-import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
+import { IStoreState } from '../../core/types';
+import { INotepadsStoreState, INotepadStoreState } from '../../core/types/NotepadTypes';
 import { default as SyncOptionsComponent, ISyncOptionsComponentProps } from '../components/sync/SyncOptionsComponent';
 import { Action, Dispatch } from 'redux';
 import { connect } from 'react-redux';

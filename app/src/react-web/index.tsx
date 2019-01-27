@@ -13,9 +13,9 @@ import './theme-styles/Purple.css';
 /* JS Imports */
 import * as React from 'react';
 import registerServiceWorker from './registerServiceWorker';
-import { APP_NAME, IAppWindow, IStoreState, MICROPAD_URL } from './types';
+import { APP_NAME, IAppWindow, IStoreState, MICROPAD_URL } from '../core/types';
 import { applyMiddleware, createStore } from 'redux';
-import { BaseReducer } from './reducers/BaseReducer';
+import { BaseReducer } from '../core/reducers/BaseReducer';
 import { epicMiddleware } from './epics';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import * as localforage from 'localforage';
@@ -30,12 +30,12 @@ import * as QueryString from 'querystring';
 import * as PasteImage from 'paste-image';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
-import { SyncUser } from './types/SyncTypes';
-import { INotepadStoreState } from './types/NotepadTypes';
+import { SyncUser } from '../core/types/SyncTypes';
+import { INotepadStoreState } from '../core/types/NotepadTypes';
 import { cleanHangingAssets } from './util';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 import InsertElementComponent from './containers/InsertElementContainer';
-import { ThemeName } from './types/Themes';
+import { ThemeName } from '../core/types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './ToastEventHandler';
 

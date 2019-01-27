@@ -3,12 +3,12 @@ import { catchError, concatMap, filter, map, mergeMap, switchMap, tap } from 'rx
 import { from, Observable, of } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
-import { INotepadStoreState } from '../types/NotepadTypes';
+import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import { dataURItoBlob, generateGuid, isAction } from '../util';
 import saveAs from 'save-as';
 import { ASSET_STORAGE } from '..';
-import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
-import { IStoreState } from '../types';
+import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } from '../../core/types/ActionTypes';
+import { IStoreState } from '../../core/types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { Store } from 'redux';

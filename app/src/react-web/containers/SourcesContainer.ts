@@ -1,4 +1,4 @@
-import { IStoreState } from '../types';
+import { IStoreState } from '../../core/types';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
 import SourcesComponent, { ISourcesComponent } from '../components/note-viewer/SourcesComponent';

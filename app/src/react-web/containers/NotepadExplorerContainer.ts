@@ -1,7 +1,7 @@
-import { IStoreState } from '../types';
+import { IStoreState } from '../../core/types';
 import { connect } from 'react-redux';
 import NotepadExplorerComponent, { INotepadExplorerComponentProps } from '../components/explorer/NotepadExplorerComponent';
-import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
+import { INotepadsStoreState, INotepadStoreState } from '../../core/types/NotepadTypes';
 import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 import { FlatNotepad, Note } from 'upad-parse/dist';

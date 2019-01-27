@@ -1,5 +1,5 @@
 import { MicroPadReducer } from '../types/ReducerType';
-import { actions } from '../actions';
+import { actions } from '../../react-web/actions';
 import { NoteElement } from 'upad-parse/dist/Note';
 
 export interface IPrintStoreState {
