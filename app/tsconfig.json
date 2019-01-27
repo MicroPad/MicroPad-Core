@@ -1,36 +1,36 @@
 {
-	"compilerOptions": {
-		"outDir": "build/dist",
-		"module": "esnext",
-		"target": "es5",
-		"lib": [
-			"es2017",
-			"dom"
-		],
-		"sourceMap": true,
-		"allowJs": true,
-		"jsx": "react",
-		"moduleResolution": "node",
-		"rootDir": "src",
-		"forceConsistentCasingInFileNames": true,
-		"noImplicitReturns": true,
-		"noImplicitThis": true,
-		"noImplicitAny": false,
-		"strictNullChecks": true,
-		"suppressImplicitAnyIndexErrors": true,
-		"noUnusedLocals": false,
-		"baseUrl": ".",
-		"experimentalDecorators": true
-	},
-	"exclude": [
-		"node_modules",
-		"build",
-		"scripts",
-		"acceptance-tests",
-		"webpack",
-		"jest",
-		"src/setupTests.ts",
-		"public/",
-		"config-overrides.js"
-	]
+  "compilerOptions": {
+	"outDir": "build/dist",
+	"module": "esnext",
+	"target": "es5",
+	"lib": [
+	  "es2017",
+	  "dom"
+	],
+	"sourceMap": true,
+	"allowJs": true,
+	"jsx": "react",
+	"moduleResolution": "node",
+	"rootDir": "src",
+	"forceConsistentCasingInFileNames": true,
+	"noImplicitReturns": true,
+	"noImplicitThis": true,
+	"noImplicitAny": false,
+	"strictNullChecks": true,
+	"suppressImplicitAnyIndexErrors": true,
+	"noUnusedLocals": false,
+	"baseUrl": ".",
+	"experimentalDecorators": true
+  },
+  "exclude": [
+	"node_modules",
+	"build",
+	"scripts",
+	"acceptance-tests",
+	"webpack",
+	"jest",
+	"src/react-web/setupTests.ts",
+	"public/",
+	"config-overrides.js"
+  ]
 }
