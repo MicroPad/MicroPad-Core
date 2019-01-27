@@ -1,12 +1,12 @@
 import { SearchEpics } from '../SearchEpics';
 import { ActionsObservable } from 'redux-observable';
-import { actions } from '../../../core/actions';
+import { actions } from '../../actions';
 import { ineeda } from 'ineeda';
 import { Action } from 'redux-typescript-actions';
 import { ElementArgs } from 'upad-parse/dist/Note';
 import { FlatNotepad, Note, Trie } from 'upad-parse/dist';
-import { HashTagSearchResults } from '../../../core/reducers/SearchReducer';
-import { IStoreState } from '../../../core/types';
+import { HashTagSearchResults } from '../../reducers/SearchReducer';
+import { IStoreState } from '../../types';
 import { Store } from 'redux';
 
 describe('search$', () => {

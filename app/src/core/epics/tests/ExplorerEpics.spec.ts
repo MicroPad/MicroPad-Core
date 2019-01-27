@@ -1,11 +1,11 @@
 import { ActionsObservable, createEpicMiddleware } from 'redux-observable';
 import configureStore from 'redux-mock-store';
 import { ExplorerEpics } from '../ExplorerEpics';
-import { actions } from '../../../core/actions';
+import { actions } from '../../actions';
 import { cold } from 'jest-marbles';
-import { IStoreState } from '../../../core/types';
+import { IStoreState } from '../../types';
 import { ineeda } from 'ineeda';
-import { NewNotepadObjectAction } from '../../../core/types/ActionTypes';
+import { NewNotepadObjectAction } from '../../types/ActionTypes';
 import { FlatNotepad } from 'upad-parse/dist';
 
 const epic = createEpicMiddleware(ExplorerEpics.explorerEpics$);
