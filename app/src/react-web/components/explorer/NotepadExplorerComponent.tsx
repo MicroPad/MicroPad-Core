@@ -36,6 +36,7 @@ export interface INotepadExplorerComponentProps {
 	newSection?: (obj: NewNotepadObjectAction) => void;
 	newNote?: (obj: NewNotepadObjectAction) => void;
 	print?: () => void;
+	encrypt?: (notepad: Notepad) => void;
 }
 
 export default class NotepadExplorerComponent extends React.Component<INotepadExplorerComponentProps> {
@@ -53,7 +54,8 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 			renameNotepad,
 			expandAll,
 			expandFromNote,
-			collapseAll
+			collapseAll,
+			encrypt
 		} = this.props;
 		this.openSections = new Set<string>(this.props.openSections);
 
@@ -85,7 +87,8 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 								colour={theme.explorerContent}
 								deleteNotepad={deleteNotepad}
 								exportNotepad={exportNotepad}
-								renameNotepad={renameNotepad}/>
+								renameNotepad={renameNotepad}
+								encrypt={encrypt}/>
 						</strong>
 
 						<p style={{paddingLeft: '10px', marginTop: '0px'}}>

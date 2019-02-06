@@ -18,6 +18,7 @@ export interface IExplorerOptionsComponentProps {
 	renameNotepadObject?: (params: IRenameNotepadObjectAction) => void;
 	loadNote?: () => void;
 	print?: () => void;
+	encrypt?: (notepad: Notepad) => void;
 }
 
 export default class ExplorerOptionsComponent extends React.Component<IExplorerOptionsComponentProps> {
@@ -123,10 +124,12 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 	}
 
 	private encrypt = async () => {
-		const { objToEdit } = this.props;
+		const { objToEdit, encrypt } = this.props;
 		const notepad = objToEdit as Notepad;
 
-		if (!await Dialog.confirm(`Are you sure you want to encrypt '${notepad.title}'?`)) return;
+		if (!encrypt) return;
+
+		if (!await Dialog.confirm(`Are you sure you want to encrypt '${notepad.title}'? This will secure all of your note's text contents and the structure of the notebook. Images and other binary assets are not encrypted.`)) return;
 
 		const passkey = await Dialog.promptSecure('Passkey:');
 		if (!passkey) return;
@@ -136,7 +139,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			return;
 		}
 
-		// TODO: Dispatch an action to actually do the encryption
+		encrypt(notepad);
 	}
 
 	private closeModal = () => {

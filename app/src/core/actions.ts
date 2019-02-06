@@ -20,6 +20,7 @@ import { FlatNotepad, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { HashTagSearchResults } from './reducers/SearchReducer';
 import { ThemeName } from './types/Themes';
+import { NotepadShell } from 'upad-parse/dist/interfaces';
 
 const actionCreator = actionCreatorFactory();
 
@@ -46,6 +47,7 @@ export const actions = {
 	imagePasted: actionCreator.async<string, void, Error>('IMAGE_PASTED'),
 	exportAll: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS'),
 	exportToMarkdown: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS_TO_MD'),
+	encryptNotepad: actionCreator.async<Notepad, NotepadShell, Error>('ENCRYPT_NOTEPAD'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
