@@ -35,7 +35,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 				</Row>
 
 				<Row>
-					<Button className="blue" waves="light" onClick={exportNotepad}>
+					<Button className="blue" waves="light" onClick={this.encrypt}>
 						<Icon left={true}>enhanced_encryption</Icon> Encrypt Notebook
 					</Button>
 
@@ -120,6 +120,23 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			default:
 				break;
 		}
+	}
+
+	private encrypt = async () => {
+		const { objToEdit } = this.props;
+		const notepad = objToEdit as Notepad;
+
+		if (!await Dialog.confirm(`Are you sure you want to encrypt '${notepad.title}'?`)) return;
+
+		const passkey = await Dialog.promptSecure('Passkey:');
+		if (!passkey) return;
+
+		if (await Dialog.promptSecure('Confirm Passkey:') !== passkey) {
+			Dialog.alert('Your two passkeys did not match');
+			return;
+		}
+
+		// TODO: Dispatch an action to actually do the encryption
 	}
 
 	private closeModal = () => {

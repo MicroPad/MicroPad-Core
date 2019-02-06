@@ -26,4 +26,15 @@ export namespace Dialog {
 				});
 			}, 0);
 		});
+
+	export const promptSecure = (message: string): Promise<string> =>
+		new Promise(resolve => {
+			setTimeout(() => {
+				Vex.dialog.open({
+					message,
+					input: '<input name="vex" type="password" class="vex-dialog-prompt-input" />',
+					callback: value => resolve(value.vex)
+				});
+			}, 0);
+		});
 }
