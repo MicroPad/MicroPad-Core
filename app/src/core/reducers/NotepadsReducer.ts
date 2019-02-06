@@ -403,6 +403,17 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 					item: notepad.addNote(note).modified()
 				}
 			};
+		} else if (isType(action, actions.encryptNotepad.done)) {
+			if (!state.notepad || !state.notepad.item) return state;
+			let notepad = state.notepad.item;
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad,
+					item: notepad.clone({ crypto: 'AES-256' }).modified()
+				}
+			};
 		}
 
 		return Object.freeze(state);

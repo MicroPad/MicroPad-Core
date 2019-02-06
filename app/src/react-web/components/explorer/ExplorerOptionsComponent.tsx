@@ -18,7 +18,7 @@ export interface IExplorerOptionsComponentProps {
 	renameNotepadObject?: (params: IRenameNotepadObjectAction) => void;
 	loadNote?: () => void;
 	print?: () => void;
-	encrypt?: (notepad: Notepad) => void;
+	encrypt?: (notepad: Notepad, passkey: string) => void;
 }
 
 export default class ExplorerOptionsComponent extends React.Component<IExplorerOptionsComponentProps> {
@@ -139,7 +139,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			return;
 		}
 
-		encrypt(notepad);
+		encrypt(notepad, passkey);
 	}
 
 	private closeModal = () => {

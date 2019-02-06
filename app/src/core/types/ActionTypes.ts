@@ -66,6 +66,11 @@ export type MoveNotepadObjectAction = {
 	newParent: string;
 };
 
+export type EncryptNotepadAction = {
+	notepad: Notepad;
+	passkey: string;
+};
+
 export type SearchIndex = { notepad: FlatNotepad, trie: Trie };
 
 export type SearchIndices = SearchIndex[];

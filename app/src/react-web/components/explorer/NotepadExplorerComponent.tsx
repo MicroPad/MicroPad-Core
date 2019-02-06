@@ -36,7 +36,7 @@ export interface INotepadExplorerComponentProps {
 	newSection?: (obj: NewNotepadObjectAction) => void;
 	newNote?: (obj: NewNotepadObjectAction) => void;
 	print?: () => void;
-	encrypt?: (notepad: Notepad) => void;
+	encrypt?: (notepad: Notepad, passkey: string) => void;
 }
 
 export default class NotepadExplorerComponent extends React.Component<INotepadExplorerComponentProps> {
