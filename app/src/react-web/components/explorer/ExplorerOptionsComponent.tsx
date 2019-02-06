@@ -28,8 +28,21 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 
 		const notepadOptions: JSX.Element = (
 			<div>
-				<Row><Button className="blue" waves="light" onClick={exportNotepad}><Icon
-					left={true}>file_download</Icon> Export Notepad</Button></Row>
+				<Row>
+					<Button className="blue" waves="light" onClick={exportNotepad}>
+						<Icon left={true}>file_download</Icon> Export Notebook
+					</Button>
+				</Row>
+
+				<Row>
+					<Button className="blue" waves="light" onClick={exportNotepad}>
+						<Icon left={true}>enhanced_encryption</Icon> Encrypt Notebook
+					</Button>
+
+					<p>
+						<em>Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.</em>
+					</p>
+				</Row>
 			</div>
 		);
 
