@@ -7,23 +7,26 @@ import { ASSET_STORAGE, NOTEPAD_STORAGE } from '..';
 import { IStoreState } from '../../core/types';
 import { ICurrentNoteState } from '../../core/reducers/NoteReducer';
 import * as localforage from 'localforage';
-import { from, of } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { Dialog } from '../dialogs';
 import { ISyncedNotepad } from '../../core/types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { getUsedAssets } from '../util';
+import { Store } from 'redux';
 
 let currentNotepadTitle = '';
 
-const saveNotepad$ = action$ =>
+const saveNotepad$ = (action$: Observable<Action<Notepad>>, store: Store<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<Notepad>) => isType(action, actions.saveNotepad.started)),
 		map((action: Action<Notepad>) => action.payload),
-		switchMap((notepad: Notepad) => from((async () => {
-			// TODO: get passkey from redux
-			await NOTEPAD_STORAGE.setItem(notepad.title, await notepad.toJson());
-		})())),
+		switchMap((notepad: Notepad) => from((async () =>
+			await NOTEPAD_STORAGE.setItem(
+				notepad.title,
+				await notepad.toJson(store.getState().notepadPasskeys[notepad.title])
+			)
+		)())),
 		catchError(err => of(actions.saveNotepad.failed({ params: <Notepad> {}, error: err }))),
 		map(() => actions.saveNotepad.done({ params: <Notepad> {}, result: undefined }))
 	);

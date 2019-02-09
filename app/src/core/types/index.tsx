@@ -7,10 +7,11 @@ import { IPrintStoreState } from '../reducers/PrintReducer';
 import { ISyncState } from '../reducers/SyncReducer';
 import { IAppStoreState } from '../reducers/AppReducer';
 import { IsExportingState } from '../reducers/IsExportingReducer';
+import { NotepadPasskeysState } from '../reducers/NotepadPasskeysReducer';
 
 export interface IStoreState {
 	readonly app: IAppStoreState;
-	readonly notepadPasskeys?: string[];
+	readonly notepadPasskeys: NotepadPasskeysState;
 	readonly notepads: INotepadsStoreState;
 	readonly currentNote: ICurrentNoteState;
 	readonly explorer: IExplorerState;

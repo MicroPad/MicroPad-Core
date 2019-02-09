@@ -58,6 +58,7 @@ export function getAsBase64(blob: Blob): Promise<string> {
  * Clean up all the assets that aren't in any notepads yet
  */
 export async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage): Promise<void> {
+	return; // TODO: handle crypto
 	const notepads: Promise<Notepad>[] = [];
 	await notepadStorage.iterate((json: string) => {
 		notepads.push(Translators.Json.toNotepadFromNotepad(json));
@@ -111,7 +112,7 @@ export function getUsedAssets(notepad: FlatNotepad): Set<string> {
  * Safely travel through data that could be undefined
  */
 export function elvis(obj: any): any {
-	return new Proxy(obj, {
+	return new Proxy(typeof obj === 'object' ? { ...obj } : obj, {
 		get: (target: object, key: PropertyKey): any => {
 			// Thanks to https://www.beyondjava.net/elvis-operator-aka-safe-navigation-javascript-typescript
 			const res = target[key];

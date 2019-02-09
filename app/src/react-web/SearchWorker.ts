@@ -10,24 +10,27 @@ export async function indexNotepads(indices: SearchIndices) {
 	});
 	await NOTEPAD_STORAGE.ready();
 
-	const notepads: Promise<FlatNotepad>[] = [];
+	const notepads: Promise<FlatNotepad | void>[] = [];
 	await NOTEPAD_STORAGE.iterate((json) => {
-		try {
-			notepads.push(Translators.Json.toFlatNotepadFromNotepad(json));
-		} catch (e) {
-			console.warn(`Couldn't parse notepad: ${e}`);
-		}
+		notepads.push(
+			Translators.Json.toFlatNotepadFromNotepad(json)
+				.catch(e =>
+					console.warn(`Couldn't parse notepad: ${e}`)
+				)
+		);
 		return;
 	});
 
 	return Promise.all(notepads)
 		.then(resolvedNotepads =>
-			resolvedNotepads.map(notepad => {
-				if (!!indices[notepad.title] && !indices[notepad.title].shouldReindex(new Date(), Object.keys(notepad.notes).length)) {
-					return { notepad: notepad, trie: indices[notepad.title] };
-				}
+			resolvedNotepads
+				.filter(notepad => !!notepad)
+				.map((notepad: FlatNotepad) => {
+					if (!!indices[notepad.title] && !indices[notepad.title].shouldReindex(new Date(), Object.keys(notepad.notes).length)) {
+						return { notepad: notepad, trie: indices[notepad.title] };
+					}
 
-				return { notepad: notepad, trie: Trie.buildTrie(notepad.notes) };
-			})
+					return { notepad: notepad, trie: Trie.buildTrie(notepad.notes) };
+				})
 		);
 }
