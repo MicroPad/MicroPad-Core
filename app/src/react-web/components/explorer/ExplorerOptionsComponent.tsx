@@ -40,6 +40,10 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 						<Icon left={true}>enhanced_encryption</Icon> Encrypt Notebook
 					</Button>
 
+					{!!(objToEdit as Notepad).crypto && <p>
+						This notebook is currently secured with {(objToEdit as Notepad).crypto}.
+					</p>}
+
 					<p>
 						<em>Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.</em>
 					</p>
@@ -54,7 +58,6 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 					this.closeModal();
 					setTimeout(() => print!(), 500);
 				}}>Export/Print Note (PDF)</Button></Row>
-				<p>If you want to generate a nice PDF using {APP_NAME}-markdown, try out <a target="_blank" rel="nofollow noreferrer" href="https://github.com/NickGeek/abstract">Abstract</a>.</p>
 			</div>
 		);
 

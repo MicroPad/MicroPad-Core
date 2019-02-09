@@ -125,7 +125,7 @@ export function getStorage(): { [name: string]: LocalForage } {
 async function hydrateStoreFromLocalforage() {
 	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), SYNC_STORAGE.ready()]);
 
-	await cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE);
+	await cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store);
 
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));

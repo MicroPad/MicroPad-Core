@@ -1,9 +1,10 @@
 import * as localforage from 'localforage';
 import { FlatNotepad, Translators, Trie } from 'upad-parse/dist';
 import { SearchIndices } from '../core/types/ActionTypes';
+import { NotepadPasskeysState } from '../core/reducers/NotepadPasskeysReducer';
+import { NotepadShell } from 'upad-parse/dist/interfaces';
 
-// TODO: I'm gonna need some crypto handling here too
-export async function indexNotepads(indices: SearchIndices) {
+export async function indexNotepads(indices: SearchIndices, passkeys: NotepadPasskeysState) {
 	const NOTEPAD_STORAGE = localforage.createInstance({
 		name: 'MicroPad',
 		storeName: 'notepads'
@@ -11,9 +12,16 @@ export async function indexNotepads(indices: SearchIndices) {
 	await NOTEPAD_STORAGE.ready();
 
 	const notepads: Promise<FlatNotepad | void>[] = [];
-	await NOTEPAD_STORAGE.iterate((json) => {
+	await NOTEPAD_STORAGE.iterate((json: string) => {
+		let shell: NotepadShell;
+		try {
+			shell = JSON.parse(json);
+		} catch (ignored) {
+			return;
+		}
+
 		notepads.push(
-			Translators.Json.toFlatNotepadFromNotepad(json)
+			Translators.Json.toFlatNotepadFromNotepad(shell, passkeys[shell.title])
 				.catch(e =>
 					console.warn(`Couldn't parse notepad: ${e}`)
 				)

@@ -24,7 +24,7 @@ export namespace SearchEpics {
 			isAction(actions.indexNotepads.started),
 			map(() => store.getState().search.indices),
 			switchMap((indices: SearchIndices) =>
-				from(indexNotepads(indices)).pipe(
+				from(indexNotepads(indices, store.getState().notepadPasskeys)).pipe(
 					map(newIndices => actions.indexNotepads.done({ params: undefined, result: newIndices })),
 					catchError(err => of(actions.indexNotepads.failed({ params: undefined, error: err })))
 				)

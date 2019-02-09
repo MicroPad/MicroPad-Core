@@ -56,7 +56,7 @@
 		"semver": "^5.6.0",
 		"showdown": "^1.8.6",
 		"twemoji": "^11.0.1",
-		"upad-parse": "^6.0.0",
+		"upad-parse": "^6.0.3",
 		"vex-dialog": "^1.1.0",
 		"vex-js": "^4.1.0"
 	},
