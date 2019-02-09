@@ -11,9 +11,11 @@ import { PrintReducer } from './PrintReducer';
 import { SyncReducer } from './SyncReducer';
 import { AppReducer } from './AppReducer';
 import { IsExportingReducer } from './IsExportingReducer';
+import { NotepadPasskeysReducer } from './NotepadPasskeysReducer';
 
 export const REDUCERS: Array<MicroPadReducer<any>> = [
 	new AppReducer(),
+	new NotepadPasskeysReducer(),
 	new NotepadsReducer(),
 	new NoteReducer(),
 	new ExplorerReducer(),

@@ -2,6 +2,7 @@ import * as localforage from 'localforage';
 import { FlatNotepad, Translators, Trie } from 'upad-parse/dist';
 import { SearchIndices } from '../core/types/ActionTypes';
 
+// TODO: I'm gonna need some crypto handling here too
 export async function indexNotepads(indices: SearchIndices) {
 	const NOTEPAD_STORAGE = localforage.createInstance({
 		name: 'MicroPad',
@@ -9,7 +10,7 @@ export async function indexNotepads(indices: SearchIndices) {
 	});
 	await NOTEPAD_STORAGE.ready();
 
-	const notepads: FlatNotepad[] = [];
+	const notepads: Promise<FlatNotepad>[] = [];
 	await NOTEPAD_STORAGE.iterate((json) => {
 		try {
 			notepads.push(Translators.Json.toFlatNotepadFromNotepad(json));
@@ -19,12 +20,14 @@ export async function indexNotepads(indices: SearchIndices) {
 		return;
 	});
 
-	return notepads
-		.map(notepad => {
-			if (!!indices[notepad.title] && !indices[notepad.title].shouldReindex(new Date(), Object.keys(notepad.notes).length)) {
-				return { notepad: notepad, trie: indices[notepad.title] };
-			}
+	return Promise.all(notepads)
+		.then(resolvedNotepads =>
+			resolvedNotepads.map(notepad => {
+				if (!!indices[notepad.title] && !indices[notepad.title].shouldReindex(new Date(), Object.keys(notepad.notes).length)) {
+					return { notepad: notepad, trie: indices[notepad.title] };
+				}
 
-			return { notepad: notepad, trie: Trie.buildTrie(notepad.notes) };
-		});
+				return { notepad: notepad, trie: Trie.buildTrie(notepad.notes) };
+			})
+		);
 }

@@ -47,7 +47,6 @@ export const actions = {
 	imagePasted: actionCreator.async<string, void, Error>('IMAGE_PASTED'),
 	exportAll: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS'),
 	exportToMarkdown: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS_TO_MD'),
-	encryptNotepad: actionCreator.async<EncryptNotepadAction, NotepadShell, Error>('ENCRYPT_NOTEPAD'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
@@ -96,5 +95,6 @@ export const actions = {
 	moveNotepadObject: actionCreator<MoveNotepadObjectAction>('MOVE_NOTEPAD_OBJECT'),
 	quickMarkdownInsert: actionCreator<void>('QUICK_MARKDOWN_INSERT'),
 	quickNotepad: actionCreator<void>('QUICK_NOTEPAD'),
-	flashExplorer: actionCreator<void>('FLASH_EXPLORER')
+	flashExplorer: actionCreator<void>('FLASH_EXPLORER'),
+	encryptNotepad: actionCreator<string>('ENCRYPT_NOTEPAD')
 };

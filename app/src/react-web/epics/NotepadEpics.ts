@@ -96,9 +96,9 @@ const restoreJsonNotepad$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.restoreJsonNotepad)),
 		map((action: Action<string>) => action.payload),
-		map((json: string) => {
+		switchMap((json: string) => from((async () => {
 			try {
-				const notepad: FlatNotepad = Translators.Json.toFlatNotepadFromNotepad(json);
+				const notepad: FlatNotepad = await Translators.Json.toFlatNotepadFromNotepad(json);
 
 				return actions.parseNpx.done({
 					params: '',
@@ -112,7 +112,7 @@ const restoreJsonNotepad$ = action$ =>
 					error: err
 				});
 			}
-		})
+		})()))
 	);
 
 const restoreJsonNotepadAndLoadNote$ = (action$, _, { getStorage }) =>
@@ -121,7 +121,7 @@ const restoreJsonNotepadAndLoadNote$ = (action$, _, { getStorage }) =>
 		map((action: Action<RestoreJsonNotepadAndLoadNoteAction>) => action.payload),
 		switchMap((result: RestoreJsonNotepadAndLoadNoteAction) =>
 			from((getStorage().notepadStorage as LocalForage).getItem(result.notepadTitle)).pipe(
-				map((notepadJson: string) => Translators.Json.toFlatNotepadFromNotepad(notepadJson)),
+				switchMap((notepadJson: string) => from(Translators.Json.toFlatNotepadFromNotepad(notepadJson))),
 				map((notepad: FlatNotepad) => [result.noteRef, notepad]),
 				catchError(err => {
 					console.error(err);
@@ -170,9 +170,9 @@ const exportAll$ = (action$, store) =>
 			return from(Promise.all(notepadsInStorage));
 		}),
 		switchMap((notepads: string[]) => {
-			const pendingXml = notepads.map((notepadJSON: string) => {
-				const notepad = Translators.Json.toNotepadFromNotepad(notepadJSON);
-				return getNotepadXmlWithAssets(notepad);
+			const pendingXml = notepads.map(async (notepadJSON: string) => {
+				const notepad = await Translators.Json.toNotepadFromNotepad(notepadJSON);
+				return await getNotepadXmlWithAssets(notepad);
 			});
 
 			return from(Promise.all(pendingXml));
@@ -210,9 +210,9 @@ const exportAllToMarkdown$ = (action$, store) =>
 			return from(Promise.all(notepadsInStorage));
 		}),
 		switchMap((notepads: string[]) => {
-			const pendingContent = notepads.map((notepadJSON: string) => {
-				const notepad = Translators.Json.toNotepadFromNotepad(notepadJSON);
-				return getNotepadMarkdownWithAssets(notepad);
+			const pendingContent = notepads.map(async (notepadJSON: string) => {
+				const notepad = await Translators.Json.toNotepadFromNotepad(notepadJSON);
+				return await getNotepadMarkdownWithAssets(notepad);
 			});
 
 			return from(Promise.all(pendingContent));

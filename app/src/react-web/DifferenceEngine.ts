@@ -51,6 +51,7 @@ export namespace DifferenceEngine {
 		export const getAssetDownloadLinks = (syncId: string, assets: string[]): Observable<AssetList> =>
 			call<{ urlList: AssetList }>('download_assets', syncId, { assets: JSON.stringify(assets) }).pipe(map(res => res.urlList));
 
+		// TODO: Encryption needs to happen before this point
 		export const uploadNotepad = (syncId: string, notepad: ISyncedNotepad): Observable<AssetList> =>
 			call<{ assetsToUpload: AssetList }>('upload', syncId, {
 				notepadV2: JSON.stringify(notepad, (k, v) => (k === 'parent') ? undefined : v) // Remove parent links here, unneeded content

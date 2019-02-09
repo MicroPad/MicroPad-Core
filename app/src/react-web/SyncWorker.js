@@ -13,7 +13,7 @@ export async function toSyncedNotepad(notepad) {
 
 	const assetHashes = {};
 
-	notepad = Translators.Json.toNotepadFromNotepad(notepad);
+	notepad = await Translators.Json.toNotepadFromNotepad(notepad);
 	const npAssets = Array.from(getUsedAssets(notepad.flatten()));
 
 	// Get assets from storage as base64

@@ -13,7 +13,6 @@ import { ISyncedNotepad } from '../../core/types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { getUsedAssets } from '../util';
-import { encrypt } from 'upad-parse/dist/crypto';
 
 let currentNotepadTitle = '';
 
@@ -21,18 +20,10 @@ const saveNotepad$ = action$ =>
 	action$.pipe(
 		filter((action: Action<Notepad>) => isType(action, actions.saveNotepad.started)),
 		map((action: Action<Notepad>) => action.payload),
-		switchMap((notepad: Notepad) => {
-			if (!notepad.crypto) {
-				return from(NOTEPAD_STORAGE.setItem(notepad.title, notepad.toJson()));
-			} else {
-				// TODO: grab the passkey from redux
-				return from(encrypt(notepad, '123')).pipe(
-					switchMap(encryptedNotepad => from(
-						NOTEPAD_STORAGE.setItem(notepad.title, JSON.stringify(encryptedNotepad, (k, v) => (k === 'parent') ? undefined : v))
-					))
-				);
-			}
-		}),
+		switchMap((notepad: Notepad) => from((async () => {
+			// TODO: get passkey from redux
+			await NOTEPAD_STORAGE.setItem(notepad.title, await notepad.toJson());
+		})())),
 		catchError(err => of(actions.saveNotepad.failed({ params: <Notepad> {}, error: err }))),
 		map(() => actions.saveNotepad.done({ params: <Notepad> {}, result: undefined }))
 	);

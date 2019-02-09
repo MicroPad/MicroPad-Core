@@ -58,16 +58,17 @@ export function getAsBase64(blob: Blob): Promise<string> {
  * Clean up all the assets that aren't in any notepads yet
  */
 export async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage): Promise<void> {
-	const notepads: Notepad[] = [];
+	const notepads: Promise<Notepad>[] = [];
 	await notepadStorage.iterate((json: string) => {
 		notepads.push(Translators.Json.toNotepadFromNotepad(json));
 		return;
 	});
 
 	const allUsedAssets: Set<string> = new Set<string>();
+	const resolvedNotepads = await Promise.all(notepads);
 
 	// Handle deletion of unused assets, same as what's done in the epic
-	for (let notepad of notepads) {
+	for (let notepad of resolvedNotepads) {
 		const assets = notepad.notepadAssets;
 		const usedAssets = getUsedAssets(notepad.flatten());
 		const unusedAssets = assets.filter(uuid => !usedAssets.has(uuid));

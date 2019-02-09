@@ -10,6 +10,7 @@ import { IsExportingState } from '../reducers/IsExportingReducer';
 
 export interface IStoreState {
 	readonly app: IAppStoreState;
+	readonly notepadPasskeys?: string[];
 	readonly notepads: INotepadsStoreState;
 	readonly currentNote: ICurrentNoteState;
 	readonly explorer: IExplorerState;
