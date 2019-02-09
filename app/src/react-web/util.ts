@@ -107,6 +107,21 @@ export function getUsedAssets(notepad: FlatNotepad): Set<string> {
 	);
 }
 
+/**
+ * Safely travel through data that could be undefined
+ */
+export function elvis(obj: any): any {
+	return new Proxy(obj, {
+		get: (target: object, key: PropertyKey): any => {
+			// Thanks to https://www.beyondjava.net/elvis-operator-aka-safe-navigation-javascript-typescript
+			const res = target[key];
+			if (!!res) return res instanceof Object ? elvis(res) : res;
+
+			return elvis(undefined);
+		}
+	});
+}
+
 // Thanks to http://stackoverflow.com/a/12300351/998467
 export function dataURItoBlob(dataURI: string) {
 	// convert base64 to raw binary data held in a string

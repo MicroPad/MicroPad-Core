@@ -71,6 +71,11 @@ export type EncryptNotepadAction = {
 	passkey: string;
 };
 
+export type AddCryptoPasskeyAction = {
+	notepadTitle?: string;
+	passkey: string;
+};
+
 export type SearchIndex = { notepad: FlatNotepad, trie: Trie };
 
 export type SearchIndices = SearchIndex[];
