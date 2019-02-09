@@ -8914,10 +8914,10 @@ unzip-response@^2.0.1:
   resolved "https://registry.yarnpkg.com/unzip-response/-/unzip-response-2.0.1.tgz#d2f0f737d16b0615e72a6935ed04214572d56f97"
   integrity sha1-0vD3N9FrBhXnKmk17QQhRXLVb5c=
 
-upad-parse@^6.0.3:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-6.0.3.tgz#1f5c0557717e184ce496e6c02768584902a5772e"
-  integrity sha512-ey/scLUCr9FDXCXDiTPRKmUo++eH2zmuMkjks/7XQLpfWqLM5GNzezhzn8NulDaP+vUzs6UYvWKfeAfvKgfWAw==
+upad-parse@^6.0.4:
+  version "6.0.4"
+  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-6.0.4.tgz#c3a3b39029671de60a176e13a64e4e1da9435e5a"
+  integrity sha512-JCRlivLG12iQ+8Im/rrpM5Fm04KoJPN2pfWm8aJyp3TwK5hUYVUcCxIw7ketEkSs4nC/1gn78PE8nrgZqsAuEA==
   dependencies:
     aes-js "^3.1.2"
     date-fns "^1.29.0"
