@@ -52,10 +52,10 @@ export namespace SyncEpics {
 			)
 		);
 
-	export const actWithSyncNotepad$ = (action$, store) =>
+	export const actWithSyncNotepad$ = (action$, store: Store<IStoreState>) =>
 		action$.pipe(
 			isAction(actions.actWithSyncNotepad),
-			filter(() => !!(store as Store<IStoreState>).getState().sync.user),
+			filter(() => !!store.getState().sync.user),
 			map((action: Action<NotepadToSyncNotepadAction>) => action.payload),
 			switchMap((payload: NotepadToSyncNotepadAction) =>
 				from(DifferenceEngine.SyncService.notepadToSyncedNotepad(payload.notepad)).pipe(
@@ -166,7 +166,7 @@ export namespace SyncEpics {
 			)
 		);
 
-	export const upload$ = (action$, store) =>
+	export const upload$ = (action$, store: Store<IStoreState>) =>
 		action$.pipe(
 			isAction(actions.syncUpload.started),
 			tap(() => uploadCount$.next(uploadCount$.getValue() + 1)),
@@ -180,7 +180,7 @@ export namespace SyncEpics {
 						throw 'too many assets';
 					}),
 					concatMap(() =>
-						DifferenceEngine.SyncService.uploadNotepad(payload.syncId, payload.notepad)
+						DifferenceEngine.SyncService.uploadNotepad(payload.syncId, payload.notepad, store.getState().notepadPasskeys[payload.notepad.title])
 							.pipe(
 								concatMap((assetList: AssetList) => from((async () => {
 									const requests: UploadAssetAction[] = [];

@@ -1,6 +1,7 @@
 import actionCreatorFactory from 'redux-typescript-actions';
 import { IRenameNotepadObjectAction } from './types/NotepadTypes';
 import {
+	AddCryptoPasskeyAction,
 	AddToSyncAction,
 	DeleteElementAction,
 	ExpandFromNoteAction,
@@ -94,5 +95,7 @@ export const actions = {
 	moveNotepadObject: actionCreator<MoveNotepadObjectAction>('MOVE_NOTEPAD_OBJECT'),
 	quickMarkdownInsert: actionCreator<void>('QUICK_MARKDOWN_INSERT'),
 	quickNotepad: actionCreator<void>('QUICK_NOTEPAD'),
-	flashExplorer: actionCreator<void>('FLASH_EXPLORER')
+	flashExplorer: actionCreator<void>('FLASH_EXPLORER'),
+	encryptNotepad: actionCreator<string>('ENCRYPT_NOTEPAD'),
+	addCryptoPasskey: actionCreator<AddCryptoPasskeyAction>('ADD_CRYPTO_PASSKEY')
 };
