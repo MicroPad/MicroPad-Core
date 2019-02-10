@@ -47,7 +47,8 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepad
 				note: notepad.notes[note.internalRef]
 			}));
 		},
-		print: () => dispatch(actions.print.started(undefined))
+		print: () => dispatch(actions.print.started(undefined)),
+		encrypt: (_, passkey) => dispatch(actions.encryptNotepad(passkey))
 	};
 }
 

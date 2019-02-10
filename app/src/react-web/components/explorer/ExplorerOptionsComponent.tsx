@@ -18,6 +18,7 @@ export interface IExplorerOptionsComponentProps {
 	renameNotepadObject?: (params: IRenameNotepadObjectAction) => void;
 	loadNote?: () => void;
 	print?: () => void;
+	encrypt?: (notepad: Notepad, passkey: string) => void;
 }
 
 export default class ExplorerOptionsComponent extends React.Component<IExplorerOptionsComponentProps> {
@@ -28,8 +29,27 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 
 		const notepadOptions: JSX.Element = (
 			<div>
-				<Row><Button className="blue" waves="light" onClick={exportNotepad}><Icon
-					left={true}>file_download</Icon> Export Notepad</Button></Row>
+				<Row>
+					<Button className="blue" waves="light" onClick={exportNotepad}>
+						<Icon left={true}>file_download</Icon> Export Notebook
+					</Button>
+				</Row>
+
+				<Row>
+					<p><strong>Experimental Options:</strong></p>
+
+					<Button className="blue" waves="light" onClick={this.encrypt}>
+						<Icon left={true}>enhanced_encryption</Icon> Encrypt Notebook
+					</Button>
+
+					{!!(objToEdit as Notepad).crypto && <p>
+						This notebook is currently secured with {(objToEdit as Notepad).crypto}.
+					</p>}
+
+					<p>
+						<em>Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.</em>
+					</p>
+				</Row>
 			</div>
 		);
 
@@ -40,7 +60,6 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 					this.closeModal();
 					setTimeout(() => print!(), 500);
 				}}>Export/Print Note (PDF)</Button></Row>
-				<p>If you want to generate a nice PDF using {APP_NAME}-markdown, try out <a target="_blank" rel="nofollow noreferrer" href="https://github.com/NickGeek/abstract">Abstract</a>.</p>
 			</div>
 		);
 
@@ -107,6 +126,25 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			default:
 				break;
 		}
+	}
+
+	private encrypt = async () => {
+		const { objToEdit, encrypt } = this.props;
+		const notepad = objToEdit as Notepad;
+
+		if (!encrypt) return;
+
+		if (!await Dialog.confirm(`Are you sure you want to encrypt '${notepad.title}'? This will secure all of your note's text contents and the structure of the notebook. Images and other binary assets are not encrypted.`)) return;
+
+		const passkey = await Dialog.promptSecure('Passkey:');
+		if (!passkey) return;
+
+		if (await Dialog.promptSecure('Confirm Passkey:') !== passkey) {
+			Dialog.alert('Your two passkeys did not match');
+			return;
+		}
+
+		encrypt(notepad, passkey);
 	}
 
 	private closeModal = () => {

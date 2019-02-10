@@ -7,20 +7,28 @@ import { ASSET_STORAGE, NOTEPAD_STORAGE } from '..';
 import { IStoreState } from '../../core/types';
 import { ICurrentNoteState } from '../../core/reducers/NoteReducer';
 import * as localforage from 'localforage';
-import { from, of } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { Dialog } from '../dialogs';
 import { ISyncedNotepad } from '../../core/types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { getUsedAssets } from '../util';
+import { getUsedAssets, isAction } from '../util';
+import { Store } from 'redux';
+import { fromShell } from '../CryptoService';
+import { EncryptNotepadAction } from '../../core/types/ActionTypes';
 
 let currentNotepadTitle = '';
 
-const saveNotepad$ = action$ =>
+const saveNotepad$ = (action$: Observable<Action<Notepad>>, store: Store<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<Notepad>) => isType(action, actions.saveNotepad.started)),
 		map((action: Action<Notepad>) => action.payload),
-		switchMap((notepad: Notepad) => from(NOTEPAD_STORAGE.setItem(notepad.title, notepad.toJson()))),
+		switchMap((notepad: Notepad) => from((async () =>
+			await NOTEPAD_STORAGE.setItem(
+				notepad.title,
+				await notepad.toJson(!!notepad.crypto ? store.getState().notepadPasskeys[notepad.title] : undefined)
+			)
+		)())),
 		catchError(err => of(actions.saveNotepad.failed({ params: <Notepad> {}, error: err }))),
 		map(() => actions.saveNotepad.done({ params: <Notepad> {}, result: undefined }))
 	);
@@ -86,17 +94,22 @@ const getNotepadList$ = action$ =>
 		)
 	);
 
-const openNotepadFromStorage$ = action$ =>
+const openNotepadFromStorage$ = (action$: Observable<Action<String>>, store: Store<IStoreState>) =>
 	action$.pipe(
-		filter((action: Action<string>) => isType(action, actions.openNotepadFromStorage.started)),
+		isAction(actions.openNotepadFromStorage.started),
 		map((action: Action<string>) => action.payload),
 		switchMap((notepadTitle: string) =>
 			from(NOTEPAD_STORAGE.getItem(notepadTitle)).pipe(
-				mergeMap((json: string) => [
+				switchMap((json: string) => {
+					return from(fromShell(JSON.parse(json), store.getState().notepadPasskeys[notepadTitle]));
+				}),
+				mergeMap((res: EncryptNotepadAction) => [
+					actions.addCryptoPasskey({ notepadTitle: res.notepad.title, passkey: res.passkey }),
 					actions.openNotepadFromStorage.done({ params: '', result: undefined }),
-					actions.restoreJsonNotepad(json)
+					actions.parseNpx.done({ params: '', result: res.notepad.flatten() }),
 				]),
 				catchError(err => {
+					console.error(err);
 					Dialog.alert(`Error opening notepad`);
 					return of(actions.openNotepadFromStorage.failed(err));
 				})

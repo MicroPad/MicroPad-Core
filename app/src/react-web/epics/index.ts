@@ -13,6 +13,7 @@ import { HelpEpics } from './HelpEpics';
 import { SearchEpics } from '../../core/epics/SearchEpics';
 import { getStorage } from '..';
 import { Action } from 'redux-typescript-actions';
+import { CryptoEpics } from './CryptoEpics';
 
 const baseEpic$ = combineEpics(
 	notepadEpics$,
@@ -23,7 +24,8 @@ const baseEpic$ = combineEpics(
 	ExplorerEpics.explorerEpics$,
 	AppEpics.appEpics$,
 	PrintEpics.printEpics$,
-	SyncEpics.syncEpics$
+	SyncEpics.syncEpics$,
+	CryptoEpics.cryptoEpics$
 );
 
 export const epicMiddleware = createEpicMiddleware<Action<any>, any, {

@@ -28,6 +28,8 @@ import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { RestoreJsonNotepadAndLoadNoteAction } from '../../core/types/ActionTypes';
 import { Store } from 'redux';
 import { format } from 'date-fns';
+import { NotepadShell } from 'upad-parse/dist/interfaces';
+import { fromShell } from '../CryptoService';
 
 const parseQueue: string[] = [];
 
@@ -57,13 +59,16 @@ const parseNpx$ = action$ =>
 		)
 	);
 
-const syncOnNotepadParsed$ = (action$, store) =>
+const syncOnNotepadParsed$ = (action$, store: Store<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.updateCurrentSyncId),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads.notepad),
 		filter((npState: INotepadStoreState) => !!npState && !!npState.item),
-		map((npState: INotepadStoreState) => actions.actWithSyncNotepad({ notepad: (npState.item!).toNotepad(), action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId: npState.activeSyncId! }) }))
+		map((npState: INotepadStoreState) => actions.actWithSyncNotepad({
+			notepad: (npState.item!).toNotepad(),
+			action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId: npState.activeSyncId! })
+		}))
 	);
 
 const parseEnex$ = action$ =>
@@ -92,36 +97,49 @@ const parseEnex$ = action$ =>
 		)
 	);
 
-const restoreJsonNotepad$ = action$ =>
+const restoreJsonNotepad$ = (action$, store: Store<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.restoreJsonNotepad)),
 		map((action: Action<string>) => action.payload),
-		map((json: string) => {
+		switchMap((json: string) => from((async () => {
 			try {
-				const notepad: FlatNotepad = Translators.Json.toFlatNotepadFromNotepad(json);
+				const shell: NotepadShell = JSON.parse(json);
+				const res = await fromShell(shell);
 
-				return actions.parseNpx.done({
-					params: '',
-					result: notepad
-				});
+				return [
+					actions.addCryptoPasskey({
+						notepadTitle: res.notepad.title,
+						passkey: res.passkey
+					}),
+					actions.parseNpx.done({
+						params: '',
+						result: res.notepad.flatten()
+					})
+				];
 			} catch (err) {
 				Dialog.alert(`Error restoring notepad`);
 				console.error(err);
-				return actions.parseNpx.failed({
+				return [actions.parseNpx.failed({
 					params: '',
 					error: err
-				});
+				})];
 			}
-		})
+		})())),
+		mergeMap((restoreActions: Action<any>[]) => [...restoreActions])
 	);
 
-const restoreJsonNotepadAndLoadNote$ = (action$, _, { getStorage }) =>
+const restoreJsonNotepadAndLoadNote$ = (action$, store: Store<IStoreState>, { getStorage }) =>
 	action$.pipe(
 		isAction(actions.restoreJsonNotepadAndLoadNote),
 		map((action: Action<RestoreJsonNotepadAndLoadNoteAction>) => action.payload),
 		switchMap((result: RestoreJsonNotepadAndLoadNoteAction) =>
 			from((getStorage().notepadStorage as LocalForage).getItem(result.notepadTitle)).pipe(
-				map((notepadJson: string) => Translators.Json.toFlatNotepadFromNotepad(notepadJson)),
+				switchMap((notepadJson: string) =>
+					from(Translators.Json.toFlatNotepadFromNotepad(
+						notepadJson,
+						store.getState().notepadPasskeys[result.notepadTitle]
+					))
+				),
 				map((notepad: FlatNotepad) => [result.noteRef, notepad]),
 				catchError(err => {
 					console.error(err);
@@ -155,7 +173,7 @@ const exportNotepad$ = (action$, store) =>
 		filter(() => false)
 	);
 
-const exportAll$ = (action$, store) =>
+const exportAll$ = (action$, store: Store<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<void>) => isType(action, actions.exportAll.started)),
 		map(() => store.getState()),
@@ -167,30 +185,38 @@ const exportAll$ = (action$, store) =>
 			const notepadsInStorage: Promise<string>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
-			return from(Promise.all(notepadsInStorage));
-		}),
-		switchMap((notepads: string[]) => {
-			const pendingXml = notepads.map((notepadJSON: string) => {
-				const notepad = Translators.Json.toNotepadFromNotepad(notepadJSON);
-				return getNotepadXmlWithAssets(notepad);
-			});
+			return from(Promise.all(notepadsInStorage)).pipe(
+				switchMap((notepads: string[]) => {
+					const pendingXml = notepads.map(async (notepadJSON: string) => {
+						const shell: NotepadShell = JSON.parse(notepadJSON);
 
-			return from(Promise.all(pendingXml));
-		}),
-		switchMap((exportNotepads: IExportedNotepad[]) => {
-			const zip: JSZip = new JSZip();
+						const notepad = (await fromShell(shell, store.getState().notepadPasskeys[shell.title])).notepad;
+						return await getNotepadXmlWithAssets(notepad);
+					});
 
-			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
-				const blob: Blob = new Blob([exportedNotepad.content as string], { type: 'text/xml;charset=utf-8' });
-				zip.file(`${fixFileName(exportedNotepad.title)}.npx`, blob);
-			});
+					return from(Promise.all(pendingXml));
+				}),
+				switchMap((exportNotepads: IExportedNotepad[]) => {
+					const zip: JSZip = new JSZip();
 
-			return from(zip.generateAsync({
-				type: 'blob',
-				compression: 'DEFLATE'
-			})).pipe(
-				map((zipBlob: Blob) => actions.exportAll.done({ params: undefined, result: zipBlob })),
-				catchError(err => of(actions.exportAll.failed({ params: undefined, error: err })))
+					exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
+						const blob: Blob = new Blob([exportedNotepad.content as string], { type: 'text/xml;charset=utf-8' });
+						zip.file(`${fixFileName(exportedNotepad.title)}.npx`, blob);
+					});
+
+					return from(zip.generateAsync({
+						type: 'blob',
+						compression: 'DEFLATE'
+					})).pipe(
+						map((zipBlob: Blob) => actions.exportAll.done({ params: undefined, result: zipBlob })),
+						catchError(err => of(actions.exportAll.failed({ params: undefined, error: err })))
+					);
+				}),
+				catchError(err => {
+					console.error(err);
+					Dialog.alert(err.message);
+					return of(actions.exportAll.failed({ params: undefined, error: err }));
+				})
 			);
 		})
 	);
@@ -207,34 +233,42 @@ const exportAllToMarkdown$ = (action$, store) =>
 			const notepadsInStorage: Promise<string>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
-			return from(Promise.all(notepadsInStorage));
-		}),
-		switchMap((notepads: string[]) => {
-			const pendingContent = notepads.map((notepadJSON: string) => {
-				const notepad = Translators.Json.toNotepadFromNotepad(notepadJSON);
-				return getNotepadMarkdownWithAssets(notepad);
-			});
+			return from(Promise.all(notepadsInStorage)).pipe(
+				switchMap((notepads: string[]) => {
+					const pendingContent = notepads.map(async (notepadJSON: string) => {
+						const shell: NotepadShell = JSON.parse(notepadJSON);
 
-			return from(Promise.all(pendingContent));
-		}),
-		switchMap((exportNotepads: IExportedNotepad[]) => {
-			const zip: JSZip = new JSZip();
+						const notepad = (await fromShell(shell, store.getState().notepadPasskeys[shell.title])).notepad;
+						return await getNotepadMarkdownWithAssets(notepad);
+					});
 
-			exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
-				(<MarkdownNote[]> exportedNotepad.content).forEach(mdNote =>
-					zip.file(
-						`${fixFileName(exportedNotepad.title)}/${fixFileName(mdNote.title)}.md`,
-						new Blob([mdNote.md], { type: 'text/markdown;charset=utf-8' })
-					)
-				);
-			});
+					return from(Promise.all(pendingContent));
+				}),
+				switchMap((exportNotepads: IExportedNotepad[]) => {
+					const zip: JSZip = new JSZip();
 
-			return from(zip.generateAsync({
-				type: 'blob',
-				compression: 'DEFLATE'
-			})).pipe(
-				map((zipBlob: Blob) => actions.exportAll.done({ params: undefined, result: zipBlob })),
-				catchError(err => of(actions.exportAll.failed({ params: undefined, error: err })))
+					exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
+						(<MarkdownNote[]> exportedNotepad.content).forEach(mdNote =>
+							zip.file(
+								`${fixFileName(exportedNotepad.title)}/${fixFileName(mdNote.title)}.md`,
+								new Blob([mdNote.md], { type: 'text/markdown;charset=utf-8' })
+							)
+						);
+					});
+
+					return from(zip.generateAsync({
+						type: 'blob',
+						compression: 'DEFLATE'
+					})).pipe(
+						map((zipBlob: Blob) => actions.exportAll.done({ params: undefined, result: zipBlob })),
+						catchError(err => of(actions.exportAll.failed({ params: undefined, error: err })))
+					);
+				}),
+				catchError(err => {
+					console.error(err);
+					Dialog.alert(err.message);
+					return of(actions.exportToMarkdown.failed({ params: undefined, error: err }));
+				})
 			);
 		})
 	);
