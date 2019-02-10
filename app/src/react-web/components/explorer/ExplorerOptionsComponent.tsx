@@ -36,6 +36,8 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 				</Row>
 
 				<Row>
+					<p><strong>Experimental Options:</strong></p>
+
 					<Button className="blue" waves="light" onClick={this.encrypt}>
 						<Icon left={true}>enhanced_encryption</Icon> Encrypt Notebook
 					</Button>

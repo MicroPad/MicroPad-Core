@@ -1,15 +1,16 @@
 // @ts-ignore
 import SyncWorker from '!workerize-loader!./SyncWorker.js';
 
-import { Observable } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { MICROPAD_URL } from '../core/types';
-import { map, retry } from 'rxjs/operators';
+import { concatMap, map, retry, tap } from 'rxjs/operators';
 import { AssetList, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from '../core/types/SyncTypes';
 import { parse } from 'date-fns';
 import { Base64 } from 'js-base64';
 import * as QueryString from 'querystring';
 import { Notepad } from 'upad-parse/dist';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
+import { encrypt } from 'upad-parse/dist/crypto';
 
 export namespace DifferenceEngine {
 	const SyncThread = new SyncWorker() as ISyncWorker;
@@ -52,14 +53,17 @@ export namespace DifferenceEngine {
 			call<{ urlList: AssetList }>('download_assets', syncId, { assets: JSON.stringify(assets) }).pipe(map(res => res.urlList));
 
 		// TODO: Encryption needs to happen before this point
-		export const uploadNotepad = (syncId: string, notepad: ISyncedNotepad): Observable<AssetList> =>
-			call<{ assetsToUpload: AssetList }>('upload', syncId, {
-				notepadV2: JSON.stringify(notepad, (k, v) => (k === 'parent') ? undefined : v) // Remove parent links here, unneeded content
-					.replace(
-						/[\u007f-\uffff]/g,
-						char => '\\u' + ('0000' + char.charCodeAt(0).toString(16)).slice(-4)
-					) // Fix unicode encoding
-			}).pipe(
+		export const uploadNotepad = (syncId: string, notepad: ISyncedNotepad, passkey?: string): Observable<AssetList> =>
+			from(!!notepad.crypto && !!passkey ? encrypt(notepad, passkey) : of(notepad)).pipe(
+				concatMap(np =>
+					call<{ assetsToUpload: AssetList }>('upload', syncId, {
+						notepadV2: JSON.stringify(np, (k, v) => (k === 'parent') ? undefined : v) // Remove parent links here, unneeded content
+							.replace(
+								/[\u007f-\uffff]/g,
+								char => '\\u' + ('0000' + char.charCodeAt(0).toString(16)).slice(-4)
+							) // Fix unicode encoding
+					})
+				),
 				map(res => res.assetsToUpload)
 			);
 

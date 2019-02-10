@@ -59,13 +59,16 @@ const parseNpx$ = action$ =>
 		)
 	);
 
-const syncOnNotepadParsed$ = (action$, store) =>
+const syncOnNotepadParsed$ = (action$, store: Store<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.updateCurrentSyncId),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads.notepad),
 		filter((npState: INotepadStoreState) => !!npState && !!npState.item),
-		map((npState: INotepadStoreState) => actions.actWithSyncNotepad({ notepad: (npState.item!).toNotepad(), action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId: npState.activeSyncId! }) }))
+		map((npState: INotepadStoreState) => actions.actWithSyncNotepad({
+			notepad: (npState.item!).toNotepad(),
+			action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId: npState.activeSyncId! })
+		}))
 	);
 
 const parseEnex$ = action$ =>
@@ -94,27 +97,35 @@ const parseEnex$ = action$ =>
 		)
 	);
 
-const restoreJsonNotepad$ = action$ =>
+const restoreJsonNotepad$ = (action$, store: Store<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.restoreJsonNotepad)),
 		map((action: Action<string>) => action.payload),
 		switchMap((json: string) => from((async () => {
 			try {
-				const notepad: FlatNotepad = await Translators.Json.toFlatNotepadFromNotepad(json);
+				const shell: NotepadShell = JSON.parse(json);
+				const res = await fromShell(shell);
 
-				return actions.parseNpx.done({
-					params: '',
-					result: notepad
-				});
+				return [
+					actions.addCryptoPasskey({
+						notepadTitle: res.notepad.title,
+						passkey: res.passkey
+					}),
+					actions.parseNpx.done({
+						params: '',
+						result: res.notepad.flatten()
+					})
+				];
 			} catch (err) {
 				Dialog.alert(`Error restoring notepad`);
 				console.error(err);
-				return actions.parseNpx.failed({
+				return [actions.parseNpx.failed({
 					params: '',
 					error: err
-				});
+				})];
 			}
-		})()))
+		})())),
+		mergeMap((restoreActions: Action<any>[]) => [...restoreActions])
 	);
 
 const restoreJsonNotepadAndLoadNote$ = (action$, store: Store<IStoreState>, { getStorage }) =>
@@ -126,8 +137,8 @@ const restoreJsonNotepadAndLoadNote$ = (action$, store: Store<IStoreState>, { ge
 				switchMap((notepadJson: string) =>
 					from(Translators.Json.toFlatNotepadFromNotepad(
 						notepadJson,
-						store.getState().notepadPasskeys[result.notepadTitle])
-					)
+						store.getState().notepadPasskeys[result.notepadTitle]
+					))
 				),
 				map((notepad: FlatNotepad) => [result.noteRef, notepad]),
 				catchError(err => {
