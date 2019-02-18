@@ -412,7 +412,7 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 				notepad: {
 					...state.notepad,
 					item: notepad.clone({
-						crypto: 'AES-256',
+						crypto: 'AES-256-GZ',
 						lastModified: new Date()
 					})
 				}
