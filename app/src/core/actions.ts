@@ -97,5 +97,6 @@ export const actions = {
 	quickNotepad: actionCreator<void>('QUICK_NOTEPAD'),
 	flashExplorer: actionCreator<void>('FLASH_EXPLORER'),
 	encryptNotepad: actionCreator<string>('ENCRYPT_NOTEPAD'),
-	addCryptoPasskey: actionCreator<AddCryptoPasskeyAction>('ADD_CRYPTO_PASSKEY')
+	addCryptoPasskey: actionCreator<AddCryptoPasskeyAction>('ADD_CRYPTO_PASSKEY'),
+	closeNotepad: actionCreator<void>('CLOSE_NOTEPAD')
 };
