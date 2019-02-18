@@ -1,6 +1,6 @@
 import { actions } from '../../core/actions';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
-import { Action, isType } from 'redux-typescript-actions';
+import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '..';
@@ -146,6 +146,29 @@ const deleteNotepad$ = action$ =>
 		filter(() => false)
 	);
 
+const persistLastOpenedNotepad$ = (action$: Observable<Action<Success<string, FlatNotepad>>>) =>
+	action$.pipe(
+		isAction(actions.parseNpx.done),
+		map(action => action.payload.result),
+		tap((notepad: FlatNotepad) =>
+			localforage
+				.setItem('last opened notepad', notepad.title)
+				.catch(() => { return; })
+		),
+		filter(() => false)
+	);
+
+const clearLastOpenedNotepad$ = (action$: Observable<Action<Success<string, FlatNotepad>>>) =>
+	action$.pipe(
+		isAction(actions.closeNotepad, actions.parseNpx.failed),
+		tap(() =>
+			localforage
+				.setItem('last opened notepad', undefined)
+				.catch(() => { return; })
+		),
+		filter(() => false)
+	);
+
 export const storageEpics$ = combineEpics(
 	saveNotepad$,
 	getNotepadList$,
@@ -153,5 +176,7 @@ export const storageEpics$ = combineEpics(
 	deleteNotepad$,
 	saveOnChanges$,
 	saveDefaultFontSize$,
-	cleanUnusedAssets$
+	cleanUnusedAssets$,
+	persistLastOpenedNotepad$,
+	clearLastOpenedNotepad$
 );

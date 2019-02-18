@@ -417,6 +417,11 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 					})
 				}
 			};
+		} else if (isType(action, actions.closeNotepad)) {
+			return {
+				...state,
+				notepad: !!state.notepad ? { ...state.notepad, item: undefined } : undefined
+			};
 		}
 
 		return Object.freeze(state);
