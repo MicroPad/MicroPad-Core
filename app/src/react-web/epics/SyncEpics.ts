@@ -1,15 +1,31 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../../core/actions';
-import { catchError, combineLatest, concatMap, filter, first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import {
+	catchError,
+	combineLatest,
+	concatMap,
+	distinctUntilKeyChanged,
+	filter,
+	first,
+	map,
+	mergeMap,
+	switchMap,
+	tap
+} from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../../core/types/SyncTypes';
 import { ASSET_STORAGE, store as STORE, SYNC_STORAGE, TOAST_HANDLER } from '..';
 import { DifferenceEngine } from '../DifferenceEngine';
 import { Dialog } from '../dialogs';
 import { IStoreState, SYNC_NAME } from '../../core/types';
-import { AddToSyncAction, NotepadToSyncNotepadAction, SyncAction, UploadAssetAction } from '../../core/types/ActionTypes';
-import { BehaviorSubject, EMPTY, from, of } from 'rxjs';
+import {
+	AddToSyncAction,
+	NotepadToSyncNotepadAction,
+	SyncAction,
+	UploadAssetAction
+} from '../../core/types/ActionTypes';
+import { BehaviorSubject, EMPTY, forkJoin, from, of } from 'rxjs';
 import { parse } from 'date-fns';
 import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
@@ -134,7 +150,7 @@ export namespace SyncEpics {
 												)
 											);
 
-										if (downloads$.length > 0) return downloads$;
+										if (downloads$.length > 0) return forkJoin(downloads$) as any;
 										return [of(remoteNotepad)];
 									}),
 									concatMap(assetDownloads => assetDownloads),
@@ -149,6 +165,7 @@ export namespace SyncEpics {
 							})
 						);
 					}),
+					distinctUntilKeyChanged('lastModified'),
 					map((remoteNotepad: ISyncedNotepad) => actions.restoreJsonNotepad(stringify(remoteNotepad))),
 					catchError((error): Observable<Action<any>> => {
 						console.error(error);
