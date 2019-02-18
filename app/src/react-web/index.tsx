@@ -139,6 +139,9 @@ async function hydrateStoreFromLocalforage() {
 
 	const theme = await localforage.getItem<ThemeName>('theme');
 	if (!!theme) store.dispatch(actions.selectTheme(theme));
+
+	const lastOpenedNotepad = await localforage.getItem<string>('last opened notepad');
+	if (!!lastOpenedNotepad) store.dispatch(actions.openNotepadFromStorage.started(lastOpenedNotepad));
 }
 
 async function compatibilityCheck(): Promise<boolean> {

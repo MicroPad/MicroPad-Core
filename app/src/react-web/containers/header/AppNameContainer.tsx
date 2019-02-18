@@ -1,9 +1,17 @@
 import { IStoreState } from '../../../core/types';
 import { connect } from 'react-redux';
-import AppNameComponent from '../../components/header/AppNameComponent/AppNameComponent';
+import AppNameComponent, { IAppNameComponentProps } from '../../components/header/AppNameComponent/AppNameComponent';
+import { Action, Dispatch } from 'redux';
+import { actions } from '../../../core/actions';
 
-export function mapStateToProps({ app }: IStoreState) {
-	return app.version;
+export function mapStateToProps({ app }: IStoreState): IAppNameComponentProps {
+	return { version: app.version };
 }
 
-export default connect(mapStateToProps)(AppNameComponent);
+export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IAppNameComponentProps> {
+	return {
+		closeNotepad: () => dispatch(actions.closeNotepad())
+	};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppNameComponent);

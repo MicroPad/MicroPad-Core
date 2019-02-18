@@ -16,6 +16,7 @@ export interface IHeaderComponentProps {
 	getHelp?: () => void;
 	notepad?: INotepadStoreState;
 	flipFullScreenState?: () => void;
+	closeNotepad?: () => void;
 }
 
 export default class HeaderComponent extends React.Component<IHeaderComponentProps> {
