@@ -3,7 +3,12 @@ import { APP_NAME } from '../../../../core/types';
 import './AppNameComponent.css';
 import { IVersion } from '../../../../core/reducers/AppReducer';
 
-export default class AppNameComponent extends React.Component<IVersion> {
+export interface IAppNameComponentProps {
+	version: IVersion;
+	closeNotepad?: () => void;
+}
+
+export default class AppNameComponent extends React.Component<IAppNameComponentProps> {
 	private readonly statusToSymbol = {
 		dev: 'ρ',
 		alpha: 'α',
@@ -12,10 +17,10 @@ export default class AppNameComponent extends React.Component<IVersion> {
 	};
 
 	render() {
-		const { major, minor, patch, status } = this.props;
+		const { major, minor, patch, status } = this.props.version;
 
 		return (
-			<span title={`${APP_NAME} v${major}.${minor}.${patch}-${status}`}>
+			<span onClick={() => this.props.closeNotepad!()} title={`${APP_NAME} v${major}.${minor}.${patch}-${status}`}>
 				{APP_NAME}
 				<em
 					className="AppNameComponent__version">

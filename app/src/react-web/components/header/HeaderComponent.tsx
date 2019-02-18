@@ -21,7 +21,7 @@ export interface IHeaderComponentProps {
 
 export default class HeaderComponent extends React.Component<IHeaderComponentProps> {
 	render() {
-		const { getHelp, notepad, isFullScreen, isSyncing, theme, flipFullScreenState, closeNotepad } = this.props;
+		const { getHelp, notepad, isFullScreen, isSyncing, theme, flipFullScreenState } = this.props;
 
 		const navStyle: CSSProperties = {
 			position: 'fixed',
@@ -42,7 +42,7 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 
 		return (
 			<header style={{position: 'fixed', zIndex: 1000}}>
-				<Navbar className="menu-items" brand={<AppNameComponent />} href="#!" style={navStyle} right={true} onClick={() => closeNotepad!()}>
+				<Navbar className="menu-items" brand={<AppNameComponent />} href="#!" style={navStyle} right={true}>
 					<li style={{ marginRight: '10px', color: theme.explorerContent }}>{saveText}</li>
 					<ThemeDropdownComponent />
 					<NotepadDropdownComponent />

@@ -20,7 +20,7 @@ describe(`version number tests`, () => {
 	].forEach(status => {
 		it(`should display correctly for ${status} status`, () => {
 			// Arrange
-			const component = enzyme.shallow(<AppNameComponent major={1} minor={2} patch={3} status={status as any}/>);
+			const component = enzyme.shallow(<AppNameComponent version={{ major: 1, minor: 2, patch: 3, status: status as any }} />);
 
 			// Assert
 			expect(component.find('.AppNameComponent__version').text()).toEqual(statusToSymbol[status]);
