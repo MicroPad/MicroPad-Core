@@ -35,7 +35,7 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 		return (
 			<React.Fragment>
 				<strong>{SYNC_NAME} Options for <em>{notepad.title}</em></strong>
-				{!syncId && <span><a href="#!" onClick={() => addNotepad!(syncState.user!, notepad.title)}><br /> Start syncing this notepad</a></span>}
+				{!syncId && <span><a href="#!" onClick={() => addNotepad!(syncState.user!, notepad.title)} style={{ textDecoration: 'underline' }}><br /> Start syncing this notepad</a></span>}
 
 				{
 					!!syncId &&

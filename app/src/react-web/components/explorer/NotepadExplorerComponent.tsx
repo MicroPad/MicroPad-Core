@@ -14,6 +14,7 @@ import { Note, Notepad, Parent, Section } from 'upad-parse/dist';
 import { ITheme } from '../../../core/types/Themes';
 import { NEW_SECTION_HELP, OPEN_NOTE_HELP, OPEN_NOTEPAD_HELP } from '../../../core/types';
 import DueDateListComponent from '../../containers/DueDateListContainer';
+import AppSettingsComponent from './AppSettingsComponent';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: Notepad;
@@ -77,7 +78,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 			<div id="notepad-explorer" style={notepadExplorerStyle}>
 				{
 					!!notepad &&
-					<div style={{ paddingBottom: '200px' }}>
+					<div>
 						<a href="#!" onClick={flipFullScreenState} style={{ paddingRight: '5px', fontSize: '24px' }}>»</a>
 						<strong style={{ display: 'inline-flex' }}>
 							<span style={{ paddingRight: '5px' }}>{notepad.title}</span>
@@ -144,6 +145,11 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						message={OPEN_NOTEPAD_HELP}
 						video={require('../../assets/instructions/open-notepad.mp4')} />
 				}
+
+				{!!notepad && <hr />}
+				<div style={{ paddingBottom: '200px' }}>
+					<AppSettingsComponent />
+				</div>
 			</div>
 		);
 	}

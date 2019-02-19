@@ -37,7 +37,6 @@ import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from '../core/types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './ToastEventHandler';
-import { cleanHangingAssets } from './util';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -126,7 +125,7 @@ async function hydrateStoreFromLocalforage() {
 	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), SYNC_STORAGE.ready()]);
 
 	// TODO: Get a new hanging asset clean working
-	await cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store);
+	// await cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store);
 
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
