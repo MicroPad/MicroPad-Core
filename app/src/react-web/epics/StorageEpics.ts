@@ -1,5 +1,15 @@
 import { actions } from '../../core/actions';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import {
+	catchError,
+	concatMap,
+	debounceTime,
+	distinctUntilChanged,
+	filter,
+	map,
+	mergeMap,
+	switchMap,
+	tap
+} from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
 import { INotepadStoreState } from '../../core/types/NotepadTypes';
@@ -15,7 +25,8 @@ import { NoteElement } from 'upad-parse/dist/Note';
 import { getUsedAssets, isAction } from '../util';
 import { Store } from 'redux';
 import { fromShell } from '../CryptoService';
-import { EncryptNotepadAction } from '../../core/types/ActionTypes';
+import { AddCryptoPasskeyAction, EncryptNotepadAction } from '../../core/types/ActionTypes';
+import { NotepadShell } from 'upad-parse/dist/interfaces';
 
 let currentNotepadTitle = '';
 
@@ -169,6 +180,20 @@ const clearLastOpenedNotepad$ = (action$: Observable<Action<Success<string, Flat
 		filter(() => false)
 	);
 
+const clearOldData$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+	action$.pipe(
+		isAction(actions.clearOldData.started),
+		concatMap(() =>
+			from(cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store)).pipe(
+				mergeMap((addPasskeyActions: Action<AddCryptoPasskeyAction>[]) => [
+					actions.clearOldData.done({ params: undefined, result: undefined }),
+					...addPasskeyActions
+				]),
+				catchError(error => of(actions.clearOldData.failed({ params: undefined, error })))
+			)
+		)
+	);
+
 export const storageEpics$ = combineEpics(
 	saveNotepad$,
 	getNotepadList$,
@@ -178,5 +203,65 @@ export const storageEpics$ = combineEpics(
 	saveDefaultFontSize$,
 	cleanUnusedAssets$,
 	persistLastOpenedNotepad$,
-	clearLastOpenedNotepad$
+	clearLastOpenedNotepad$,
+	clearOldData$
 );
+
+/**
+ *  Clean up all the assets that aren't in any notepads yet
+ */
+async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage, store: Store<IStoreState>): Promise<Action<AddCryptoPasskeyAction>[]> {
+	const cryptoPasskeys: Action<AddCryptoPasskeyAction>[] = [];
+
+	const notepads: Promise<EncryptNotepadAction>[] = [];
+	await notepadStorage.iterate((json: string) => {
+		const shell: NotepadShell = JSON.parse(json);
+		notepads.push(fromShell(shell, store.getState().notepadPasskeys[shell.title]));
+
+		return;
+	});
+
+	const allUsedAssets: Set<string> = new Set<string>();
+	const resolvedNotepadsOrErrors = (await Promise.all(
+		notepads
+			.map(p => p.catch(err => err))
+	));
+
+	const areNotepadsStillEncrypted = resolvedNotepadsOrErrors.find(res => res instanceof Error).length > 0;
+
+	const resolvedNotepads = resolvedNotepadsOrErrors.filter(res => !(res instanceof Error)).map((cryptoInfo: EncryptNotepadAction) => {
+		cryptoPasskeys.push(actions.addCryptoPasskey({ notepadTitle: cryptoInfo.notepad.title, passkey: cryptoInfo.passkey }));
+		return cryptoInfo.notepad;
+	});
+
+	// Handle deletion of unused assets, same as what's done in the epic
+	for (let notepad of resolvedNotepads) {
+		const assets = notepad.notepadAssets;
+		const usedAssets = getUsedAssets(notepad.flatten());
+		const unusedAssets = assets.filter(uuid => !usedAssets.has(uuid));
+		usedAssets.forEach(uuid => allUsedAssets.add(uuid));
+
+		await Promise.all(unusedAssets.map(uuid => assetStorage.removeItem(uuid)));
+
+		// Update notepadAssets
+		notepad = notepad.clone({ notepadAssets: Array.from(usedAssets) });
+
+		await notepadStorage.setItem(notepad.title, await notepad.toJson(store.getState().notepadPasskeys[notepad.title]));
+	}
+
+	if (areNotepadsStillEncrypted) return cryptoPasskeys;
+
+	// Handle the deletion of assets we've lost track of and aren't in any notepad
+	let lostAssets: string[] = [];
+	await assetStorage.iterate((value, key) => {
+		lostAssets.push(key);
+		return;
+	});
+	lostAssets = lostAssets.filter(uuid => !allUsedAssets.has(uuid));
+
+	for (const uuid of lostAssets) {
+		await assetStorage.removeItem(uuid);
+	}
+
+	return cryptoPasskeys;
+}

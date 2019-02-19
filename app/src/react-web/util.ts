@@ -3,12 +3,6 @@ import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
 import { FlatNotepad } from 'upad-parse/dist';
-import { IStoreState } from '../core/types';
-import { Store } from 'redux';
-import { EncryptNotepadAction } from '../core/types/ActionTypes';
-import { actions } from '../core/actions';
-import { fromShell } from './CryptoService';
-import { NotepadShell } from 'upad-parse/dist/interfaces';
 
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
@@ -58,55 +52,6 @@ export function getAsBase64(blob: Blob): Promise<string> {
 			resolve('');
 		}
 	});
-}
-
-/**
- *  Clean up all the assets that aren't in any notepads yet
- */
-export async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage, store: Store<IStoreState>): Promise<void> {
-	const notepads: Promise<EncryptNotepadAction>[] = [];
-	await notepadStorage.iterate((json: string) => {
-		const shell: NotepadShell = JSON.parse(json);
-		notepads.push(fromShell(shell, store.getState().notepadPasskeys[shell.title]));
-
-		return;
-	});
-
-	const allUsedAssets: Set<string> = new Set<string>();
-	const resolvedNotepads = (await Promise.all(
-		notepads
-			.map(p => p.catch(err => err))
-	)).filter(res => !(res instanceof Error)).map((cryptoInfo: EncryptNotepadAction) => {
-		store.dispatch(actions.addCryptoPasskey({ notepadTitle: cryptoInfo.notepad.title, passkey: cryptoInfo.passkey }));
-		return cryptoInfo.notepad;
-	});
-
-	// Handle deletion of unused assets, same as what's done in the epic
-	for (let notepad of resolvedNotepads) {
-		const assets = notepad.notepadAssets;
-		const usedAssets = getUsedAssets(notepad.flatten());
-		const unusedAssets = assets.filter(uuid => !usedAssets.has(uuid));
-		usedAssets.forEach(uuid => allUsedAssets.add(uuid));
-
-		await Promise.all(unusedAssets.map(uuid => assetStorage.removeItem(uuid)));
-
-		// Update notepadAssets
-		notepad = notepad.clone({ notepadAssets: Array.from(usedAssets) });
-
-		await notepadStorage.setItem(notepad.title, await notepad.toJson(store.getState().notepadPasskeys[notepad.title]));
-	}
-
-	// Handle the deletion of assets we've lost track of and aren't in any notepad
-	let lostAssets: string[] = [];
-	await assetStorage.iterate((value, key) => {
-		lostAssets.push(key);
-		return;
-	});
-	lostAssets = lostAssets.filter(uuid => !allUsedAssets.has(uuid));
-
-	for (const uuid of lostAssets) {
-		await assetStorage.removeItem(uuid);
-	}
 }
 
 export function getUsedAssets(notepad: FlatNotepad): Set<string> {

@@ -47,6 +47,7 @@ export const actions = {
 	imagePasted: actionCreator.async<string, void, Error>('IMAGE_PASTED'),
 	exportAll: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS'),
 	exportToMarkdown: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS_TO_MD'),
+	clearOldData: actionCreator.async<void, void, Error>('CLEAR_OLD_DATA'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),

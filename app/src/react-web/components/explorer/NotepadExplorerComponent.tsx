@@ -14,7 +14,7 @@ import { Note, Notepad, Parent, Section } from 'upad-parse/dist';
 import { ITheme } from '../../../core/types/Themes';
 import { NEW_SECTION_HELP, OPEN_NOTE_HELP, OPEN_NOTEPAD_HELP } from '../../../core/types';
 import DueDateListComponent from '../../containers/DueDateListContainer';
-import AppSettingsComponent from './AppSettingsComponent';
+import AppSettingsComponent from '../../containers/AppSettingsContainer';
 
 export interface INotepadExplorerComponentProps {
 	notepad?: Notepad;
