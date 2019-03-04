@@ -104,7 +104,7 @@ export function getStorage(): { [name: string]: LocalForage } {
 		document.getElementById('app') as HTMLElement
 	);
 
-	if (!await localforage.getItem('hasRunBefore')) store.dispatch(actions.getHelp(undefined));
+	if (!await localforage.getItem('hasRunBefore')) store.dispatch(actions.getHelp());
 	await localforage.setItem('hasRunBefore', true);
 
 	await displayWhatsNew();
@@ -123,9 +123,6 @@ export function getStorage(): { [name: string]: LocalForage } {
 
 async function hydrateStoreFromLocalforage() {
 	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), SYNC_STORAGE.ready()]);
-
-	// TODO: Get a new hanging asset clean working
-	// await cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store);
 
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
