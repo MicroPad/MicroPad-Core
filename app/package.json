@@ -1,6 +1,6 @@
 {
 	"name": "micropad",
-	"version": "3.16.0",
+	"version": "3.16.1",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/MicroPad/Web.git"
@@ -84,7 +84,6 @@
 		"react-addons-test-utils": "^15.6.2",
 		"react-app-rewired": "^1.5.2",
 		"redux-mock-store": "^1.5.3",
-		"sinon": "^5.0.7",
 		"tslint": "^5.11.0",
 		"typescript": "^3.2.2",
 		"workerize-loader": "^1.0.3"
