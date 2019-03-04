@@ -171,7 +171,7 @@ const persistLastOpenedNotepad$ = (action$: Observable<Action<Success<string, Fl
 
 const clearLastOpenedNotepad$ = (action$: Observable<Action<Success<string, FlatNotepad>>>) =>
 	action$.pipe(
-		isAction(actions.closeNotepad, actions.parseNpx.failed),
+		isAction(actions.closeNotepad, actions.parseNpx.failed, actions.deleteNotepad),
 		tap(() =>
 			localforage
 				.setItem('last opened notepad', undefined)
@@ -189,7 +189,10 @@ const clearOldData$ = (action$: Observable<Action<void>>, store: Store<IStoreSta
 					actions.clearOldData.done({ params: undefined, result: undefined }),
 					...addPasskeyActions
 				]),
-				catchError(error => of(actions.clearOldData.failed({ params: undefined, error })))
+				catchError(error => {
+					console.error(error);
+					return of(actions.clearOldData.failed({ params: undefined, error }));
+				})
 			)
 		)
 	);
@@ -227,7 +230,7 @@ async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: Loc
 			.map(p => p.catch(err => err))
 	));
 
-	const areNotepadsStillEncrypted = resolvedNotepadsOrErrors.find(res => res instanceof Error).length > 0;
+	const areNotepadsStillEncrypted = !!resolvedNotepadsOrErrors.find(res => res instanceof Error);
 
 	const resolvedNotepads = resolvedNotepadsOrErrors.filter(res => !(res instanceof Error)).map((cryptoInfo: EncryptNotepadAction) => {
 		cryptoPasskeys.push(actions.addCryptoPasskey({ notepadTitle: cryptoInfo.notepad.title, passkey: cryptoInfo.passkey }));
