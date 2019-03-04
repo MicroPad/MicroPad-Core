@@ -37,7 +37,6 @@ import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from '../core/types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './ToastEventHandler';
-import { cleanHangingAssets } from './util';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -105,7 +104,7 @@ export function getStorage(): { [name: string]: LocalForage } {
 		document.getElementById('app') as HTMLElement
 	);
 
-	if (!await localforage.getItem('hasRunBefore')) store.dispatch(actions.getHelp(undefined));
+	if (!await localforage.getItem('hasRunBefore')) store.dispatch(actions.getHelp());
 	await localforage.setItem('hasRunBefore', true);
 
 	await displayWhatsNew();
@@ -124,9 +123,6 @@ export function getStorage(): { [name: string]: LocalForage } {
 
 async function hydrateStoreFromLocalforage() {
 	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), SYNC_STORAGE.ready()]);
-
-	// TODO: Get a new hanging asset clean working
-	await cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store);
 
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
@@ -156,11 +152,11 @@ async function compatibilityCheck(): Promise<boolean> {
 			<div style={{ margin: '10px' }}>
 				<h1>Bad news 😢</h1>
 				<p>
-					Your web-browser doesn't support important security features required for {APP_NAME} v{store.getState().app.version.major} to function.<br />
-					Try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noreferrer">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="nofollow noreferrer">Mozilla Firefox</a>.
+					Your web-browser doesn't support important features required for {APP_NAME} to function.<br />
+					You can try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noreferrer">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="nofollow noreferrer">Mozilla Firefox</a>.
 				</p>
 				<p>
-					You can always get the downloadable version of {APP_NAME} <a href="https://getmicropad.com/#download">here</a>.
+					You could also download {APP_NAME} <a href="https://getmicropad.com/#download">here</a>.
 				</p>
 			</div>,
 			document.getElementById('app') as HTMLElement

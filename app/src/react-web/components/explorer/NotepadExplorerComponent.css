@@ -98,3 +98,8 @@
 	width: -moz-max-content;
 	width: max-content;
 }
+
+.app-settings-component__action-list > li {
+	margin-left: 1em;
+	text-decoration: underline;
+}

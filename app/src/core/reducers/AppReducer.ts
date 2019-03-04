@@ -7,6 +7,7 @@ import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { ThemeName } from '../types/Themes';
 import { parse } from 'semver';
+import { isDev } from '../../react-web/util';
 
 export interface IAppStoreState {
 	version: IVersion;
@@ -33,7 +34,7 @@ export class AppReducer extends MicroPadReducer<IAppStoreState> {
 			major,
 			minor,
 			patch,
-			status: 'beta'
+			status: isDev() ? 'dev' : 'beta'
 		},
 		isFullScreen: false,
 		defaultFontSize: '16px',
