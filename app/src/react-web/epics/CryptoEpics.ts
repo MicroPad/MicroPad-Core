@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable';
 import { Action } from 'redux-typescript-actions';
-import { elvis, isAction } from '../util';
+import { elvis, isAction, resolveElvis } from '../util';
 import { actions } from '../../core/actions';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -14,7 +14,7 @@ export namespace CryptoEpics {
 			isAction(actions.encryptNotepad),
 			map(action => ({
 				passkey: action.payload,
-				notepadTitle: elvis(store.getState().notepads).notepad.item.title
+				notepadTitle: resolveElvis(elvis(store.getState().notepads).notepad.item.title)
 			} as AddCryptoPasskeyAction)),
 			map(payload => actions.addCryptoPasskey(payload))
 		);
