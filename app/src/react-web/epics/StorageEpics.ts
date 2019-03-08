@@ -190,11 +190,19 @@ const clearOldData$ = (action$: Observable<Action<void>>, store: Store<IStoreSta
 					...addPasskeyActions
 				]),
 				catchError(error => {
+					Dialog.alert('There was an error clearing old data');
 					console.error(error);
 					return of(actions.clearOldData.failed({ params: undefined, error }));
 				})
 			)
 		)
+	);
+
+const notifyOnClearOldDataSuccess$ = (action$: Observable<Action<Success<void, void>>>) =>
+	action$.pipe(
+		isAction(actions.clearOldData.done),
+		tap(() => Dialog.alert('The spring cleaning has been done!')),
+		filter(() => false)
 	);
 
 export const storageEpics$ = combineEpics(
@@ -207,7 +215,8 @@ export const storageEpics$ = combineEpics(
 	cleanUnusedAssets$,
 	persistLastOpenedNotepad$,
 	clearLastOpenedNotepad$,
-	clearOldData$
+	clearOldData$,
+	notifyOnClearOldDataSuccess$
 );
 
 /**
