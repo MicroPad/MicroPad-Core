@@ -70,6 +70,8 @@ export function getUsedAssets(notepad: FlatNotepad): Set<string> {
  * Safely travel through data that could be undefined
  */
 export function elvis(obj: any): any {
+	if (obj === undefined || obj === null) obj = { isUndefined: true };
+
 	return new Proxy(typeof obj === 'object' ? { ...obj } : obj, {
 		get: (target: object, key: PropertyKey): any => {
 			// Thanks to https://www.beyondjava.net/elvis-operator-aka-safe-navigation-javascript-typescript
@@ -79,6 +81,10 @@ export function elvis(obj: any): any {
 			return elvis(undefined);
 		}
 	});
+}
+
+export function resolveElvis(obj: any): any {
+	return !!obj.isUndefined ? undefined : obj;
 }
 
 // Thanks to http://stackoverflow.com/a/12300351/998467

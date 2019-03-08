@@ -22,7 +22,7 @@ import { Dialog } from '../dialogs';
 import { ISyncedNotepad } from '../../core/types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { getUsedAssets, isAction } from '../util';
+import { elvis, getUsedAssets, isAction, resolveElvis } from '../util';
 import { Store } from 'redux';
 import { fromShell } from '../CryptoService';
 import { AddCryptoPasskeyAction, EncryptNotepadAction } from '../../core/types/ActionTypes';
@@ -249,7 +249,16 @@ async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: Loc
 		// Update notepadAssets
 		notepad = notepad.clone({ notepadAssets: Array.from(usedAssets) });
 
-		await notepadStorage.setItem(notepad.title, await notepad.toJson(store.getState().notepadPasskeys[notepad.title]));
+		await notepadStorage.setItem(
+			notepad.title,
+			await notepad.toJson(
+				resolveElvis(
+					elvis(cryptoPasskeys.find(action => action.payload.notepadTitle === notepad.title))
+					.payload
+					.passkey
+				)
+			)
+		);
 	}
 
 	if (areNotepadsStillEncrypted) return cryptoPasskeys;
