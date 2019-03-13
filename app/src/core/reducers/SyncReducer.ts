@@ -1,4 +1,4 @@
-import { SyncedNotepadList, SyncUser } from '../types/SyncTypes';
+import { INotepadSharingData, SyncedNotepadList, SyncUser } from '../types/SyncTypes';
 import { MicroPadReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
@@ -7,6 +7,7 @@ import { actions } from '../actions';
 export interface ISyncState {
 	user?: SyncUser;
 	notepadList?: SyncedNotepadList;
+	sharedNotepadList?: Record<string, INotepadSharingData>;
 	isLoading: boolean;
 }
 
@@ -65,7 +66,8 @@ export class SyncReducer extends MicroPadReducer<ISyncState> {
 		} else if (isType(action, actions.getSyncedNotepadList.done)) {
 			return {
 				...state,
-				notepadList: action.payload.result,
+				notepadList: action.payload.result.syncedNotepadList,
+				sharedNotepadList: action.payload.result.sharedNotepadList,
 				isLoading: false
 			};
 		} else if (isType(action, actions.syncLogout)) {

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ISyncState } from '../../../core/reducers/SyncReducer';
-import { SYNC_NAME } from '../../../core/types';
+import { MICROPAD_URL, SYNC_NAME } from '../../../core/types';
 import { ISyncedNotepad, SyncUser } from '../../../core/types/SyncTypes';
 import { DifferenceEngine } from '../../DifferenceEngine';
 import { Dialog } from '../../dialogs';
@@ -52,13 +52,17 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 									<li>
 										<a
 											href="#!"
-											style={{
-												textDecoration: 'underline',
-												textDecorationColor: '#F44336'
-											}}
+											style={{ textDecorationColor: '#F44336' }}
 											onClick={() => setTimeout(() => this.stopSyncing(), 0)}>
 											Stop syncing this notepad
 										</a>
+									</li>
+
+									<li style={{ paddingTop: '1em' }}>
+										<a target="_blank" href={`${MICROPAD_URL}/sync/manage`}>Collaboration/Sharing Options</a>
+										<ul className="sync-settings-component__action-list">
+											<li>Scribe: <em>test</em></li>
+										</ul>
 									</li>
 								</ul>
 							</div>

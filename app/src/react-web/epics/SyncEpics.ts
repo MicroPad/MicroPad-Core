@@ -25,7 +25,7 @@ import {
 	SyncAction,
 	UploadAssetAction
 } from '../../core/types/ActionTypes';
-import { BehaviorSubject, EMPTY, forkJoin, from, of } from 'rxjs';
+import { BehaviorSubject, combineLatest as combineLatest2, EMPTY, forkJoin, from, of } from 'rxjs';
 import { parse } from 'date-fns';
 import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
@@ -261,8 +261,12 @@ export namespace SyncEpics {
 			isAction(actions.getSyncedNotepadList.started),
 			map((action: Action<SyncUser>) => action.payload),
 			switchMap((user: SyncUser) =>
-				DifferenceEngine.NotepadService.listNotepads(user.username, user.token)
+				combineLatest2(DifferenceEngine.NotepadService.listNotepads(user.username, user.token), DifferenceEngine.NotepadService.listSharedNotepads(user.username, user.token))
 					.pipe(
+						map(([syncedNotepadList, sharedNotepadList]) => ({
+							syncedNotepadList,
+							sharedNotepadList
+						})),
 						map(res => actions.getSyncedNotepadList.done({ params: user, result: res })),
 						catchError((error): Observable<any> => {
 							if (!!error.response && !!error.response.error) {
