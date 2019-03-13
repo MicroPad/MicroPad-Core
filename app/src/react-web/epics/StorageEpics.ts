@@ -171,7 +171,7 @@ const persistLastOpenedNotepad$ = (action$: Observable<Action<Success<string, Fl
 
 const clearLastOpenedNotepad$ = (action$: Observable<Action<Success<string, FlatNotepad>>>) =>
 	action$.pipe(
-		isAction(actions.closeNotepad, actions.parseNpx.failed, actions.deleteNotepad),
+		isAction(actions.closeNotepad, actions.parseNpx.failed, actions.deleteNotepad, actions.renameNotepad.done),
 		tap(() =>
 			localforage
 				.setItem('last opened notepad', undefined)
