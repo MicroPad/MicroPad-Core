@@ -44,18 +44,23 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 						{
 							!syncState.isLoading &&
 							<div>
-								Synced! (<a href="#!" style={{ textDecoration: 'underline' }} onClick={this.manualSync}>Refresh</a>)
+								<ul className="sync-settings-component__action-list">
+									<li>
+										Synced! (<a href="#!" style={{ textDecoration: 'underline' }} onClick={this.manualSync}>Refresh</a>)
+									</li>
 
-								<p>
-									<a href="#!"
-										style={{
-											textDecoration: 'underline',
-											textDecorationColor: '#F44336'
-										}}
-										onClick={() => setTimeout(() => this.stopSyncing(), 0)}>
-										Stop syncing this notepad
-									</a>
-								</p>
+									<li>
+										<a
+											href="#!"
+											style={{
+												textDecoration: 'underline',
+												textDecorationColor: '#F44336'
+											}}
+											onClick={() => setTimeout(() => this.stopSyncing(), 0)}>
+											Stop syncing this notepad
+										</a>
+									</li>
+								</ul>
 							</div>
 						}
 					</div>
