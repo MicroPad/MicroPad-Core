@@ -19,6 +19,16 @@ export type AssetList = { [uuid: string]: string };
 
 export type SyncedNotepadList = { [title: string]: string }; // title -> uuid
 
+export interface INotepadSharingData {
+	title: string;
+	notepad: string;
+	owner: string;
+	collaborators?: string[];
+	scribe?: string;
+}
+
+export type CombinedNotepadSyncList = Record<string, INotepadSharingData>;
+
 export interface ISyncedNotepad extends Notepad {
 	assetHashList: AssetList;
 }

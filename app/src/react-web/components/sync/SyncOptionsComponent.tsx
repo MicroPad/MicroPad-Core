@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ISyncState } from '../../../core/reducers/SyncReducer';
-import { SYNC_NAME } from '../../../core/types';
+import { MICROPAD_URL, SYNC_NAME } from '../../../core/types';
 import { ISyncedNotepad, SyncUser } from '../../../core/types/SyncTypes';
 import { DifferenceEngine } from '../../DifferenceEngine';
 import { Dialog } from '../../dialogs';
@@ -19,7 +19,7 @@ export interface ISyncOptionsComponentProps {
 export default class SyncOptionsComponent extends React.Component<ISyncOptionsComponentProps> {
 	render() {
 		const { syncState, syncId, notepad, addNotepad } = this.props;
-		if (!notepad || (!syncState.notepadList && syncState.user)) return null;
+		if (!notepad || (!syncState.sharedNotepadList && syncState.user)) return null;
 
 		if (!syncState.user) {
 			return (
@@ -44,18 +44,27 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 						{
 							!syncState.isLoading &&
 							<div>
-								Synced! (<a href="#!" style={{ textDecoration: 'underline' }} onClick={this.manualSync}>Refresh</a>)
+								<ul className="sync-settings-component__action-list">
+									<li>
+										Synced! (<a href="#!" style={{ textDecoration: 'underline' }} onClick={this.manualSync}>Refresh</a>)
+									</li>
 
-								<p>
-									<a href="#!"
-										style={{
-											textDecoration: 'underline',
-											textDecorationColor: '#F44336'
-										}}
-										onClick={() => setTimeout(() => this.stopSyncing(), 0)}>
-										Stop syncing this notepad
-									</a>
-								</p>
+									<li>
+										<a
+											href="#!"
+											style={{ textDecorationColor: '#F44336' }}
+											onClick={() => setTimeout(() => this.stopSyncing(), 0)}>
+											Stop syncing this notepad
+										</a>
+									</li>
+
+									<li style={{ paddingTop: '1em' }}>
+										<a target="_blank" href={`${MICROPAD_URL}/sync/manage`}>Collaboration/Sharing Options</a>
+										<ul className="sync-settings-component__action-list">
+											<li>Scribe: <em>{syncState.sharedNotepadList![notepad.title].scribe}</em></li>
+										</ul>
+									</li>
+								</ul>
 							</div>
 						}
 					</div>

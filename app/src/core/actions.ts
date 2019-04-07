@@ -16,7 +16,7 @@ import {
 	UpdateElementAction
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
-import { SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
+import { CombinedNotepadSyncList, SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
 import { FlatNotepad, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { HashTagSearchResults } from './reducers/SearchReducer';
@@ -37,7 +37,7 @@ export const actions = {
 	expandAllExplorer: actionCreator.async<void, string[], any>('EXPAND_ALL_EXPLORER'),
 	print: actionCreator.async<void, NoteElement, void>('PRINT'),
 	syncLogin: actionCreator.async<SyncLoginRequest, SyncUser, any>('SYNC_LOGIN'),
-	getSyncedNotepadList: actionCreator.async<SyncUser, SyncedNotepadList, any>('SYNC_GET_NOTEPAD_LIST'),
+	getSyncedNotepadList: actionCreator.async<SyncUser, CombinedNotepadSyncList, any>('SYNC_GET_NOTEPAD_LIST'),
 	syncDownload: actionCreator.async<string, Notepad, any>('SYNC_DOWNLOAD'),
 	syncUpload: actionCreator.async<SyncAction, void, any>('SYNC_UPLOAD'),
 	deleteFromSync: actionCreator.async<string, void, any>('SYNC_DELETE'),
@@ -84,7 +84,7 @@ export const actions = {
 	updateZoomLevel: actionCreator<number>('UPDATE_ZOOM_LEVEL'),
 	clearPrintView: actionCreator<void>('CLEAR_PRINT'),
 	syncLogout: actionCreator<void>('SYNC_LOGOUT'),
-	updateCurrentSyncId: actionCreator<SyncedNotepadList>('UPDATE_SYNC_ID'),
+	updateCurrentSyncId: actionCreator<CombinedNotepadSyncList>('UPDATE_SYNC_ID'),
 	sync: actionCreator<SyncAction>('SYNC'),
 	actWithSyncNotepad: actionCreator<NotepadToSyncNotepadAction>('ACT_WITH_SYNC_NOTEPAD'),
 	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD'),

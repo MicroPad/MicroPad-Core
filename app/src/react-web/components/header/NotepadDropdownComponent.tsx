@@ -75,11 +75,11 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 
 					<NavItem divider={true} />
 					{syncState.isLoading && <NavItem href="#!">Loading...</NavItem>}
-					{!!syncState.notepadList &&  Object.keys(syncState.notepadList).map(title =>
+					{!!syncState.sharedNotepadList &&  Object.keys(syncState.sharedNotepadList).map(title =>
 						<NavItem key={generateGuid()} href="#!" onClick={() => {
-							downloadNotepad!(syncState.notepadList![title]);
+							downloadNotepad!(syncState.sharedNotepadList![title].notepad);
 						}}>
-							{title} ({SYNC_NAME})
+							{title} ({SYNC_NAME} - {syncState.sharedNotepadList![title].owner})
 						</NavItem>
 					)}
 				</Dropdown>

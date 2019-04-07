@@ -103,3 +103,11 @@
 	margin-left: 1em;
 	text-decoration: underline;
 }
+
+.sync-settings-component__action-list > li {
+	margin-left: 1em;
+}
+
+.sync-settings-component__action-list > li > a {
+	text-decoration: underline;
+}

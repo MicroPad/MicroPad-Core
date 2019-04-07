@@ -3,10 +3,15 @@ import SyncWorker from '!workerize-loader!./SyncWorker.js';
 
 import { from, Observable, of } from 'rxjs';
 import { MICROPAD_URL } from '../core/types';
-import { concatMap, map, retry, tap } from 'rxjs/operators';
-import { AssetList, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from '../core/types/SyncTypes';
+import { concatMap, map, retry } from 'rxjs/operators';
+import {
+	AssetList,
+	INotepadSharingData,
+	ISyncedNotepad,
+	ISyncWorker,
+	SyncedNotepadList
+} from '../core/types/SyncTypes';
 import { parse } from 'date-fns';
-import { Base64 } from 'js-base64';
 import * as QueryString from 'querystring';
 import { Notepad } from 'upad-parse/dist';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
@@ -32,8 +37,12 @@ export namespace DifferenceEngine {
 	export namespace NotepadService {
 		const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('notepad', endpoint, resource, payload);
 
+		/** @deprecated */
 		export const listNotepads = (username: string, token: string): Observable<SyncedNotepadList> =>
 			call<{ notepads: SyncedNotepadList }>('list_notepads', username, { token }).pipe(map(res => res.notepads));
+
+		export const listSharedNotepads = (username: string, token: string): Observable<Record<string, INotepadSharingData>> =>
+			call<{ notepads: Record<string, INotepadSharingData> }>('sharing_list_notepads', username, { token }).pipe(map(res => res.notepads));
 
 		export const create = (username: string, token: string, notepadTitle: string): Observable<string> => {
 			return call<{ notepad: string }>('create', username, { token, notepadTitle }).pipe(map(res => res.notepad));
@@ -52,8 +61,7 @@ export namespace DifferenceEngine {
 		export const getAssetDownloadLinks = (syncId: string, assets: string[]): Observable<AssetList> =>
 			call<{ urlList: AssetList }>('download_assets', syncId, { assets: JSON.stringify(assets) }).pipe(map(res => res.urlList));
 
-		// TODO: Encryption needs to happen before this point
-		export const uploadNotepad = (syncId: string, notepad: ISyncedNotepad, passkey?: string): Observable<AssetList> =>
+		export const uploadNotepad = (username: string, token: string, syncId: string, notepad: ISyncedNotepad, passkey?: string): Observable<AssetList> =>
 			from(!!notepad.crypto && !!passkey ? encrypt(notepad, passkey) : of(notepad)).pipe(
 				concatMap(np =>
 					call<{ assetsToUpload: AssetList }>('upload', syncId, {
@@ -61,7 +69,9 @@ export namespace DifferenceEngine {
 							.replace(
 								/[\u007f-\uffff]/g,
 								char => '\\u' + ('0000' + char.charCodeAt(0).toString(16)).slice(-4)
-							) // Fix unicode encoding
+							), // Fix unicode encoding
+						username,
+						token
 					})
 				),
 				map(res => res.assetsToUpload)

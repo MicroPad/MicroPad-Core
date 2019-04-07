@@ -324,7 +324,7 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 				...state,
 				notepad: {
 					...state.notepad!,
-					activeSyncId: id
+					activeSyncId: id.notepad
 				}
 			};
 		} else if (isType(action, actions.addToSync.done)) {
@@ -421,6 +421,18 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 			return {
 				...state,
 				notepad: !!state.notepad ? { ...state.notepad, item: undefined } : undefined
+			};
+		} else if (isType(action, actions.syncUpload.failed)) {
+			if (!state.notepad || !state.notepad.item || !action.payload.error.response || !action.payload.error.response.error) return state;
+
+			if (!action.payload.error.response.error.includes('they are the scribe')) return state;
+
+			return {
+				...state,
+				notepad: {
+					...state.notepad,
+					item: state.notepad.item.clone({ lastModified: new Date(0) })
+				}
 			};
 		}
 

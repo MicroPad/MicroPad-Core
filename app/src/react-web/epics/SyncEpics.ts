@@ -197,7 +197,13 @@ export namespace SyncEpics {
 						throw 'too many assets';
 					}),
 					concatMap(() =>
-						DifferenceEngine.SyncService.uploadNotepad(payload.syncId, payload.notepad, store.getState().notepadPasskeys[payload.notepad.title])
+						DifferenceEngine.SyncService.uploadNotepad(
+							user.username,
+							user.token,
+							payload.syncId,
+							payload.notepad,
+							store.getState().notepadPasskeys[payload.notepad.title]
+						)
 							.pipe(
 								concatMap((assetList: AssetList) => from((async () => {
 									const requests: UploadAssetAction[] = [];
@@ -222,6 +228,8 @@ export namespace SyncEpics {
 						)
 					),
 					catchError((error): Observable<Action<any>> => {
+						uploadCount$.next(0);
+
 						if (error === 'too many assets') {
 							return of(actions.syncProError(undefined));
 						}
@@ -261,7 +269,7 @@ export namespace SyncEpics {
 			isAction(actions.getSyncedNotepadList.started),
 			map((action: Action<SyncUser>) => action.payload),
 			switchMap((user: SyncUser) =>
-				DifferenceEngine.NotepadService.listNotepads(user.username, user.token)
+				DifferenceEngine.NotepadService.listSharedNotepads(user.username, user.token)
 					.pipe(
 						map(res => actions.getSyncedNotepadList.done({ params: user, result: res })),
 						catchError((error): Observable<any> => {
