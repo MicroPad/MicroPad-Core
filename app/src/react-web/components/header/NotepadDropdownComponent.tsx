@@ -79,7 +79,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 						<NavItem key={generateGuid()} href="#!" onClick={() => {
 							downloadNotepad!(syncState.sharedNotepadList![title].notepad);
 						}}>
-							{title} ({SYNC_NAME})
+							{title} ({SYNC_NAME} - {syncState.sharedNotepadList![title].owner})
 						</NavItem>
 					)}
 				</Dropdown>

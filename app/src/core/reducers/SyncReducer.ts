@@ -33,6 +33,7 @@ export class SyncReducer extends MicroPadReducer<ISyncState> {
 			|| isType(action, actions.syncUpload.failed)
 			|| isType(action, actions.deleteFromSync.failed)
 			|| isType(action, actions.syncProError)
+			|| isType(action, actions.parseNpx.failed)
 		) {
 			return {
 				...state,
