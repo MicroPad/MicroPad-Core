@@ -20,7 +20,7 @@ import saveAs from 'save-as';
 import * as JSZip from 'jszip';
 import { fixFileName, generateGuid, isAction } from '../util';
 import { Dialog } from '../dialogs';
-import { ISyncedNotepad, SyncedNotepadList, SyncUser } from '../../core/types/SyncTypes';
+import { CombinedNotepadSyncList, ISyncedNotepad, SyncedNotepadList, SyncUser } from '../../core/types/SyncTypes';
 import { Asset, FlatNotepad, Note, Notepad, Translators } from 'upad-parse/dist';
 import { MarkdownNote } from 'upad-parse/dist/Note';
 import { from, Observable, of } from 'rxjs';
@@ -364,7 +364,7 @@ const loadNotepadByIndex$ = (action$, store) =>
 const updateSyncedNotepadIdOnSyncListLoad$ = action$ =>
 	action$.pipe(
 		isAction(actions.getSyncedNotepadList.done),
-		map((action: Action<Success<SyncUser, SyncedNotepadList>>) => actions.updateCurrentSyncId(action.payload.result))
+		map((action: Action<Success<SyncUser, CombinedNotepadSyncList>>) => actions.updateCurrentSyncId(action.payload.result))
 	);
 
 const saveNotepadOnCreation$ = (action$, store: Store<IStoreState>) =>

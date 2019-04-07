@@ -6,7 +6,6 @@ import { actions } from '../actions';
 
 export interface ISyncState {
 	user?: SyncUser;
-	notepadList?: SyncedNotepadList;
 	sharedNotepadList?: Record<string, INotepadSharingData>;
 	isLoading: boolean;
 }
@@ -55,7 +54,7 @@ export class SyncReducer extends MicroPadReducer<ISyncState> {
 		} else if (isType(action, actions.getSyncedNotepadList.started)) {
 			return {
 				...state,
-				notepadList: undefined,
+				sharedNotepadList: undefined,
 				isLoading: true
 			};
 		} else if (isType(action, actions.getSyncedNotepadList.failed)) {
@@ -66,8 +65,7 @@ export class SyncReducer extends MicroPadReducer<ISyncState> {
 		} else if (isType(action, actions.getSyncedNotepadList.done)) {
 			return {
 				...state,
-				notepadList: action.payload.result.syncedNotepadList,
-				sharedNotepadList: action.payload.result.sharedNotepadList,
+				sharedNotepadList: action.payload.result,
 				isLoading: false
 			};
 		} else if (isType(action, actions.syncLogout)) {

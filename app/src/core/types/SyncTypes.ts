@@ -27,10 +27,7 @@ export interface INotepadSharingData {
 	scribe?: string;
 }
 
-export type CombinedNotepadSyncList = {
-	syncedNotepadList: SyncedNotepadList;
-	sharedNotepadList: Record<string, INotepadSharingData>;
-};
+export type CombinedNotepadSyncList = Record<string, INotepadSharingData>;
 
 export interface ISyncedNotepad extends Notepad {
 	assetHashList: AssetList;

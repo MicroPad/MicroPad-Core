@@ -25,7 +25,7 @@ import {
 	SyncAction,
 	UploadAssetAction
 } from '../../core/types/ActionTypes';
-import { BehaviorSubject, combineLatest as combineLatest2, EMPTY, forkJoin, from, of } from 'rxjs';
+import { BehaviorSubject, EMPTY, forkJoin, from, of } from 'rxjs';
 import { parse } from 'date-fns';
 import { INotepadStoreState } from '../../core/types/NotepadTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
@@ -183,6 +183,7 @@ export namespace SyncEpics {
 			)
 		);
 
+	// TODO: This doesn't emit done when the scribe has changed without a refresh
 	export const upload$ = (action$, store: Store<IStoreState>) =>
 		action$.pipe(
 			isAction(actions.syncUpload.started),
@@ -197,7 +198,13 @@ export namespace SyncEpics {
 						throw 'too many assets';
 					}),
 					concatMap(() =>
-						DifferenceEngine.SyncService.uploadNotepad(payload.syncId, payload.notepad, store.getState().notepadPasskeys[payload.notepad.title])
+						DifferenceEngine.SyncService.uploadNotepad(
+							user.username,
+							user.token,
+							payload.syncId,
+							payload.notepad,
+							store.getState().notepadPasskeys[payload.notepad.title]
+						)
 							.pipe(
 								concatMap((assetList: AssetList) => from((async () => {
 									const requests: UploadAssetAction[] = [];
@@ -261,12 +268,8 @@ export namespace SyncEpics {
 			isAction(actions.getSyncedNotepadList.started),
 			map((action: Action<SyncUser>) => action.payload),
 			switchMap((user: SyncUser) =>
-				combineLatest2(DifferenceEngine.NotepadService.listNotepads(user.username, user.token), DifferenceEngine.NotepadService.listSharedNotepads(user.username, user.token))
+				DifferenceEngine.NotepadService.listSharedNotepads(user.username, user.token)
 					.pipe(
-						map(([syncedNotepadList, sharedNotepadList]) => ({
-							syncedNotepadList,
-							sharedNotepadList
-						})),
 						map(res => actions.getSyncedNotepadList.done({ params: user, result: res })),
 						catchError((error): Observable<any> => {
 							if (!!error.response && !!error.response.error) {

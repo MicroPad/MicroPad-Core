@@ -19,7 +19,7 @@ export interface ISyncOptionsComponentProps {
 export default class SyncOptionsComponent extends React.Component<ISyncOptionsComponentProps> {
 	render() {
 		const { syncState, syncId, notepad, addNotepad } = this.props;
-		if (!notepad || (!syncState.notepadList && syncState.user)) return null;
+		if (!notepad || (!syncState.sharedNotepadList && syncState.user)) return null;
 
 		if (!syncState.user) {
 			return (
@@ -61,7 +61,7 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 									<li style={{ paddingTop: '1em' }}>
 										<a target="_blank" href={`${MICROPAD_URL}/sync/manage`}>Collaboration/Sharing Options</a>
 										<ul className="sync-settings-component__action-list">
-											<li>Scribe: <em>test</em></li>
+											<li>Scribe: <em>{syncState.sharedNotepadList![notepad.title].scribe}</em></li>
 										</ul>
 									</li>
 								</ul>

@@ -84,7 +84,7 @@ export const actions = {
 	updateZoomLevel: actionCreator<number>('UPDATE_ZOOM_LEVEL'),
 	clearPrintView: actionCreator<void>('CLEAR_PRINT'),
 	syncLogout: actionCreator<void>('SYNC_LOGOUT'),
-	updateCurrentSyncId: actionCreator<SyncedNotepadList>('UPDATE_SYNC_ID'),
+	updateCurrentSyncId: actionCreator<CombinedNotepadSyncList>('UPDATE_SYNC_ID'),
 	sync: actionCreator<SyncAction>('SYNC'),
 	actWithSyncNotepad: actionCreator<NotepadToSyncNotepadAction>('ACT_WITH_SYNC_NOTEPAD'),
 	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD'),

@@ -10,6 +10,7 @@ export interface INotepadStoreState {
 	isLoading: boolean;
 	saving: boolean;
 	activeSyncId?: string;
+	scribe?: string;
 	item?: FlatNotepad;
 }
 
