@@ -183,7 +183,6 @@ export namespace SyncEpics {
 			)
 		);
 
-	// TODO: This doesn't emit done when the scribe has changed without a refresh
 	export const upload$ = (action$, store: Store<IStoreState>) =>
 		action$.pipe(
 			isAction(actions.syncUpload.started),
@@ -229,6 +228,8 @@ export namespace SyncEpics {
 						)
 					),
 					catchError((error): Observable<Action<any>> => {
+						uploadCount$.next(0);
+
 						if (error === 'too many assets') {
 							return of(actions.syncProError(undefined));
 						}
