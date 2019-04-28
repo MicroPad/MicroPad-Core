@@ -9,8 +9,8 @@ There are a couple [GitHub Project boards](https://github.com/MicroPad/Web/proje
 
 ## Building MicroPad
 You will need the following:  
-- [https://yarnpkg.com/lang/en/](Yarn)
-- [https://nodejs.org/en/](Node.js) (preferably >=v10.x)
+- [Yarn](https://yarnpkg.com/lang/en/)
+- [Node.js](https://nodejs.org/en/) (preferably >=v10.x)
 
 ### Installing dependencies
 ```bash
