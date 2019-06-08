@@ -16,6 +16,13 @@ export class Dialog {
 		})
 	)
 
+	public static confirmUnsafe = (unsafeMessage: string): Promise<boolean> => new Promise(resolve =>
+		Vex.dialog.confirm({
+			unsafeMessage,
+			callback: value => resolve(value)
+		})
+	)
+
 	public static prompt = (message: string, placeholder?: string): Promise<string> =>
 		new Promise(resolve => {
 			setTimeout(() => {
