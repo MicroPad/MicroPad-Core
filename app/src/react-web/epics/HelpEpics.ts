@@ -17,7 +17,7 @@ export namespace HelpEpics {
 					const notepadList = store.getState().notepads.savedNotepadTitles;
 					if (!notepadList || !notepadList.includes('Help')) return true;
 
-					return await Dialog.confirm(`You have already imported the Help notebook. You can access it from the notebooks dropdown. If you continue you will lose all changes you may have made to the notebook.`);
+					return await Dialog.confirm(`You have already imported the Help notebook. It can be accessed from the notebooks dropdown. If you continue you will lose any changes made to the notebook.`);
 				})())
 			),
 			filter(Boolean),
