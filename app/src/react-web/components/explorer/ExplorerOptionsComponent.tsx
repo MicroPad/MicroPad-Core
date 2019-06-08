@@ -26,6 +26,8 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 	render() {
 		const { objToEdit, type, colour, exportNotepad, loadNote, print } = this.props;
 
+		const displayType = type === 'notepad' ? 'notebook' : type;
+
 		const notepadOptions: JSX.Element = (
 			<div>
 				<Row>
@@ -70,10 +72,10 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 				<div id="explorer-options-modal">
 					<Row>
 						<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>
-						<Col s={6}><Button className="blue" waves="light" onClick={this.rename}>Rename {type}</Button></Col>
+						<Col s={6}><Button className="blue" waves="light" onClick={this.rename}>Rename {displayType}</Button></Col>
 					</Row>
 					<Row><Button className="red" waves="light" onClick={this.delete}><Icon
-						left={true}>delete_forever</Icon> Delete {type}</Button></Row>
+						left={true}>delete_forever</Icon> Delete {displayType}</Button></Row>
 					{(type === 'notepad') && notepadOptions}
 					{(type === 'note') && noteOptions}
 					{
