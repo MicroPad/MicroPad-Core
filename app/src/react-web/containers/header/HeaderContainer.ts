@@ -16,8 +16,8 @@ export function mapStateToProps({ notepads, app, sync }: IStoreState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 	return {
-		getHelp: () => dispatch(actions.getHelp(undefined)),
-		flipFullScreenState: () => dispatch(actions.flipFullScreenState(undefined)),
+		getHelp: () => dispatch(actions.getHelp.started()),
+		flipFullScreenState: () => dispatch(actions.flipFullScreenState()),
 		closeNotepad: () => dispatch(actions.closeNotepad())
 	};
 }

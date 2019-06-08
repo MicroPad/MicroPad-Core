@@ -52,7 +52,7 @@ export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 	// Help
 	mousetrap.bind('f1', e => {
 		e.preventDefault();
-		store.dispatch(actions.getHelp(undefined));
+		store.dispatch(actions.getHelp.started());
 	});
 
 	// Quick Actions
