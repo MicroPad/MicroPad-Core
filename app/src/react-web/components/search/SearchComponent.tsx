@@ -21,7 +21,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	private searchInput: Input;
 	private results: JSX.Element[];
 	private triggerClickedSub: Subscription;
-	private readonly supportsDataElement = !!window['HTMLDataListElement'] && !(!!window['isElectron'] && window.navigator.platform === 'MacIntel');
+	private readonly supportsDataElement = !!window['HTMLDataListElement'] && !(!!window['isElectron'] && window.navigator.platform.includes('Mac'));
 
 	render() {
 		const { notepad, query, hashTagResults, indices } = this.props;
