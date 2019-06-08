@@ -42,7 +42,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/node:10.4
+      - image: circleci/node:10.16.0-jessie
     working_directory: ~/repo
     steps:
       - checkout
@@ -74,7 +74,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/node:10.4
+      - image: circleci/node:10.16.0-jessie
 
     working_directory: ~/repo
 
