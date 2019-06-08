@@ -14,6 +14,7 @@ import { SearchEpics } from '../../core/epics/SearchEpics';
 import { getStorage } from '..';
 import { Action } from 'redux-typescript-actions';
 import { CryptoEpics } from './CryptoEpics';
+import { Dialog } from '../dialogs';
 
 const baseEpic$ = combineEpics(
 	notepadEpics$,
@@ -28,12 +29,16 @@ const baseEpic$ = combineEpics(
 	CryptoEpics.cryptoEpics$
 );
 
-export const epicMiddleware = createEpicMiddleware<Action<any>, any, {
+export type EpicDeps = {
 	helpNpx: string,
-	getStorage: () => { [name: string]: LocalForage }
-}>(baseEpic$, {
+	getStorage: () => { [name: string]: LocalForage },
+	Dialog: Dialog
+};
+
+export const epicMiddleware = createEpicMiddleware<Action<any>, any, EpicDeps>(baseEpic$, {
 	dependencies: {
 		helpNpx,
-		getStorage: getStorage
+		getStorage: getStorage,
+		Dialog: Dialog
 	}
 });

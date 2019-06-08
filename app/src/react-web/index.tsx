@@ -104,7 +104,7 @@ export function getStorage(): { [name: string]: LocalForage } {
 		document.getElementById('app') as HTMLElement
 	);
 
-	if (!await localforage.getItem('hasRunBefore')) store.dispatch(actions.getHelp());
+	if (!await localforage.getItem('hasRunBefore')) store.dispatch(actions.getHelp.started());
 	await localforage.setItem('hasRunBefore', true);
 
 	await displayWhatsNew();

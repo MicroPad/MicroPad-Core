@@ -6,17 +6,17 @@ import 'vex-js/dist/css/vex-theme-top.css';
 Vex.registerPlugin(VexDialog);
 Vex.defaultOptions!.className = 'vex-theme-top';
 
-export namespace Dialog {
-	export const alert = (message: string) => Vex.dialog.alert(message);
+export class Dialog {
+	public static alert = (message: string) => Vex.dialog.alert(message);
 
-	export const confirm = (message: string): Promise<boolean> => new Promise(resolve =>
+	public static confirm = (message: string): Promise<boolean> => new Promise(resolve =>
 		Vex.dialog.confirm({
 			message,
 			callback: value => resolve(value)
 		})
-	);
+	)
 
-	export const prompt = (message: string, placeholder?: string): Promise<string> =>
+	public static prompt = (message: string, placeholder?: string): Promise<string> =>
 		new Promise(resolve => {
 			setTimeout(() => {
 				Vex.dialog.prompt({
@@ -25,9 +25,9 @@ export namespace Dialog {
 					callback: value => resolve(value)
 				});
 			}, 0);
-		});
+		})
 
-	export const promptSecure = (message: string): Promise<string> =>
+	public static promptSecure = (message: string): Promise<string> =>
 		new Promise(resolve => {
 			setTimeout(() => {
 				Vex.dialog.open({
@@ -36,5 +36,5 @@ export namespace Dialog {
 					callback: value => resolve(value.vex)
 				});
 			}, 0);
-		});
+		})
 }
