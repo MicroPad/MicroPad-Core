@@ -20,7 +20,7 @@ import saveAs from 'save-as';
 import * as JSZip from 'jszip';
 import { fixFileName, generateGuid, isAction } from '../util';
 import { Dialog } from '../dialogs';
-import { CombinedNotepadSyncList, ISyncedNotepad, SyncedNotepadList, SyncUser } from '../../core/types/SyncTypes';
+import { CombinedNotepadSyncList, ISyncedNotepad, SyncUser } from '../../core/types/SyncTypes';
 import { Asset, FlatNotepad, Note, Notepad, Translators } from 'upad-parse/dist';
 import { MarkdownNote } from 'upad-parse/dist/Note';
 import { from, Observable, of } from 'rxjs';
@@ -33,9 +33,9 @@ import { fromShell } from '../CryptoService';
 
 const parseQueue: string[] = [];
 
-const parseNpx$ = action$ =>
+const parseNpx$ = (action$: Observable<Action<string>>) =>
 	action$.pipe(
-		filter((action: Action<string>) => isType(action, actions.parseNpx.started)),
+		isAction(actions.parseNpx.started),
 		switchMap((action: Action<string>) =>
 			from((async () => {
 				let notepad: Notepad;

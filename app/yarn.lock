@@ -4721,7 +4721,7 @@ jest-leak-detector@^22.4.0:
   dependencies:
     pretty-format "^22.4.3"
 
-jest-marbles@^2.0.0:
+jest-marbles@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/jest-marbles/-/jest-marbles-2.3.1.tgz#ef7056bf2ebfe8b620b33da620c64f8e565efe18"
   integrity sha512-GUkj72Yq67zn7WWV487Dq3kvKISqjO/QzLb01DmdSJQHxutAb1TrsTl4ZRnbeJ8XNnV2chk7/qxEvxXlnKZMxA==

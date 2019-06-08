@@ -27,7 +27,7 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 					<strong><a href="#!" style={{
 						textDecoration: 'underline',
 						whiteSpace: 'normal'
-					}}>Connect to {SYNC_NAME} to have this notepad on all of your devices</a></strong>
+					}}>Connect to {SYNC_NAME} to have this notebook on all of your devices</a></strong>
 				} />
 			);
 		}

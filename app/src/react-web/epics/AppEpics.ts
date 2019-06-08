@@ -12,6 +12,7 @@ import { EMPTY } from 'rxjs';
 import { lt as versionLessThan } from 'semver';
 import { ThemeName } from '../../core/types/Themes';
 import { IVersion } from '../../core/reducers/AppReducer';
+import { EpicDeps } from './index';
 
 export namespace AppEpics {
 	export const closeDrawingEditorOnZoom$ = (action$, store) =>
@@ -38,7 +39,7 @@ export namespace AppEpics {
 			map(() => actions.setHelpPref(true))
 		);
 
-	export const checkVersion$ = (action$, store) =>
+	export const checkVersion$ = (action$, store, { Dialog }) =>
 		action$.pipe(
 			isAction(actions.checkVersion),
 			map(() => store.getState()),
@@ -57,7 +58,7 @@ export namespace AppEpics {
 					map((res: AjaxResponse) => res.response.trim()),
 					filter(latestVersion => versionLessThan(version, latestVersion)),
 					tap((latestVersion: string) =>
-						Materialize.toast(`v${latestVersion} of ${APP_NAME} is out now <a target="_blank" class="btn-flat amber-text" style="font-weight: 500;" href="${MICROPAD_URL}/#download">UPDATE</a>`)
+						Dialog.confirmUnsafe(`v${latestVersion} of ${APP_NAME} is out now! <a target="_blank" href="${MICROPAD_URL}/#download">Update here</a>.`)
 					),
 					catchError(err => {
 						console.error(err);
@@ -75,7 +76,7 @@ export namespace AppEpics {
 			filter(() => false)
 		);
 
-	export const appEpics$ = combineEpics(
+	export const appEpics$ = combineEpics<any, any, EpicDeps>(
 		closeDrawingEditorOnZoom$,
 		saveHelpPreference$,
 		revertHelpPrefOnHelpLoad$,

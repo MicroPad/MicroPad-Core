@@ -48,6 +48,7 @@ export const actions = {
 	exportAll: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS'),
 	exportToMarkdown: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS_TO_MD'),
 	clearOldData: actionCreator.async<void, void, Error>('CLEAR_OLD_DATA'),
+	getHelp: actionCreator.async<void, void, Error>('GET_HELP'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
@@ -70,7 +71,6 @@ export const actions = {
 	updateDefaultFontSize: actionCreator<string>('UPDATE_DEFAULT_FONT_SIZE'),
 	newSection: actionCreator<NewNotepadObjectAction>('NEW_SECTION'),
 	newNote: actionCreator<NewNotepadObjectAction>('NEW_NOTE'),
-	getHelp: actionCreator<void>('GET_HELP'),
 	trackAsset: actionCreator<string>('TRACK_ASSET'),
 	untrackAsset: actionCreator<string>('UNTRACK_ASSET'),
 	reloadNote: actionCreator<void>('RELOAD_NOTE'),
