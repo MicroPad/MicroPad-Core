@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { CSSProperties } from 'react';
 import './NotepadBreadcrumbsComponent.css';
-import { Breadcrumb as MaterialBreadcrumb, MenuItem, Dropdown, NavItem } from 'react-materialize';
+import { Breadcrumb as MaterialBreadcrumb, MenuItem } from 'react-materialize';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import Link from '@material-ui/core/Link';
 import { generateGuid } from '../../../util';
 import { ThemeName } from '../../../../core/types/Themes';
 
@@ -41,11 +43,20 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 				</MenuItem>
 			));
 
+		// return (
+		// 	<div id="breadcrumb-holder" style={breadcrumbStyle}>
+		// 		<MaterialBreadcrumb className={themeName}>
+		// 			{crumbs}
+		// 		</MaterialBreadcrumb>
+		// 	</div>
+		// );
+
 		return (
 			<div id="breadcrumb-holder" style={breadcrumbStyle}>
-				<MaterialBreadcrumb className={themeName}>
-					{crumbs}
-				</MaterialBreadcrumb>
+				<Breadcrumbs separator="›" className={themeName}>
+					<Link>yolo</Link>
+					<Link>yeet</Link>
+				</Breadcrumbs>
 			</div>
 		);
 	}
