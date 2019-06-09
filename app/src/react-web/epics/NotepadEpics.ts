@@ -352,7 +352,7 @@ const getNextParse$ = action$ =>
 		map(() => actions.parseNpx.started(parseQueue[0]))
 	);
 
-const loadNotepadByIndex$ = (action$, store) =>
+const loadNotepadByIndex$ = (action$: Observable<Action<number>>, store) =>
 	action$.pipe(
 		isAction(actions.loadNotepadByIndex),
 		map((action: Action<number>) => action.payload),
