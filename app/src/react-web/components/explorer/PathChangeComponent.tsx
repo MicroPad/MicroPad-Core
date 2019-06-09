@@ -2,7 +2,6 @@ import * as React from 'react';
 import { FlatNotepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
-import { Input } from 'react-materialize';
 
 export interface IPathChangeComponentProps {
 	notepad?: FlatNotepad;
