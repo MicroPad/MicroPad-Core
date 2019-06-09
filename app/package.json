@@ -21,6 +21,8 @@
 		"eject": "react-scripts-ts eject"
 	},
 	"dependencies": {
+		"@material-ui/core": "^4.0.2",
+		"@material-ui/icons": "^4.0.1",
 		"date-fns": "^1.29.0",
 		"deep-equal": "^1.0.1",
 		"deep-freeze": "0.0.1",
