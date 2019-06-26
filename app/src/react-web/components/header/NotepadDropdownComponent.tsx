@@ -8,7 +8,7 @@ import LoginComponent from '../../containers/LoginContainer';
 import { ISyncState } from '../../../core/reducers/SyncReducer';
 import ManageSyncComponent from '../../containers/ManageSyncContainer';
 import { FlatNotepad, Note } from 'upad-parse/dist';
-import ImportMarkdownComponent from './ImportMarkdownComponent';
+import ImportMarkdownComponent from '../../containers/header/ImportMarkdownContainer';
 
 const NPX_ICON = require('../../assets/npx.png');
 const MD_ICON = require('../../assets/md.svg');
@@ -48,7 +48,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 				}>
 					<NavItem href="#!" onClick={this.createNotepad}><Icon left={true}>add</Icon> New</NavItem>
 					<UploadNotepadsComponent />
-					<ImportMarkdownComponent importMd={(md) => { debugger; }} />
+					<ImportMarkdownComponent />
 
 					<Modal
 						header="Export All Notepads"
