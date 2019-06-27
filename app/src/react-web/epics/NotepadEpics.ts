@@ -97,7 +97,24 @@ const parseEnex$ = action$ =>
 		)
 	);
 
-const restoreJsonNotepad$ = (action$, store: Store<IStoreState>) =>
+const parseMarkdownImport$ = (action$: Observable<Action<Translators.Markdown.MarkdownImport[]>>) =>
+	action$.pipe(
+		isAction(actions.importMarkdown),
+		map((action: Action<Translators.Markdown.MarkdownImport[]>) => action.payload),
+		map(markdownNotes => {
+			try {
+				return Translators.Markdown.toNotepadFromMarkdown(markdownNotes);
+			} catch (e) {
+				console.error(e);
+				Dialog.alert(`Error importing markdown`);
+				return false;
+			}
+		}),
+		filter(Boolean),
+		map((np: Notepad) => actions.parseNpx.done({ params: '', result: np.flatten() }))
+	);
+
+const restoreJsonNotepad$ = action$ =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.restoreJsonNotepad)),
 		map((action: Action<string>) => action.payload),
@@ -442,6 +459,7 @@ export const notepadEpics$ = combineEpics(
 	queueParseNpx$,
 	getNextParse$,
 	parseEnex$,
+	parseMarkdownImport$,
 	loadNotepadByIndex$,
 	updateSyncedNotepadIdOnSyncListLoad$,
 	saveNotepadOnCreation$,
