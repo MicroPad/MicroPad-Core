@@ -56,7 +56,7 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 						</p>
 						<p>
 							It's completely free for any notepad that's mostly text,
-							and only NZ$2.99/m for up to twenty of your more advanced
+							and it costs less than a cup of coffee for up to twenty of your more advanced
 							notepads. <a target="_blank" href={`${MICROPAD_URL}/sync`}>More information >></a>
 						</p>
 					</div>
