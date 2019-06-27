@@ -125,6 +125,12 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					this.oldZIndex = this.container.style.zIndex;
 					this.container.style.zIndex = '5000';
 				}}
+				bounds={{
+					left: 0,
+					top: 0,
+					right: Number.MAX_SAFE_INTEGER,
+					bottom: Number.MAX_SAFE_INTEGER
+				}}
 				onStop={(event, data) => {
 					this.handleDrag(event, data);
 					this.isDragging = false;
