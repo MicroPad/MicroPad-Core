@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { CSSProperties } from 'react';
 import './NotepadBreadcrumbsComponent.css';
-import { Breadcrumb as MaterialBreadcrumb, MenuItem, Dropdown, NavItem } from 'react-materialize';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import Link from '@material-ui/core/Link';
 import { generateGuid } from '../../../util';
 import { ThemeName } from '../../../../core/types/Themes';
 
@@ -18,7 +20,7 @@ export interface INotepadBreadcrumbsProps {
 }
 
 export default class NotepadBreadcrumbsComponent extends React.Component<INotepadBreadcrumbsProps> {
-	private readonly timeStyle = {
+	private readonly timeStyle: CSSProperties = {
 		paddingLeft: '20px',
 		fontFamily: 'Roboto',
 		fontWeight:  200 as 200
@@ -34,18 +36,34 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 		};
 
 		const crumbs: JSX.Element[] = [];
-		(breadcrumbs || []).forEach((crumb: Breadcrumb, i: number) =>
+		(breadcrumbs || []).forEach((crumb: Breadcrumb, i: number) => {
+			const isLast = i === breadcrumbs.length - 1;
+
 			crumbs.push(
-				<MenuItem key={generateGuid()} href={!!crumb.ref ? '#!' : undefined} onClick={() => !!focusItem && focusItem(crumb.ref)}>
-					{crumb.text} {i === breadcrumbs.length - 1 && !!noteTime && <span style={this.timeStyle}>{noteTime}</span>}
-				</MenuItem>
-			));
+				<Link
+					key={generateGuid()}
+					className="notepad-breadcrumbs__breadcrumb"
+					href={!!crumb.ref ? '#!' : undefined}
+					onClick={() => !!focusItem && focusItem(crumb.ref)}
+					underline="none"
+					style={isLast ? { color: 'white' } : { color: 'hsla(0,0%, 100%, .7)' }}>
+
+					{crumb.text} {isLast && !!noteTime && <span style={this.timeStyle}>{noteTime}</span>}
+
+				</Link>
+			);
+		});
 
 		return (
 			<div id="breadcrumb-holder" style={breadcrumbStyle}>
-				<MaterialBreadcrumb className={themeName}>
+				<Breadcrumbs
+					separator={<NavigateNextIcon fontSize="small" style={{ color: 'hsla(0,0%, 100%, .7)' }} />}
+					className={themeName}
+					style={{ paddingLeft: '10px', paddingRight: '10px' }}>
+
 					{crumbs}
-				</MaterialBreadcrumb>
+
+				</Breadcrumbs>
 			</div>
 		);
 	}

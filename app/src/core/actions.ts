@@ -17,7 +17,7 @@ import {
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
 import { CombinedNotepadSyncList, SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
-import { FlatNotepad, Notepad } from 'upad-parse/dist';
+import { FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { HashTagSearchResults } from './reducers/SearchReducer';
 import { ThemeName } from './types/Themes';
@@ -99,5 +99,6 @@ export const actions = {
 	flashExplorer: actionCreator<void>('FLASH_EXPLORER'),
 	encryptNotepad: actionCreator<string>('ENCRYPT_NOTEPAD'),
 	addCryptoPasskey: actionCreator<AddCryptoPasskeyAction>('ADD_CRYPTO_PASSKEY'),
-	closeNotepad: actionCreator<void>('CLOSE_NOTEPAD')
+	closeNotepad: actionCreator<void>('CLOSE_NOTEPAD'),
+	importMarkdown: actionCreator<Translators.Markdown.MarkdownImport[]>('IMPORT_FROM_MARKDOWN')
 };
