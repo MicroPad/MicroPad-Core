@@ -34,7 +34,7 @@ export class AppReducer extends MicroPadReducer<IAppStoreState> {
 			major,
 			minor,
 			patch,
-			status: isDev() ? 'dev' : 'beta'
+			status: isDev() ? 'dev' : 'stable'
 		},
 		isFullScreen: false,
 		defaultFontSize: '16px',
