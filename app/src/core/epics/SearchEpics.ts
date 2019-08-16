@@ -2,7 +2,7 @@
 
 import { combineEpics } from 'redux-observable';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
-import { from, of } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { HashTagSearchResult, HashTagSearchResults } from '../reducers/SearchReducer';
@@ -15,7 +15,7 @@ import { indexNotepads } from '../../react-web/SearchWorker';
 export namespace SearchEpics {
 	export const refreshIndices$ = action$ =>
 		action$.pipe(
-			isAction(actions.saveNotepad.done),
+			isAction(actions.saveNotepad.done, actions.deleteNotepad),
 			map(() => actions.indexNotepads.started(undefined))
 		);
 
