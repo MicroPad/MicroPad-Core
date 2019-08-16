@@ -5007,7 +5007,7 @@ jest-jasmine2@^22.4.4:
     jest-util "^22.4.1"
     source-map-support "^0.5.0"
 
-jest-marbles@^2.3.1:
+jest-marbles@^2.4.1:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/jest-marbles/-/jest-marbles-2.4.1.tgz#158f25f12b075ddc0a30de3eb1ef04f59a627f58"
   integrity sha512-fUAXZj7yy4RcJkKS1XzjtLll58mMfZ38ORplp3fR96Cu79kYIqHfFTo2v88JcjjdbEqTKpE+aV3A4cBTgvdm+Q==
