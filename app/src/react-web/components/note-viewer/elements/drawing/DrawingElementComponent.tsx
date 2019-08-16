@@ -130,6 +130,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 			// Restore saved image to canvas
 			const img = new Image();
 			img.onload = () => {
+				if (!this.canvasElement) return;
 				this.canvasElement.width = img.naturalWidth;
 				this.canvasElement.height = img.naturalHeight;
 				this.ctx.drawImage(img, 0, 0);
