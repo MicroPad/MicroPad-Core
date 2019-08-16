@@ -80,7 +80,7 @@
 		"enzyme": "^3.3.0",
 		"enzyme-adapter-react-16": "^1.1.1",
 		"ineeda": "^0.12.0-alpha.0",
-		"jest-marbles": "^2.3.1",
+		"jest-marbles": "^2.4.1",
 		"raw-loader": "^0.5.1",
 		"react-addons-test-utils": "^15.6.2",
 		"react-app-rewired": "^1.5.2",
