@@ -35,7 +35,10 @@ const saveNotepad$ = (action$: Observable<Action<Notepad>>, store: Store<IStoreS
 		filter((action: Action<Notepad>) => isType(action, actions.saveNotepad.started)),
 		map((action: Action<Notepad>) => action.payload),
 		switchMap((notepad: Notepad) => from((async () =>
-			await new Promise<void>(resolve => setTimeout(() => resolve(), 5000   ))
+			await NOTEPAD_STORAGE.setItem(
+				notepad.title,
+				await notepad.toJson(!!notepad.crypto ? store.getState().notepadPasskeys[notepad.title] : undefined)
+			)
 		)())),
 		catchError(err => of(actions.saveNotepad.failed({ params: <Notepad> {}, error: err }))),
 		map(() => actions.saveNotepad.done({ params: <Notepad> {}, result: undefined }))
