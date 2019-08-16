@@ -8,6 +8,10 @@
 	margin-bottom: 0;
 }
 
+#breadcrumb-holder .MuiBreadcrumbs-ol {
+	flex-wrap: nowrap;
+}
+
 .notepad-breadcrumbs__breadcrumb {
 	font-size: 18px;
 	color: white;

@@ -1,6 +1,6 @@
 {
 	"name": "micropad",
-	"version": "3.19.3",
+	"version": "3.19.4",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/MicroPad/Web.git"
@@ -45,7 +45,7 @@
 		"react-google-recaptcha": "^0.11.1",
 		"react-materialize": "^2.1.2",
 		"react-promise": "^2.0.2",
-		"react-redux": "^5.0.7",
+		"react-redux": "^7.1.0",
 		"react-scripts-ts": "^3.1.0",
 		"react-treeview": "^0.4.7",
 		"redux": "^3.7.2",
@@ -74,13 +74,13 @@
 		"@types/react": "^16.8.19",
 		"@types/react-dom": "^16.8.4",
 		"@types/react-google-recaptcha": "^0.9.1",
-		"@types/react-redux": "^6.0.9",
+		"@types/react-redux": "^7.1.2",
 		"@types/semver": "^5.5.0",
 		"@types/showdown": "^1.7.3",
 		"enzyme": "^3.3.0",
 		"enzyme-adapter-react-16": "^1.1.1",
 		"ineeda": "^0.12.0-alpha.0",
-		"jest-marbles": "^2.3.1",
+		"jest-marbles": "^2.4.1",
 		"raw-loader": "^0.5.1",
 		"react-addons-test-utils": "^15.6.2",
 		"react-app-rewired": "^1.5.2",

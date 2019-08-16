@@ -63,7 +63,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 		return (
 			<Modal
 				key={`search-${(notepad || { title: 'all' }).title}`}
-				header="Search Notepad"
+				header="Search"
 				trigger={<NavItem id={`search-button`} href="#!"><Icon left={true}>search</Icon> Search</NavItem>}>
 				<Row>
 					<Input
