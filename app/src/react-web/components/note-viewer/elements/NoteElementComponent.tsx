@@ -60,7 +60,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					search={search!} />
 				);
 				break;
-				
+
 			case 'image':
 				elementComponent = (
 					<ImageElementComponent
@@ -154,7 +154,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 								</Row>
 
 								<Row style={{ paddingLeft: '5px' }}>
-									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{marginRight: '5px', float: 'right'}}>Close (autosaved)</Button>
+									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{marginRight: '5px', float: 'right'}}>Close editor (autosaved)</Button>
 								</Row>
 							</div>
 						}
