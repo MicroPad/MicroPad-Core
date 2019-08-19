@@ -66,11 +66,23 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 		const isEditing = elementEditing === element.args.id;
 
+		const numericSizes = {
+			width: parseInt(element.args.width || '', 10),
+			height: parseInt(element.args.height || '', 10)
+		};
+
+		if (isNaN(numericSizes.width)) numericSizes.width = -1;
+		if (isNaN(numericSizes.height)) numericSizes.height = -1;
+
+		const minWidth = isEditing ? Math.max(400, numericSizes.width) : Math.max(170, numericSizes.width);
+		const width = isEditing ? 'auto' : element.args.width!;
+		const height = isEditing ? 'auto' : element.args.height!;
+
 		return (
 			<Resizable
 				style={{overflow: 'hidden'}}
-				size={{ width: element.args.width!, height: element.args.height! }}
-				minWidth={(isEditing) ? 300 : 170}
+				size={{ width, height }}
+				minWidth={minWidth}
 				enable={{
 					top: false,
 					bottom: false,
@@ -130,11 +142,13 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 						<textarea
 							style={
 								{
+									minWidth,
 									height: '400px',
 									backgroundColor: theme.background,
 									color: theme.text,
-									maxWidth: '100%',
-									minWidth: (element.args.width !== 'auto') ? '100%' : '400px'
+									whiteSpace: 'pre',
+									overflowWrap: 'normal',
+									overflowX: 'scroll'
 								}
 							}
 							ref={input => this.editBox = input!}
