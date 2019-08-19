@@ -6,7 +6,8 @@ import { IAppWindow, UNSUPPORTED_MESSAGE } from '../../../../../core/types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
-import { Col, Input, Row } from 'react-materialize';
+import Grid from '@material-ui/core/Grid';
+import { Input } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
 import Resizable from 're-resizable';
 import { Dialog } from '../../../../dialogs';
@@ -104,24 +105,24 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 				{
 					isEditing &&
-					<Row style={{ marginBottom: 0, color: theme.text }}>
-						<Col s={6}>
+					<Grid style={{ paddingLeft: '5px', paddingRight: '5px', marginBottom: 0, color: theme.text }} container={true} spacing={3}>
+						<Grid item={true} xs={6}>
 							<Input
 								label="Font Size"
 								defaultValue={element.args.fontSize}
 								onChange={this.onFontSizeEdit}
 							/>
-						</Col>
+						</Grid>
 
-						<Col s={6}>
+						<Grid item={true} xs={6}>
 							<Input
 								style={{ width: '100%', color: theme.text }}
 								label="Width"
 								defaultValue={element.args.width}
 								onChange={(e, v) => this.onSizeEdit('width', v)}
 							/>
-						</Col>
-					</Row>
+						</Grid>
+					</Grid>
 				}
 
 				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>Markdown Editor (<MarkdownHelpComponent />)</span>}
