@@ -75,7 +75,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		if (isNaN(numericSizes.width)) numericSizes.width = -1;
 		if (isNaN(numericSizes.height)) numericSizes.height = -1;
 
-		const minWidth = isEditing ? Math.max(400, numericSizes.width) : Math.max(170, numericSizes.width);
+		const minWidth = isEditing ? Math.max(400, numericSizes.width) : 170;
 		const width = isEditing ? 'auto' : element.args.width!;
 		const height = isEditing ? 'auto' : element.args.height!;
 
