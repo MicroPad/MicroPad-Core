@@ -1,11 +1,25 @@
 export function enableTabs(event) {
-	if (event.keyCode === 9) {
-		const v = this.value;
-		const s = this.selectionStart;
-		const e = this.selectionEnd;
+	const value = this.value;
+	const selectionStart = this.selectionStart;
+	const selectionEnd = this.selectionEnd;
 
-		setNativeValue(this, v.substring(0, s) + '\t' + v.substring(e));
-		this.selectionStart = this.selectionEnd = s + 1;
+	if (event.keyCode === 9) { // Key === tab
+		setNativeValue(this, value.substring(0, selectionStart) + '\t' + value.substring(selectionEnd));
+		this.selectionStart = this.selectionEnd = selectionStart + 1;
+
+		this.dispatchEvent(new Event('input', { bubbles: true }));
+		return false;
+	} else if (event.keyCode === 13) { // Key === enter
+		// I adapted this from https://stackoverflow.com/a/21715788
+		const currentLine = this.value.substr(0, this.selectionStart).split("\n").pop();
+		const indent = currentLine.match(/^\s*/)[0];
+		const textBefore = value.substring(0, selectionStart);
+		const textAfter  = value.substring(selectionStart, value.length);
+
+		// Manually insert the new line plus the same level of indentation as the line before
+		event.preventDefault();
+		setNativeValue(this, `${textBefore}\n${indent}${textAfter}`);
+		this.selectionStart = this.selectionEnd = selectionStart + indent.length + 1;
 
 		this.dispatchEvent(new Event('input', { bubbles: true }));
 		return false;
