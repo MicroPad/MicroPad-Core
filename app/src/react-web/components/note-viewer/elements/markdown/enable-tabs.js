@@ -1,3 +1,5 @@
+const INDENT_AND_LIST_PATTERN = /^([\t ]*[-*] \[] |[\t ]*[-*] \[ ] |[\t ]*[-*] \[x] |[\t ]*[-*] |\s*)/;
+
 export function enableTabs(event) {
 	const value = this.value;
 	const selectionStart = this.selectionStart;
@@ -12,7 +14,7 @@ export function enableTabs(event) {
 	} else if (event.keyCode === 13) { // Key === enter
 		// I adapted this from https://stackoverflow.com/a/21715788
 		const currentLine = this.value.substr(0, this.selectionStart).split("\n").pop();
-		const indent = currentLine.match(/^\s*/)[0];
+		const indent = currentLine.match(INDENT_AND_LIST_PATTERN)[0];
 		const textBefore = value.substring(0, selectionStart);
 		const textAfter  = value.substring(selectionStart, value.length);
 
