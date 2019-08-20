@@ -6,7 +6,8 @@ import { IAppWindow, UNSUPPORTED_MESSAGE } from '../../../../../core/types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
-import { Col, Input, Row } from 'react-materialize';
+import Grid from '@material-ui/core/Grid';
+import { Input } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
 import Resizable from 're-resizable';
 import { Dialog } from '../../../../dialogs';
@@ -66,11 +67,23 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 		const isEditing = elementEditing === element.args.id;
 
+		const numericSizes = {
+			width: parseInt(element.args.width || '', 10),
+			height: parseInt(element.args.height || '', 10)
+		};
+
+		if (isNaN(numericSizes.width)) numericSizes.width = -1;
+		if (isNaN(numericSizes.height)) numericSizes.height = -1;
+
+		const minWidth = isEditing ? Math.max(400, numericSizes.width) : 170;
+		const width = isEditing ? 'auto' : element.args.width!;
+		const height = isEditing ? 'auto' : element.args.height!;
+
 		return (
 			<Resizable
 				style={{overflow: 'hidden'}}
-				size={{ width: element.args.width!, height: element.args.height! }}
-				minWidth={(isEditing) ? 300 : 170}
+				size={{ width, height }}
+				minWidth={minWidth}
 				enable={{
 					top: false,
 					bottom: false,
@@ -92,24 +105,24 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 				{
 					isEditing &&
-					<Row style={{ marginBottom: 0, color: theme.text }}>
-						<Col s={6}>
+					<Grid style={{ paddingLeft: '5px', paddingRight: '5px', marginBottom: 0, color: theme.text }} container={true} spacing={3}>
+						<Grid item={true} xs={6}>
 							<Input
 								label="Font Size"
 								defaultValue={element.args.fontSize}
 								onChange={this.onFontSizeEdit}
 							/>
-						</Col>
+						</Grid>
 
-						<Col s={6}>
+						<Grid item={true} xs={6}>
 							<Input
 								style={{ width: '100%', color: theme.text }}
 								label="Width"
 								defaultValue={element.args.width}
 								onChange={(e, v) => this.onSizeEdit('width', v)}
 							/>
-						</Col>
-					</Row>
+						</Grid>
+					</Grid>
 				}
 
 				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>Markdown Editor (<MarkdownHelpComponent />)</span>}
@@ -130,11 +143,13 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 						<textarea
 							style={
 								{
+									minWidth,
 									height: '400px',
 									backgroundColor: theme.background,
 									color: theme.text,
-									maxWidth: '100%',
-									minWidth: (element.args.width !== 'auto') ? '100%' : '400px'
+									whiteSpace: 'pre',
+									overflowWrap: 'normal',
+									overflowX: 'scroll'
 								}
 							}
 							ref={input => this.editBox = input!}
