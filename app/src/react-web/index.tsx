@@ -185,6 +185,13 @@ function notepadDownloadHandler() {
 }
 
 function pasteWatcher() {
+	/*
+		The paste watcher breaks text inputs in Safari (https://github.com/MicroPad/Web/issues/179).
+		TODO: Consider re-enabling this when https://github.com/MicroPad/Web/issues/143 is done.
+	*/
+	const isSafariLike = navigator.vendor === 'Apple Computer, Inc.';
+	if (isSafariLike) return;
+
 	PasteImage.on('paste-image', async (image: HTMLImageElement) => {
 		store.dispatch(actions.imagePasted.started(image.src));
 	});
