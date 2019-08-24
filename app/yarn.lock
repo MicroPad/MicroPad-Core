@@ -183,6 +183,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.50.tgz#7f2b7fd8a389fd90230c330da0a6ae2f414516af"
   integrity sha512-9Yzqn2NzJxwFzon4W+aqUAMl3FiVnJ965f5F3H5T+EpUrHqb2Is1SPp/lsj2WFBqXrhIINJ5SzSwneLMg5PgSQ==
 
+"@types/pdfobject@^2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@types/pdfobject/-/pdfobject-2.0.6.tgz#67da3ce9663f93e15bcfa0d4ecea2169091ece1a"
+  integrity sha512-KtwKbfAX4FOmB9aWbwP/tURPr4oU7Sc9mc3HZJtzQV8hsPwoMyVwx9duEvAAhVjr9/WQJKBkuaAf4pfmBIiX0g==
+
 "@types/prop-types@*":
   version "15.7.1"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.1.tgz#f1a11e7babb0c3cad68100be381d1e064c68f1f6"
@@ -6768,6 +6773,11 @@ pbkdf2@^3.0.3:
     ripemd160 "^2.0.1"
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
+
+pdfobject@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/pdfobject/-/pdfobject-2.1.1.tgz#2949d4d218d130d16b6149c7f7226f0a73400d4a"
+  integrity sha512-QFktTHyjs4q/WhGFfV2RdAbscPdNkyQb/JfFz18cwILvs9ocDiYVFAEh/jgkKGv6my+r4nlbLjwj7BHFKAupHQ==
 
 performance-now@^2.1.0:
   version "2.1.0"

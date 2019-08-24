@@ -5,20 +5,71 @@
 - Licence: MIT
 - https://github.com/babel/babel/tree/master/packages/babel-code-frame
 
-## @babel/highlight@7.0.0
+## @babel/code-frame@7.5.5
+- Published By: Sebastian McKenzie
+- Licence: MIT
+- https://github.com/babel/babel/tree/master/packages/babel-code-frame
+
+## @babel/highlight@7.5.0
 - Published By: suchipi
 - Licence: MIT
 - https://github.com/babel/babel/tree/master/packages/babel-highlight
 
-## @babel/runtime@7.1.5
+## @babel/runtime@7.5.5
 - Published By: Sebastian McKenzie
 - Licence: MIT
 - https://github.com/babel/babel/tree/master/packages/babel-runtime
 
+## @emotion/hash@0.7.2
+- Licence: MIT
+- https://github.com/emotion-js/emotion/tree/master/packages/hash
+
+## @material-ui/core@4.3.2
+- Published By: Material-UI Team
+- Licence: MIT
+- https://github.com/mui-org/material-ui
+
+## @material-ui/icons@4.2.1
+- Published By: Material-UI Team
+- Licence: MIT
+- https://github.com/mui-org/material-ui
+
+## @material-ui/styles@4.3.0
+- Published By: Material-UI Team
+- Licence: MIT
+- https://github.com/mui-org/material-ui
+
+## @material-ui/system@4.3.3
+- Published By: Material-UI Team
+- Licence: MIT
+- https://github.com/mui-org/material-ui
+
+## @material-ui/types@4.1.1
+- Published By: Material-UI Team
+- Licence: MIT
+- https://github.com/mui-org/material-ui
+
+## @material-ui/utils@4.3.0
+- Published By: Material-UI Team
+- Licence: MIT
+- https://github.com/mui-org/material-ui
+
 ## @types/json5@0.0.29
 - Published By: Jason Swearingen
 - Licence: MIT
-- https://www.github.com/DefinitelyTyped/DefinitelyTyped
+- https://github.com/DefinitelyTyped/DefinitelyTyped
+
+## @types/prop-types@15.7.1
+- Licence: MIT
+- https://github.com/DefinitelyTyped/DefinitelyTyped
+
+## @types/react-transition-group@4.2.2
+- Licence: MIT
+- https://github.com/DefinitelyTyped/DefinitelyTyped
+
+## @types/react@16.9.2
+- Licence: MIT
+- https://github.com/DefinitelyTyped/DefinitelyTyped
 
 ## abab@1.0.4
 - Published By: Jeff Carpenter
@@ -30,7 +81,7 @@
 - Licence: BSD*
 - https://github.com/jsdom/abab
 
-## accepts@1.3.5
+## accepts@1.3.7
 - Licence: MIT
 - https://github.com/jshttp/accepts
 
@@ -39,17 +90,17 @@
 - Licence: MIT
 - https://github.com/kesne/acorn-dynamic-import
 
-## acorn-globals@4.1.0
+## acorn-globals@3.1.0
 - Published By: ForbesLindesay
 - Licence: MIT
 - https://github.com/ForbesLindesay/acorn-globals
 
-## acorn-globals@4.3.0
+## acorn-globals@4.3.3
 - Published By: ForbesLindesay
 - Licence: MIT
 - https://github.com/ForbesLindesay/acorn-globals
 
-## acorn-walk@6.1.1
+## acorn-walk@6.2.0
 - Licence: MIT
 - https://github.com/acornjs/acorn
 
@@ -57,15 +108,11 @@
 - Licence: MIT
 - https://github.com/ternjs/acorn
 
-## acorn@5.7.1
-- Licence: MIT
-- https://github.com/acornjs/acorn
-
 ## acorn@5.7.3
 - Licence: MIT
 - https://github.com/acornjs/acorn
 
-## acorn@6.0.4
+## acorn@6.3.0
 - Licence: MIT
 - https://github.com/acornjs/acorn
 
@@ -74,12 +121,22 @@
 - Licence: MIT
 - https://github.com/node-modules/address
 
+## address@1.1.0
+- Published By: fengmk2
+- Licence: MIT
+- https://github.com/node-modules/address
+
+## aes-js@3.1.2
+- Published By: Richard Moore
+- Licence: MIT
+- https://github.com/ricmoo/aes-js
+
 ## ajv-keywords@2.1.1
 - Published By: Evgeny Poberezkin
 - Licence: MIT
 - https://github.com/epoberezkin/ajv-keywords
 
-## ajv-keywords@3.2.0
+## ajv-keywords@3.4.0
 - Published By: Evgeny Poberezkin
 - Licence: MIT
 - https://github.com/epoberezkin/ajv-keywords
@@ -89,7 +146,12 @@
 - Licence: MIT
 - https://github.com/epoberezkin/ajv
 
-## ajv@6.5.5
+## ajv@6.10.0
+- Published By: Evgeny Poberezkin
+- Licence: MIT
+- https://github.com/epoberezkin/ajv
+
+## ajv@6.10.2
 - Published By: Evgeny Poberezkin
 - Licence: MIT
 - https://github.com/epoberezkin/ajv
@@ -109,7 +171,12 @@
 - Licence: ISC
 - https://github.com/nexdrew/ansi-align
 
-## ansi-escapes@3.1.0
+## ansi-escapes@1.4.0
+- Published By: Sindre Sorhus
+- Licence: MIT
+- https://github.com/sindresorhus/ansi-escapes
+
+## ansi-escapes@3.2.0
 - Published By: Sindre Sorhus
 - Licence: MIT
 - https://github.com/sindresorhus/ansi-escapes
@@ -203,7 +270,7 @@
 - Licence: MIT
 - https://github.com/blakeembrey/array-flatten
 
-## array-flatten@2.1.1
+## array-flatten@2.1.2
 - Published By: Blake Embrey
 - Licence: MIT
 - https://github.com/blakeembrey/array-flatten
@@ -267,9 +334,9 @@
 - Licence: MIT
 - https://github.com/mcavage/node-assert-plus
 
-## assert@1.4.1
+## assert@1.5.0
 - Licence: MIT
-- https://github.com/defunctzombie/commonjs-assert
+- https://github.com/browserify/commonjs-assert
 
 ## assertion-error@1.1.0
 - Published By: Jake Luer
@@ -281,17 +348,12 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/assign-symbols
 
-## astral-regex@1.0.0
-- Published By: Kevin Mårtensson
-- Licence: MIT
-- https://github.com/kevva/astral-regex
-
-## async-each@1.0.1
+## async-each@1.0.3
 - Published By: Paul Miller
 - Licence: MIT
 - https://github.com/paulmillr/async-each
 
-## async-limiter@1.0.0
+## async-limiter@1.0.1
 - Published By: Samuel Reed
 - Licence: MIT
 - https://github.com/strml/async-limiter
@@ -301,7 +363,7 @@
 - Licence: MIT
 - https://github.com/caolan/async
 
-## async@2.6.1
+## async@2.6.2
 - Published By: Caolan McMahon
 - Licence: MIT
 - https://github.com/caolan/async
@@ -330,11 +392,6 @@
 - Published By: Mikeal Rogers
 - Licence: Apache-2.0
 - https://github.com/mikeal/aws-sign
-
-## aws4@1.7.0
-- Published By: Michael Hart
-- Licence: MIT
-- https://github.com/mhart/aws4
 
 ## aws4@1.8.0
 - Published By: Michael Hart
@@ -409,11 +466,11 @@
 - Licence: MIT
 - https://github.com/babel/babel/tree/master/packages/babel-helpers
 
-## babel-jest@22.4.4
-- Licence: MIT
+## babel-jest@20.0.3
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
-## babel-loader@7.1.5
+## babel-loader@7.1.2
 - Published By: Luis Couto
 - Licence: MIT
 - https://github.com/babel/babel-loader
@@ -436,6 +493,10 @@
 - Published By: Thai Pangsakulyanont @dtinth
 - Licence: BSD-3-Clause
 - https://github.com/istanbuljs/babel-plugin-istanbul
+
+## babel-plugin-jest-hoist@20.0.3
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
 
 ## babel-plugin-jest-hoist@22.4.4
 - Licence: MIT
@@ -624,6 +685,10 @@
 - Licence: MIT
 - https://github.com/babel/babel/tree/master/packages/babel-preset-flow
 
+## babel-preset-jest@20.0.3
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
 ## babel-preset-jest@22.4.4
 - Licence: MIT
 - https://github.com/facebook/jest
@@ -701,12 +766,17 @@
 - Licence: MIT
 - https://github.com/MikeMcl/big.js
 
-## binary-extensions@1.12.0
+## big.js@5.2.2
+- Published By: Michael Mclaughlin
+- Licence: MIT
+- https://github.com/MikeMcl/big.js
+
+## binary-extensions@1.13.1
 - Published By: Sindre Sorhus
 - Licence: MIT
 - https://github.com/sindresorhus/binary-extensions
 
-## bluebird@3.5.3
+## bluebird@3.5.5
 - Published By: Petka Antonov
 - Licence: MIT
 - https://github.com/petkaantonov/bluebird
@@ -716,7 +786,7 @@
 - Licence: MIT
 - https://github.com/indutny/bn.js
 
-## body-parser@1.18.3
+## body-parser@1.19.0
 - Licence: MIT
 - https://github.com/expressjs/body-parser
 
@@ -754,11 +824,6 @@
 - Published By: Fedor Indutny
 - Licence: MIT
 - https://github.com/indutny/brorand
-
-## browser-process-hrtime@0.1.2
-- Published By: kumavis
-- Licence: BSD-2-Clause
-- https://github.com/kumavis/browser-process-hrtime
 
 ## browser-process-hrtime@0.1.3
 - Published By: kumavis
@@ -807,6 +872,11 @@
 - Licence: MIT
 - https://github.com/ai/browserslist
 
+## bser@1.0.2
+- Published By: Wez Furlong
+- Licence: Apache-2.0
+- https://github.com/facebook/watchman
+
 ## bser@2.0.0
 - Published By: Wez Furlong
 - Licence: Apache-2.0
@@ -842,6 +912,11 @@
 - https://github.com/bendrucker/builtin-status-codes
 
 ## bytes@3.0.0
+- Published By: TJ Holowaychuk
+- Licence: MIT
+- https://github.com/visionmedia/bytes.js
+
+## bytes@3.1.0
 - Published By: TJ Holowaychuk
 - Licence: MIT
 - https://github.com/visionmedia/bytes.js
@@ -895,20 +970,15 @@
 - Licence: MIT
 - https://github.com/nyalab/caniuse-api
 
-## caniuse-db@1.0.30000907
+## caniuse-db@1.0.30000974
 - Published By: Alexis Deveria
 - Licence: CC-BY-4.0
 - https://github.com/Fyrd/caniuse
 
-## caniuse-lite@1.0.30000907
+## caniuse-lite@1.0.30000974
 - Published By: Ben Briggs
 - Licence: CC-BY-4.0
 - https://github.com/ben-eb/caniuse-lite
-
-## capture-exit@1.2.0
-- Published By: Stefan Penner
-- Licence: ISC
-- https://github.com/stefanpenner/capture-exit
 
 ## capture-stack-trace@1.0.1
 - Published By: Vsevolod Strukchinsky
@@ -939,10 +1009,6 @@
 - Licence: MIT
 - https://github.com/chalk/chalk
 
-## chalk@2.4.1
-- Licence: MIT
-- https://github.com/chalk/chalk
-
 ## chalk@2.4.2
 - Licence: MIT
 - https://github.com/chalk/chalk
@@ -967,7 +1033,7 @@
 - Licence: MIT
 - https://github.com/paulmillr/chokidar
 
-## chokidar@2.0.4
+## chokidar@2.1.6
 - Published By: Paul Miller
 - Licence: MIT
 - https://github.com/paulmillr/chokidar
@@ -1047,6 +1113,11 @@
 - Licence: MIT
 - https://github.com/pvorb/node-clone
 
+## clsx@1.0.4
+- Published By: Luke Edwards
+- Licence: MIT
+- https://github.com/lukeed/clsx
+
 ## co@4.6.0
 - Licence: MIT
 - https://github.com/tj/co
@@ -1100,12 +1171,7 @@
 - Licence: MIT
 - https://github.com/Marak/colors.js
 
-## combined-stream@1.0.6
-- Published By: Felix Geisendörfer
-- Licence: MIT
-- https://github.com/felixge/node-combined-stream
-
-## combined-stream@1.0.7
+## combined-stream@1.0.8
 - Published By: Felix Geisendörfer
 - Licence: MIT
 - https://github.com/felixge/node-combined-stream
@@ -1125,20 +1191,25 @@
 - Licence: MIT
 - https://github.com/tj/commander.js
 
+## commander@2.20.0
+- Published By: TJ Holowaychuk
+- Licence: MIT
+- https://github.com/tj/commander.js
+
 ## commondir@1.0.1
 - Published By: James Halliday
 - Licence: MIT
 - https://github.com/substack/node-commondir
 
-## component-emitter@1.2.1
+## component-emitter@1.3.0
 - Licence: MIT
 - https://github.com/component/emitter
 
-## compressible@2.0.15
+## compressible@2.0.17
 - Licence: MIT
 - https://github.com/jshttp/compressible
 
-## compression@1.7.3
+## compression@1.7.4
 - Licence: MIT
 - https://github.com/expressjs/compression
 
@@ -1157,7 +1228,7 @@
 - Licence: BSD-2-Clause
 - https://github.com/yeoman/configstore
 
-## connect-history-api-fallback@1.5.0
+## connect-history-api-fallback@1.6.0
 - Published By: Ben Ripkens
 - Licence: MIT
 - https://github.com/bripkens/connect-history-api-fallback
@@ -1172,14 +1243,25 @@
 - Licence: MIT
 - https://github.com/juliangruber/constants-browserify
 
-## content-disposition@0.5.2
+## content-disposition@0.5.3
+- Published By: Douglas Christopher Wilson
 - Licence: MIT
 - https://github.com/jshttp/content-disposition
+
+## content-type-parser@1.0.2
+- Published By: Domenic Denicola
+- Licence: MIT
+- https://github.com/jsdom/content-type-parser
 
 ## content-type@1.0.4
 - Published By: Douglas Christopher Wilson
 - Licence: MIT
 - https://github.com/jshttp/content-type
+
+## convert-css-length@2.0.1
+- Published By: Kyle Mathews
+- Licence: MIT
+- https://github.com/KyleAMathews/convert-css-length
 
 ## convert-source-map@1.6.0
 - Published By: Thorsten Lorenz
@@ -1191,7 +1273,7 @@
 - Licence: MIT
 - https://github.com/visionmedia/node-cookie-signature
 
-## cookie@0.3.1
+## cookie@0.4.0
 - Published By: Roman Shtylman
 - Licence: MIT
 - https://github.com/jshttp/cookie
@@ -1206,11 +1288,7 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/copy-descriptor
 
-## core-js@2.3.0
-- Licence: MIT
-- https://github.com/zloirock/core-js
-
-## core-js@2.5.7
+## core-js@2.6.9
 - Licence: MIT
 - https://github.com/zloirock/core-js
 
@@ -1287,7 +1365,12 @@
 - Licence: MIT
 - https://github.com/css-modules/css-selector-tokenizer
 
-## css-what@2.1.2
+## css-vendor@2.0.6
+- Published By: Oleg Slobodskoi
+- Licence: MIT
+- https://github.com/cssinjs/css-vendor
+
+## css-what@2.1.3
 - Published By: Felix Böhm
 - Licence: BSD-2-Clause
 - https://github.com/fb55/css-what
@@ -1307,18 +1390,23 @@
 - Licence: MIT
 - https://github.com/css/csso
 
-## cssom@0.3.4
+## cssom@0.3.8
 - Published By: Nikita Vasilyev
 - Licence: MIT
 - https://github.com/NV/CSSOM
 
-## cssstyle@1.0.0
+## cssstyle@0.2.37
+- Licence: MIT
+- https://github.com/chad3814/CSSStyleDeclaration
+
+## cssstyle@1.4.0
 - Licence: MIT
 - https://github.com/jsakas/CSSStyleDeclaration
 
-## cssstyle@1.1.1
+## csstype@2.6.6
+- Published By: Fredrik Nicol
 - Licence: MIT
-- https://github.com/jsakas/CSSStyleDeclaration
+- https://github.com/frenic/csstype
 
 ## currently-unhandled@0.4.1
 - Published By: James Talmage
@@ -1340,20 +1428,10 @@
 - Licence: MIT
 - https://github.com/trentm/node-dashdash
 
-## data-urls@1.0.0
-- Published By: Domenic Denicola
-- Licence: MIT
-- https://github.com/jsdom/data-urls
-
 ## data-urls@1.1.0
 - Published By: Domenic Denicola
 - Licence: MIT
 - https://github.com/jsdom/data-urls
-
-## date-fns@1.29.0
-- Published By: Sasha Koss
-- Licence: MIT
-- https://github.com/date-fns/date-fns
 
 ## date-fns@1.30.1
 - Published By: Sasha Koss
@@ -1366,11 +1444,6 @@
 - https://github.com/Colingo/date-now
 
 ## debug@2.6.9
-- Published By: TJ Holowaychuk
-- Licence: MIT
-- https://github.com/visionmedia/debug
-
-## debug@3.1.0
 - Published By: TJ Holowaychuk
 - Licence: MIT
 - https://github.com/visionmedia/debug
@@ -1424,6 +1497,10 @@
 - Published By: Nick Fisher
 - Licence: MIT
 - https://github.com/KyleAMathews/deepmerge
+
+## deepmerge@4.0.0
+- Licence: MIT
+- https://github.com/TehShrike/deepmerge
 
 ## default-require-extensions@1.0.0
 - Published By: James Talmage
@@ -1490,11 +1567,6 @@
 - Licence: MIT
 - https://github.com/sindresorhus/detect-indent
 
-## detect-newline@2.1.0
-- Published By: Sindre Sorhus
-- Licence: MIT
-- https://github.com/sindresorhus/detect-newline
-
 ## detect-node@2.0.4
 - Published By: Ilya Kantor
 - Licence: ISC
@@ -1533,7 +1605,12 @@
 - Licence: MIT
 - https://github.com/AriaMinaei/dom-converter
 
-## dom-serializer@0.1.0
+## dom-helpers@3.4.0
+- Published By: Jason Quense
+- Licence: MIT
+- https://github.com/jquense/dom-helpers
+
+## dom-serializer@0.1.1
 - Published By: Felix Boehm
 - Licence: MIT
 - https://github.com/cheeriojs/dom-renderer
@@ -1548,11 +1625,6 @@
 - Licence: MIT
 - https://github.com/bevry/domain-browser
 
-## domelementtype@1.1.3
-- Published By: Felix Boehm
-- Licence: BSD*
-- https://github.com/FB55/domelementtype
-
 ## domelementtype@1.3.1
 - Published By: Felix Boehm
 - Licence: BSD-2-Clause
@@ -1563,24 +1635,24 @@
 - Licence: MIT
 - https://github.com/jsdom/domexception
 
-## domhandler@2.1.0
+## domhandler@2.4.2
 - Published By: Felix Boehm
-- Licence: BSD*
-- https://github.com/fb55/domhandler
+- Licence: BSD-2-Clause
+- https://github.com/fb55/DomHandler
 
 ## domify@1.4.0
 - Published By: TJ Holowaychuk
 - Licence: MIT
 - https://github.com/component/domify
 
-## domutils@1.1.6
+## domutils@1.5.1
 - Published By: Felix Boehm
 - Licence: BSD*
 - https://github.com/FB55/domutils
 
-## domutils@1.5.1
+## domutils@1.7.0
 - Published By: Felix Boehm
-- Licence: BSD*
+- Licence: BSD-2-Clause
 - https://github.com/FB55/domutils
 
 ## dot-prop@4.2.0
@@ -1607,7 +1679,7 @@
 - Licence: MIT
 - https://github.com/Raynos/duplexer
 
-## duplexify@3.6.1
+## duplexify@3.7.1
 - Published By: Mathias Buus
 - Licence: MIT
 - https://github.com/mafintosh/duplexify
@@ -1622,7 +1694,7 @@
 - Licence: MIT
 - https://github.com/jonathanong/ee-first
 
-## electron-to-chromium@1.3.84
+## electron-to-chromium@1.3.154
 - Published By: Kilian Valkhof
 - Licence: ISC
 - https://github.com/kilian/electron-to-chromium
@@ -1664,7 +1736,7 @@
 - Licence: MIT
 - https://github.com/qix-/node-error-ex
 
-## es-abstract@1.12.0
+## es-abstract@1.13.0
 - Published By: Jordan Harband
 - Licence: MIT
 - https://github.com/ljharb/es-abstract
@@ -1674,7 +1746,7 @@
 - Licence: MIT
 - https://github.com/ljharb/es-to-primitive
 
-## es5-ext@0.10.46
+## es5-ext@0.10.50
 - Published By: Mariusz Nowak
 - Licence: ISC
 - https://github.com/medikoo/es5-ext
@@ -1694,12 +1766,7 @@
 - Licence: MIT
 - https://github.com/rubennorte/es6-object-assign
 
-## es6-promise@3.0.2
-- Published By: Yehuda Katz, Tom Dale, Stefan Penner and contributors
-- Licence: MIT
-- https://github.com/jakearchibald/ES6-Promises
-
-## es6-promise@4.2.5
+## es6-promise@4.2.8
 - Published By: Yehuda Katz, Tom Dale, Stefan Penner and contributors
 - Licence: MIT
 - https://github.com/stefanpenner/es6-promise
@@ -1714,9 +1781,9 @@
 - Licence: MIT
 - https://github.com/medikoo/es6-symbol
 
-## es6-weak-map@2.0.2
+## es6-weak-map@2.0.3
 - Published By: Mariusz Nowak
-- Licence: MIT
+- Licence: ISC
 - https://github.com/medikoo/es6-weak-map
 
 ## escape-html@1.0.3
@@ -1728,7 +1795,11 @@
 - Licence: MIT
 - https://github.com/sindresorhus/escape-string-regexp
 
-## escodegen@1.11.0
+## escodegen@1.11.1
+- Licence: BSD-2-Clause
+- https://github.com/estools/escodegen
+
+## escodegen@1.12.0
 - Licence: BSD-2-Clause
 - https://github.com/estools/escodegen
 
@@ -1759,8 +1830,12 @@
 - Licence: BSD-2-Clause
 - https://github.com/estools/estraverse
 
-## esutils@2.0.2
-- Licence: BSD
+## estraverse@4.3.0
+- Licence: BSD-2-Clause
+- https://github.com/estools/estraverse
+
+## esutils@2.0.3
+- Licence: BSD-2-Clause
 - https://github.com/estools/esutils
 
 ## etag@1.8.1
@@ -1772,12 +1847,17 @@
 - Licence: MIT
 - https://github.com/medikoo/event-emitter
 
-## eventemitter3@3.1.0
+## eventemitter3@3.1.2
 - Published By: Arnout Kazemier
 - Licence: MIT
 - https://github.com/primus/eventemitter3
 
 ## events@1.1.1
+- Published By: Irakli Gozalishvili
+- Licence: MIT
+- https://github.com/Gozala/events
+
+## events@3.0.0
 - Published By: Irakli Gozalishvili
 - Licence: MIT
 - https://github.com/Gozala/events
@@ -1801,11 +1881,6 @@
 - Published By: Sindre Sorhus
 - Licence: MIT
 - https://github.com/sindresorhus/execa
-
-## exit@0.1.2
-- Published By: "Cowboy" Ben Alman
-- Licence: MIT
-- https://github.com/cowboy/node-exit
 
 ## expand-brackets@0.1.5
 - Published By: Jon Schlinkert
@@ -1831,7 +1906,7 @@
 - Licence: MIT
 - https://github.com/facebook/jest
 
-## express@4.16.4
+## express@4.17.1
 - Published By: TJ Holowaychuk
 - Licence: MIT
 - https://github.com/expressjs/express
@@ -1914,6 +1989,11 @@
 - Licence: MIT
 - https://github.com/faye/faye-websocket-node
 
+## fb-watchman@1.9.2
+- Published By: Wez Furlong
+- Licence: Apache-2.0
+- https://github.com/facebook/watchman
+
 ## fb-watchman@2.0.0
 - Published By: Wez Furlong
 - Licence: Apache-2.0
@@ -1924,7 +2004,7 @@
 - Licence: MIT
 - https://github.com/sindresorhus/figures
 
-## file-loader@0.11.2
+## file-loader@1.1.5
 - Published By: Tobias Koppers @sokra
 - Licence: MIT
 - https://github.com/webpack/file-loader
@@ -1954,7 +2034,7 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/fill-range
 
-## finalhandler@1.1.1
+## finalhandler@1.1.2
 - Published By: Douglas Christopher Wilson
 - Licence: MIT
 - https://github.com/pillarjs/finalhandler
@@ -1984,15 +2064,15 @@
 - Licence: MIT
 - https://github.com/jesusabdullah/node-flatten
 
-## flush-write-stream@1.0.3
+## flush-write-stream@1.1.1
 - Published By: Mathias Buus
 - Licence: MIT
 - https://github.com/mafintosh/flush-write-stream
 
-## follow-redirects@1.5.9
-- Published By: Olivier Lalonde
+## follow-redirects@1.7.0
+- Published By: Ruben Verborgh
 - Licence: MIT
-- https://github.com/olalonde/follow-redirects
+- https://github.com/follow-redirects/follow-redirects
 
 ## for-in@1.0.2
 - Published By: Jon Schlinkert
@@ -2013,11 +2093,6 @@
 - Published By: Piotr Oleś
 - Licence: MIT
 - https://github.com/Realytics/fork-ts-checker-webpack-plugin
-
-## form-data@2.3.2
-- Published By: Felix Geisendörfer
-- Licence: MIT
-- https://github.com/form-data/form-data
 
 ## form-data@2.3.3
 - Published By: Felix Geisendörfer
@@ -2132,7 +2207,7 @@
 - Licence: MIT
 - https://github.com/wearefractal/glob2base
 
-## glob@7.1.3
+## glob@7.1.4
 - Published By: Isaac Z. Schlueter
 - Licence: ISC
 - https://github.com/isaacs/node-glob
@@ -2195,7 +2270,7 @@
 - Licence: MIT
 - https://github.com/indutny/handle-thing
 
-## handlebars@4.0.12
+## handlebars@4.1.2
 - Published By: Yehuda Katz
 - Licence: MIT
 - https://github.com/wycats/handlebars.js
@@ -2204,11 +2279,6 @@
 - Published By: Ahmad Nassri
 - Licence: ISC
 - https://github.com/ahmadnassri/har-schema
-
-## har-validator@5.0.3
-- Published By: Ahmad Nassri
-- Licence: ISC
-- https://github.com/ahmadnassri/har-validator
 
 ## har-validator@5.1.3
 - Published By: Ahmad Nassri
@@ -2270,7 +2340,7 @@
 - Licence: MIT
 - https://github.com/crypto-browserify/hash-base
 
-## hash.js@1.1.5
+## hash.js@1.1.7
 - Published By: Fedor Indutny
 - Licence: MIT
 - https://github.com/indutny/hash.js
@@ -2285,7 +2355,7 @@
 - Licence: MIT
 - https://github.com/indutny/hmac-drbg
 
-## hoist-non-react-statics@3.1.0
+## hoist-non-react-statics@3.3.0
 - Published By: Michael Ridgway
 - Licence: BSD-3-Clause
 - https://github.com/mridgway/hoist-non-react-statics
@@ -2295,7 +2365,7 @@
 - Licence: MIT
 - https://github.com/sindresorhus/home-or-tmp
 
-## homedir-polyfill@1.0.1
+## homedir-polyfill@1.0.3
 - Published By: Brian Woodward
 - Licence: MIT
 - https://github.com/doowb/homedir-polyfill
@@ -2335,7 +2405,7 @@
 - Licence: MIT
 - https://github.com/jantimon/html-webpack-plugin
 
-## htmlparser2@3.3.0
+## htmlparser2@3.10.1
 - Published By: Felix Boehm
 - Licence: MIT
 - https://github.com/fb55/htmlparser2
@@ -2346,6 +2416,11 @@
 - https://github.com/indutny/http-deceiver
 
 ## http-errors@1.6.3
+- Published By: Jonathan Ong
+- Licence: MIT
+- https://github.com/jshttp/http-errors
+
+## http-errors@1.7.2
 - Published By: Jonathan Ong
 - Licence: MIT
 - https://github.com/jshttp/http-errors
@@ -2375,15 +2450,10 @@
 - Licence: MIT
 - https://github.com/substack/https-browserify
 
-## iconv-lite@0.4.19
-- Published By: Alexander Shtuchkin
-- Licence: MIT
-- https://github.com/ashtuchkin/iconv-lite
-
-## iconv-lite@0.4.23
-- Published By: Alexander Shtuchkin
-- Licence: MIT
-- https://github.com/ashtuchkin/iconv-lite
+## hyphenate-style-name@1.0.3
+- Published By: Espen Hovlandsdal
+- Licence: BSD-3-Clause
+- https://github.com/rexxars/hyphenate-style-name
 
 ## iconv-lite@0.4.24
 - Published By: Alexander Shtuchkin
@@ -2400,7 +2470,7 @@
 - Licence: ISC
 - https://github.com/css-modules/icss-utils
 
-## ieee754@1.1.12
+## ieee754@1.1.13
 - Published By: Feross Aboukhadijeh
 - Licence: BSD-3-Clause
 - https://github.com/feross/ieee754
@@ -2418,11 +2488,6 @@
 - Published By: Sindre Sorhus
 - Licence: MIT
 - https://github.com/sindresorhus/import-lazy
-
-## import-local@0.1.1
-- Published By: Sindre Sorhus
-- Licence: MIT
-- https://github.com/sindresorhus/import-local
 
 ## import-local@1.0.0
 - Published By: Sindre Sorhus
@@ -2460,6 +2525,10 @@
 - Licence: ISC
 - https://github.com/isaacs/inherits
 
+## inherits@2.0.4
+- Licence: ISC
+- https://github.com/isaacs/inherits
+
 ## ini@1.3.5
 - Published By: Isaac Z. Schlueter
 - Licence: ISC
@@ -2475,10 +2544,10 @@
 - Licence: MIT
 - https://github.com/sindresorhus/internal-ip
 
-## interpret@1.1.0
-- Published By: Tyler Kellen
+## interpret@1.2.0
+- Published By: Gulp Team
 - Licence: MIT
-- https://github.com/tkellen/node-interpret
+- https://github.com/gulpjs/interpret
 
 ## invariant@2.2.4
 - Published By: Andres Suarez
@@ -2495,7 +2564,7 @@
 - Licence: MIT
 - https://github.com/indutny/node-ip
 
-## ipaddr.js@1.8.0
+## ipaddr.js@1.9.0
 - Published By: whitequark
 - Licence: MIT
 - https://github.com/whitequark/ipaddr.js
@@ -2635,10 +2704,15 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/is-glob
 
-## is-glob@4.0.0
+## is-glob@4.0.1
 - Published By: Jon Schlinkert
 - Licence: MIT
-- https://github.com/jonschlinkert/is-glob
+- https://github.com/micromatch/is-glob
+
+## is-in-browser@1.1.3
+- Published By: Jared Anderson
+- Licence: MIT
+- https://github.com/tuxsudo/is-in-browser
 
 ## is-installed-globally@0.1.0
 - Published By: Sindre Sorhus
@@ -2691,6 +2765,11 @@
 - https://github.com/sindresorhus/is-plain-obj
 
 ## is-plain-object@2.0.4
+- Published By: Jon Schlinkert
+- Licence: MIT
+- https://github.com/jonschlinkert/is-plain-object
+
+## is-plain-object@3.0.0
 - Published By: Jon Schlinkert
 - Licence: MIT
 - https://github.com/jonschlinkert/is-plain-object
@@ -2790,6 +2869,11 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/isobject
 
+## isobject@4.0.0
+- Published By: Jon Schlinkert
+- Licence: MIT
+- https://github.com/jonschlinkert/isobject
+
 ## isstream@0.1.2
 - Published By: Rod Vagg
 - Licence: MIT
@@ -2830,28 +2914,44 @@
 - Licence: BSD-3-Clause
 - https://github.com/istanbuljs/istanbuljs
 
-## jest-changed-files@22.4.3
-- Licence: MIT
+## jest-changed-files@20.0.3
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
-## jest-cli@22.4.4
-- Licence: MIT
+## jest-cli@20.0.4
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
+## jest-config@20.0.4
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
 ## jest-config@22.4.4
 - Licence: MIT
 - https://github.com/facebook/jest
 
+## jest-diff@20.0.3
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
 ## jest-diff@22.4.3
 - Licence: MIT
 - https://github.com/facebook/jest
 
-## jest-docblock@22.4.3
-- Licence: MIT
+## jest-docblock@20.0.3
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
+## jest-environment-jsdom@20.0.3
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
 ## jest-environment-jsdom@22.4.3
 - Licence: MIT
+- https://github.com/facebook/jest
+
+## jest-environment-node@20.0.3
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
 ## jest-environment-node@22.4.3
@@ -2862,80 +2962,104 @@
 - Licence: MIT
 - https://github.com/facebook/jest
 
-## jest-haste-map@22.4.3
-- Licence: MIT
+## jest-haste-map@20.0.5
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
+## jest-jasmine2@20.0.4
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
 ## jest-jasmine2@22.4.4
 - Licence: MIT
 - https://github.com/facebook/jest
 
-## jest-leak-detector@22.4.3
-- Licence: MIT
+## jest-matcher-utils@20.0.3
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
 ## jest-matcher-utils@22.4.3
 - Licence: MIT
 - https://github.com/facebook/jest
 
+## jest-matchers@20.0.3
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
+## jest-message-util@20.0.3
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
 ## jest-message-util@22.4.3
 - Licence: MIT
+- https://github.com/facebook/jest
+
+## jest-mock@20.0.3
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
 ## jest-mock@22.4.3
 - Licence: MIT
 - https://github.com/facebook/jest
 
+## jest-regex-util@20.0.3
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
 ## jest-regex-util@22.4.3
 - Licence: MIT
 - https://github.com/facebook/jest
 
-## jest-resolve-dependencies@22.4.3
-- Licence: MIT
+## jest-resolve-dependencies@20.0.3
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
+## jest-resolve@20.0.4
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
 ## jest-resolve@22.4.3
 - Licence: MIT
 - https://github.com/facebook/jest
 
-## jest-runner@22.4.4
-- Licence: MIT
+## jest-runtime@20.0.4
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
-## jest-runtime@22.4.4
-- Licence: MIT
-- https://github.com/facebook/jest
-
-## jest-serializer@22.4.3
-- Licence: MIT
+## jest-snapshot@20.0.3
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
 ## jest-snapshot@22.4.3
 - Licence: MIT
 - https://github.com/facebook/jest
 
+## jest-util@20.0.3
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
 ## jest-util@22.4.3
 - Licence: MIT
+- https://github.com/facebook/jest
+
+## jest-validate@20.0.3
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
 ## jest-validate@22.4.4
 - Licence: MIT
 - https://github.com/facebook/jest
 
-## jest-worker@22.4.3
-- Licence: MIT
+## jest@20.0.4
+- Licence: BSD-3-Clause
 - https://github.com/facebook/jest
 
-## jest@22.4.2
-- Licence: MIT
-- https://github.com/facebook/jest
-
-## jquery@3.3.1
+## jquery@3.4.1
 - Published By: JS Foundation and other contributors
 - Licence: MIT
 - https://github.com/jquery/jquery
 
-## js-base64@2.4.9
+## js-base64@2.5.1
 - Published By: Dan Kogai
 - Licence: BSD-3-Clause
 - https://github.com/dankogai/js-base64
@@ -2950,12 +3074,7 @@
 - Licence: MIT
 - https://github.com/lydell/js-tokens
 
-## js-yaml@3.12.0
-- Published By: Vladimir Zapparov
-- Licence: MIT
-- https://github.com/nodeca/js-yaml
-
-## js-yaml@3.12.1
+## js-yaml@3.13.1
 - Published By: Vladimir Zapparov
 - Licence: MIT
 - https://github.com/nodeca/js-yaml
@@ -2973,6 +3092,10 @@
 ## jsdom@11.12.0
 - Licence: MIT
 - https://github.com/jsdom/jsdom
+
+## jsdom@9.12.0
+- Licence: MIT
+- https://github.com/tmpvar/jsdom
 
 ## jsesc@0.5.0
 - Published By: Mathias Bynens
@@ -3014,7 +3137,7 @@
 - Licence: ISC
 - https://github.com/isaacs/json-stringify-safe
 
-## json3@3.3.2
+## json3@3.3.3
 - Published By: Kit Cambridge
 - Licence: MIT
 - https://github.com/bestiejs/json3
@@ -3053,7 +3176,47 @@
 - Licence: MIT
 - https://github.com/joyent/node-jsprim
 
-## jszip@3.1.5
+## jss-plugin-camel-case@10.0.0-alpha.23
+- Published By: JSS Team
+- Licence: MIT
+- https://github.com/cssinjs/jss
+
+## jss-plugin-default-unit@10.0.0-alpha.23
+- Published By: JSS Team
+- Licence: MIT
+- https://github.com/cssinjs/jss
+
+## jss-plugin-global@10.0.0-alpha.23
+- Published By: JSS Team
+- Licence: MIT
+- https://github.com/cssinjs/jss
+
+## jss-plugin-nested@10.0.0-alpha.23
+- Published By: JSS Team
+- Licence: MIT
+- https://github.com/cssinjs/jss
+
+## jss-plugin-props-sort@10.0.0-alpha.23
+- Published By: JSS Team
+- Licence: MIT
+- https://github.com/cssinjs/jss
+
+## jss-plugin-rule-value-function@10.0.0-alpha.23
+- Published By: JSS Team
+- Licence: MIT
+- https://github.com/cssinjs/jss
+
+## jss-plugin-vendor-prefixer@10.0.0-alpha.23
+- Published By: JSS Team
+- Licence: MIT
+- https://github.com/cssinjs/jss
+
+## jss@10.0.0-alpha.23
+- Published By: JSS Team
+- Licence: MIT
+- https://github.com/cssinjs/jss
+
+## jszip@3.2.2
 - Published By: Stuart Knightley
 - Licence: (MIT OR GPL-3.0)
 - https://github.com/Stuk/jszip
@@ -3122,6 +3285,10 @@
 - Licence: MIT
 - https://github.com/calvinmetcalf/lie
 
+## lie@3.3.0
+- Licence: MIT
+- https://github.com/calvinmetcalf/lie
+
 ## load-json-file@1.1.0
 - Published By: Sindre Sorhus
 - Licence: MIT
@@ -3132,7 +3299,7 @@
 - Licence: MIT
 - https://github.com/sindresorhus/load-json-file
 
-## loader-runner@2.3.1
+## loader-runner@2.4.0
 - Published By: Tobias Koppers @sokra
 - Licence: MIT
 - https://github.com/webpack/loader-runner
@@ -3142,7 +3309,7 @@
 - Licence: MIT
 - https://github.com/webpack/loader-utils
 
-## loader-utils@1.1.0
+## loader-utils@1.2.3
 - Published By: Tobias Koppers @sokra
 - Licence: MIT
 - https://github.com/webpack/loader-utils
@@ -3157,7 +3324,7 @@
 - Licence: MIT
 - https://github.com/sindresorhus/locate-path
 
-## lodash-es@4.17.11
+## lodash-es@4.17.15
 - Published By: John-David Dalton
 - Licence: MIT
 - https://github.com/lodash/lodash
@@ -3168,11 +3335,6 @@
 - https://github.com/lodash/lodash
 
 ## lodash.camelcase@4.3.0
-- Published By: John-David Dalton
-- Licence: MIT
-- https://github.com/lodash/lodash
-
-## lodash.debounce@4.0.8
 - Published By: John-David Dalton
 - Licence: MIT
 - https://github.com/lodash/lodash
@@ -3212,12 +3374,12 @@
 - Licence: MIT
 - https://github.com/lodash/lodash
 
-## lodash.template@4.4.0
+## lodash.template@4.5.0
 - Published By: John-David Dalton
 - Licence: MIT
 - https://github.com/lodash/lodash
 
-## lodash.templatesettings@4.1.0
+## lodash.templatesettings@4.2.0
 - Published By: John-David Dalton
 - Licence: MIT
 - https://github.com/lodash/lodash
@@ -3227,17 +3389,17 @@
 - Licence: MIT
 - https://github.com/lodash/lodash
 
-## lodash@4.17.10
-- Published By: John-David Dalton
-- Licence: MIT
-- https://github.com/lodash/lodash
-
 ## lodash@4.17.11
 - Published By: John-David Dalton
 - Licence: MIT
 - https://github.com/lodash/lodash
 
-## loglevel@1.6.1
+## lodash@4.17.15
+- Published By: John-David Dalton
+- Licence: MIT
+- https://github.com/lodash/lodash
+
+## loglevel@1.6.2
 - Published By: Tim Perry
 - Licence: MIT
 - https://github.com/pimterry/loglevel
@@ -3267,10 +3429,15 @@
 - Licence: MIT
 - https://github.com/sindresorhus/lowercase-keys
 
-## lru-cache@4.1.3
+## lru-cache@4.1.5
 - Published By: Isaac Z. Schlueter
 - Licence: ISC
 - https://github.com/isaacs/node-lru-cache
+
+## lz-string@1.4.4
+- Published By: pieroxy
+- Licence: WTFPL
+- https://github.com/pieroxy/lz-string
 
 ## make-dir@1.3.0
 - Published By: Sindre Sorhus
@@ -3312,7 +3479,7 @@
 - Licence: MIT
 - https://github.com/redhivesoftware/math-expression-evaluator.git#readme
 
-## math-random@1.0.1
+## math-random@1.0.4
 - Published By: Michael Rhodes
 - Licence: MIT
 - https://github.com/michaelrhodes/math-random
@@ -3352,11 +3519,6 @@
 - Licence: MIT
 - https://github.com/component/merge-descriptors
 
-## merge-stream@1.0.1
-- Published By: Stephen Sugden
-- Licence: MIT
-- https://github.com/grncdr/merge-stream
-
 ## merge@1.2.1
 - Published By: yeikos
 - Licence: MIT
@@ -3376,7 +3538,7 @@
 - Licence: MIT
 - https://github.com/micromatch/micromatch
 
-## micropad@3.12.6
+## micropad@3.20.1
 - Published By: Nick Webster
 - Licence: MPL-2.0
 - https://github.com/MicroPad/Web
@@ -3386,26 +3548,13 @@
 - Licence: MIT
 - https://github.com/indutny/miller-rabin
 
-## mime-db@1.35.0
+## mime-db@1.40.0
 - Licence: MIT
 - https://github.com/jshttp/mime-db
 
-## mime-db@1.37.0
-- Licence: MIT
-- https://github.com/jshttp/mime-db
-
-## mime-types@2.1.19
+## mime-types@2.1.24
 - Licence: MIT
 - https://github.com/jshttp/mime-types
-
-## mime-types@2.1.21
-- Licence: MIT
-- https://github.com/jshttp/mime-types
-
-## mime@1.4.1
-- Published By: Robert Kieffer
-- Licence: MIT
-- https://github.com/broofa/node-mime
 
 ## mime@1.6.0
 - Published By: Robert Kieffer
@@ -3466,7 +3615,7 @@
 - Licence: MIT
 - https://github.com/substack/node-mkdirp
 
-## mousetrap@1.6.2
+## mousetrap@1.6.3
 - Published By: Craig Campbell
 - Licence: Apache*
 - https://github.com/ccampbell/mousetrap
@@ -3481,6 +3630,10 @@
 - https://github.com/zeit/ms
 
 ## ms@2.1.1
+- Licence: MIT
+- https://github.com/zeit/ms
+
+## ms@2.1.2
 - Licence: MIT
 - https://github.com/zeit/ms
 
@@ -3509,11 +3662,11 @@
 - Licence: MIT
 - https://github.com/litejs/natural-compare-lite
 
-## negotiator@0.6.1
+## negotiator@0.6.2
 - Licence: MIT
 - https://github.com/jshttp/negotiator
 
-## neo-async@2.6.0
+## neo-async@2.6.1
 - Licence: MIT
 - https://github.com/suguru03/neo-async
 
@@ -3537,17 +3690,17 @@
 - Licence: MIT
 - https://github.com/broofa/node-int64
 
-## node-libs-browser@2.1.0
+## node-libs-browser@2.2.0
 - Published By: Tobias Koppers @sokra
 - Licence: MIT
 - https://github.com/webpack/node-libs-browser
 
-## node-notifier@5.3.0
+## node-notifier@5.4.0
 - Published By: Mikael Brevik
 - Licence: MIT
 - https://github.com/mikaelbr/node-notifier
 
-## normalize-package-data@2.4.0
+## normalize-package-data@2.5.0
 - Published By: Meryn Stol
 - Licence: BSD-2-Clause
 - https://github.com/npm/normalize-package-data
@@ -3557,10 +3710,20 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/normalize-path
 
+## normalize-path@3.0.0
+- Published By: Jon Schlinkert
+- Licence: MIT
+- https://github.com/jonschlinkert/normalize-path
+
 ## normalize-range@0.1.2
 - Published By: James Talmage
 - Licence: MIT
 - https://github.com/jamestalmage/normalize-range
+
+## normalize-scroll-left@0.2.0
+- Published By: Ali Taheri Moghaddar
+- Licence: MIT
+- https://github.com/alitaheri/normalize-scroll-left
 
 ## normalize-url@1.9.1
 - Published By: Sindre Sorhus
@@ -3587,20 +3750,15 @@
 - Licence: MIT
 - https://github.com/sindresorhus/number-is-nan
 
-## nwsapi@2.0.8
+## nwmatcher@1.4.4
+- Published By: Diego Perini
+- Licence: MIT
+- https://github.com/dperini/nwmatcher
+
+## nwsapi@2.1.4
 - Published By: Diego Perini
 - Licence: MIT
 - https://github.com/dperini/nwsapi
-
-## nwsapi@2.0.9
-- Published By: Diego Perini
-- Licence: MIT
-- https://github.com/dperini/nwsapi
-
-## oauth-sign@0.8.2
-- Published By: Mikeal Rogers
-- Licence: Apache-2.0
-- https://github.com/mikeal/oauth-sign
 
 ## oauth-sign@0.9.0
 - Published By: Mikeal Rogers
@@ -3617,7 +3775,7 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/object-copy
 
-## object-keys@1.0.12
+## object-keys@1.1.1
 - Published By: Jordan Harband
 - Licence: MIT
 - https://github.com/ljharb/object-keys
@@ -3626,11 +3784,6 @@
 - Published By: Jon Schlinkert
 - Licence: MIT
 - https://github.com/jonschlinkert/object-visit
-
-## object.getownpropertydescriptors@2.0.3
-- Published By: Jordan Harband
-- Licence: MIT
-- https://github.com/ljharb/object.getownpropertydescriptors
 
 ## object.omit@2.0.1
 - Published By: Jon Schlinkert
@@ -3651,7 +3804,7 @@
 - Licence: MIT
 - https://github.com/jshttp/on-finished
 
-## on-headers@1.0.1
+## on-headers@1.0.2
 - Published By: Douglas Christopher Wilson
 - Licence: MIT
 - https://github.com/jshttp/on-headers
@@ -3671,7 +3824,7 @@
 - Licence: MIT
 - https://github.com/sindresorhus/opn
 
-## opn@5.4.0
+## opn@5.5.0
 - Published By: Sindre Sorhus
 - Licence: MIT
 - https://github.com/sindresorhus/opn
@@ -3751,7 +3904,7 @@
 - Licence: MIT
 - https://github.com/sindresorhus/package-json
 
-## pako@1.0.6
+## pako@1.0.10
 - Licence: (MIT AND Zlib)
 - https://github.com/nodeca/pako
 
@@ -3765,7 +3918,7 @@
 - Licence: MIT
 - https://github.com/blakeembrey/param-case
 
-## parse-asn1@5.1.1
+## parse-asn1@5.1.4
 - Licence: ISC
 - https://github.com/crypto-browserify/parse-asn1
 
@@ -3784,12 +3937,17 @@
 - Licence: MIT
 - https://github.com/doowb/parse-passwd
 
+## parse5@1.5.1
+- Published By: Ivan Nikulin
+- Licence: MIT
+- https://github.com/inikulin/parse5
+
 ## parse5@4.0.0
 - Published By: Ivan Nikulin
 - Licence: MIT
 - https://github.com/inikulin/parse5
 
-## parseurl@1.3.2
+## parseurl@1.3.3
 - Licence: MIT
 - https://github.com/pillarjs/parseurl
 
@@ -3871,6 +4029,11 @@
 - Licence: MIT
 - https://github.com/crypto-browserify/pbkdf2
 
+## pdfobject@2.1.1
+- Published By: Philip Hutchison
+- Licence: MIT
+- git+https://pipwerks@github.com/pipwerks/PDFObject
+
 ## performance-now@2.1.0
 - Published By: Braveg1rl
 - Licence: MIT
@@ -3906,7 +4069,12 @@
 - Licence: MIT
 - https://github.com/cscott/node-pn
 
-## portfinder@1.0.19
+## popper.js@1.15.0
+- Published By: Federico Zivolo
+- Licence: MIT
+- https://github.com/FezVrasta/popper.js
+
+## portfinder@1.0.20
 - Published By: Charlie Robbins
 - Licence: MIT
 - https://github.com/indexzero/node-portfinder
@@ -4141,6 +4309,11 @@
 - Licence: MIT
 - https://github.com/AriaMinaei/pretty-error
 
+## pretty-format@20.0.3
+- Published By: James Kyle
+- Licence: BSD-3-Clause
+- https://github.com/facebook/jest
+
 ## pretty-format@22.4.3
 - Published By: James Kyle
 - Licence: MIT
@@ -4151,11 +4324,7 @@
 - Licence: MIT
 - https://github.com/benjamn/private
 
-## process-nextick-args@1.0.7
-- Licence: MIT
-- https://github.com/calvinmetcalf/process-nextick-args
-
-## process-nextick-args@2.0.0
+## process-nextick-args@2.0.1
 - Licence: MIT
 - https://github.com/calvinmetcalf/process-nextick-args
 
@@ -4174,11 +4343,11 @@
 - Licence: MIT
 - https://github.com/then/promise
 
-## prop-types@15.6.2
+## prop-types@15.7.2
 - Licence: MIT
 - https://github.com/facebook/prop-types
 
-## proxy-addr@2.0.4
+## proxy-addr@2.0.5
 - Published By: Douglas Christopher Wilson
 - Licence: MIT
 - https://github.com/jshttp/proxy-addr
@@ -4193,10 +4362,10 @@
 - Licence: ISC
 - https://github.com/isaacs/pseudomap
 
-## psl@1.1.29
+## psl@1.3.0
 - Published By: Lupo Montero
 - Licence: MIT
-- https://github.com/wrangr/psl
+- https://github.com/lupomontero/psl
 
 ## public-encrypt@4.0.3
 - Published By: Calvin Metcalf
@@ -4237,12 +4406,16 @@
 - Licence: BSD-3-Clause
 - https://github.com/ljharb/qs
 
+## qs@6.7.0
+- Licence: BSD-3-Clause
+- https://github.com/ljharb/qs
+
 ## query-string@4.3.4
 - Published By: Sindre Sorhus
 - Licence: MIT
 - https://github.com/sindresorhus/query-string
 
-## query-string@6.2.0
+## query-string@6.8.2
 - Published By: Sindre Sorhus
 - Licence: MIT
 - https://github.com/sindresorhus/query-string
@@ -4257,7 +4430,7 @@
 - Licence: MIT
 - https://github.com/Gozala/querystring
 
-## querystringify@2.1.0
+## querystringify@2.1.1
 - Published By: Arnout Kazemier
 - Licence: MIT
 - https://github.com/unshiftio/querystringify
@@ -4272,7 +4445,7 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/randomatic
 
-## randombytes@2.0.6
+## randombytes@2.1.0
 - Licence: MIT
 - https://github.com/crypto-browserify/randombytes
 
@@ -4280,12 +4453,12 @@
 - Licence: MIT
 - https://github.com/crypto-browserify/randomfill
 
-## range-parser@1.2.0
+## range-parser@1.2.1
 - Published By: TJ Holowaychuk
 - Licence: MIT
 - https://github.com/jshttp/range-parser
 
-## raw-body@2.3.3
+## raw-body@2.4.0
 - Published By: Jonathan Ong
 - Licence: MIT
 - https://github.com/stream-utils/raw-body
@@ -4309,11 +4482,15 @@
 - Licence: MIT
 - https://github.com/facebookincubator/create-react-app
 
-## react-dom@16.7.0
+## react-dom@16.8.6
 - Licence: MIT
 - https://github.com/facebook/react
 
-## react-draggable@3.1.1
+## react-dom@16.9.0
+- Licence: MIT
+- https://github.com/facebook/react
+
+## react-draggable@3.3.1
 - Published By: Matt Zabriskie
 - Licence: MIT
 - https://github.com/mzabriskie/react-draggable
@@ -4328,13 +4505,13 @@
 - Licence: MIT
 - https://github.com/dozoisch/react-google-recaptcha
 
-## react-is@16.6.3
+## react-is@16.8.6
 - Licence: MIT
 - https://github.com/facebook/react
 
-## react-lifecycles-compat@3.0.4
+## react-is@16.9.0
 - Licence: MIT
-- https://github.com/reactjs/react-lifecycles-compat
+- https://github.com/facebook/react
 
 ## react-materialize@2.6.0
 - Published By: Isaiah Peng
@@ -4346,21 +4523,29 @@
 - Licence: MIT
 - https://github.com/capaj/react-async
 
-## react-redux@5.1.1
+## react-redux@7.1.0
 - Published By: Dan Abramov
 - Licence: MIT
 - https://github.com/reduxjs/react-redux
 
-## react-scripts-ts@2.17.0
+## react-scripts-ts@3.1.0
 - Licence: BSD-3-Clause
 - https://github.com/wmonk/create-react-app
+
+## react-transition-group@4.2.2
+- Licence: BSD-3-Clause
+- https://github.com/reactjs/react-transition-group
 
 ## react-treeview@0.4.7
 - Published By: chenglou
 - Licence: MIT
 - https://github.com/chenglou/react-treeview
 
-## react@16.7.0
+## react@16.8.6
+- Licence: MIT
+- https://github.com/facebook/react
+
+## react@16.9.0
 - Licence: MIT
 - https://github.com/facebook/react
 
@@ -4384,16 +4569,11 @@
 - Licence: MIT
 - https://github.com/sindresorhus/read-pkg
 
-## readable-stream@1.0.34
-- Published By: Isaac Z. Schlueter
-- Licence: MIT
-- https://github.com/isaacs/readable-stream
-
-## readable-stream@2.0.6
+## readable-stream@2.3.6
 - Licence: MIT
 - https://github.com/nodejs/readable-stream
 
-## readable-stream@2.3.6
+## readable-stream@3.4.0
 - Licence: MIT
 - https://github.com/nodejs/readable-stream
 
@@ -4401,11 +4581,6 @@
 - Published By: Thorsten Lorenz
 - Licence: MIT
 - https://github.com/paulmillr/readdirp
-
-## realpath-native@1.0.2
-- Published By: Simen Bekkhus
-- Licence: MIT
-- https://github.com/SimenB/realpath-native
 
 ## recursive-readdir@2.2.1
 - Published By: Jamison Dance
@@ -4427,7 +4602,7 @@
 - Licence: MIT
 - https://github.com/MoOx/reduce-function-call
 
-## redux-devtools-extension@2.13.7
+## redux-devtools-extension@2.13.8
 - Published By: Mihail Diordiev
 - Licence: MIT
 - https://github.com/zalmoxisus/redux-devtools-extension
@@ -4460,7 +4635,7 @@
 - Licence: MIT
 - https://github.com/facebook/regenerator/tree/master/packages/regenerator-runtime
 
-## regenerator-runtime@0.12.1
+## regenerator-runtime@0.13.3
 - Published By: Ben Newman
 - Licence: MIT
 - https://github.com/facebook/regenerator/tree/master/packages/regenerator-runtime
@@ -4490,7 +4665,7 @@
 - Licence: MIT
 - https://github.com/mathiasbynens/regexpu-core
 
-## registry-auth-token@3.3.2
+## registry-auth-token@3.4.0
 - Published By: Espen Hovlandsdal
 - Licence: MIT
 - https://github.com/rexxars/registry-auth-token
@@ -4520,7 +4695,7 @@
 - Licence: ISC
 - https://github.com/darsain/remove-trailing-separator
 
-## renderkid@2.0.2
+## renderkid@2.0.3
 - Published By: Aria Minaei
 - Licence: MIT
 - https://github.com/AriaMinaei/RenderKid
@@ -4540,20 +4715,15 @@
 - Licence: MIT
 - https://github.com/sindresorhus/repeating
 
-## request-promise-core@1.1.1
+## request-promise-core@1.1.2
 - Published By: Nicolai Kamenzky
 - Licence: ISC
 - https://github.com/request/promise-core
 
-## request-promise-native@1.0.5
+## request-promise-native@1.0.7
 - Published By: Nicolai Kamenzky
 - Licence: ISC
 - https://github.com/request/request-promise-native
-
-## request@2.87.0
-- Published By: Mikeal Rogers
-- Licence: Apache-2.0
-- https://github.com/request/request
 
 ## request@2.88.0
 - Published By: Mikeal Rogers
@@ -4605,20 +4775,20 @@
 - Licence: MIT
 - https://github.com/substack/node-resolve
 
+## resolve@1.11.1
+- Published By: James Halliday
+- Licence: MIT
+- https://github.com/browserify/resolve
+
+## resolve@1.12.0
+- Published By: James Halliday
+- Licence: MIT
+- https://github.com/browserify/resolve
+
 ## resolve@1.6.0
 - Published By: James Halliday
 - Licence: MIT
 - https://github.com/browserify/node-resolve
-
-## resolve@1.8.1
-- Published By: James Halliday
-- Licence: MIT
-- https://github.com/browserify/resolve
-
-## resolve@1.9.0
-- Published By: James Halliday
-- Licence: MIT
-- https://github.com/browserify/resolve
 
 ## restore-cursor@2.0.0
 - Published By: Sindre Sorhus
@@ -4635,7 +4805,7 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/right-align
 
-## rimraf@2.6.2
+## rimraf@2.6.3
 - Published By: Isaac Z. Schlueter
 - Licence: ISC
 - https://github.com/isaacs/rimraf
@@ -4643,11 +4813,6 @@
 ## ripemd160@2.0.2
 - Licence: MIT
 - https://github.com/crypto-browserify/ripemd160
-
-## rsvp@3.6.2
-- Published By: Tilde, Inc. & Stefan Penner
-- Licence: MIT
-- https://github.com/tildeio/rsvp.js
 
 ## run-async@2.3.0
 - Published By: Simon Boudrias
@@ -4669,15 +4834,20 @@
 - Licence: Apache License, Version 2.0
 - https://github.com/Reactive-Extensions/RxJS
 
-## rxjs-compat@6.3.3
+## rxjs-compat@6.5.2
 - Licence: Apache-2.0
 
-## rxjs@6.3.3
+## rxjs@6.5.2
 - Published By: Ben Lesh
 - Licence: Apache-2.0
 - https://github.com/reactivex/rxjs
 
 ## safe-buffer@5.1.2
+- Published By: Feross Aboukhadijeh
+- Licence: MIT
+- https://github.com/feross/safe-buffer
+
+## safe-buffer@5.2.0
 - Published By: Feross Aboukhadijeh
 - Licence: MIT
 - https://github.com/feross/safe-buffer
@@ -4692,7 +4862,7 @@
 - Licence: MIT
 - https://github.com/ChALkeR/safer-buffer
 
-## sane@2.5.2
+## sane@1.6.0
 - Published By: amasad
 - Licence: MIT
 - https://github.com/amasad/sane
@@ -4707,7 +4877,11 @@
 - Licence: ISC
 - https://github.com/isaacs/sax-js
 
-## scheduler@0.12.0
+## scheduler@0.13.6
+- Licence: MIT
+- https://github.com/facebook/react
+
+## scheduler@0.15.0
 - Licence: MIT
 - https://github.com/facebook/react
 
@@ -4720,6 +4894,11 @@
 - Published By: webpack Contrib
 - Licence: MIT
 - https://github.com/webpack-contrib/schema-utils
+
+## scrypt-js@2.0.4
+- Published By: Richard Moore
+- Licence: MIT
+- https://github.com/ricmoo/scrypt-js
 
 ## select-hose@2.0.0
 - Published By: Fedor Indutny
@@ -4736,16 +4915,20 @@
 - Licence: MIT
 - https://github.com/sindresorhus/semver-diff
 
-## semver@5.6.0
+## semver@5.7.0
 - Licence: ISC
 - https://github.com/npm/node-semver
 
-## send@0.16.2
+## semver@5.7.1
+- Licence: ISC
+- https://github.com/npm/node-semver
+
+## send@0.17.1
 - Published By: TJ Holowaychuk
 - Licence: MIT
 - https://github.com/pillarjs/send
 
-## serialize-javascript@1.5.0
+## serialize-javascript@1.7.0
 - Published By: Eric Ferraiuolo
 - Licence: BSD-3-Clause
 - https://github.com/yahoo/serialize-javascript
@@ -4755,7 +4938,7 @@
 - Licence: MIT
 - https://github.com/expressjs/serve-index
 
-## serve-static@1.13.2
+## serve-static@1.14.1
 - Published By: Douglas Christopher Wilson
 - Licence: MIT
 - https://github.com/expressjs/serve-static
@@ -4768,6 +4951,11 @@
 - Published By: Ben Coe
 - Licence: ISC
 - https://github.com/yargs/set-blocking
+
+## set-immediate-shim@1.0.1
+- Published By: Sindre Sorhus
+- Licence: MIT
+- https://github.com/sindresorhus/set-immediate-shim
 
 ## set-value@0.4.3
 - Published By: Jon Schlinkert
@@ -4785,6 +4973,11 @@
 - https://github.com/YuzuJS/setImmediate
 
 ## setprototypeof@1.1.0
+- Published By: Wes Todd
+- Licence: ISC
+- https://github.com/wesleytodd/setprototypeof
+
+## setprototypeof@1.1.1
 - Published By: Wes Todd
 - Licence: ISC
 - https://github.com/wesleytodd/setprototypeof
@@ -4844,17 +5037,12 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/snapdragon
 
-## sockjs-client@1.1.4
-- Published By: Bryce Kahle
-- Licence: MIT
-- https://github.com/sockjs/sockjs-client
-
 ## sockjs-client@1.1.5
 - Published By: Bryce Kahle
 - Licence: MIT
 - https://github.com/sockjs/sockjs-client
 
-## sockjs@0.3.18
+## sockjs@0.3.19
 - Published By: Marek Majkowski
 - Licence: MIT
 - https://github.com/sockjs/sockjs-node
@@ -4883,7 +5071,7 @@
 - Licence: MIT
 - https://github.com/evanw/node-source-map-support
 
-## source-map-support@0.5.9
+## source-map-support@0.5.12
 - Licence: MIT
 - https://github.com/evanw/node-source-map-support
 
@@ -4902,7 +5090,7 @@
 - Licence: BSD-3-Clause
 - https://github.com/mozilla/source-map
 
-## spdx-correct@3.0.2
+## spdx-correct@3.1.0
 - Published By: Kyle E. Mitchell
 - Licence: Apache-2.0
 - https://github.com/jslicense/spdx-correct.js
@@ -4917,7 +5105,7 @@
 - Licence: MIT
 - https://github.com/jslicense/spdx-expression-parse.js
 
-## spdx-license-ids@3.0.2
+## spdx-license-ids@3.0.4
 - Published By: Shinnosuke Watanabe
 - Licence: CC0-1.0
 - https://github.com/shinnn/spdx-license-ids
@@ -4932,6 +5120,11 @@
 - Licence: MIT
 - https://github.com/indutny/node-spdy
 
+## split-on-first@1.1.0
+- Published By: Sindre Sorhus
+- Licence: MIT
+- https://github.com/sindresorhus/split-on-first
+
 ## split-string@3.1.0
 - Published By: Jon Schlinkert
 - Licence: MIT
@@ -4942,12 +5135,7 @@
 - Licence: BSD-3-Clause
 - https://github.com/alexei/sprintf.js
 
-## sshpk@1.14.2
-- Published By: Joyent, Inc
-- Licence: MIT
-- https://github.com/arekinath/node-sshpk
-
-## sshpk@1.15.2
+## sshpk@1.16.1
 - Published By: Joyent, Inc
 - Licence: MIT
 - https://github.com/joyent/node-sshpk
@@ -4967,10 +5155,6 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/static-extend
 
-## statuses@1.4.0
-- Licence: MIT
-- https://github.com/jshttp/statuses
-
 ## statuses@1.5.0
 - Licence: MIT
 - https://github.com/jshttp/statuses
@@ -4980,10 +5164,10 @@
 - Licence: ISC
 - https://github.com/analog-nico/stealthy-require
 
-## stream-browserify@2.0.1
+## stream-browserify@2.0.2
 - Published By: James Halliday
 - Licence: MIT
-- https://github.com/substack/stream-browserify
+- https://github.com/browserify/stream-browserify
 
 ## stream-each@1.2.3
 - Published By: Mathias Buus
@@ -5010,7 +5194,7 @@
 - Licence: MIT
 - https://github.com/kevva/strict-uri-encode
 
-## string-length@2.0.0
+## string-length@1.0.1
 - Published By: Sindre Sorhus
 - Licence: MIT
 - https://github.com/sindresorhus/string-length
@@ -5025,11 +5209,11 @@
 - Licence: MIT
 - https://github.com/sindresorhus/string-width
 
-## string_decoder@0.10.31
-- Licence: MIT
-- https://github.com/rvagg/string_decoder
-
 ## string_decoder@1.1.1
+- Licence: MIT
+- https://github.com/nodejs/string_decoder
+
+## string_decoder@1.2.0
 - Licence: MIT
 - https://github.com/nodejs/string_decoder
 
@@ -5127,7 +5311,12 @@
 - Licence: MIT
 - https://github.com/jsdom/js-symbol-tree
 
-## tapable@0.2.8
+## symbol-tree@3.2.4
+- Published By: Joris van der Wel
+- Licence: MIT
+- https://github.com/jsdom/js-symbol-tree
+
+## tapable@0.2.9
 - Published By: Tobias Koppers @sokra
 - Licence: MIT
 - https://github.com/webpack/tapable
@@ -5147,7 +5336,7 @@
 - Licence: MIT
 - https://github.com/substack/text-table
 
-## throat@4.1.0
+## throat@3.2.0
 - Published By: ForbesLindesay
 - Licence: MIT
 - https://github.com/ForbesLindesay/throat
@@ -5181,6 +5370,11 @@
 - Published By: J. Ryan Stinnett
 - Licence: MIT
 - https://github.com/jryans/timers-browserify
+
+## tiny-warning@1.0.3
+- Published By: Alex Reardon
+- Licence: MIT
+- https://github.com/alexreardon/tiny-warning
 
 ## tmp@0.0.33
 - Published By: KARASZI István
@@ -5217,20 +5411,30 @@
 - Licence: MIT
 - https://github.com/jonschlinkert/to-regex
 
+## toidentifier@1.0.0
+- Published By: Douglas Christopher Wilson
+- Licence: MIT
+- https://github.com/component/toidentifier
+
 ## toposort@1.0.7
 - Published By: Marcel Klehr
 - Licence: MIT
 - https://github.com/marcelklehr/toposort
 
-## tough-cookie@2.3.4
-- Published By: Jeremy Stashewsky
-- Licence: BSD-3-Clause
-- https://github.com/salesforce/tough-cookie
-
 ## tough-cookie@2.4.3
 - Published By: Jeremy Stashewsky
 - Licence: BSD-3-Clause
 - https://github.com/salesforce/tough-cookie
+
+## tough-cookie@2.5.0
+- Published By: Jeremy Stashewsky
+- Licence: BSD-3-Clause
+- https://github.com/salesforce/tough-cookie
+
+## tr46@0.0.3
+- Published By: Sebastian Mayr
+- Licence: MIT
+- https://github.com/Sebmaster/tr46.js
 
 ## tr46@1.0.1
 - Published By: Sebastian Mayr
@@ -5262,17 +5466,22 @@
 - Licence: MIT
 - https://github.com/dividab/tsconfig-paths-webpack-plugin
 
-## tsconfig-paths@3.7.0
+## tsconfig-paths@3.8.0
 - Published By: Jonas Kello
 - Licence: MIT
 - https://github.com/dividab/tsconfig-paths
+
+## tslib@1.10.0
+- Published By: Microsoft Corp.
+- Licence: Apache-2.0
+- https://github.com/Microsoft/tslib
 
 ## tslib@1.9.3
 - Published By: Microsoft Corp.
 - Licence: Apache-2.0
 - https://github.com/Microsoft/tslib
 
-## tslint-config-prettier@1.16.0
+## tslint-config-prettier@1.18.0
 - Published By: Alex Jover Morales
 - Licence: MIT
 - https://github.com/prettier/tslint-config-prettier
@@ -5281,7 +5490,7 @@
 - Licence: Apache-2.0
 - https://github.com/palantir/tslint-react
 
-## tslint@5.11.0
+## tslint@5.17.0
 - Licence: Apache-2.0
 - https://github.com/palantir/tslint
 
@@ -5315,7 +5524,7 @@
 - Licence: Unlicense
 - https://github.com/dchest/tweetnacl-js
 
-## twemoji@11.2.0
+## twemoji@11.3.0
 - Published By: Twitter, Inc.
 - Licence: MIT,CC-BY-4.0
 - https://github.com/twitter/twemoji
@@ -5330,7 +5539,7 @@
 - Licence: MIT
 - https://github.com/chaijs/type-detect
 
-## type-is@1.6.16
+## type-is@1.6.18
 - Licence: MIT
 - https://github.com/jshttp/type-is
 
@@ -5339,7 +5548,7 @@
 - Licence: MIT
 - https://github.com/substack/typedarray
 
-## typescript@3.2.2
+## typescript@3.5.3
 - Published By: Microsoft Corp.
 - Licence: Apache-2.0
 - https://github.com/Microsoft/TypeScript
@@ -5354,7 +5563,12 @@
 - Licence: BSD-2-Clause
 - https://github.com/mishoo/UglifyJS2
 
-## uglify-js@3.4.9
+## uglify-js@3.4.10
+- Published By: Mihai Bazon
+- Licence: BSD-2-Clause
+- https://github.com/mishoo/UglifyJS2
+
+## uglify-js@3.6.0
 - Published By: Mihai Bazon
 - Licence: BSD-2-Clause
 - https://github.com/mishoo/UglifyJS2
@@ -5368,7 +5582,7 @@
 - Licence: MIT
 - https://github.com/webpack-contrib/uglifyjs-webpack-plugin
 
-## uglifyjs-webpack-plugin@1.3.0
+## uglifyjs-webpack-plugin@1.2.5
 - Published By: webpack Contrib Team
 - Licence: MIT
 - https://github.com/webpack-contrib/uglifyjs-webpack-plugin
@@ -5422,12 +5636,12 @@
 - Licence: MIT
 - https://github.com/sindresorhus/unzip-response
 
-## upad-parse@4.0.6
+## upad-parse@6.3.0
 - Published By: Nick Webster
 - Licence: MPL-2.0
 - https://github.com/MicroPad/Web-Parser
 
-## upath@1.1.0
+## upath@1.1.2
 - Published By: Angelos Pikoulas
 - Licence: MIT
 - https://github.com/anodynos/upath
@@ -5467,7 +5681,7 @@
 - Licence: MIT
 - https://github.com/sindresorhus/url-parse-lax
 
-## url-parse@1.4.4
+## url-parse@1.4.7
 - Published By: Arnout Kazemier
 - Licence: MIT
 - https://github.com/unshiftio/url-parse
@@ -5486,17 +5700,12 @@
 - Licence: MIT
 - https://github.com/TooTallNate/util-deprecate
 
-## util.promisify@1.0.0
-- Published By: Jordan Harband
-- Licence: MIT
-- https://github.com/ljharb/util.promisify
-
 ## util@0.10.3
 - Published By: Joyent
 - Licence: MIT
 - https://github.com/defunctzombie/node-util
 
-## util@0.10.4
+## util@0.11.1
 - Published By: Joyent
 - Licence: MIT
 - https://github.com/defunctzombie/node-util
@@ -5510,11 +5719,6 @@
 - Published By: Jared Hanson
 - Licence: MIT
 - https://github.com/jaredhanson/utils-merge
-
-## uuid@2.0.3
-- Published By: Robert Kieffer
-- Licence: MIT
-- https://github.com/defunctzombie/node-uuid
 
 ## uuid@3.3.2
 - Licence: MIT
@@ -5530,7 +5734,7 @@
 - Licence: MIT
 - https://github.com/jshttp/vary
 
-## vendors@1.0.2
+## vendors@1.0.3
 - Published By: Titus Wormer
 - Licence: MIT
 - https://github.com/wooorm/vendors
@@ -5563,9 +5767,14 @@
 - Licence: Apache-2.0
 - https://github.com/daaku/nodejs-walker
 
-## watch@0.18.0
+## warning@4.0.3
+- Published By: Berkeley Martinez
+- Licence: MIT
+- https://github.com/BerkeleyTrue/warning
+
+## watch@0.10.0
 - Published By: Mikeal Rogers
-- Licence: Apache-2.0
+- Licence: Apache*
 - https://github.com/mikeal/watch
 
 ## watchpack@1.6.0
@@ -5578,6 +5787,11 @@
 - Licence: MIT
 - https://github.com/indutny/wbuf
 
+## webidl-conversions@3.0.1
+- Published By: Domenic Denicola
+- Licence: BSD-2-Clause
+- https://github.com/jsdom/webidl-conversions
+
 ## webidl-conversions@4.0.2
 - Published By: Domenic Denicola
 - Licence: BSD-2-Clause
@@ -5588,7 +5802,7 @@
 - Licence: MIT
 - https://github.com/webpack/webpack-dev-middleware
 
-## webpack-dev-server@2.9.4
+## webpack-dev-server@2.11.3
 - Published By: Tobias Koppers @sokra
 - Licence: MIT
 - https://github.com/webpack/webpack-dev-server
@@ -5618,11 +5832,6 @@
 - Licence: MIT
 - https://github.com/faye/websocket-extensions-node
 
-## whatwg-encoding@1.0.3
-- Published By: Domenic Denicola
-- Licence: MIT
-- https://github.com/jsdom/whatwg-encoding
-
 ## whatwg-encoding@1.0.5
 - Published By: Domenic Denicola
 - Licence: MIT
@@ -5632,15 +5841,15 @@
 - Licence: MIT
 - https://github.com/github/fetch
 
-## whatwg-mimetype@2.1.0
+## whatwg-mimetype@2.3.0
 - Published By: Domenic Denicola
 - Licence: MIT
 - https://github.com/jsdom/whatwg-mimetype
 
-## whatwg-mimetype@2.2.0
-- Published By: Domenic Denicola
+## whatwg-url@4.8.0
+- Published By: Sebastian Mayr
 - Licence: MIT
-- https://github.com/jsdom/whatwg-mimetype
+- https://github.com/jsdom/whatwg-url
 
 ## whatwg-url@6.5.0
 - Published By: Sebastian Mayr
@@ -5697,7 +5906,7 @@
 - Licence: MIT
 - https://github.com/substack/node-wordwrap
 
-## worker-farm@1.6.0
+## worker-farm@1.7.0
 - Licence: MIT
 - https://github.com/rvagg/node-worker-farm
 
@@ -5711,7 +5920,7 @@
 - Licence: ISC
 - https://github.com/npm/wrappy
 
-## write-file-atomic@2.3.0
+## write-file-atomic@2.4.3
 - Published By: Rebecca Turner
 - Licence: ISC
 - https://github.com/iarna/write-file-atomic
@@ -5725,6 +5934,11 @@
 - Published By: Sindre Sorhus
 - Licence: MIT
 - https://github.com/sindresorhus/xdg-basedir
+
+## xml-name-validator@2.0.1
+- Published By: Domenic Denicola
+- Licence: WTFPL
+- https://github.com/jsdom/xml-name-validator
 
 ## xml-name-validator@3.0.0
 - Published By: Domenic Denicola
@@ -5766,6 +5980,11 @@
 - Licence: ISC
 - https://github.com/yargs/yargs-parser
 
+## yargs-parser@5.0.0
+- Published By: Ben Coe
+- Licence: ISC
+- https://github.com/yargs/yargs-parser
+
 ## yargs-parser@7.0.0
 - Published By: Ben Coe
 - Licence: ISC
@@ -5786,6 +6005,10 @@
 - https://github.com/bcoe/yargs
 
 ## yargs@6.6.0
+- Licence: MIT
+- https://github.com/yargs/yargs
+
+## yargs@7.1.0
 - Licence: MIT
 - https://github.com/yargs/yargs
 
