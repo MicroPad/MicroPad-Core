@@ -149,7 +149,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 									color: theme.text,
 									whiteSpace: 'pre',
 									overflowWrap: 'normal',
-									overflowX: 'scroll'
+									overflowX: 'auto'
 								}
 							}
 							ref={input => this.editBox = input!}
