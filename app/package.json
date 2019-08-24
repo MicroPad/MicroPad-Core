@@ -1,6 +1,6 @@
 {
 	"name": "micropad",
-	"version": "3.20.1",
+	"version": "3.21.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/MicroPad/Web.git"
@@ -36,6 +36,7 @@
 		"mousetrap": "^1.6.1",
 		"opus-recorder": "^4.1.0",
 		"paste-image": "^0.0.3",
+		"pdfobject": "^2.1.1",
 		"query-string": "^6.0.0",
 		"re-resizable": "^4.4.8",
 		"react": "^16.8.6",
@@ -58,7 +59,7 @@
 		"semver": "^5.6.0",
 		"showdown": "^1.8.6",
 		"twemoji": "^11.0.1",
-		"upad-parse": "^6.2.2",
+		"upad-parse": "^6.3.0",
 		"vex-dialog": "^1.1.0",
 		"vex-js": "^4.1.0"
 	},
@@ -70,6 +71,7 @@
 		"@types/md5": "^2.1.32",
 		"@types/mousetrap": "^1.6.0",
 		"@types/node": "^9.4.0",
+		"@types/pdfobject": "^2.0.6",
 		"@types/query-string": "^5.1.0",
 		"@types/react": "^16.8.19",
 		"@types/react-dom": "^16.8.4",

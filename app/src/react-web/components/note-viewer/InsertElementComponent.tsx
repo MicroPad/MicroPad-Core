@@ -29,8 +29,8 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 		const { note, x, y, enabled, fontSize, theme, isFullScreen } = this.props;
 		if (!note) return null;
 
-		const elementHeight = 260;
-		const elementWidth = 266;
+		const elementHeight = 320;
+		const elementWidth = 286;
 		const containerStyles = {
 			padding: 0,
 			height: elementHeight + 'px',
@@ -86,6 +86,16 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 							},
 							content: 'AS'
 						})}><Icon left={true}>gesture</Icon> Drawing</a></li>
+
+						<li><a href="#!" onClick={() => this.doInsert({
+							type: 'pdf',
+							args: {
+								...defaultArgs,
+								ext: generateGuid(),
+								filename: ''
+							},
+							content: 'AS'
+						})}><Icon left={true}>picture_as_pdf</Icon> PDF Document</a></li>
 
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'file',

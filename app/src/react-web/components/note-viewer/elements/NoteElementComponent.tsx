@@ -13,6 +13,7 @@ import { NoteElement } from 'upad-parse/dist/Note';
 import { EditDueDateComponent } from './EditDueDateComponent';
 import { TOAST_HANDLER } from '../../..';
 import * as Materialize from 'materialize-css/dist/js/materialize';
+import PdfElementComponent from './PdfElementComponent';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
@@ -70,6 +71,18 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					updateElement={updateElement}
 					noteAssets={noteAssets}
 					edit={edit} />
+				);
+				break;
+
+			case 'pdf':
+				elementComponent = (
+					<PdfElementComponent
+						element={element}
+						theme={theme}
+						elementEditing={elementEditing}
+						updateElement={updateElement}
+						noteAssets={noteAssets}
+						edit={edit} />
 				);
 				break;
 
