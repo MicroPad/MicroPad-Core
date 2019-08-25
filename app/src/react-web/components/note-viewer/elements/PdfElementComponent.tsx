@@ -95,7 +95,7 @@ export default class PdfElementComponent extends React.Component<INoteElementCom
 		PDFObject.embed(asset, this.viewerElementRef, {
 			fallbackLink: false,
 			PDFJS_URL: './assets/pdfjs/web/viewer.html',
-			forcePDFJS: false
+			forcePDFJS: !!window['isElectron']
 		});
 	}
 
