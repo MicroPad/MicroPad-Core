@@ -58,7 +58,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 		return (
 			<div className="noteElement" style={containerStyles}>
 				<div id="insert-element" className="z-depth-2 hoverable" style={{ backgroundColor: theme.background, color: theme.text }}>
-					<h4>Insert an Element</h4>
+					<h4>Insert an element</h4>
 					<ul>
 						<li><a href="#!" onClick={() => this.doInsert({
 							type: 'markdown',
