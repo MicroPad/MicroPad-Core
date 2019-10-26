@@ -7,8 +7,8 @@ import {
 	filter,
 	map,
 	mergeMap,
-	switchMap,
-	tap
+	switchMap, take,
+	tap, withLatestFrom
 } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
@@ -22,23 +22,23 @@ import { Dialog } from '../dialogs';
 import { ISyncedNotepad } from '../../core/types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { elvis, getUsedAssets, isAction, resolveElvis } from '../util';
-import { Store } from 'redux';
+import { elvis, filterTruthy, getUsedAssets, isAction, resolveElvis } from '../util';
 import { fromShell } from '../CryptoService';
 import { AddCryptoPasskeyAction, EncryptNotepadAction } from '../../core/types/ActionTypes';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 
 let currentNotepadTitle = '';
 
-const saveNotepad$ = (action$: Observable<Action<Notepad>>, store: Store<IStoreState>) =>
+const saveNotepad$ = (action$: Observable<Action<Notepad>>, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<Notepad>) => isType(action, actions.saveNotepad.started)),
 		map((action: Action<Notepad>) => action.payload),
-		switchMap((notepad: Notepad) =>
+		withLatestFrom(state$),
+		switchMap(([notepad, state]: [Notepad, IStoreState]) =>
 			from((async () =>
 					await NOTEPAD_STORAGE.setItem(
 						notepad.title,
-						await notepad.toJson(!!notepad.crypto ? store.getState().notepadPasskeys[notepad.title] : undefined)
+						await notepad.toJson(!!notepad.crypto ? state.notepadPasskeys[notepad.title] : undefined)
 					)
 			)()).pipe(
 				catchError(err => of(actions.saveNotepad.failed({ params: <Notepad> {}, error: err }))),
@@ -47,13 +47,13 @@ const saveNotepad$ = (action$: Observable<Action<Notepad>>, store: Store<IStoreS
 		)
 	);
 
-const saveOnChanges$ = (action$, store) =>
+const saveOnChanges$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
-		map(() => store.getState()),
+		switchMap(() => state$.pipe(take(1))),
 		map((state: IStoreState) => state.notepads.notepad),
-		filter(Boolean),
+		filterTruthy(),
 		map((notepadState: INotepadStoreState) => notepadState.item),
-		filter(Boolean),
+		filterTruthy(),
 		debounceTime(1000),
 		distinctUntilChanged(),
 		filter((notepad: FlatNotepad) => {
@@ -63,10 +63,11 @@ const saveOnChanges$ = (action$, store) =>
 			return condition;
 		}),
 		map((notepad: FlatNotepad) => notepad.toNotepad()),
-		mergeMap((notepad: Notepad) => {
+		withLatestFrom(state$),
+		mergeMap(([notepad, state]: [Notepad, IStoreState]) => {
 			const actionsToReturn: Action<any>[] = [];
 
-			const syncId = (<IStoreState> store.getState()).notepads.notepad!.activeSyncId;
+			const syncId = state.notepads.notepad!.activeSyncId;
 			if (syncId) actionsToReturn.push(actions.actWithSyncNotepad({
 				notepad,
 				action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId })
@@ -79,17 +80,17 @@ const saveOnChanges$ = (action$, store) =>
 		})
 	);
 
-const saveDefaultFontSize$ = (action$, store) =>
+const saveDefaultFontSize$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
-		map(() => store.getState()),
+		switchMap(() => state$.pipe(take(1))),
 		map((state: IStoreState) => [state.notepads.notepad, state.currentNote]),
 		filter(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => !!notepad && !!notepad.item && !!current && current.ref.length > 0),
 		map(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => [notepad.item!.notes[current.ref], current.elementEditing]),
 		filter(([note, id]: [Note, string]) => !!note && id.length > 0),
 		map(([note, id]: [Note, string]) => note.elements.filter((element: NoteElement) => element.args.id === id)[0]),
-		filter(Boolean),
+		filterTruthy(),
 		map((element: NoteElement) => element.args.fontSize),
-		filter(Boolean),
+		filterTruthy(),
 		distinctUntilChanged(),
 		tap((fontSize: string) => localforage.setItem('font size', fontSize)),
 		map((fontSize: string) => actions.updateDefaultFontSize(fontSize))
@@ -108,15 +109,18 @@ const getNotepadList$ = action$ =>
 		)
 	);
 
-const openNotepadFromStorage$ = (action$: Observable<Action<String>>, store: Store<IStoreState>) =>
+const openNotepadFromStorage$ = (action$: Observable<Action<String>>, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.openNotepadFromStorage.started),
 		map((action: Action<string>) => action.payload),
 		switchMap((notepadTitle: string) =>
 			from(NOTEPAD_STORAGE.getItem(notepadTitle)).pipe(
-				switchMap((json: string) => {
-					return from(fromShell(JSON.parse(json), store.getState().notepadPasskeys[notepadTitle]));
-				}),
+				switchMap((json: string) => state$.pipe(
+					take(1),
+					switchMap(state => from(
+						fromShell(JSON.parse(json), state.notepadPasskeys[notepadTitle])
+					))
+				)),
 				mergeMap((res: EncryptNotepadAction) => [
 					actions.addCryptoPasskey({ notepadTitle: res.notepad.title, passkey: res.passkey }),
 					actions.openNotepadFromStorage.done({ params: '', result: undefined }),
@@ -131,15 +135,15 @@ const openNotepadFromStorage$ = (action$: Observable<Action<String>>, store: Sto
 		)
 	);
 
-const cleanUnusedAssets$ = (action$, store) =>
+const cleanUnusedAssets$ = (action$, state$: Observable<IStoreState>) =>
 	action$
 		.pipe(
 			filter((action: Action<any>) => isType(action, actions.parseNpx.done) || isType(action, actions.deleteElement)),
-			map(() => store.getState()),
+			switchMap(() => state$.pipe(take(1))),
 			map((state: IStoreState) => state.notepads.notepad),
-			filter(Boolean),
+			filterTruthy(),
 			map((notepadState: INotepadStoreState) => notepadState.item),
-			filter(Boolean),
+			filterTruthy(),
 			map((notepad: FlatNotepad) => [getUsedAssets(notepad), notepad.notepadAssets]),
 			filter(([usedAssets, npAssets]: [Set<string>, string[]]) => !!usedAssets && !!npAssets),
 			switchMap(([usedAssets, npAssets]: [Set<string>, string[]]) => {
@@ -183,22 +187,25 @@ const clearLastOpenedNotepad$ = (action$: Observable<Action<Success<string, Flat
 		filter(() => false)
 	);
 
-const clearOldData$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+const clearOldData$ = (action$: Observable<Action<void>>, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.clearOldData.started),
-		concatMap(() =>
-			from(cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store)).pipe(
-				mergeMap((addPasskeyActions: Action<AddCryptoPasskeyAction>[]) => [
-					actions.clearOldData.done({ params: undefined, result: undefined }),
-					...addPasskeyActions
-				]),
-				catchError(error => {
-					Dialog.alert('There was an error clearing old data');
-					console.error(error);
-					return of(actions.clearOldData.failed({ params: undefined, error }));
-				})
+		concatMap(() => state$.pipe(
+			take(1),
+			switchMap(state =>
+				from(cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, state)).pipe(
+					mergeMap((addPasskeyActions: Action<AddCryptoPasskeyAction>[]) => [
+						actions.clearOldData.done({ params: undefined, result: undefined }),
+						...addPasskeyActions
+					]),
+					catchError(error => {
+						Dialog.alert('There was an error clearing old data');
+						console.error(error);
+						return of(actions.clearOldData.failed({ params: undefined, error }));
+					})
+				)
 			)
-		)
+		))
 	);
 
 const notifyOnClearOldDataSuccess$ = (action$: Observable<Action<Success<void, void>>>) =>
@@ -225,13 +232,13 @@ export const storageEpics$ = combineEpics(
 /**
  *  Clean up all the assets that aren't in any notepads yet
  */
-async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage, store: Store<IStoreState>): Promise<Action<AddCryptoPasskeyAction>[]> {
+async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage, state: IStoreState): Promise<Action<AddCryptoPasskeyAction>[]> {
 	const cryptoPasskeys: Action<AddCryptoPasskeyAction>[] = [];
 
 	const notepads: Promise<EncryptNotepadAction>[] = [];
 	await notepadStorage.iterate((json: string) => {
 		const shell: NotepadShell = JSON.parse(json);
-		notepads.push(fromShell(shell, store.getState().notepadPasskeys[shell.title]));
+		notepads.push(fromShell(shell, state.notepadPasskeys[shell.title]));
 
 		return;
 	});
