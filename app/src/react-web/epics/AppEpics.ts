@@ -1,24 +1,23 @@
 import { combineEpics } from 'redux-observable';
 import { isAction } from '../util';
 import { actions } from '../../core/actions';
-import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { APP_NAME, IStoreState, MICROPAD_URL } from '../../core/types';
 import * as localforage from 'localforage';
 import { Action, Success } from 'redux-typescript-actions';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
-import * as Materialize from 'materialize-css/dist/js/materialize';
 import { FlatNotepad } from 'upad-parse/dist';
-import { EMPTY } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { lt as versionLessThan } from 'semver';
 import { ThemeName } from '../../core/types/Themes';
 import { IVersion } from '../../core/reducers/AppReducer';
 import { EpicDeps } from './index';
 
 export namespace AppEpics {
-	export const closeDrawingEditorOnZoom$ = (action$, store) =>
+	export const closeDrawingEditorOnZoom$ = (action$, state$: Observable<IStoreState>) =>
 		action$.pipe(
 			isAction(actions.updateZoomLevel),
-			map(() => store.getState()),
+			switchMap(() => state$.pipe(take(1))),
 			map((state: IStoreState) => state.currentNote.elementEditing),
 			filter((elementId: string) => elementId.includes('drawing')),
 			map(() => actions.openEditor(''))
@@ -39,10 +38,10 @@ export namespace AppEpics {
 			map(() => actions.setHelpPref(true))
 		);
 
-	export const checkVersion$ = (action$, store, { Dialog }) =>
+	export const checkVersion$ = (action$, state$: Observable<IStoreState>, { Dialog }: EpicDeps) =>
 		action$.pipe(
 			isAction(actions.checkVersion),
-			map(() => store.getState()),
+			switchMap(() => state$.pipe(take(1))),
 			map((state: IStoreState) => state.app.version),
 			map((version: IVersion) => `${version.major}.${version.minor}.${version.patch}`),
 			switchMap((version: string) =>
@@ -58,6 +57,7 @@ export namespace AppEpics {
 					map((res: AjaxResponse) => res.response.trim()),
 					filter(latestVersion => versionLessThan(version, latestVersion)),
 					tap((latestVersion: string) =>
+						// @ts-ignore
 						Dialog.confirmUnsafe(`v${latestVersion} of ${APP_NAME} is out now! <a target="_blank" href="${MICROPAD_URL}/#download">Update here</a>.`)
 					),
 					catchError(err => {
@@ -76,7 +76,7 @@ export namespace AppEpics {
 			filter(() => false)
 		);
 
-	export const appEpics$ = combineEpics<any, any, EpicDeps>(
+	export const appEpics$ = combineEpics(
 		closeDrawingEditorOnZoom$,
 		saveHelpPreference$,
 		revertHelpPrefOnHelpLoad$,
