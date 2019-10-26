@@ -1,34 +1,37 @@
 import { combineEpics } from 'redux-observable';
-import { catchError, concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { catchError, concatMap, filter, map, mergeMap, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../../core/actions';
 import { INotepadStoreState } from '../../core/types/NotepadTypes';
-import { dataURItoBlob, generateGuid, isAction } from '../util';
+import { dataURItoBlob, filterTruthy, generateGuid, isAction } from '../util';
 import saveAs from 'save-as';
 import { ASSET_STORAGE } from '..';
 import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } from '../../core/types/ActionTypes';
 import { IStoreState } from '../../core/types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { Store } from 'redux';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 
-const loadNote$ = (action$, store) =>
+const loadNote$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.loadNote.started)),
 		tap(() => Materialize.Toast.removeAll()),
-		map((action: Action<string>) => [action.payload, { ...(store.getState().notepads.notepad || <INotepadStoreState> {}).item }]),
-		filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
-		map(([ref, notepad]: [string, FlatNotepad]) => notepad.notes[ref]),
-		filter(Boolean),
-		mergeMap((note: Note) => [actions.expandFromNote({
-			note,
-			notepad: (store.getState() as IStoreState).notepads.notepad!.item!
-		}), actions.checkNoteAssets.started([note.internalRef, note.elements])])
+		switchMap((action: Action<string>) => state$.pipe(
+			take(1),
+			map(state => [action.payload, { ...(state.notepads.notepad || <INotepadStoreState> {}).item }]),
+			filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
+			map(([ref, notepad]: [string, FlatNotepad]) => notepad.notes[ref]),
+			filterTruthy(),
+			withLatestFrom(state$),
+			mergeMap(([note, state]: [Note, IStoreState]) => [actions.expandFromNote({
+				note,
+				notepad: state.notepads.notepad!.item!
+			}), actions.checkNoteAssets.started([note.internalRef, note.elements])])
+		))
 	);
 
-const checkNoteAssets$ = (action$, store) =>
+const checkNoteAssets$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<[string, NoteElement[]]>) => isType(action, actions.checkNoteAssets.started)),
 		map((action: Action<[string, NoteElement[]]>) => action.payload),
@@ -36,7 +39,10 @@ const checkNoteAssets$ = (action$, store) =>
 			from(getNoteAssets(elements))
 				.pipe(map((res) => [ref, res.elements, res.blobUrls]))
 		),
-		map(([ref, elements, blobUrls]) => [ref, elements, blobUrls, (store.getState().notepads.notepad || <INotepadStoreState> {}).item]),
+		switchMap(([ref, elements, blobUrls]) => state$.pipe(
+			take(1),
+			map(state => [ref, elements, blobUrls, (state.notepads.notepad || <INotepadStoreState> {}).item])
+		)),
 		filter(([ref, elements, blobUrls, notepad]) => !!notepad),
 		mergeMap(([ref, elements, blobUrls, notepad]: [string, NoteElement[], object, FlatNotepad]) => {
 			let newNotepad = notepad.clone({
@@ -71,7 +77,7 @@ const downloadAsset$ = action$ =>
 					map((blob: Blob) => [blob, filename])
 				)
 		),
-		filter(Boolean),
+		filterTruthy(),
 		tap(([blob, filename]: [Blob, string]) => saveAs(blob, filename)),
 		map(([blob, filename]: [Blob, string]) => actions.downloadAsset.done({ params: { filename, uuid: '' }, result: undefined }))
 	);
@@ -108,38 +114,45 @@ const binaryElementUpdate$ = action$ =>
 		])
 	);
 
-const reloadNote$ = (action$, store) =>
+const reloadNote$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.reloadNote),
-		map(() => store.getState()),
+		switchMap(() => state$.pipe(take(1))),
 		map((state: IStoreState) => state.currentNote.ref),
 		filter((noteRef: string) => !!noteRef && noteRef.length > 0),
 		map((noteRef: string) => actions.loadNote.started(noteRef))
 
 	);
 
-const autoLoadNewNote$ = (action$, store) =>
+const autoLoadNewNote$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.newNote),
-		map((action: Action<NewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
+		switchMap((action: Action<NewNotepadObjectAction>) => state$.pipe(
+			take(1),
+			map(state => [action.payload, state.notepads.notepad!.item]),
+		)),
 		filter(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!insertAction.parent && !!notepad),
 		map(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) =>
 			// Get a note with the new title that is in the expected parent
 			Object.values((notepad as FlatNotepad).notes).find(n => n.parent === insertAction.parent && n.title === insertAction.title)
 		),
-		filter(Boolean),
+		filterTruthy(),
 		map((newNote: Note) => actions.loadNote.started(newNote.internalRef))
 	);
 
-const closeNoteOnDeletedParent$ = (action$, store: Store<IStoreState>) =>
+const closeNoteOnDeletedParent$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.deleteNotepadObject),
-		map(() => store.getState().notepads.notepad),
-		filter(Boolean),
+		switchMap(() => state$.pipe(
+			take(1),
+			map(state => state.notepads.notepad)
+		)),
+		filterTruthy(),
 		map((notepadState: INotepadStoreState) => notepadState.item),
 
 		// Has the currently opened note been deleted?
-		filter((notepad: FlatNotepad) => store.getState().currentNote.ref.length > 0 && !notepad.notes[store.getState().currentNote.ref]),
+		withLatestFrom(state$),
+		filter(([notepad, state]: [FlatNotepad, IStoreState]) => state.currentNote.ref.length > 0 && !notepad.notes[state.currentNote.ref]),
 		map(() => actions.closeNote(undefined))
 	);
 
@@ -151,13 +164,14 @@ const loadNoteOnMove$ = action$ =>
 		map((payload: MoveNotepadObjectAction) => actions.loadNote.started(payload.objectRef))
 	);
 
-const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+const quickMarkdownInsert$ = (action$: Observable<Action<void>>, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.quickMarkdownInsert),
-		map(() => store.getState().currentNote.ref),
-		filter(ref => ref.length > 0 && !!store.getState().notepads.notepad && !!store.getState().notepads.notepad!.item),
-		map(ref => store.getState().notepads.notepad!.item!.notes[ref]),
-		concatMap(note => {
+		switchMap(() => state$.pipe(take(1))),
+		map(state => [state, state.currentNote.ref]),
+		filter(([state, ref]: [IStoreState, string]) => ref.length > 0 && !!state.notepads.notepad && !!state.notepads.notepad!.item),
+		map(([state, ref]: [IStoreState, string]) => [state.notepads.notepad!.item!.notes[ref], state.app.defaultFontSize]),
+		concatMap(([note, defaultFontSize]: [Note, string]) => {
 			let count = note.elements.filter(e => e.type === 'markdown').length + 1;
 			let id = `markdown${count}`;
 			while (note.elements.some(e => e.args.id === id)) id = `markdown${++count}`;
@@ -173,7 +187,7 @@ const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IS
 							y: '10px',
 							width: 'auto',
 							height: 'auto',
-							fontSize: store.getState().app.defaultFontSize
+							fontSize: defaultFontSize
 						},
 						content: ''
 					}
@@ -184,45 +198,48 @@ const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IS
 		})
 	);
 
-const imagePasted$ = (action$: Observable<Action<string>>, store: Store<IStoreState>) =>
+const imagePasted$ = (action$: Observable<Action<string>>, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.imagePasted.started),
-		filter(() => store.getState().currentNote.ref.length > 0),
 		map(action => action.payload),
-		switchMap(imageUrl =>
-			from(fetch(imageUrl).then(res => res.blob())).pipe(
-				concatMap(image => {
-					const note = store.getState().notepads.notepad!.item!.notes[store.getState().currentNote.ref];
-					const id = `image${note.elements.filter(e => e.type === 'image').length + 1}`;
-					const element: NoteElement = {
-						type: 'image',
-						args: {
-							id,
-							x: '10px',
-							y: '10px',
-							width: 'auto',
-							height: 'auto',
-						},
-						content: 'AS'
-					};
+		switchMap(imageUrl => state$.pipe(
+			take(1),
+			filter(state => state.currentNote.ref.length > 0),
+			switchMap(state =>
+				from(fetch(imageUrl).then(res => res.blob())).pipe(
+					concatMap(image => {
+						const note = state.notepads.notepad!.item!.notes[state.currentNote.ref];
+						const id = `image${note.elements.filter(e => e.type === 'image').length + 1}`;
+						const element: NoteElement = {
+							type: 'image',
+							args: {
+								id,
+								x: '10px',
+								y: '10px',
+								width: 'auto',
+								height: 'auto',
+							},
+							content: 'AS'
+						};
 
-					return [
-						actions.insertElement({
-							noteRef: store.getState().currentNote.ref,
-							element
-						}),
+						return [
+							actions.insertElement({
+								noteRef: state.currentNote.ref,
+								element
+							}),
 
-						actions.updateElement({
-							element,
-							noteRef: store.getState().currentNote.ref,
-							elementId: id,
-							newAsset: image
-						})
-					];
-				}),
-				catchError(error => of(actions.imagePasted.failed({ params: '', error })))
+							actions.updateElement({
+								element,
+								noteRef: state.currentNote.ref,
+								elementId: id,
+								newAsset: image
+							})
+						];
+					}),
+					catchError(error => of(actions.imagePasted.failed({ params: '', error })))
+				)
 			)
-		)
+		))
 	);
 
 export const noteEpics$ = combineEpics(
