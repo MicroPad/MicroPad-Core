@@ -3,9 +3,13 @@ import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
 import { FlatNotepad } from 'upad-parse/dist';
+import { AppWindow } from '../core/types';
+import { Observable } from 'rxjs';
 
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
+
+export const filterTruthy = <T>() => filter((a: T | undefined | null): a is T => !!a);
 
 export function isDev(): boolean {
 	return (
@@ -60,7 +64,7 @@ export function getUsedAssets(notepad: FlatNotepad): Set<string> {
 		.map(
 			n => n.elements
 				.map(e => e.args.ext!)
-				.filter(Boolean)
+				.filter(ext => !!ext)
 		)
 		.reduce((used, cur) => used.concat(cur), [])
 	);
@@ -117,4 +121,8 @@ export function debounce(callback: (...args: any[]) => void, time: number) {
 			callback(...args);
 		}, time);
 	};
+}
+
+export function isElection(): boolean {
+	return ((window as unknown) as AppWindow).isElectron;
 }

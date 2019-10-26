@@ -35,12 +35,14 @@ export class BaseReducer {
 		this.initialState = Object.freeze(initialState as IStoreState);
 	}
 
-	public reducer(state: IStoreState, action: Action<any>): IStoreState {
+	public reducer = (inputState: IStoreState | undefined, action: Action<any>): IStoreState => {
+		const state = inputState || this.initialState;
+
 		let newState = {
 			...state
 		};
 		REDUCERS.forEach(reducer => newState[reducer.key] = Object.freeze(reducer.reducer(Object.freeze(state[reducer.key]), action)));
-		
+
 		return (!isDev) ? Object.freeze(newState) : deepFreeze(newState);
 	}
 }

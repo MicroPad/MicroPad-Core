@@ -21,9 +21,9 @@ export interface IStoreState {
 	readonly isExporting: IsExportingState;
 }
 
-export interface IAppWindow extends Window {
+export type AppWindow =  Window & {
 	isElectron: boolean;
-}
+};
 
 export const APP_NAME = 'µPad';
 export const SYNC_NAME = 'µSync';

@@ -15,8 +15,8 @@ import * as React from 'react';
 import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed
 import 'materialize-css/dist/js/materialize.js';
 import registerServiceWorker from './registerServiceWorker';
-import { APP_NAME, IAppWindow, IStoreState, MICROPAD_URL } from '../core/types';
-import { applyMiddleware, createStore } from 'redux';
+import { APP_NAME, IStoreState, MICROPAD_URL } from '../core/types';
+import { applyMiddleware, createStore, Store } from 'redux';
 import { BaseReducer } from '../core/reducers/BaseReducer';
 import { epicMiddleware } from './epics';
 import { composeWithDevTools } from 'redux-devtools-extension';
@@ -39,6 +39,9 @@ import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from '../core/types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './ToastEventHandler';
+import { isElection } from './util';
+import { Action } from 'redux-typescript-actions';
+import { baseEpic$ } from '../core/epics/BaseEpics';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -47,11 +50,17 @@ try {
 }
 
 const baseReducer: BaseReducer = new BaseReducer();
-export const store = createStore<IStoreState>(
+export const store: Store<IStoreState, Action<any>> = createStore<IStoreState, Action<any>, unknown, unknown>(
 	baseReducer.reducer,
-	baseReducer.initialState,
-	composeWithDevTools(applyMiddleware(epicMiddleware))
+	composeWithDevTools(
+		applyMiddleware(
+			epicMiddleware
+		)
+	)
 );
+
+// Start the epic listener for side-effect execution
+epicMiddleware.run(baseEpic$);
 
 export const NOTEPAD_STORAGE = localforage.createInstance({
 	name: 'MicroPad',
@@ -82,7 +91,7 @@ export function getStorage(): { [name: string]: LocalForage } {
 	if (!await compatibilityCheck()) return;
 	await hydrateStoreFromLocalforage();
 
-	if ((window as IAppWindow).isElectron) store.dispatch(actions.checkVersion(undefined));
+	if (isElection()) store.dispatch(actions.checkVersion(undefined));
 	store.dispatch(actions.getNotepadList.started(undefined));
 	store.dispatch(actions.indexNotepads.started(undefined));
 
@@ -91,7 +100,7 @@ export function getStorage(): { [name: string]: LocalForage } {
 
 	// Render the main UI
 	ReactDOM.render(
-		<Provider store={store}>
+		<Provider<Action<any>> store={store}>
 			<PrintViewOrAppContainerComponent>
 				<HeaderComponent />
 				<AppBodyComponent>
