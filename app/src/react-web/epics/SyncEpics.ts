@@ -33,6 +33,7 @@ import { Observable } from 'rxjs/Observable';
 import { FlatNotepad } from 'upad-parse/dist';
 import * as stringify from 'json-stringify-safe';
 
+// TODO: Test this
 export namespace SyncEpics {
 	export const uploadCount$ = new BehaviorSubject<number>(0);
 

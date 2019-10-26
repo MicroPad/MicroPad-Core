@@ -2,14 +2,15 @@
 import SearchWorker from '!workerize-loader!../../react-web/SearchWorker.js';
 
 import { combineEpics } from 'redux-observable';
-import { catchError, filter, map, switchMap, take, withLatestFrom } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { HashTagSearchResult, HashTagSearchResults } from '../reducers/SearchReducer';
 import { IStoreState } from '../types';
-import { isAction } from '../../react-web/util';
-import { SearchIndex } from '../types/ActionTypes';
+import { isAction, restoreObject } from '../../react-web/util';
+import { SearchIndex, SearchIndices } from '../types/ActionTypes';
+import { FlatNotepad, Trie } from 'upad-parse/dist';
 
 export namespace SearchEpics {
 	const searchWorker = new SearchWorker() as any;
@@ -31,7 +32,18 @@ export namespace SearchEpics {
 				})),
 				switchMap(({ indices, notepadPasskeys }) =>
 					from(searchWorker.indexNotepads(indices, notepadPasskeys)).pipe(
-						map((newIndices: SearchIndex[]) => actions.indexNotepads.done({ params: undefined, result: newIndices })),
+						map((newIndices: SearchIndices) =>
+							newIndices.map((index): SearchIndex => {
+								// TODO: Deep restore the object, not just first level
+
+								return {
+									notepad: restoreObject<FlatNotepad>(index.notepad, new FlatNotepad('tmp')),
+									trie: restoreObject<Trie>(index.trie, new Trie())
+								};
+							})
+						),
+						tap(a => console.log(a)),
+						map(newIndices => actions.indexNotepads.done({ params: undefined, result: newIndices })),
 						catchError(err => of(actions.indexNotepads.failed({ params: undefined, error: err })))
 					)
 				)

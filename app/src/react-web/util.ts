@@ -4,7 +4,6 @@ import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
 import { FlatNotepad } from 'upad-parse/dist';
 import { AppWindow } from '../core/types';
-import { Observable } from 'rxjs';
 
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
@@ -125,4 +124,16 @@ export function debounce(callback: (...args: any[]) => void, time: number) {
 
 export function isElection(): boolean {
 	return ((window as unknown) as AppWindow).isElectron;
+}
+
+export function restoreObject<T>(objectToRestore: T, template: T): T {
+	for (let o = template; o !== Object.prototype; o = Object.getPrototypeOf(o)) {
+		for (let key of Object.getOwnPropertyNames(o)) {
+			if (typeof template[key] === 'function') {
+				objectToRestore[key] = template[key];
+			}
+		}
+	}
+
+	return objectToRestore;
 }
