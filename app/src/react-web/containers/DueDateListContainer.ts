@@ -14,7 +14,7 @@ export function mapStateToProps({ notepads }: IStoreState): IDueDateListComponen
 			.map(note => {
 				const earliestDueDate = note.elements
 					.map(element => element.args.dueDate)
-					.filter(Boolean)
+					.filter(dueDate => !!dueDate)
 					.map(dueDate => parseInt(dueDate!, 10))
 					.filter(due => due >= new Date().getTime())
 					.sort()[0];

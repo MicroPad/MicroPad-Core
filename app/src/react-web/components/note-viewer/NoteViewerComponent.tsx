@@ -222,7 +222,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			Array.from(event.dataTransfer.items)
 				.filter(item => item.kind === 'file')
 				.map(file => file.getAsFile())
-				.filter(Boolean)
+				.filter(file => !!file)
 				.forEach((file: File) => this.insertFileFromDrag(file, x, y));
 
 			event.dataTransfer.items.clear();

@@ -2,10 +2,10 @@ import * as React from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
 import { MarkDownViewer } from './MarkdownViewerHtml';
-import { IAppWindow, UNSUPPORTED_MESSAGE } from '../../../../../core/types';
+import { UNSUPPORTED_MESSAGE } from '../../../../../core/types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
-import { debounce } from '../../../../util';
+import { debounce, isElection } from '../../../../util';
 import Grid from '@material-ui/core/Grid';
 import { Input } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
@@ -252,7 +252,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private generateHtml = (element: NoteElement): Promise<string> => {
 		return new Promise<string>(resolve => {
 			let html = this.converter.makeHtml(element.content);
-			if (navigator.onLine || (window as IAppWindow).isElectron) html = Twemoji.parse(html, icon => require(`twemoji/2/svg/${icon}.svg`));
+			if (navigator.onLine || isElection()) html = Twemoji.parse(html, icon => require(`twemoji/2/svg/${icon}.svg`));
 			resolve(html);
 		});
 	}
@@ -279,7 +279,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					newWindow.opener = null;
 					newWindow.focus();
 				} else {
-					if (!(window as IAppWindow).isElectron) Dialog.alert('Your browser blocked opening the link');
+					if (!isElection()) Dialog.alert('Your browser blocked opening the link');
 				}
 				break;
 
