@@ -1,15 +1,16 @@
 import { actions } from '../../core/actions';
 import {
-	catchError,
-	combineLatest,
+	catchError, combineLatest,
 	concatMap,
 	filter,
 	map,
 	mergeMap,
 	retry,
 	switchMap,
+	take,
 	tap,
-	throttleTime
+	throttleTime,
+	withLatestFrom
 } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
 import { combineEpics } from 'redux-observable';
@@ -18,7 +19,7 @@ import { ASSET_STORAGE, NOTEPAD_STORAGE } from '..';
 import { IStoreState } from '../../core/types';
 import saveAs from 'save-as';
 import * as JSZip from 'jszip';
-import { fixFileName, generateGuid, isAction } from '../util';
+import { filterTruthy, fixFileName, generateGuid, isAction } from '../util';
 import { Dialog } from '../dialogs';
 import { CombinedNotepadSyncList, ISyncedNotepad, SyncUser } from '../../core/types/SyncTypes';
 import { Asset, FlatNotepad, Note, Notepad, Translators } from 'upad-parse/dist';
@@ -26,10 +27,10 @@ import { MarkdownNote } from 'upad-parse/dist/Note';
 import { from, Observable, of } from 'rxjs';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { RestoreJsonNotepadAndLoadNoteAction } from '../../core/types/ActionTypes';
-import { Store } from 'redux';
 import { format } from 'date-fns';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { fromShell } from '../CryptoService';
+import { EpicDeps } from './index';
 
 const parseQueue: string[] = [];
 
@@ -59,10 +60,10 @@ const parseNpx$ = (action$: Observable<Action<string>>) =>
 		)
 	);
 
-const syncOnNotepadParsed$ = (action$, store: Store<IStoreState>) =>
+const syncOnNotepadParsed$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.updateCurrentSyncId),
-		map(() => store.getState()),
+		switchMap(() => state$.pipe(take(1))),
 		map((state: IStoreState) => state.notepads.notepad),
 		filter((npState: INotepadStoreState) => !!npState && !!npState.item),
 		map((npState: INotepadStoreState) => actions.actWithSyncNotepad({
@@ -110,7 +111,7 @@ const parseMarkdownImport$ = (action$: Observable<Action<Translators.Markdown.Ma
 				return false;
 			}
 		}),
-		filter(Boolean),
+		filterTruthy(),
 		map((np: Notepad) => actions.parseNpx.done({ params: '', result: np.flatten() }))
 	);
 
@@ -145,16 +146,17 @@ const restoreJsonNotepad$ = action$ =>
 		mergeMap((restoreActions: Action<any>[]) => [...restoreActions])
 	);
 
-const restoreJsonNotepadAndLoadNote$ = (action$, store: Store<IStoreState>, { getStorage }) =>
+const restoreJsonNotepadAndLoadNote$ = (action$, state$: Observable<IStoreState>, { getStorage }: EpicDeps) =>
 	action$.pipe(
 		isAction(actions.restoreJsonNotepadAndLoadNote),
 		map((action: Action<RestoreJsonNotepadAndLoadNoteAction>) => action.payload),
 		switchMap((result: RestoreJsonNotepadAndLoadNoteAction) =>
 			from((getStorage().notepadStorage as LocalForage).getItem(result.notepadTitle)).pipe(
-				switchMap((notepadJson: string) =>
+				withLatestFrom(state$),
+				switchMap(([notepadJson, state]: [string, IStoreState]) =>
 					from(Translators.Json.toFlatNotepadFromNotepad(
 						notepadJson,
-						store.getState().notepadPasskeys[result.notepadTitle]
+						state.notepadPasskeys[result.notepadTitle]
 					))
 				),
 				map((notepad: FlatNotepad) => [result.noteRef, notepad]),
@@ -165,21 +167,21 @@ const restoreJsonNotepadAndLoadNote$ = (action$, store: Store<IStoreState>, { ge
 				})
 			)
 		),
-		filter(Boolean),
+		filterTruthy(),
 		concatMap(([noteRef, notepad]: [string, FlatNotepad]) => [
 			actions.parseNpx.done({ params: '', result: notepad }),
 			actions.loadNote.started(noteRef)
 		])
 	);
 
-const exportNotepad$ = (action$, store) =>
+const exportNotepad$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<void>) => isType(action, actions.exportNotepad)),
-		map(() => store.getState()),
+		switchMap(() => state$.pipe(take(1))),
 		map((state: IStoreState) => state.notepads),
-		filter(Boolean),
+		filterTruthy(),
 		map((state: INotepadsStoreState) => (state.notepad || <INotepadStoreState> {}).item),
-		filter(Boolean),
+		filterTruthy(),
 		switchMap((notepad: FlatNotepad) =>
 			from(getNotepadXmlWithAssets(notepad.toNotepad()))
 		),
@@ -190,15 +192,16 @@ const exportNotepad$ = (action$, store) =>
 		filter(() => false)
 	);
 
-const exportAll$ = (action$, store: Store<IStoreState>) =>
+const exportAll$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<void>) => isType(action, actions.exportAll.started)),
-		map(() => store.getState()),
+		switchMap(() => state$.pipe(take(1))),
 		map((state: IStoreState) => state.notepads),
-		filter(Boolean),
+		filterTruthy(),
 		map((state: INotepadsStoreState) => state.savedNotepadTitles),
-		filter(Boolean),
-		switchMap((titles: string[]) => {
+		filterTruthy(),
+		withLatestFrom(state$),
+		switchMap(([titles, state]: [string[], IStoreState]) => {
 			const notepadsInStorage: Promise<string>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
@@ -207,7 +210,7 @@ const exportAll$ = (action$, store: Store<IStoreState>) =>
 					const pendingXml = notepads.map(async (notepadJSON: string) => {
 						const shell: NotepadShell = JSON.parse(notepadJSON);
 
-						const notepad = (await fromShell(shell, store.getState().notepadPasskeys[shell.title])).notepad;
+						const notepad = (await fromShell(shell, state.notepadPasskeys[shell.title])).notepad;
 						return await getNotepadXmlWithAssets(notepad);
 					});
 
@@ -238,15 +241,16 @@ const exportAll$ = (action$, store: Store<IStoreState>) =>
 		})
 	);
 
-const exportAllToMarkdown$ = (action$, store) =>
+const exportAllToMarkdown$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<void>) => isType(action, actions.exportToMarkdown.started)),
-		map(() => store.getState()),
+		switchMap(() => state$.pipe(take(1))),
 		map((state: IStoreState) => state.notepads),
-		filter(Boolean),
+		filterTruthy(),
 		map((state: INotepadsStoreState) => state.savedNotepadTitles),
-		filter(Boolean),
-		switchMap((titles: string[]) => {
+		filterTruthy(),
+		withLatestFrom(state$),
+		switchMap(([titles, state]: [string[], IStoreState]) => {
 			const notepadsInStorage: Promise<string>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
@@ -255,7 +259,7 @@ const exportAllToMarkdown$ = (action$, store) =>
 					const pendingContent = notepads.map(async (notepadJSON: string) => {
 						const shell: NotepadShell = JSON.parse(notepadJSON);
 
-						const notepad = (await fromShell(shell, store.getState().notepadPasskeys[shell.title])).notepad;
+						const notepad = (await fromShell(shell, state.notepadPasskeys[shell.title])).notepad;
 						return await getNotepadMarkdownWithAssets(notepad);
 					});
 
@@ -298,26 +302,35 @@ const exportAllDone$ = (action$: Observable<Action<Success<void, Blob>>>) =>
 		filter(() => false)
 	);
 
-const renameNotepad$ = (action$, store) =>
+const renameNotepad$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.renameNotepad.started)),
-		switchMap((action: Action<string>) => {
-			const oldTitle = store.getState().notepads.notepad.item.title;
+		switchMap((action: Action<string>) => state$.pipe(
+			take(1),
+			switchMap(state => {
+				const oldTitle = state.notepads.notepad!.item!.title;
 
-			return from(NOTEPAD_STORAGE.removeItem(oldTitle))
-				.pipe(
-					map(() => { return { newTitle: action.payload, oldTitle }; })
-				);
-		}),
-		map((res: {newTitle: string, oldTitle: string}) => actions.renameNotepad.done({params: res.newTitle, result: res.oldTitle}))
+				return from(NOTEPAD_STORAGE.removeItem(oldTitle))
+					.pipe(
+						map(() => { return { newTitle: action.payload, oldTitle }; })
+					);
+			}),
+			map((res: {newTitle: string, oldTitle: string}) => actions.renameNotepad.done({params: res.newTitle, result: res.oldTitle}))
+		))
 	);
 
-const saveNotepadOnRenameOrNew$ = (action$, store) =>
+const saveNotepadOnRenameOrNew$ = (action$, state$: Observable<IStoreState>) =>
 	action$
 		.pipe(
 			filter((action: Action<Success<any, any>>) => isType(action, actions.renameNotepad.done) || isType(action, actions.parseNpx.done)),
-			map(() => store.getState().notepads.notepad.item),
-			map((notepad: FlatNotepad) => actions.saveNotepad.started(notepad.toNotepad()))
+			switchMap(() => state$.pipe(
+				take(1),
+				map(state => state.notepads.notepad),
+				filterTruthy(),
+				map(notepadState => notepadState.item),
+				filterTruthy(),
+				map((notepad: FlatNotepad) => actions.saveNotepad.started(notepad.toNotepad()))
+			))
 		);
 
 const downloadExternalNotepad$ = action$ =>
@@ -327,7 +340,7 @@ const downloadExternalNotepad$ = action$ =>
 		switchMap(url => of(url).pipe(
 			combineLatest(from(Dialog.confirm(`Are you sure you want to download this notepad: ${url}?`)))
 		)),
-		filter(([url, shouldDownload]: [string, boolean]) => shouldDownload),
+		filter(([, shouldDownload]: [string, boolean]) => shouldDownload),
 		map(([url]: [string, boolean]) => url),
 		mergeMap((url: string) =>
 			ajax({
@@ -369,13 +382,16 @@ const getNextParse$ = action$ =>
 		map(() => actions.parseNpx.started(parseQueue[0]))
 	);
 
-const loadNotepadByIndex$ = (action$: Observable<Action<number>>, store) =>
+const loadNotepadByIndex$ = (action$: Observable<Action<number>>, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.loadNotepadByIndex),
 		map((action: Action<number>) => action.payload),
-		filter(index => !!(<IStoreState> store.getState()).notepads && (<IStoreState> store.getState()).notepads.savedNotepadTitles!.length >= index),
-		map((index: number) => (<IStoreState> store.getState()).notepads.savedNotepadTitles![index - 1]),
-		map((title: string) => actions.openNotepadFromStorage.started(title))
+		switchMap(index => state$.pipe(
+			take(1),
+			filter(state => !!state.notepads && state.notepads.savedNotepadTitles!.length >= index),
+			map(state => state.notepads.savedNotepadTitles![index - 1]),
+			map((title: string) => actions.openNotepadFromStorage.started(title))
+		))
 	);
 
 const updateSyncedNotepadIdOnSyncListLoad$ = action$ =>
@@ -384,27 +400,33 @@ const updateSyncedNotepadIdOnSyncListLoad$ = action$ =>
 		map((action: Action<Success<SyncUser, CombinedNotepadSyncList>>) => actions.updateCurrentSyncId(action.payload.result))
 	);
 
-const saveNotepadOnCreation$ = (action$, store: Store<IStoreState>) =>
+const saveNotepadOnCreation$ = (action$, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.newNotepad),
-		map(() => store.getState().notepads.notepad),
-		filter(Boolean),
-		map((notepadState: INotepadStoreState) => notepadState.item),
-		filter(Boolean),
-		map((notepad: FlatNotepad) => notepad.toNotepad()),
-		map((notepad: Notepad) => actions.saveNotepad.started(notepad))
+		switchMap(() => state$.pipe(
+			take(1),
+			map(state => state.notepads.notepad),
+			filterTruthy(),
+			map((notepadState: INotepadStoreState) => notepadState.item),
+			filterTruthy(),
+			map((notepad: FlatNotepad) => notepad.toNotepad()),
+			map((notepad: Notepad) => actions.saveNotepad.started(notepad))
+		))
 	);
 
-const quickNote$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+const quickNote$ = (action$: Observable<Action<void>>, state$: Observable<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.quickNote.started),
-		map(() => store.getState().notepads.notepad),
-		filter(Boolean),
-		map((notepadState: INotepadStoreState) => notepadState.item),
-		filter(Boolean),
-		throttleTime(1000),
-		map(() => generateGuid()),
-		map(guid => actions.quickNote.done({ params: undefined, result: guid}))
+		switchMap(() => state$.pipe(
+			take(1),
+			map(state => state.notepads.notepad),
+			filterTruthy(),
+			map((notepadState: INotepadStoreState) => notepadState.item),
+			filterTruthy(),
+			throttleTime(1000),
+			map(() => generateGuid()),
+			map(guid => actions.quickNote.done({ params: undefined, result: guid}))
+		)),
 	);
 
 const loadQuickNote$ = (action$: Observable<Action<Success<void, string>>>) =>
