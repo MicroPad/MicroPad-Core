@@ -4,16 +4,16 @@ import { SearchIndices } from '../core/types/ActionTypes';
 import { NotepadPasskeysState } from '../core/reducers/NotepadPasskeysReducer';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 
-export async function indexNotepads(indices: SearchIndices, passkeys: NotepadPasskeysState) {
+export async function indexNotepads(indices, passkeys) {
 	const NOTEPAD_STORAGE = localforage.createInstance({
 		name: 'MicroPad',
 		storeName: 'notepads'
 	});
 	await NOTEPAD_STORAGE.ready();
 
-	const notepads: Promise<FlatNotepad | void>[] = [];
-	await NOTEPAD_STORAGE.iterate((json: string) => {
-		let shell: NotepadShell;
+	const notepads = [];
+	await NOTEPAD_STORAGE.iterate((json) => {
+		let shell;
 		try {
 			shell = JSON.parse(json);
 		} catch (ignored) {
@@ -26,14 +26,13 @@ export async function indexNotepads(indices: SearchIndices, passkeys: NotepadPas
 					console.warn(`Couldn't parse notepad: ${e}`)
 				)
 		);
-		return;
 	});
 
 	return Promise.all(notepads)
 		.then(resolvedNotepads =>
 			resolvedNotepads
 				.filter(notepad => !!notepad)
-				.map((notepad: FlatNotepad) => {
+				.map((notepad) => {
 					if (!!indices[notepad.title] && !indices[notepad.title].shouldReindex(new Date(), Object.keys(notepad.notes).length)) {
 						return { notepad: notepad, trie: indices[notepad.title] };
 					}

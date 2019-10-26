@@ -4,6 +4,8 @@ import * as localforage from 'localforage';
 import * as md5 from 'md5';
 
 export async function toSyncedNotepad(notepad) {
+	debugger;
+
 	// Setup access to our binary assets
 	const ASSET_STORAGE = localforage.createInstance({
 		name: 'MicroPad',

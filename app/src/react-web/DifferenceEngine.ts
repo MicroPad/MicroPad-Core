@@ -79,8 +79,8 @@ export namespace DifferenceEngine {
 
 		export const deleteNotepad = (syncId: string): Observable<void> => call<void>('delete', syncId);
 
-		export async function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
-			return await SyncThread.toSyncedNotepad(notepad);
+		export function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
+			return SyncThread.toSyncedNotepad(notepad);
 		}
 	}
 

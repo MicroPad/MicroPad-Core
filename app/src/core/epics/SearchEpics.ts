@@ -1,3 +1,6 @@
+// @ts-ignore
+import SearchWorker from '!workerize-loader!../../react-web/SearchWorker.js';
+
 import { combineEpics } from 'redux-observable';
 import { catchError, filter, map, switchMap, take, withLatestFrom } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
@@ -6,9 +9,11 @@ import { actions } from '../actions';
 import { HashTagSearchResult, HashTagSearchResults } from '../reducers/SearchReducer';
 import { IStoreState } from '../types';
 import { isAction } from '../../react-web/util';
-import { indexNotepads } from '../../react-web/SearchWorker';
+import { SearchIndex } from '../types/ActionTypes';
 
 export namespace SearchEpics {
+	const searchWorker = new SearchWorker() as any;
+
 	export const refreshIndices$ = action$ =>
 		action$.pipe(
 			isAction(actions.saveNotepad.done, actions.deleteNotepad),
@@ -25,8 +30,8 @@ export namespace SearchEpics {
 					notepadPasskeys: state.notepadPasskeys
 				})),
 				switchMap(({ indices, notepadPasskeys }) =>
-					from(indexNotepads(indices, notepadPasskeys)).pipe(
-						map(newIndices => actions.indexNotepads.done({ params: undefined, result: newIndices })),
+					from(searchWorker.indexNotepads(indices, notepadPasskeys)).pipe(
+						map((newIndices: SearchIndex[]) => actions.indexNotepads.done({ params: undefined, result: newIndices })),
 						catchError(err => of(actions.indexNotepads.failed({ params: undefined, error: err })))
 					)
 				)
