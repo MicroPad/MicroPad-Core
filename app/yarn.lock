@@ -11063,10 +11063,10 @@ unset-value@^1.0.0:
     has-value "^0.3.1"
     isobject "^3.0.0"
 
-upad-parse@^6.3.0:
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-6.3.0.tgz#7b540969fd2ecfdf729f4b605b152a656e72de30"
-  integrity sha512-YtaYA15gP6QnL/+5mlMES2nULuWaXJ+Zc08d4D/QgwBqT4cNjx/VLX5Sxt+eCkRs251JHY8TP+qNR1TNWj4TQQ==
+upad-parse@^6.4.0:
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-6.4.0.tgz#11bc5853775dc09bc5dfc93be29948e38d744953"
+  integrity sha512-V9/xPZVbhPBV9G0HOia4+PSZsf+WGFPB9i3DyB0jeXXvAseoCt5SyGdmB60eKyOOMipgrYeZ+hFhqh0jLEAVvw==
   dependencies:
     aes-js "^3.1.2"
     date-fns "^1.30.1"
