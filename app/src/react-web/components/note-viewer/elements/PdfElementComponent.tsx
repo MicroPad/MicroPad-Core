@@ -81,7 +81,7 @@ export default class PdfElementComponent extends React.Component<INoteElementCom
 
 	componentDidUpdate(prevProps: Readonly<INoteElementComponentProps>): void {
 		const wasEditing = prevProps.elementEditing === this.props.element.args.id;
-		const elementChanged = prevProps.element !== this.props.element;
+		const elementChanged = prevProps.element !== this.props.element || prevProps.noteAssets !== this.props.noteAssets;
 
 		if (wasEditing || elementChanged) this.embedPdf();
 	}

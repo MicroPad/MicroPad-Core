@@ -242,7 +242,8 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 	const storageRequests: Promise<Blob>[] = [];
 	const blobRefs: string[] = [];
 
-	elements.map(element => {
+	elements = elements.map(element => {
+		// Is this a notebook before v2?
 		if (element.type !== 'markdown' && element.content !== 'AS') {
 			const asset = new Asset(dataURItoBlob(element.content));
 			storageRequests.push(ASSET_STORAGE.setItem(asset.uuid, asset.data));
@@ -251,8 +252,19 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 			return { ...element, args: { ...element.args, ext: asset.uuid }, content: 'AS' };
 		}
 
+		// Notebooks from v2 or higher
 		if (!!element.args.ext) {
-			storageRequests.push(ASSET_STORAGE.getItem(element.args.ext));
+			storageRequests.push(
+				ASSET_STORAGE.getItem(element.args.ext)
+					.then((blob: Blob) => {
+						if (element.type === 'pdf') {
+							return blob.slice(0, blob.size, 'application/pdf');
+						}
+
+						return blob;
+					})
+			);
+
 			blobRefs.push(element.args.ext);
 		}
 
