@@ -19,6 +19,9 @@ export default class PdfElementComponent extends React.Component<INoteElementCom
 
 		this.isEditing = elementEditing === element.args.id;
 
+		// The PDF.js viewer must have a fixed height so disallow auto and set to the minimum (500px)
+		const elementHeight = element.args.height === 'auto' ? '500px' : element.args.height;
+
 		return (
 			<div style={{
 				overflow: 'hidden',
@@ -29,7 +32,7 @@ export default class PdfElementComponent extends React.Component<INoteElementCom
 			}} onClick={this.openEditor}>
 				<Resizable
 					style={{ overflow: 'hidden' }}
-					size={{ width: element.args.width!, height: element.args.height! }}
+					size={{ width: element.args.width!, height: elementHeight }}
 					minWidth={330}
 					minHeight={500}
 					lockAspectRatio={false}
