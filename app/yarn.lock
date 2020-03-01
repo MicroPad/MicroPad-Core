@@ -7184,10 +7184,9 @@ pretty-bytes@^4.0.2:
   resolved "https://registry.yarnpkg.com/pretty-bytes/-/pretty-bytes-4.0.2.tgz#b2bf82e7350d65c6c33aa95aaa5a4f6327f61cd9"
   integrity sha1-sr+C5zUNZcbDOqlaqlpPYyf2HNk=
 
-pretty-data@^0.40.0:
-  version "0.40.0"
-  resolved "https://registry.yarnpkg.com/pretty-data/-/pretty-data-0.40.0.tgz#572aa8ea23467467ab94b6b5266a6fd9c8fddd72"
-  integrity sha1-Vyqo6iNGdGerlLa1Jmpv2cj93XI=
+"pretty-data@git+https://github.com/vkiryukhin/pretty-data.git#22a34a534745714ea974f72db2e9bf7561b3fdc7":
+  version "0.50.0"
+  resolved "git+https://github.com/vkiryukhin/pretty-data.git#22a34a534745714ea974f72db2e9bf7561b3fdc7"
 
 pretty-error@^2.0.2:
   version "2.1.1"
@@ -8215,10 +8214,10 @@ schema-utils@^0.4.5:
     ajv "^6.1.0"
     ajv-keywords "^3.1.0"
 
-scrypt-js@^2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/scrypt-js/-/scrypt-js-2.0.4.tgz#32f8c5149f0797672e551c07e230f834b6af5f16"
-  integrity sha512-4KsaGcPnuhtCZQCxFxN3GVYIhKFPTdLd8PLC552XwbMndtD0cjRFAhDuuydXQ0h08ZfPgzqe6EKHozpuH74iDw==
+scrypt-js@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/scrypt-js/-/scrypt-js-3.0.0.tgz#52361c1f272eeaab09ec1f806ea82078bca58b15"
+  integrity sha512-7CC7aufwukEvqdmllR0ny0QaSg0+S22xKXrXz3ZahaV6J+fgD2YAtrjtImuoDWog17/Ty9Q4HBmnXEXJ3JkfQA==
 
 select-hose@^2.0.0:
   version "2.0.0"
@@ -9347,17 +9346,17 @@ unzip-response@^2.0.1:
   resolved "https://registry.yarnpkg.com/unzip-response/-/unzip-response-2.0.1.tgz#d2f0f737d16b0615e72a6935ed04214572d56f97"
   integrity sha1-0vD3N9FrBhXnKmk17QQhRXLVb5c=
 
-upad-parse@^6.4.0:
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-6.4.0.tgz#11bc5853775dc09bc5dfc93be29948e38d744953"
-  integrity sha512-V9/xPZVbhPBV9G0HOia4+PSZsf+WGFPB9i3DyB0jeXXvAseoCt5SyGdmB60eKyOOMipgrYeZ+hFhqh0jLEAVvw==
+upad-parse@^6.4.3:
+  version "6.4.3"
+  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-6.4.3.tgz#6c567a035f56f3c4f4aa3b748d653b4193394b00"
+  integrity sha512-P8c7BAziXMECW9fxaCSPeY1R3H4LbuwDGGkEUWD9K+KQ4DEf2fOKFWdj7uotfHiaHCURjuz1S/oMYGdl45jlXg==
   dependencies:
     aes-js "^3.1.2"
     date-fns "^1.30.1"
     json-stringify-safe "^5.0.1"
     lz-string "^1.4.4"
-    pretty-data "^0.40.0"
-    scrypt-js "^2.0.4"
+    pretty-data "https://github.com/vkiryukhin/pretty-data#22a34a534745714ea974f72db2e9bf7561b3fdc7"
+    scrypt-js "^3.0.0"
     turndown "^4.0.2"
     turndown-plugin-gfm "^1.0.2"
     xml2js "^0.4.19"
