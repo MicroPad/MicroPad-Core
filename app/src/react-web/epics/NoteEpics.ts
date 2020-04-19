@@ -193,7 +193,10 @@ const imagePasted$ = (action$: Observable<Action<string>>, store: Store<IStoreSt
 			from(fetch(imageUrl).then(res => res.blob())).pipe(
 				concatMap(image => {
 					const note = store.getState().notepads.notepad!.item!.notes[store.getState().currentNote.ref];
-					const id = `image${note.elements.filter(e => e.type === 'image').length + 1}`;
+					let count = note.elements.filter(e => e.type === 'image').length + 1;
+					let id = `image${count}`;
+					while (note.elements.some(e => e.args.id === id)) id = `image${++count}`;
+
 					const element: NoteElement = {
 						type: 'image',
 						args: {
