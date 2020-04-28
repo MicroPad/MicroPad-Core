@@ -54,6 +54,19 @@ export function getAsBase64(blob: Blob): Promise<string> {
 	});
 }
 
+export function getBytes(blob: Blob): Promise<Uint8Array> {
+	return new Promise(resolve => {
+		try {
+			const reader = new FileReader();
+			reader.onload = event => resolve(new Uint8Array((event.target as any).result));
+			reader.readAsArrayBuffer(blob);
+		} catch (e) {
+			console.warn(e);
+			resolve(new Uint8Array());
+		}
+	});
+}
+
 export function getUsedAssets(notepad: FlatNotepad): Set<string> {
 	return new Set(
 		Object.values(notepad.notes)
