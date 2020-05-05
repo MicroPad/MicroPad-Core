@@ -9,8 +9,11 @@ There are a couple [GitHub Project boards](https://github.com/MicroPad/Web/proje
 
 ## Building MicroPad
 You will need the following:  
-- [Yarn](https://yarnpkg.com/lang/en/)
-- [Node.js](https://nodejs.org/en/) (preferably >=v10.x)
+- [Yarn](https://classic.yarnpkg.com/lang/en/) classic
+- [Node.js](https://nodejs.org/en/)
+- [Rust and Cargo](https://rustup.rs/)
+- [Python 3](https://www.python.org/)
+- [`wasm-bindgen`](https://rustwasm.github.io/docs/wasm-bindgen/)
 
 ### Installing dependencies
 ```bash
@@ -25,11 +28,5 @@ yarn start
 ```
 ### Building for production
 ```bash
-# Not needed to build, but definitely a good idea to make sure these pass
-yarn check-syntax
-yarn lint
-yarn test
-
-# Actually do the build
 yarn build
 ```
