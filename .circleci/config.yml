@@ -7,7 +7,7 @@ jobs:
   test:
     docker:
       # specify the version you desire here
-      - image: circleci/node:10.16.0-jessie
+      - image: circleci/rust:latest-node
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -27,6 +27,7 @@ jobs:
             - yarn-packages-master
             - yarn-packages-
 
+      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: cd app && yarn
 
       - save_cache:
@@ -36,13 +37,12 @@ jobs:
             - app/node_modules/
         
       # run tests!
-      - run: cd app && yarn check-syntax
-      - run: cd app && yarn lint
+      - run: cd app && yarn typecheck
       - run: cd app && yarn test
 
   build:
     docker:
-      - image: circleci/node:10.16.0-jessie
+      - image: circleci/rust:latest-node
     working_directory: ~/repo
     steps:
       - checkout
@@ -54,6 +54,8 @@ jobs:
             - yarn-packages-{{ .Branch }}
             - yarn-packages-master
             - yarn-packages-
+
+      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: cd app && yarn
 
       - save_cache:
@@ -62,7 +64,7 @@ jobs:
           paths:
             - app/node_modules/
 
-      - run: cd app && yarn build && tar cfJ micropad.tar.xz build/*
+      - run: cd app && CI=false yarn build && tar cfJ micropad.tar.xz build/*
       - store_artifacts:
           path: app/micropad.tar.xz
           destination: micropad.tar.xz
@@ -74,7 +76,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/node:10.16.0-jessie
+      - image: circleci/rust:latest-node
 
     working_directory: ~/repo
 
