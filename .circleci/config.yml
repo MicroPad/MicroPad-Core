@@ -37,7 +37,7 @@ jobs:
             - app/node_modules/
         
       # run tests!
-      - run: cd app && yarn check-syntax
+      - run: cd app && yarn typecheck
       - run: cd app && yarn lint
       - run: cd app && yarn test
 
