@@ -1,36 +1,30 @@
 {
   "compilerOptions": {
-	"outDir": "build/dist",
-	"module": "esnext",
-	"target": "es5",
-	"lib": [
-	  "es2017",
-	  "dom"
-	],
-	"sourceMap": true,
-	"allowJs": true,
-	"jsx": "react",
-	"moduleResolution": "node",
-	"rootDir": "src",
-	"forceConsistentCasingInFileNames": true,
-	"noImplicitReturns": true,
-	"noImplicitThis": true,
-	"noImplicitAny": false,
-	"strictNullChecks": true,
-	"suppressImplicitAnyIndexErrors": true,
-	"noUnusedLocals": false,
-	"baseUrl": ".",
-	"experimentalDecorators": true
+    "target": "es2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react",
+    "strict": true
   },
-  "exclude": [
-	"node_modules",
-	"build",
-	"scripts",
-	"acceptance-tests",
-	"webpack",
-	"jest",
-	"src/react-web/setupTests.ts",
-	"public/",
-	"config-overrides.js"
+  "include": [
+    "src"
   ]
 }
