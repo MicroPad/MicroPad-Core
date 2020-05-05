@@ -1,4 +1,6 @@
 # µPad
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMicroPad%2FWeb.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FMicroPad%2FWeb?ref=badge_shield)
+
 
 µPad is an open digital note taking app.
 
@@ -30,3 +32,7 @@ yarn start
 ```bash
 yarn build
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMicroPad%2FWeb.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FMicroPad%2FWeb?ref=badge_large)
