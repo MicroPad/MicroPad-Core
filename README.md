@@ -7,7 +7,7 @@
 Try it today at https://web.getmicropad.com
 
 ## What's going on with development?
-There are a couple [GitHub Project boards](https://github.com/MicroPad/Web/projects) with what's in development. That board would also be a great place to look for cases to contribute to.
+There are a couple [GitHub Project boards](https://github.com/orgs/MicroPad/projects) with what's in development. That board would also be a great place to look for cases to contribute to.
 
 ## Building MicroPad
 You will need the following:  
