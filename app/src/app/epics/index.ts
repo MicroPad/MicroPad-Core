@@ -16,6 +16,7 @@ import { helpEpics$ } from './HelpEpics';
 import { searchEpics$ } from './SearchEpics';
 import { syncEpics$ } from './SyncEpics';
 import { explorerEpics$ } from './ExplorerEpics';
+import { dueDatesEpics$ } from './DueDatesEpics';
 
 const baseEpic$ = combineEpics(
 	notepadEpics$,
@@ -27,7 +28,8 @@ const baseEpic$ = combineEpics(
 	appEpics$,
 	printEpics$,
 	syncEpics$,
-	cryptoEpics$
+	cryptoEpics$,
+	dueDatesEpics$
 );
 
 export type EpicDeps = {

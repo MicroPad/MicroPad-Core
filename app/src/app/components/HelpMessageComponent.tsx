@@ -28,7 +28,7 @@ export default class HelpMessageComponent extends React.Component<IHelpMessageCo
 			position: 'fixed',
 			backgroundColor: theme.chrome,
 			borderRadius: '10px',
-			right: 310,
+			right: 360,
 			top: 150,
 			padding: '5px',
 			width: '400px',

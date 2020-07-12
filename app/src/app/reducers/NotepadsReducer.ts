@@ -2,16 +2,18 @@ import { MicroPadReducer } from '../types/ReducerType';
 import { Action } from 'redux';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { actions } from '../actions';
-import { isType } from 'redux-typescript-actions';
+import { isType, Success } from 'redux-typescript-actions';
 import stringify from 'json-stringify-safe';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { FlatNotepad, Note } from 'upad-parse/dist';
 import { format } from 'date-fns';
+import { DueItem } from '../services/DueDates';
 
 export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 	public readonly key = 'notepads';
 	public readonly initialState: INotepadsStoreState = {
-		isLoading: false
+		isLoading: false,
+		dueDates: { isLoading: false, dueItems: [] }
 	};
 
 	public reducer(state: INotepadsStoreState, action: Action): INotepadsStoreState {
@@ -434,6 +436,28 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 					item: state.notepad.item.clone({ lastModified: new Date(0) })
 				}
 			};
+		} else if (isType(action, actions.getDueDates.started)) {
+			return {
+				...state,
+				dueDates: {
+					...state.dueDates,
+					isLoading: true
+				}
+			}
+		} else if (isType(action, actions.getDueDates.done) || isType(action, actions.getDueDates.failed)) {
+			let dueItems: DueItem[] = state.dueDates.dueItems;
+			if (!action.error) {
+				const payload = action.payload as unknown as Success<void, DueItem[]>;
+				dueItems = payload.result;
+			}
+
+			return {
+				...state,
+				dueDates: {
+					isLoading: false,
+					dueItems
+				}
+			}
 		}
 
 		return Object.freeze(state);
