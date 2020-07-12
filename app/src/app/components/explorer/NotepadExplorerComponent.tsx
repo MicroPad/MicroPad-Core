@@ -76,10 +76,14 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 
 		return (
 			<div id="notepad-explorer" style={notepadExplorerStyle}>
+				<div style={{ paddingRight: '5px' }}>
+					<a href="#!" onClick={flipFullScreenState} style={{ paddingRight: '5px', fontSize: '24px' }}>»</a>
+					<DueDateListComponent />
+				</div>
+
 				{
 					!!notepad &&
 					<div>
-						<a href="#!" onClick={flipFullScreenState} style={{ paddingRight: '5px', fontSize: '24px' }}>»</a>
 						<strong style={{ display: 'inline-flex' }}>
 							<span style={{ paddingRight: '5px' }}>{notepad.title}</span>
 							<ExplorerOptionsComponent
@@ -92,7 +96,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 								encrypt={encrypt}/>
 						</strong>
 
-						<p style={{paddingLeft: '10px', marginTop: '0px'}}>
+						<p style={{ marginTop: '0px' }}>
 							(<a href="#!" onClick={expandAll}>Expand All</a> | <a href="#!" onClick={() => {
 								if (!!openNote) {
 									collapseAll!();
@@ -108,7 +112,6 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 						{treeViews}
 
 						<div style={{ paddingLeft: '10px', marginTop: '10px' }}>
-							<DueDateListComponent />
 							<SyncOptionsComponent />
 						</div>
 

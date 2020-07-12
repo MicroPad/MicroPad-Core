@@ -2,14 +2,12 @@
 import 'material-icons-font/material-icons-font.css';
 import 'materialize-css/dist/css/materialize.min.css'; // TODO: Roboto will need to be imported here when this isn't
 import './root.css';
-
 /* Themes */
 import './theme-styles/Classic.css';
 import './theme-styles/Solarized.css';
 import './theme-styles/IanPad.css';
 import './theme-styles/Midnight.css';
 import './theme-styles/Purple.css';
-
 /* JS Imports */
 import * as React from 'react';
 import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed
@@ -120,6 +118,8 @@ export function getStorage(): { [name: string]: LocalForage } {
         const isSyncing = store.getState().sync.isLoading;
         window.onbeforeunload = (isSyncing || isSaving) ? () => true : null;
     });
+
+    store.dispatch(actions.started());
 })();
 
 async function hydrateStoreFromLocalforage() {
