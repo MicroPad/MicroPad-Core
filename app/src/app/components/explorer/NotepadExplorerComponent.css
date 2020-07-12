@@ -1,7 +1,7 @@
 #notepad-explorer {
 	order: 1;
 	padding: 5px;
-	width: 300px;
+	width: 350px;
 	overflow: auto;
 	white-space: nowrap;
 
@@ -15,6 +15,7 @@
 
 #notepad-explorer .due-date-list {
 	margin-bottom: 20px;
+	display: inline;
 }
 
 .tree-view_children {

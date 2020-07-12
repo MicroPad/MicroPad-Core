@@ -1,37 +1,29 @@
 import { IStoreState } from '../types';
-import DueDateListComponent, { DueItem, IDueDateListComponentProps } from '../components/explorer/DueDateListComponent';
-import { INotepadStoreState } from '../types/NotepadTypes';
+import DueDateListComponent, { IDueDateListComponentProps } from '../components/explorer/DueDateListComponent';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 
 export function mapStateToProps({ notepads }: IStoreState): IDueDateListComponentProps {
-	const notepad = (notepads.notepad || {} as INotepadStoreState).item;
-	if (!notepad) return { dueItems: [] };
+	// const currentTitle = notepads.notepad?.item?.title; TODO: Figure out why it won't let me build with optional chaining
+	const currentTitle = ((notepads.notepad || {} as any).item || {} as any).title;
 
 	return {
-		dueItems: Object.values(notepad.notes)
-			.map(note => {
-				const earliestDueDate = note.elements
-					.map(element => element.args.dueDate)
-					.filter(Boolean)
-					.map(dueDate => parseInt(dueDate!, 10))
-					.filter(due => due >= new Date().getTime())
-					.sort()[0];
-
-				return {
-					note,
-					date: !!earliestDueDate ? new Date(earliestDueDate) : undefined
-				};
-			})
-			.filter((dueItem: Partial<DueItem>): dueItem is DueItem => !!dueItem.date)
-			.sort((a, b) => a.date.getTime() - b.date.getTime())
+		isLoading: notepads.dueDates.isLoading,
+		dueItems: notepads.dueDates.dueItems,
+		currentTitle
 	};
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IDueDateListComponentProps> {
 	return {
-		loadNote: ref => dispatch(actions.loadNote.started(ref))
+		loadNote: (data, currentNotepadTitle) => {
+			if (currentNotepadTitle === data.notepadTitle) {
+				dispatch(actions.loadNote.started(data.noteRef));
+			} else {
+				dispatch(actions.restoreJsonNotepadAndLoadNote(data));
+			}
+		}
 	};
 }
 

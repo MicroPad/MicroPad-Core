@@ -1,33 +1,40 @@
 import * as React from 'react';
-import { Note } from 'upad-parse/dist';
 import { distanceInWordsStrict } from 'date-fns';
 import { generateGuid } from '../../util';
-
-export type DueItem = {
-	date: Date;
-	note: Note;
-};
+import { RestoreJsonNotepadAndLoadNoteAction } from '../../types/ActionTypes';
+import { DueItem } from '../../services/DueDates';
 
 export interface IDueDateListComponentProps {
+	currentTitle?: string;
+	isLoading: boolean;
 	dueItems: DueItem[];
-	loadNote?: (ref: string) => void;
+	loadNote?: (data: RestoreJsonNotepadAndLoadNoteAction, currentNotepadTitle?: string) => void;
 }
 
 export default class DueDateListComponent extends React.Component<IDueDateListComponentProps> {
 	render() {
-		const { dueItems, loadNote } = this.props;
-		if (dueItems.length < 1 || !loadNote) return null;
+		const { currentTitle, isLoading, dueItems, loadNote } = this.props;
+		if ((dueItems.length < 1 && !isLoading) || !loadNote) return null;
 
 		return (
 			<div className="due-date-list">
 				<strong>Upcoming due dates</strong>
+				{isLoading ? <em style={{ display: 'block' }}>Recalculating due dates…</em> : <React.Fragment />}
 				<ol>
 					{
 						dueItems.map(item =>
 							<li key={generateGuid()}>
-								<a href="#!" onClick={() => loadNote(item.note.internalRef)} style={{
-									textDecoration: 'underline'
-								}}>{item.note.title}</a> ({distanceInWordsStrict(new Date(), item.date)})
+								{item.notepadTitle} > <a
+									href="#!"
+									onClick={() => loadNote({
+										notepadTitle: item.notepadTitle,
+										noteRef: item.note.internalRef
+									}, currentTitle)}
+									style={{
+										textDecoration: 'underline'
+									}}>
+									{item.note.title}
+								</a> ({distanceInWordsStrict(new Date(), item.date)})
 							</li>
 						)
 					}

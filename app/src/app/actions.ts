@@ -16,11 +16,12 @@ import {
 	UpdateElementAction
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
-import { CombinedNotepadSyncList, SyncedNotepadList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
+import { CombinedNotepadSyncList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
 import { FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { HashTagSearchResults } from './reducers/SearchReducer';
 import { ThemeName } from './types/Themes';
+import { DueItem } from './services/DueDates';
 
 const actionCreator = actionCreatorFactory();
 
@@ -49,7 +50,9 @@ export const actions = {
 	exportToMarkdown: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS_TO_MD'),
 	clearOldData: actionCreator.async<void, void, Error>('CLEAR_OLD_DATA'),
 	getHelp: actionCreator.async<void, void, Error>('GET_HELP'),
+	getDueDates: actionCreator.async<string[], DueItem[], Error>('GET_DUE_DATES'),
 
+	started: actionCreator<void>('APP_STARTED'),
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
 	newNotepad: actionCreator<FlatNotepad>('NEW_NOTEPAD'),

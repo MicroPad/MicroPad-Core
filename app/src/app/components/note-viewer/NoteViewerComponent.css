@@ -1,6 +1,6 @@
 #note-viewer {
 	order: 0;
-	width: calc(100vw - 300px);
+	width: calc(100vw - 350px);
 	overflow: auto;
 
 	background-position: center center, left top;
