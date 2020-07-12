@@ -96,7 +96,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 								encrypt={encrypt}/>
 						</strong>
 
-						<p style={{paddingLeft: '10px', marginTop: '0px'}}>
+						<p style={{ marginTop: '0px' }}>
 							(<a href="#!" onClick={expandAll}>Expand All</a> | <a href="#!" onClick={() => {
 								if (!!openNote) {
 									collapseAll!();
