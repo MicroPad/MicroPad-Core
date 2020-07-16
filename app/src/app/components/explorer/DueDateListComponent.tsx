@@ -18,8 +18,10 @@ export default class DueDateListComponent extends React.Component<IDueDateListCo
 
 		return (
 			<div className="due-date-list">
-				<strong>Upcoming due dates</strong>
-				{isLoading ? <em style={{ display: 'block' }}>Recalculating due dates…</em> : <React.Fragment />}
+				<span>
+					<strong>Upcoming due dates</strong>
+					{isLoading ? <em>(Recalculating…)</em> : <React.Fragment />}
+				</span>
 				<ol>
 					{
 						dueItems.map(item =>
