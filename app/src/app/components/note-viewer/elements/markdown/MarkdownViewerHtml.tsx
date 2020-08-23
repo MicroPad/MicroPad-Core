@@ -141,6 +141,8 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 <div id="content"></div>
 
 <script>
+	const AUTO_WIDTH_MAX = 600;
+
 	var content = document.getElementById('content');
 	var id = '${id}';
 	var element;
@@ -179,8 +181,12 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 
 			case 'render':
 				element = message.payload;
-				content.style.width = element.args.width || 'auto';
-				content.style.height = element.args.height || '50px';
+				
+				const height = element.args.height  || 'auto';
+				let width = element.args.width  || 'auto';
+				
+				content.style.width = width;
+				content.style.height = height;
 				content.style.fontSize = element.args.fontSize || '16px';
 				isPrinting = element.isPrinting;
 
@@ -198,7 +204,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 				if (isPrinting) break;
 				MathJax.Hub.Queue(['Typeset', MathJax.Hub, content]);
 				MathJax.Hub.Queue(function () {
-					if (!element.args.width || element.args.width === 'auto') {
+					if (width === 'auto') {
 						content.style.width = 'fit-content';
 						document.documentElement.style.overflow = 'hidden';
 					}
@@ -237,7 +243,13 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 
 			content.style.width = (!isFirefox) ? 'max-content' : '-moz-max-content';
 
-			var computedWidth = parseInt(window.getComputedStyle(content, null).getPropertyValue('width'), 10) + 10 + 'px';
+			let computedWidthValue = parseInt(window.getComputedStyle(content, null).getPropertyValue('width'), 10) + 10;
+			if (computedWidthValue > AUTO_WIDTH_MAX && element.args.height === 'auto') {
+				computedWidthValue = AUTO_WIDTH_MAX;
+			}
+			
+			const computedWidth = computedWidthValue + 'px';
+			
 			content.style.width = computedWidth;
 
 			parent.postMessage({
@@ -287,7 +299,9 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 
 	try {
 		new ResizeObserver(function() {
-			if (!!element && element.args.width === 'auto') content.style.width = 'auto';
+			if (!!element && element.args.width === 'auto') {
+				content.style.width = 'auto';
+			}
 
 			adjustWidth();
 		}).observe(content);
