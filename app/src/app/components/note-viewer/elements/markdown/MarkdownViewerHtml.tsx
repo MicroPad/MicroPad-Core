@@ -141,7 +141,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 <div id="content"></div>
 
 <script>
-	const AUTO_WIDTH_MAX = '600px';
+	const AUTO_WIDTH_MAX = 600;
 
 	var content = document.getElementById('content');
 	var id = '${id}';
@@ -184,9 +184,6 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 				
 				const height = element.args.height  || 'auto';
 				let width = element.args.width  || 'auto';
-				if (width === 'auto' && height === 'auto') {
-					width = AUTO_WIDTH_MAX;
-				}
 				
 				content.style.width = width;
 				content.style.height = height;
@@ -246,7 +243,13 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 
 			content.style.width = (!isFirefox) ? 'max-content' : '-moz-max-content';
 
-			var computedWidth = parseInt(window.getComputedStyle(content, null).getPropertyValue('width'), 10) + 10 + 'px';
+			let computedWidthValue = parseInt(window.getComputedStyle(content, null).getPropertyValue('width'), 10) + 10;
+			if (computedWidthValue > AUTO_WIDTH_MAX && element.args.height === 'auto') {
+				computedWidthValue = AUTO_WIDTH_MAX;
+			}
+			
+			const computedWidth = computedWidthValue + 'px';
+			
 			content.style.width = computedWidth;
 
 			parent.postMessage({
@@ -297,7 +300,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 	try {
 		new ResizeObserver(function() {
 			if (!!element && element.args.width === 'auto') {
-				content.style.width = element.args.height === 'auto' ? AUTO_WIDTH_MAX : 'auto';
+				content.style.width = 'auto';
 			}
 
 			adjustWidth();
