@@ -79,3 +79,8 @@ export type AddCryptoPasskeyAction = {
 export type SearchIndex = { notepad: FlatNotepad, trie: Trie };
 
 export type SearchIndices = SearchIndex[];
+
+export enum ZoomChange {
+	INCREASE,
+	DECREASE
+}

@@ -8,6 +8,7 @@ import { actions } from '../actions';
 import { ThemeName } from '../types/Themes';
 import { parse } from 'semver';
 import { isDev } from '../util';
+import { ZoomChange } from '../types/ActionTypes';
 
 export interface IAppStoreState {
 	version: IVersion;
@@ -63,14 +64,16 @@ export class AppReducer extends MicroPadReducer<IAppStoreState> {
 				defaultFontSize: action.payload
 			};
 		} else if (isType(action, actions.updateZoomLevel)) {
-			let zoom = state.zoom + action.payload;
-			if (zoom > 1.5) zoom = 1.51;
-			if (zoom <= 0) zoom = 0.09;
+			switch (action.payload) {
+				case ZoomChange.INCREASE:
+					return { ...state, zoom: state.zoom * 1.1 };
 
-			return {
-				...state,
-				zoom
-			};
+				case ZoomChange.DECREASE:
+					return { ...state, zoom: state.zoom * 0.9 };
+
+				default:
+					throw new Error(`Invalid ZoomChange`);
+			}
 		} else if (isType(action, actions.openEditor)) {
 			if (!action.payload.includes('drawing')) return state;
 

@@ -4,6 +4,7 @@ import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 import { IStoreState } from '../types';
 import { ThemeValues } from '../ThemeValues';
+import { ZoomChange } from '../types/ActionTypes';
 
 function mapStateToProps({ app }: IStoreState): IZoomComponentProps {
 	return {
@@ -12,9 +13,10 @@ function mapStateToProps({ app }: IStoreState): IZoomComponentProps {
 	};
 }
 
-function mapDispatchToProps(dispatch: Dispatch<Action>) {
+function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IZoomComponentProps> {
 	return {
-		update: newZoom => dispatch(actions.updateZoomLevel(newZoom))
+		zoomIn: () => dispatch(actions.updateZoomLevel(ZoomChange.INCREASE)),
+		zoomOut: () => dispatch(actions.updateZoomLevel(ZoomChange.DECREASE))
 	};
 }
 

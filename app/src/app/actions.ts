@@ -13,7 +13,8 @@ import {
 	SearchIndices,
 	SyncAction,
 	UpdateBibliographyAction,
-	UpdateElementAction
+	UpdateElementAction,
+	ZoomChange
 } from './types/ActionTypes';
 import { IInsertElementState } from './reducers/NoteReducer';
 import { CombinedNotepadSyncList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
@@ -84,7 +85,7 @@ export const actions = {
 	parseEnex: actionCreator<string>('PARSE_ENEX'),
 	updateBibliography: actionCreator<UpdateBibliographyAction>('UPDATE_BIBLIOGRAPHY'),
 	loadNotepadByIndex: actionCreator<number>('LOAD_NOTEPAD_BY_INDEX'),
-	updateZoomLevel: actionCreator<number>('UPDATE_ZOOM_LEVEL'),
+	updateZoomLevel: actionCreator<ZoomChange>('UPDATE_ZOOM_LEVEL'),
 	clearPrintView: actionCreator<void>('CLEAR_PRINT'),
 	syncLogout: actionCreator<void>('SYNC_LOGOUT'),
 	updateCurrentSyncId: actionCreator<CombinedNotepadSyncList>('UPDATE_SYNC_ID'),
