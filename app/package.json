@@ -1,6 +1,6 @@
 {
   "name": "micropad",
-  "version": "3.23.1",
+  "version": "3.24.0",
   "private": true,
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py",
