@@ -45,9 +45,12 @@ export class AppReducer extends MicroPadReducer<IAppStoreState> {
 
 	public reducer(state: IAppStoreState, action: Action): IAppStoreState {
 		if (isType(action, actions.flipFullScreenState)) {
+			const zoom = state.isFullScreen ? this.initialState.zoom : state.zoom;
+
 			return {
 				...state,
-				isFullScreen: !state.isFullScreen
+				isFullScreen: !state.isFullScreen,
+				zoom
 			};
 		} else if (isType(action, actions.exitFullScreen)) {
 			return {

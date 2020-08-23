@@ -1,13 +1,14 @@
 import { connect } from 'react-redux';
-import ZoomComponent from '../components/note-viewer/ZoomComponent';
+import ZoomComponent, { IZoomComponentProps } from '../components/note-viewer/ZoomComponent';
 import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 import { IStoreState } from '../types';
 import { ThemeValues } from '../ThemeValues';
 
-function mapStateToProps({ app }: IStoreState) {
+function mapStateToProps({ app }: IStoreState): IZoomComponentProps {
 	return {
-		theme: ThemeValues[app.theme]
+		theme: ThemeValues[app.theme],
+		isFullScreen: app.isFullScreen
 	};
 }
 
