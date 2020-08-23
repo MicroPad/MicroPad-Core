@@ -141,6 +141,8 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 <div id="content"></div>
 
 <script>
+	const AUTO_WIDTH_MAX = '600px';
+
 	var content = document.getElementById('content');
 	var id = '${id}';
 	var element;
@@ -179,8 +181,15 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 
 			case 'render':
 				element = message.payload;
-				content.style.width = element.args.width || 'auto';
-				content.style.height = element.args.height || '50px';
+				
+				const height = element.args.height  || 'auto';
+				let width = element.args.width  || 'auto';
+				if (width === 'auto' && height === 'auto') {
+					width = AUTO_WIDTH_MAX;
+				}
+				
+				content.style.width = width;
+				content.style.height = height;
 				content.style.fontSize = element.args.fontSize || '16px';
 				isPrinting = element.isPrinting;
 
@@ -198,7 +207,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 				if (isPrinting) break;
 				MathJax.Hub.Queue(['Typeset', MathJax.Hub, content]);
 				MathJax.Hub.Queue(function () {
-					if (!element.args.width || element.args.width === 'auto') {
+					if (width === 'auto') {
 						content.style.width = 'fit-content';
 						document.documentElement.style.overflow = 'hidden';
 					}
@@ -287,7 +296,9 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 
 	try {
 		new ResizeObserver(function() {
-			if (!!element && element.args.width === 'auto') content.style.width = 'auto';
+			if (!!element && element.args.width === 'auto') {
+				content.style.width = element.args.height === 'auto' ? AUTO_WIDTH_MAX : 'auto';
+			}
 
 			adjustWidth();
 		}).observe(content);
