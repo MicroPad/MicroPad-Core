@@ -60,8 +60,7 @@ export const openBreadcrumb$ = (action$: Observable<Action<string>>, store: Stor
 					.map(section => actions.expandSection(section.internalRef)),
 				actions.flashExplorer()
 			]
-		),
-		tap(a => console.log(a))
+		)
 	);
 
 export const flashExplorer$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
