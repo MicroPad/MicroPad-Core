@@ -1,12 +1,22 @@
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import MathJax from '!raw-loader!../../../../assets/MathJax.js';
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import hljs from '!raw-loader!../../../../assets/highlight.js/highlight.min.js';
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import hljsCss from '!raw-loader!../../../../assets/highlight.js/default.css';
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import hljsCssDark from '!raw-loader!../../../../assets/highlight.js/monokai.css';
 import { ITheme } from '../../../../types/Themes';
 
 export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): string => `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<style>${theme.text === '#000' ? hljsCss : hljsCssDark}</style>
 	<style>
 		html, body, #content {
 			margin: 0;
@@ -68,7 +78,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 		}
 
 		blockquote {
-			background: #${theme.text === '#000' ? 'f9f9f9' : '424242'};
+			background: #${theme.text === '#000' ? 'f9f9f9' : '272822'};
 			border-left: 10px solid #ffb300;
 			margin: 1.5em 10px;
 			padding: 0.5em 10px;
@@ -136,6 +146,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 		});
 	</script>
 	<script>${MathJax}</script>
+	<script>${hljs}</script>
 </head>
 <body>
 <div id="content"></div>
@@ -197,7 +208,14 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 						link.setAttribute('onclick', 'redirectLinkClick(event);');
 					}
 				});
-				
+
+				hljs.configure({
+					languages: [] // disable language autodetection
+				});
+				document.querySelectorAll('pre code').forEach((block) => {
+					hljs.highlightBlock(block);
+				});
+
 				manageToDoItems();
 				adjustWidth();
 
