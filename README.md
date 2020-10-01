@@ -19,8 +19,8 @@ You will need the following:
 
 ### Installing dependencies
 ```bash
-git clone https://github.com/MicroPad/Web micropad-web
-cd micropad-web/app
+git clone https://github.com/MicroPad/MicroPad-Core.git micropad-core
+cd micropad-core/app
 yarn
 ```
 
