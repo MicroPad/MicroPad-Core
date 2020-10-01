@@ -13,3 +13,7 @@
 #breadcrumb-holder > nav.Void {
 	background-color: #212121;
 }
+
+.noteElement > div {
+	border: solid 1px #ddd;
+}
