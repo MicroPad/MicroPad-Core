@@ -1,0 +1,19 @@
+.theme-Void #notepad-explorer a {
+	color: #ddd;
+}
+
+.theme-Void .btn-flat {
+	color: #ddd;
+}
+
+.theme-Void .btn:hover, .theme-Void .btn-large:hover {
+	background-color: #424242;
+}
+
+#breadcrumb-holder > nav.Void {
+	background-color: #212121;
+}
+
+.theme-Void .noteElement > div {
+	border: solid 1px #ddd;
+}

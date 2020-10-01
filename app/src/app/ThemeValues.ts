@@ -68,6 +68,21 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 			element: elementInstructionsDark
 		}
 	},
+	Void: {
+		background: '#000',
+		accent: '#424242',
+		chrome: '#212121',
+		text: '#ddd',
+		links: '#039be5',
+		explorerContent: '#ddd',
+		backgroundImage: filledBackground,
+		drawingBackground: '#ffffff30',
+		instructionImages: {
+			notepad: instructionImageDark,
+			note: noteInstructionsDark,
+			element: elementInstructionsDark
+		}
+	},
 	Purple: {
 		background: '#fff',
 		accent: '#ffcc00',
@@ -82,5 +97,4 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 			element: elementInstructionsLight
 		}
 	}
-
 };

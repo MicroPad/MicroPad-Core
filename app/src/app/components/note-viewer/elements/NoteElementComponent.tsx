@@ -14,6 +14,7 @@ import { EditDueDateComponent } from './EditDueDateComponent';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import PdfElementComponent from './PdfElementComponent';
 import { TOAST_HANDLER } from '../../../root';
+import { ThemeValues } from '../../../ThemeValues';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
@@ -42,9 +43,10 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 			zIndex: (isEditing) ? 5000 : 'auto' as 'auto'
 		};
 
+		const backgroundColour = theme.background === '#000' ? ThemeValues.Midnight.background : theme.background;
 		const elementStyles = {
 			width: (element.type !== 'image' && element.type !== 'markdown') ? element.args.width : 'auto',
-			backgroundColor: (isEditing) ? theme.background : undefined
+			backgroundColor: (isEditing) ? backgroundColour : undefined
 		};
 
 		let elementComponent: JSX.Element | undefined = undefined;
