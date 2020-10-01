@@ -186,7 +186,17 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 			if (idx < 0) return;
 
 			if (this.shouldErase(event)) {
-				this.ctx.clearRect(pos.x - 10, pos.y - 10, 20, 20);
+				const radius = 10;
+				this.ctx.save();
+				this.ctx.beginPath();
+				this.ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI, false);
+				this.ctx.clip();
+				this.ctx.clearRect(
+					pos.x - radius - 1,
+					pos.y - radius - 1,
+					radius * 2 + 2,
+					radius * 2 + 2);
+				this.ctx.restore();
 				return;
 			}
 
