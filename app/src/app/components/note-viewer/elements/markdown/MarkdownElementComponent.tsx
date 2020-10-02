@@ -423,7 +423,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			type: 'listener',
 			listeners: {
 				'images.after': (event, text: string) =>
-					text.replace(/c\[([^\]]+)]\(([^)]+)\)/gi, (match, content, colour) =>
+					// e.g. c[this is green](green), or c[red](rgb(255, 0, 0))
+					text.replace(/c\[([^\]]+)]\(([^()]*(?:\([^()]*\)[^()]*)?)\)/gi, (match, content, colour) =>
 						`<span style="color: ${colour}">${content}</span>`
 					)
 			}
