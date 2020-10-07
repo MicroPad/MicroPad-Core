@@ -50,7 +50,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			emoji: true,
-			extensions: ['maths', 'quick-maths', 'latex', 'graphs', 'hashtags', 'colour']
+			extensions: ['maths', 'graphs', 'hashtags', 'colour']
 		} as IShowdownOpts);
 
 		this.updateWithDebounce = this.createUpdateWithDebounce();
@@ -316,72 +316,18 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			return [
 				{
 					type: 'lang',
-					regex: /===([^]+?)===/gi,
-					replace: function(s: string, match: number) {
-						matches.push('===' + match + '===');
+					regex: /(===[^]+?===|''[^]+?''|;;[^]+?;;)/gi,
+					replace: function(s: string, match: string) {
+						matches.push(match);
 						let n = matches.length - 1;
-						return '%ASCIIMATHPLACEHOLDER1' + n + 'ENDASCIIMATHPLACEHOLDER1%';
+						return '%MATHPLACEHOLDER' + n + 'ENDMATHPLACEHOLDER%';
 					}
 				},
 				{
 					type: 'output',
 					filter: function(text: string) {
 						for (let i = 0; i < matches.length; ++i) {
-							let pat = '%ASCIIMATHPLACEHOLDER1' + i + 'ENDASCIIMATHPLACEHOLDER1%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
-					}
-				}
-			];
-		});
-
-		extension('quick-maths', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /''([^]+?)''/gi,
-					replace: function(s: string, match: number) {
-						matches.push(`''${match}''`);
-						let n = matches.length - 1;
-						return '%PLACEHOLDER4' + n + 'ENDPLACEHOLDER4%';
-					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							let pat = '%PLACEHOLDER4' + i + 'ENDPLACEHOLDER4%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
-					}
-				}
-			];
-		});
-
-		extension('latex', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /;;([^]+?);;/gi,
-					replace: function(s: string, match: number) {
-						matches.push(`;;${match};;`);
-						let n = matches.length - 1;
-						return '%LATEXPLACEHOLDER1' + n + 'ENDLATEXPLACEHOLDER1%';
-					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							let pat = '%LATEXPLACEHOLDER1' + i + 'ENDLATEXPLACEHOLDER1%';
+							let pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
 							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 						}
 						// reset array
