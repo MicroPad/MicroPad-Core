@@ -14,6 +14,7 @@ import { Dialog } from '../../../../services/dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
 import Twemoji from 'twemoji/2/twemoji.amd';
+import { colourTransformer, fendTransformer } from './MarkdownTransformers';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -50,7 +51,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			emoji: true,
-			extensions: ['maths', 'graphs', 'hashtags', 'colour']
+			extensions: ['maths', 'fend', 'graphs', 'hashtags', 'colour']
 		} as IShowdownOpts);
 
 		this.updateWithDebounce = this.createUpdateWithDebounce();
@@ -338,6 +339,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			];
 		});
 
+		extension('fend', fendTransformer);
+
 		extension('graphs', () => {
 			let matches: string[] = [];
 			return [
@@ -392,15 +395,6 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			];
 		});
 
-		extension('colour', {
-			type: 'listener',
-			listeners: {
-				'images.after': (event, text: string) =>
-					// e.g. c[this is green](green), or c[red](rgb(255, 0, 0))
-					text.replace(/c\[([^\]]+)]\(([^()]*(?:\([^()]*\)[^()]*)?)\)/gi, (match, content, colour) =>
-						`<span style="color: ${colour}">${content}</span>`
-					)
-			}
-		} as any);
+		extension('colour', colourTransformer);
 	}
 }

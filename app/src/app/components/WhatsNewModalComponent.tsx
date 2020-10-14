@@ -8,6 +8,7 @@ import { IShowdownOpts } from './note-viewer/elements/markdown/MarkdownElementCo
 import { Modal } from 'react-materialize';
 import Async, { Props as AsyncProps } from 'react-promise';
 import { Translators } from 'upad-parse';
+import { colourTransformer, fendTransformer } from './note-viewer/elements/markdown/MarkdownTransformers';
 
 const ModalAsync = Async as { new (props: AsyncProps<WhatsNewNote>): Async<WhatsNewNote> };
 
@@ -35,15 +36,9 @@ export default class WhatsNewModalComponent extends React.Component {
 	private getHtml: () => Promise<WhatsNewNote> = async () => {
 		const whatsNewNote = (await Translators.Xml.toNotepadFromNpx(helpNpx)).sections[0].notes[2];
 
-		extension('colour', {
-			type: 'listener',
-			listeners: {
-				'images.after': (event, text: string) =>
-					text.replace(/c\[([^\]]+)]\(([^)]+)\)/gi, (match, content, colour) =>
-						`<span style="color: ${colour}">${content}</span>`
-					)
-			}
-		} as any);
+		extension('colour', colourTransformer);
+
+		extension('fend', fendTransformer);
 
 		const html = new Converter({
 			parseImgDimensions: true,
@@ -53,7 +48,7 @@ export default class WhatsNewModalComponent extends React.Component {
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			emoji: true,
-			extensions: ['colour']
+			extensions: ['colour', 'fend']
 		} as IShowdownOpts)
 			.makeHtml(whatsNewNote.elements[0].content)
 			.split('<ul>').join('<ul class="browser-default">')

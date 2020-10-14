@@ -9,6 +9,7 @@ import { IShowdownOpts } from './MarkdownElementComponent';
 import './MarkdownHelpComponent.css';
 import Async, { Props as AsyncProps } from 'react-promise';
 import { Translators } from 'upad-parse/dist';
+import { colourTransformer, fendTransformer } from './MarkdownTransformers';
 
 const ModalAsync = Async as { new (props: AsyncProps<FormattingHelpNote>): Async<FormattingHelpNote> };
 
@@ -64,15 +65,9 @@ export default class MarkdownHelpComponent extends React.Component {
 			];
 		});
 
-		extension('colour', {
-			type: 'listener',
-			listeners: {
-				'images.after': (event, text: string) =>
-					text.replace(/c\[([^\]]+)]\(([^)]+)\)/gi, (match, content, colour) =>
-						`<span style="color: ${colour}">${content}</span>`
-					)
-			}
-		} as any);
+		extension('fend', fendTransformer);
+
+		extension('colour', colourTransformer);
 
 		const html = new Converter({
 			parseImgDimensions: true,
@@ -82,7 +77,7 @@ export default class MarkdownHelpComponent extends React.Component {
 			tasklists: true,
 			prefixHeaderId: 'mdheader_',
 			emoji: true,
-			extensions: ['mock', 'colour']
+			extensions: ['mock', 'colour', 'fend']
 		} as IShowdownOpts)
 			.makeHtml(mdGuideNote.elements[0].content)
 			.split('<ul>').join('<ul class="browser-default">')
