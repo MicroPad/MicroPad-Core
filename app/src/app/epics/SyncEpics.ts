@@ -208,8 +208,15 @@ export const upload$ = (action$, store: Store<IStoreState>) =>
 								const requests: UploadAssetAction[] = [];
 
 								const blobs: Array<Blob | null> = await Promise.all(Object.keys(assetList).map(uuid => ASSET_STORAGE.getItem<Blob>(uuid)));
-								const cleanedBlobs = blobs.filter((blob): blob is Blob => !!blob);
-								Object.values(assetList).forEach((url, i) => requests.push({ url, asset: cleanedBlobs[i] }));
+								Object.values(assetList)
+									.filter((url, i) => {
+										if (!blobs[i]) {
+											console.error('Asset was null, skipping ', url);
+											return false;
+										}
+										return true;
+									})
+									.forEach((url, i) => requests.push({ url, asset: blobs[i]! }));
 
 								return requests;
 							})())),
