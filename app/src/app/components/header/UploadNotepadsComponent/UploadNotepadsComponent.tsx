@@ -49,7 +49,7 @@ export default class UploadNotepadsComponent extends React.Component<IUploadNote
 								for (let name in zip.files) {
 									if (name.split('.').pop()!.toLowerCase() !== 'npx') continue;
 
-									zip.file(name).async('text')
+									zip.file(name)!.async('text')
 										.then(xml => parseNpx!(xml));
 								}
 							});

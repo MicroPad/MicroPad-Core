@@ -90,6 +90,7 @@ export function getStorage(): { [name: string]: LocalForage } {
     // Render the main UI
     ReactDOM.render(
         <Provider store={store as any}>
+            // @ts-ignore TODO:  Type has no properties in common with type 'IntrinsicAttributes & Pick ClassAttributes PrintViewOrAppContainerComponent & IPrintViewComponentProps & IAppProps, "ref" | "key">'
             <PrintViewOrAppContainerComponent>
                 <HeaderComponent />
                 <AppBodyComponent>
@@ -132,7 +133,7 @@ async function hydrateStoreFromLocalforage() {
     const helpPref: boolean | null = await localforage.getItem<boolean>('show help');
     if (helpPref !== null) store.dispatch(actions.setHelpPref(helpPref));
 
-    const syncUser: SyncUser = await SYNC_STORAGE.getItem<SyncUser>('sync user');
+    const syncUser: SyncUser | null = await SYNC_STORAGE.getItem<SyncUser>('sync user');
     if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
 
     const theme = await localforage.getItem<ThemeName>('theme');
