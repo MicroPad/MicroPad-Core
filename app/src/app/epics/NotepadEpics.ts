@@ -199,10 +199,11 @@ const exportAll$ = (action$, store: Store<IStoreState>) =>
 		map((state: INotepadsStoreState) => state.savedNotepadTitles),
 		filter(Boolean),
 		switchMap((titles: string[]) => {
-			const notepadsInStorage: Promise<string>[] = [];
+			const notepadsInStorage: Promise<string | null>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
 			return from(Promise.all(notepadsInStorage)).pipe(
+				map((notepads: Array<string | null>) => notepads.filter(json => !!json) as string[]),
 				switchMap((notepads: string[]) => {
 					const pendingXml = notepads.map(async (notepadJSON: string) => {
 						const shell: NotepadShell = JSON.parse(notepadJSON);
@@ -247,10 +248,11 @@ const exportAllToMarkdown$ = (action$, store) =>
 		map((state: INotepadsStoreState) => state.savedNotepadTitles),
 		filter(Boolean),
 		switchMap((titles: string[]) => {
-			const notepadsInStorage: Promise<string>[] = [];
+			const notepadsInStorage: Promise<string | null>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
 
 			return from(Promise.all(notepadsInStorage)).pipe(
+				map((notepads: Array<string | null>) => notepads.filter(json => !!json) as string[]),
 				switchMap((notepads: string[]) => {
 					const pendingContent = notepads.map(async (notepadJSON: string) => {
 						const shell: NotepadShell = JSON.parse(notepadJSON);
@@ -493,16 +495,16 @@ export function getAssets(notepadAssets: string[]): Promise<Asset[]> {
 			return;
 		}
 
-		const resolvedAssets: Promise<Blob>[] = [];
+		const resolvedAssets: Promise<Blob | null>[] = [];
 		for (let uuid of notepadAssets) {
 			resolvedAssets.push(ASSET_STORAGE.getItem(uuid));
 		}
 
 		Promise.all(resolvedAssets)
-			.then((blobs: Blob[]) => {
-				blobs.forEach((blob: Blob, i: number) => {
-					assets.push(new Asset(blob, notepadAssets[i]));
-				});
+			.then((blobs: Array<Blob | null>) => {
+				blobs
+					.filter((blob): blob is Blob => !!blob)
+					.forEach((blob: Blob, i: number) => assets.push(new Asset(blob, notepadAssets[i])));
 
 				resolve(assets);
 			});

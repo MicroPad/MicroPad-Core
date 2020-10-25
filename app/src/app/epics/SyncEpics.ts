@@ -207,8 +207,9 @@ export const upload$ = (action$, store: Store<IStoreState>) =>
 							concatMap((assetList: AssetList) => from((async () => {
 								const requests: UploadAssetAction[] = [];
 
-								const blobs: Blob[] = await Promise.all(Object.keys(assetList).map(uuid => ASSET_STORAGE.getItem<Blob>(uuid)));
-								Object.values(assetList).forEach((url, i) => requests.push({ url, asset: blobs[i] }));
+								const blobs: Array<Blob | null> = await Promise.all(Object.keys(assetList).map(uuid => ASSET_STORAGE.getItem<Blob>(uuid)));
+								const cleanedBlobs = blobs.filter((blob): blob is Blob => !!blob);
+								Object.values(assetList).forEach((url, i) => requests.push({ url, asset: cleanedBlobs[i] }));
 
 								return requests;
 							})())),

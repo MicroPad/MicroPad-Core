@@ -7727,9 +7727,9 @@ pretty-bytes@^5.1.0:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/pretty-bytes/-/pretty-bytes-5.4.1.tgz#cd89f79bbcef21e3d21eb0da68ffe93f803e884b"
 
-"pretty-data@git+https://github.com/vkiryukhin/pretty-data.git#22a34a534745714ea974f72db2e9bf7561b3fdc7":
+"pretty-data@https://github.com/vkiryukhin/pretty-data#22a34a534745714ea974f72db2e9bf7561b3fdc7":
   version "0.50.0"
-  resolved "git+https://github.com/vkiryukhin/pretty-data.git#22a34a534745714ea974f72db2e9bf7561b3fdc7"
+  resolved "https://github.com/vkiryukhin/pretty-data#22a34a534745714ea974f72db2e9bf7561b3fdc7"
 
 pretty-error@^2.1.1:
   version "2.1.2"

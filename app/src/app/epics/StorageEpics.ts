@@ -114,8 +114,8 @@ const openNotepadFromStorage$ = (action$: Observable<Action<String>>, store: Sto
 		map((action: Action<string>) => action.payload),
 		switchMap((notepadTitle: string) =>
 			from(NOTEPAD_STORAGE.getItem<string>(notepadTitle)).pipe(
-				switchMap((json: string) => {
-					return from(fromShell(JSON.parse(json), store.getState().notepadPasskeys[notepadTitle]));
+				switchMap((json: string | null) => {
+					return from(fromShell(JSON.parse(json!), store.getState().notepadPasskeys[notepadTitle]));
 				}),
 				mergeMap((res: EncryptNotepadAction) => [
 					actions.addCryptoPasskey({ notepadTitle: res.notepad.title, passkey: res.passkey }),
