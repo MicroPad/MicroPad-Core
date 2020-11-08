@@ -18,16 +18,8 @@ def assetChecksum():
 	run(('wasm-pack', 'build', '--release'))
 	os.chdir(base_path)
 
-def fend():
-    os.chdir(os.path.join(base_path, 'fend-wasm'))
-    run(('cargo', 'update'))
-    run(('cargo', 'build', '--release', '--verbose'))
-    run(('wasm-pack', 'build', '--release'))
-    os.chdir(base_path)
-
 build_steps = {
-    'asset-checksum': assetChecksum,
-    'fend-wasm': fend
+    'asset-checksum': assetChecksum
 }
 
 # Actually run the builds

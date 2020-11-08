@@ -15,7 +15,7 @@ of power and openness.
 - To see the future of MicroPad, take a look at our [GitHub Projects](https://github.com/orgs/MicroPad/projects).
 
 **Release notes for v3.26.0 (14th of October 2020)**
-- MicroPad's markdown just got a lot smarter with [fend](https://github.com/printfn/fend-rs/wiki) 👩‍🏫
+- MicroPad's markdown just got a lot smarter with [fend](https://github.com/printfn/fend/wiki) 👩‍🏫
 	- It's an arbitrary precision calculator/unit conversion tool/lambda calculus machine/unicorn feeder
 	- You can do fancy things like `[[1 1/2 hours/2 to minutes]]` = [[1 1/2 hours/2 to minutes]]
 	- For more information check out the *Formatting Help* on the markdown editors and in the *Help*
@@ -318,7 +318,7 @@ fn main() {
 
 ### Calculations
 
-You can perform inline calculations using [fend](https://github.com/printfn/fend-rs/wiki), like so:
+You can perform inline calculations using [fend](https://github.com/printfn/fend/wiki), like so:
 ```
 [[16699905 + 38655 to base 16]]
 ```
