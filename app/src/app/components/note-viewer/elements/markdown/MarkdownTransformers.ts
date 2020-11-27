@@ -1,5 +1,5 @@
 import { ShowdownExtension } from 'showdown';
-import { evaluate_fend_with_timeout } from 'fend-wasm';
+import { evaluateFendWithTimeout } from 'fend-wasm';
 
 export type MarkdownTransformer = ShowdownExtension;
 
@@ -9,7 +9,7 @@ export const fendTransformer: MarkdownTransformer = {
 		'images.after': (event, text: string) =>
 			// e.g. [[1+1]] -> 2
 			text.replace(/\[\[([^]+?)\]\]/gi, (match, content) => {
-				let result = evaluate_fend_with_timeout(content, 500);
+				let result = evaluateFendWithTimeout(content, 500);
 				if (result === "Error: Interrupted") {
 					result = "Error: Calculation timed out";
 				}
