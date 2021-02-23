@@ -207,8 +207,16 @@ export const upload$ = (action$, store: Store<IStoreState>) =>
 							concatMap((assetList: AssetList) => from((async () => {
 								const requests: UploadAssetAction[] = [];
 
-								const blobs: Blob[] = await Promise.all(Object.keys(assetList).map(uuid => ASSET_STORAGE.getItem<Blob>(uuid)));
-								Object.values(assetList).forEach((url, i) => requests.push({ url, asset: blobs[i] }));
+								const blobs: Array<Blob | null> = await Promise.all(Object.keys(assetList).map(uuid => ASSET_STORAGE.getItem<Blob>(uuid)));
+								Object.values(assetList)
+									.filter((url, i) => {
+										if (!blobs[i]) {
+											console.error('Asset was null, skipping ', url);
+											return false;
+										}
+										return true;
+									})
+									.forEach((url, i) => requests.push({ url, asset: blobs[i]! }));
 
 								return requests;
 							})())),

@@ -29,7 +29,7 @@ export const getDueDates$ = (action$: Observable<Action<string[]>>, store: Middl
 		map(action =>
 			action.payload.map(name =>
 				getStorage().notepadStorage.getItem<string>(name)
-					.then(json => JSON.parse(json) as NotepadShell)
+					.then(json => JSON.parse(json!) as NotepadShell)
 			)
 		),
 		switchMap(notebookObjs$ =>
