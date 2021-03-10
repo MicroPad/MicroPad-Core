@@ -4214,10 +4214,10 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "2.1.1"
 
-fend-wasm@^0.1.12:
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/fend-wasm/-/fend-wasm-0.1.12.tgz#72a3900cf853b80d4eeec603a838f0d495433d19"
-  integrity sha512-AePGjzLwMIv1jRqbsvvQxKV4QrwyNACGh/WnS8EeOCV7MXasplu5X7WON7dzhuASspFbskzZvbjfGW5xMQ15rg==
+fend-wasm@^0.1.14:
+  version "0.1.14"
+  resolved "https://registry.yarnpkg.com/fend-wasm/-/fend-wasm-0.1.14.tgz#10cb3484a8faaa8917a774f9b50f87c1fab8ee09"
+  integrity sha512-AKiE9QqEpS2Cl2f4tBPpZ8MXduCis23FijjbcQ1UKUEKZ/3c23syUgFuKzS19FEeXOLF4C+E0ugKTcDoVyswAA==
 
 figgy-pudding@^3.5.1:
   version "3.5.2"
