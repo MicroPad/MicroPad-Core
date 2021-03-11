@@ -7,11 +7,33 @@ import { Input, Row } from 'react-materialize';
 import stringify from 'json-stringify-safe';
 import * as FullScreenService from '../../../../services/FullscreenService';
 
-type Touch = {
+class Touch {
 	identifier: number;
 	x: number;
 	y: number;
+
+	constructor(event: PointerEvent) {
+		this.identifier = event.pointerId;
+		this.x = event.clientX;
+		this.y = event.clientY;
+	}
 };
+
+class OngoingTouches {
+	touches: { [id: number]: Touch | null } = {};
+
+	getTouch(event: PointerEvent): Touch {
+		return this.touches[event.pointerId] || new Touch(event);
+	}
+
+	setTouch(event: PointerEvent) {
+		this.touches[event.pointerId] = new Touch(event);
+	}
+
+	deleteTouch(id: number) {
+		this.touches[id] = null;
+	}
+}
 
 type Position = {
 	x: number,
@@ -39,7 +61,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 
 	private canvasElement!: HTMLCanvasElement;
 	private ctx!: CanvasRenderingContext2D;
-	private ongoingTouches: Touch[] = [];
+	private ongoingTouches = new OngoingTouches();
 	private canvasImage?: Blob | null;
 
 	private isErasing = false;
@@ -121,7 +143,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 	componentDidUpdate() {
 		const { element, noteAssets } = this.props;
 
-		this.ongoingTouches = [];
+		this.ongoingTouches = new OngoingTouches();
 		this.isErasing = false;
 		this.isRainbow = false;
 		if (!!this.canvasElement) {
@@ -169,26 +191,23 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 
 	private initCanvas = () => {
 		this.ctx = this.canvasElement.getContext('2d')!;
-		let ongoingPos: Position;
 
 		this.canvasElement.onpointerdown = event => {
-			this.ongoingTouches.push(this.copyTouch(event));
+			this.ongoingTouches.setTouch(event);
 			this.ctx.beginPath();
 		};
 
 		this.canvasElement.onpointermove = event => {
-			const pos = this.getRealPosition(this.copyTouch(event));
-			if (event.pressure < 0) return;
+			if (!this.ongoingTouches.touches[event.pointerId]) return;
 
 			this.ctx.strokeStyle = this.getLineStyle();
 
-			const idx = this.ongoingTouchIndexById(event.pointerId);
-			if (idx < 0) return;
+			const pos = this.getRealPosition(new Touch(event));
 
 			if (this.shouldErase(event)) {
 				const radius = 10;
 				this.ctx.save();
-				ongoingPos = this.getRealPosition(this.ongoingTouches[idx]);
+				const ongoingPos = this.getRealPosition(this.ongoingTouches.getTouch(event));
 				this.fillLineShape(ongoingPos, pos, radius);
 				this.ctx.clip();
 				this.ctx.clearRect(
@@ -197,49 +216,50 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 					this.ctx.canvas.width,
 					this.ctx.canvas.height);
 				this.ctx.restore();
-				this.ongoingTouches.splice(idx, 1, this.copyTouch(event));
+				this.ongoingTouches.setTouch(event);
 				return;
 			}
 
 			this.ctx.beginPath();
-			ongoingPos = this.getRealPosition(this.ongoingTouches[idx]);
+			const ongoingPos = this.getRealPosition(this.ongoingTouches.getTouch(event));
 			this.ctx.moveTo(ongoingPos.x, ongoingPos.y);
 			this.ctx.lineTo(pos.x, pos.y);
 			this.ctx.lineWidth = event.pressure * 10;
 			this.ctx.lineCap = 'round';
 			this.ctx.stroke();
 
-			this.ongoingTouches.splice(idx, 1, this.copyTouch(event));
+			this.ongoingTouches.setTouch(event);
 		};
 
 		this.canvasElement.onpointerup = event => {
-			const pos = this.getRealPosition(this.copyTouch(event));
-			const idx = this.ongoingTouchIndexById(event.pointerId);
-			if (idx < 0 && !this.shouldErase(event)) return;
+			const pos = this.getRealPosition(new Touch(event));
 
 			this.ctx.lineWidth = event.pressure * 10;
 			this.ctx.fillStyle = this.getLineStyle();
 			this.ctx.beginPath();
-			ongoingPos = this.getRealPosition(this.ongoingTouches[idx]);
+			const ongoingPos = this.getRealPosition(this.ongoingTouches.getTouch(event));
 
 			this.ctx.moveTo(ongoingPos.x, ongoingPos.y);
 			this.ctx.lineTo(pos.x, pos.y);
 
-			this.ongoingTouches.splice(idx, 1);
+			this.ongoingTouches.deleteTouch(event.pointerId);
 		};
 
 		this.canvasElement.onpointercancel = event => {
-			const idx = this.ongoingTouchIndexById(event.pointerId);
-			this.ongoingTouches.splice(idx, 1);
+			this.ongoingTouches.deleteTouch(event.pointerId);
 		};
-	}
 
-	private copyTouch = (event: PointerEvent): Touch => {
-		return {
-			identifier: event.pointerId,
-			x: event.clientX,
-			y: event.clientY
-		};
+		this.canvasElement.onpointerleave = event => {
+			this.ongoingTouches.deleteTouch(event.pointerId);
+		}
+
+		this.canvasElement.onpointerenter = event => {
+			// In macOS Safari, pressure is always equal to 0
+			// In desktop Chrome, pressure is equal to 0.5 if the mouse button is held down
+			if (event.pressure > 0) {
+				this.ongoingTouches.setTouch(event);
+			}
+		}
 	}
 
 	private getRealPosition = (touch: Touch): Position => {
@@ -257,14 +277,6 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 			x: (touch.x - canvasOffset.left) * scale,
 			y: (touch.y - canvasOffset.top) * scale
 		};
-	}
-
-	private ongoingTouchIndexById = (id: number): number => {
-		for (let i = 0; i < this.ongoingTouches.length; i++) {
-			if (id === this.ongoingTouches[i].identifier) return i;
-		}
-
-		return -1;
 	}
 
 	private shouldErase = (event: PointerEvent): boolean => {
