@@ -188,15 +188,16 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 			if (this.shouldErase(event)) {
 				const radius = 10;
 				this.ctx.save();
-				this.ctx.beginPath();
-				this.ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI, false);
+				ongoingPos = this.getRealPosition(this.ongoingTouches[idx]);
+				this.fillLineShape(ongoingPos, pos, radius);
 				this.ctx.clip();
 				this.ctx.clearRect(
-					pos.x - radius - 1,
-					pos.y - radius - 1,
-					radius * 2 + 2,
-					radius * 2 + 2);
+					0,
+					0,
+					this.ctx.canvas.width,
+					this.ctx.canvas.height);
 				this.ctx.restore();
+				this.ongoingTouches.splice(idx, 1, this.copyTouch(event));
 				return;
 			}
 
@@ -279,6 +280,26 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 			: this.rainbowIndex;
 
 		return (this.isRainbow) ? rainbow[this.rainbowIndex += newIndex] : '#000000';
+	}
+
+	// Draws the outline of a line from pos1 to pos2 with the given width
+	private fillLineShape = (pos1: Position, pos2: Position, width: number) => {
+		const x1 = pos1.x, y1 = pos1.y, x2 = pos2.x, y2 = pos2.y;
+		const dx = (x2 - x1);
+		const dy = (y2 - y1);
+		// length must not be zero
+		const length = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+		const shiftx = -dy * width / length;
+		const shifty = dx * width / length;
+		this.ctx.beginPath();
+		this.ctx.moveTo(x1 + shiftx, y1 + shifty);
+		this.ctx.lineTo(x1 - shiftx, y1 - shifty);
+		this.ctx.lineTo(x2 - shiftx, y2 - shifty);
+		this.ctx.lineTo(x2 + shiftx, y2 + shifty);
+		this.ctx.closePath();
+		// draw round end caps
+		this.ctx.arc(x1, y1, width, 0, 2 * Math.PI, false);
+		this.ctx.arc(x2, y2, width, 0, 2 * Math.PI, false);
 	}
 
 	private openEditor = () => {
