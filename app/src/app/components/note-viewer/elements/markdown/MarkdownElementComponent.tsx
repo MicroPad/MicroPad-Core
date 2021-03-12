@@ -13,7 +13,6 @@ import Resizable from 're-resizable';
 import { Dialog } from '../../../../services/dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
-import Twemoji from 'twemoji/2/twemoji.amd';
 import { colourTransformer, fendTransformer } from './MarkdownTransformers';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
@@ -253,7 +252,6 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private generateHtml = (element: NoteElement): Promise<string> => {
 		return new Promise<string>(resolve => {
 			let html = this.converter.makeHtml(element.content);
-			if (navigator.onLine || (window as unknown as IAppWindow).isElectron) html = Twemoji.parse(html, icon => require(`twemoji/2/svg/${icon}.svg`));
 			resolve(html);
 		});
 	}

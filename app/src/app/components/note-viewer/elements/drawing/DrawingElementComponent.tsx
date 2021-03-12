@@ -159,12 +159,14 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 		return stringify(nextProps) !== stringify(this.props);
 	}
 
-	componentWillUpdate() {
-		const { element, updateElement } = this.props;
-		if (!this.canvasElement) return;
+	getSnapshotBeforeUpdate(prevProps, prevState) {
+		const { element, updateElement } = prevProps;
+		if (!this.canvasElement) return null;
 
 		// Update element with canvas contents replacing the old asset
 		updateElement!(element.args.id, element, dataURItoBlob(this.canvasElement.toDataURL()));
+
+		return null;
 	}
 
 	private initCanvas = () => {

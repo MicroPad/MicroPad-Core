@@ -48,7 +48,6 @@
     "save-as": "^0.1.8",
     "semver": "^5.6.0",
     "showdown": "^1.8.6",
-    "twemoji": "^11.0.1",
     "typescript": "~3.5.1",
     "upad-parse": "^7.0.0",
     "vex-dialog": "^1.1.0",

@@ -14,7 +14,7 @@ def run(command):
 # Build steps
 def assetChecksum():
 	os.chdir(os.path.join(base_path, 'asset-checksum'))
-	run(('cargo', 'build', '--release', '--verbose'))
+	run(('cargo', 'build', '--release'))
 	run(('wasm-pack', 'build', '--release'))
 	os.chdir(base_path)
 
