@@ -64,7 +64,7 @@ jobs:
           paths:
             - app/node_modules/
 
-      - run: cd app && CI=false yarn build && tar cfJ micropad.tar.xz build/*
+      - run: cd app && yarn build && tar cfJ micropad.tar.xz build/*
       - store_artifacts:
           path: app/micropad.tar.xz
           destination: micropad.tar.xz
