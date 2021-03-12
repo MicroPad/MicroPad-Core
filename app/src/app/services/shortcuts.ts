@@ -29,7 +29,7 @@ export function enableKeyboardShortcuts(store: Store<IStoreState>) {
 	mousetrap.bind('mod+s', e => {
 		e.preventDefault();
 
-		if (!!(store.getState().notepads.notepad || <INotepadStoreState> {}).item) store.dispatch(actions.exportNotepad(undefined));
+		if (!!(store.getState().notepads.notepad || {} as INotepadStoreState).item) store.dispatch(actions.exportNotepad(undefined));
 	});
 
 	// Export All Notepads

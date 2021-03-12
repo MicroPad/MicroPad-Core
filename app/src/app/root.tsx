@@ -154,10 +154,10 @@ async function compatibilityCheck(): Promise<boolean> {
 	if (!doesSupportSrcDoc()) {
 		ReactDOM.render(
 			<div style={{ margin: '10px' }}>
-				<h1>Bad news 😢</h1>
+				<h1>Bad news <span role="img" aria-label="sad face">😢</span></h1>
 				<p>
 					Your web-browser doesn't support important features required for {APP_NAME} to function.<br />
-					You can try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noreferrer">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="nofollow noreferrer">Mozilla Firefox</a>.
+					You can try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer nofollow">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="noopener noreferrer nofollow">Mozilla Firefox</a>.
 				</p>
 				<p>
 					You could also download {APP_NAME} <a href="https://getmicropad.com/#download">here</a>.

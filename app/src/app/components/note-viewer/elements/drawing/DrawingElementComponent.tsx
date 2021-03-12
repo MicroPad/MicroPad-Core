@@ -93,7 +93,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 
 					<Row style={{padding: '5px'}}>
 						<Input label="Erase Mode" type="checkbox" className="filled-in" onChange={(e, v) => this.isErasing = v} />
-						<Input label={<a target="_blank" rel="nofollow noreferrer" href="https://pride.codes">Rainbow Mode</a>} type="checkbox" className="filled-in" onChange={(e, v) => this.isRainbow = v} />
+						<Input label={<a target="_blank" rel="noopener noreferrer nofollow" href="https://pride.codes">Rainbow Mode</a>} type="checkbox" className="filled-in" onChange={(e, v) => this.isRainbow = v} />
 					</Row>
 
 					{!this.supportsPointerEvents && <p><em>Your browser seems to not support pointer events. Drawing may not work.</em></p>}
@@ -109,7 +109,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 				minHeight: '130px',
 				backgroundColor: !isEditing ? theme.drawingBackground : undefined
 			}} onClick={this.openEditor}>
-				<img ref={elm => this.imageElement = elm!} style={{height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px'}} src={noteAssets[element.args.ext!]} />
+				<img ref={elm => this.imageElement = elm!} style={{height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px'}} src={noteAssets[element.args.ext!]} alt="" />
 			</div>
 		);
 	}

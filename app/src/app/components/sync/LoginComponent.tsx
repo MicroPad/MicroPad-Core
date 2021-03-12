@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Button, Input, Modal, NavItem } from 'react-materialize';
+import { FormEvent } from 'react';
+import { Button, Input, Modal } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL, SYNC_NAME } from '../../types';
 import { SyncUser } from '../../types/SyncTypes';
 import { Dialog } from '../../services/dialogs';
@@ -19,7 +20,7 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 	private password!: string;
 
 	render() {
-		const { trigger, manageTrigger, syncUser, login } = this.props;
+		const { trigger, manageTrigger, syncUser } = this.props;
 		if (!!syncUser) return (!!manageTrigger) ? manageTrigger : null;
 
 		return (
@@ -27,15 +28,7 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 				header={`Connect to ${SYNC_NAME}`}
 				actions={
 					<React.Fragment>
-						<Button className="btn-flat modal-action" onClick={() => {
-							if (!this.username || !this.password) {
-								Dialog.alert(`Username and password are both required`);
-								return;
-							}
-
-							login!(this.username, this.password);
-							this.closeModal();
-						}}>
+						<Button className="btn-flat modal-action" onClick={() => this.login()}>
 							Login
 						</Button>
 						<Button className="btn-flat modal-action modal-close">Close</Button>
@@ -57,19 +50,37 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 						<p>
 							It's completely free for any notepad that's mostly text,
 							and it costs less than a cup of coffee for up to twenty of your more advanced
-							notepads. <a target="_blank" href={`${MICROPAD_URL}/sync`}>More information >></a>
+							notepads. <a target="_blank" rel="noopener noreferrer nofollow" href={`${MICROPAD_URL}/sync`}>More information >></a>
 						</p>
 					</div>
 
-					<p><a target="_blank" href={`${MICROPAD_URL}/sync/manage`}>Sign up here</a> or login below:</p>
+					<p><a target="_blank" rel="noopener noreferrer nofollow" href={`${MICROPAD_URL}/sync/manage`}>Sign up here</a> or login below:</p>
 
-					<div className="login-component__form" style={{ marginTop: '20px' }}>
+					<form className="login-component__form" style={{ marginTop: '20px' }} action="#" onSubmit={this.login}>
 						<Input s={12} label="Username" onChange={(e, v) => this.username = v} />
 						<Input s={12} label="Password" type="password" onChange={(e, v) => this.password = v} />
-					</div>
+						<button style={{ display: 'none' }} />
+					</form>
 				</React.Fragment>
 			</Modal>
 		);
+	}
+
+	private login = (event?: FormEvent<HTMLFormElement>) => {
+		if (event) event.preventDefault();
+
+		const { login } = this.props;
+		if (!login) {
+			throw new Error('Expected a login prop.');
+		}
+
+		if (!this.username || !this.password) {
+			Dialog.alert(`Username and password are both required`);
+			return;
+		}
+
+		login(this.username, this.password);
+		this.closeModal();
 	}
 
 	private closeModal = () => {

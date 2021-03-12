@@ -131,6 +131,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					{
 						!isEditing
 						&& <iframe
+							title="Markdown element's contents"
 							id={`${element.args.id}-iframe`}
 							style={iframeStyle}
 							ref={iframe => this.iframe = iframe!}
@@ -373,7 +374,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					type: 'lang',
 					regex: /(^|\s)(#[a-z\d-]+)/gi,
 					replace: function(s: string) {
-						matches.push(`<a href="javascript:void(0);" onclick="searchHashtag(\'#${s.split('#')[1]}\');">${s}</a>`);
+						matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${s.split('#')[1]}');">${s}</a>`);
 						const n = matches.length - 1;
 						return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
 					}

@@ -10,7 +10,7 @@ import { Note } from 'upad-parse/dist';
 import { ThemeValues } from '../ThemeValues';
 
 export function mapStateToProps({ notepads, currentNote, app }: IStoreState) {
-	let note = <Note> {};
+	let note = {} as Note;
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
 	}

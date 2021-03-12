@@ -19,13 +19,8 @@ import { ASSET_STORAGE, store as STORE, SYNC_STORAGE, TOAST_HANDLER } from '../r
 import * as DifferenceEngine from '../services/DifferenceEngine';
 import { Dialog } from '../services/dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
-import {
-	AddToSyncAction,
-	NotepadToSyncNotepadAction,
-	SyncAction,
-	UploadAssetAction
-} from '../types/ActionTypes';
-import { BehaviorSubject, EMPTY, forkJoin, from, of, Observable } from 'rxjs';
+import { AddToSyncAction, NotepadToSyncNotepadAction, SyncAction, UploadAssetAction } from '../types/ActionTypes';
+import { BehaviorSubject, EMPTY, forkJoin, from, Observable, of } from 'rxjs';
 import { parse } from 'date-fns';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
@@ -53,14 +48,14 @@ export const login$ = action$ =>
 				tap(() => Dialog.alert(`Logged in successfully. Open your synced notepads using the notepads drop-down.`)),
 				map(res =>
 					actions.syncLogin.done({
-						params: <SyncLoginRequest> {},
+						params: {} as SyncLoginRequest,
 						result: { username: res.username, token: res.token }
 					})
 				),
 				catchError(error => {
 					const message = (!!error.response) ? error.response.error : 'There was an error logging in. Make sure your username/password is correct and that you\'re online.';
 					Dialog.alert(message);
-					return of(actions.syncLogin.failed({ params: <SyncLoginRequest> {}, error: error.response }));
+					return of(actions.syncLogin.failed({ params: {} as SyncLoginRequest, error: error.response }));
 				})
 			)
 		)
@@ -126,7 +121,7 @@ export const download$ = (action$, store) =>
 		concatMap((syncId: string) =>
 			DifferenceEngine.SyncService.downloadNotepad(syncId).pipe(
 				switchMap((remoteNotepad: ISyncedNotepad) => {
-					let localNotepad = (((<IStoreState> store.getState()).notepads || <INotepadStoreState> {}).notepad || <INotepadStoreState> {}).item;
+					let localNotepad = (((store.getState() as IStoreState).notepads ||{} as INotepadStoreState).notepad ||{} as INotepadStoreState).item;
 					if (!localNotepad) localNotepad = new FlatNotepad('');
 
 					return from(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad.toNotepad())).pipe(
@@ -187,13 +182,13 @@ export const upload$ = (action$, store: Store<IStoreState>) =>
 		isAction(actions.syncUpload.started),
 		tap(() => uploadCount$.next(uploadCount$.getValue() + 1)),
 		map((action: Action<SyncAction>) => action.payload),
-		map((payload: SyncAction) => [payload, (<IStoreState> store.getState()).sync.user]),
+		map((payload: SyncAction) => [payload, (store.getState() as IStoreState).sync.user]),
 		filter(([payload, user]: [SyncAction, SyncUser]) => !!payload && !!user),
 		concatMap(([payload, user]: [SyncAction, SyncUser]) =>
 			DifferenceEngine.AccountService.isPro(user.username, user.token).pipe(
 				tap((isPro: boolean) => {
 					if (Object.keys(payload.notepad.assetHashList).length < 10 || isPro) return;
-					throw 'too many assets';
+					throw new Error('too many assets');
 				}),
 				concatMap(() =>
 					DifferenceEngine.SyncService.uploadNotepad(
@@ -315,7 +310,7 @@ export const addNotepad$ = action$ =>
 		isAction(actions.addToSync.started),
 		switchMap((action: Action<AddToSyncAction>) =>
 			DifferenceEngine.NotepadService.create(action.payload.user.username, action.payload.user.token, action.payload.notepadTitle).pipe(
-				map((syncId: string) => actions.addToSync.done({ params: <AddToSyncAction> {}, result: syncId })),
+				map((syncId: string) => actions.addToSync.done({ params: {} as AddToSyncAction, result: syncId })),
 				catchError((error): Observable<Action<any>> => {
 					console.error(error);
 					if (!!error.response && !!error.response.error) {
@@ -327,7 +322,7 @@ export const addNotepad$ = action$ =>
 						Dialog.alert(error.response.error);
 					}
 
-					return of(actions.addToSync.failed({ params: <AddToSyncAction> {}, error }));
+					return of(actions.addToSync.failed({ params: {} as AddToSyncAction, error }));
 				})
 			)
 		)

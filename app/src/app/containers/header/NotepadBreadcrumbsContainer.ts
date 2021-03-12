@@ -20,7 +20,7 @@ export function mapStateToProps({ notepads, currentNote, app }: IStoreState): IN
 	if (currentNote.ref.length === 0) {
 		breadcrumbs.push(
 			makeCrumb(
-				((notepads.notepad || <INotepadStoreState> {}).item || <FlatNotepad> {}).title
+				((notepads.notepad || {} as INotepadStoreState).item || {} as FlatNotepad).title
 				|| 'Create a quick notebook below, or open/create a notebook using the drop-down/sidebar to start'
 			)
 		);

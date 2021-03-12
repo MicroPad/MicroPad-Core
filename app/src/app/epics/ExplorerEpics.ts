@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { concatMap, filter, map, startWith, tap } from 'rxjs/operators';
+import { concatMap, filter, map, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
@@ -15,7 +15,7 @@ import { ThemeValues } from '../ThemeValues';
 export const expandAll$ = (action$, store) =>
 	action$.pipe(
 		filter((action: Action<void>) => isType(action, actions.expandAllExplorer.started)),
-		map(() => (store.getState().notepads.notepad || <INotepadStoreState> {}).item),
+		map(() => (store.getState().notepads.notepad || {} as INotepadStoreState).item),
 		filter(Boolean),
 		map((notepad: FlatNotepad) => [
 			...Object.keys(notepad.sections),
@@ -27,7 +27,7 @@ export const expandAll$ = (action$, store) =>
 export const autoLoadNewSection$ = (action$, store) =>
 	action$.pipe(
 		isAction(actions.newSection),
-		map((action: Action<NewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
+		map((action: Action<NewNotepadObjectAction>) => [action.payload, (store.getState() as IStoreState).notepads.notepad!.item]),
 		filter(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!notepad),
 		map(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => {
 			const parentRef = insertAction.parent || undefined;
