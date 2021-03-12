@@ -7,34 +7,6 @@ import { Input, Row } from 'react-materialize';
 import stringify from 'json-stringify-safe';
 import * as FullScreenService from '../../../../services/FullscreenService';
 
-class Touch {
-	identifier: number;
-	x: number;
-	y: number;
-
-	constructor(event: PointerEvent) {
-		this.identifier = event.pointerId;
-		this.x = event.clientX;
-		this.y = event.clientY;
-	}
-};
-
-class OngoingTouches {
-	touches: { [id: number]: Touch | null } = {};
-
-	getTouch(event: PointerEvent): Touch {
-		return this.touches[event.pointerId] || new Touch(event);
-	}
-
-	setTouch(event: PointerEvent) {
-		this.touches[event.pointerId] = new Touch(event);
-	}
-
-	deleteTouch(id: number) {
-		this.touches[id] = null;
-	}
-}
-
 type Position = {
 	x: number,
 	y: number
@@ -318,5 +290,33 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 		const { element, edit } = this.props;
 
 		edit(element.args.id);
+	}
+}
+
+class Touch {
+	identifier: number;
+	x: number;
+	y: number;
+
+	constructor(event: PointerEvent) {
+		this.identifier = event.pointerId;
+		this.x = event.clientX;
+		this.y = event.clientY;
+	}
+}
+
+class OngoingTouches {
+	touches: { [id: number]: Touch | null } = {};
+
+	getTouch(event: PointerEvent): Touch {
+		return this.touches[event.pointerId] || new Touch(event);
+	}
+
+	setTouch(event: PointerEvent) {
+		this.touches[event.pointerId] = new Touch(event);
+	}
+
+	deleteTouch(id: number) {
+		this.touches[id] = null;
 	}
 }
