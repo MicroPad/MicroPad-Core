@@ -23,12 +23,14 @@ export default class TodoListComponent extends React.Component<ITodoListComponen
 
 		return (
 			<ProgressAsync promise={this.getProgress()} then={(progressValues) =>
-				<div style={{
-					marginLeft: '5px',
-					marginRight: '5px',
-					textAlign: 'center',
-					display: (progressValues.all > 0) ? undefined : 'none'
-				}}>
+				<div
+					className="markdown-element__todo-list-tracker"
+					style={{
+						marginLeft: '5px',
+						marginRight: '5px',
+						textAlign: 'center',
+						display: (progressValues.all > 0) ? undefined : 'none'
+					}}>
 					<meter
 						value={progressValues.done}
 						min={0}
