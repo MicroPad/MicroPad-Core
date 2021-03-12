@@ -2,3 +2,7 @@
 	height: auto;
 	display: block;
 }
+
+#printed-elements .markdown-element__todo-list-tracker {
+	display: none;
+}
