@@ -6,7 +6,7 @@ import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 
 export function mapStateToProps({ notepads }: IStoreState): IPathChangeComponentProps {
-	const notepad = ((notepads || <INotepadsStoreState> {}).notepad || <INotepadStoreState> {}).item;
+	const notepad = ((notepads || {} as INotepadsStoreState).notepad || {} as INotepadStoreState).item;
 
 	return {
 		notepad: notepad

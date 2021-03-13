@@ -13,7 +13,7 @@ import { getDueDates, sortDueDates } from '../services/DueDates';
 export const getDueDatesOnInit$ = (action$: Observable<Action<Success<void, string[]>>>) =>
 	action$.pipe(
 		ofType<Action<Success<void, string[]>>>(actions.getNotepadList.done.type),
-		map((action) => actions.getDueDates.started(action.payload.result))
+		map((action: Action<Success<void, string[]>>) => actions.getDueDates.started(action.payload.result))
 	);
 
 export const getDueDatesOnSave$ = (action$: Observable<Action<Success<Notepad, void>>>, store: MiddlewareAPI<IStoreState>) =>
@@ -26,7 +26,7 @@ export const getDueDatesOnSave$ = (action$: Observable<Action<Success<Notepad, v
 export const getDueDates$ = (action$: Observable<Action<string[]>>, store: MiddlewareAPI<IStoreState>, { getStorage }: EpicDeps) =>
 	action$.pipe(
 		ofType<Action<string[]>>(actions.getDueDates.started.type),
-		map(action =>
+		map((action: Action<string[]>) =>
 			action.payload.map(name =>
 				getStorage().notepadStorage.getItem<string>(name)
 					.then(json => JSON.parse(json!) as NotepadShell)

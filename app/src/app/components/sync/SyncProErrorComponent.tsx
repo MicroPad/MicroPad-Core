@@ -3,6 +3,7 @@ import { Button, Modal } from 'react-materialize';
 import { MICROPAD_URL, SYNC_NAME } from '../../types';
 
 export const SyncProErrorComponent = () => (
+	/* eslint-disable jsx-a11y/anchor-has-content */
 	<Modal
 		trigger={<a id="sync-pro-error-trigger" href="#!" />}
 		header="Good and bad news">

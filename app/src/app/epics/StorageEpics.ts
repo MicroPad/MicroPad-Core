@@ -41,8 +41,8 @@ const saveNotepad$ = (action$: Observable<Action<Notepad>>, store: Store<IStoreS
 						await notepad.toJson(!!notepad.crypto ? store.getState().notepadPasskeys[notepad.title] : undefined)
 					)
 			)()).pipe(
-				catchError(err => of(actions.saveNotepad.failed({ params: <Notepad> {}, error: err }))),
-				map(() => actions.saveNotepad.done({ params: <Notepad> {}, result: undefined }))
+				catchError(err => of(actions.saveNotepad.failed({ params: {} as Notepad, error: err }))),
+				map(() => actions.saveNotepad.done({ params: {} as Notepad, result: undefined }))
 			)
 		)
 	);
@@ -66,7 +66,7 @@ const saveOnChanges$ = (action$, store) =>
 		mergeMap((notepad: Notepad) => {
 			const actionsToReturn: Action<any>[] = [];
 
-			const syncId = (<IStoreState> store.getState()).notepads.notepad!.activeSyncId;
+			const syncId = (store.getState() as IStoreState).notepads.notepad!.activeSyncId;
 			if (syncId) actionsToReturn.push(actions.actWithSyncNotepad({
 				notepad,
 				action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId })

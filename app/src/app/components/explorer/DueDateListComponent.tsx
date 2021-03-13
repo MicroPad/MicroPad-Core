@@ -14,7 +14,7 @@ export interface IDueDateListComponentProps {
 export default class DueDateListComponent extends React.Component<IDueDateListComponentProps> {
 	render() {
 		const { currentTitle, isLoading, dueItems, loadNote } = this.props;
-		if ((dueItems.length < 1 && !isLoading) || !loadNote) return null;
+		if ((dueItems.length < 1) || !loadNote) return null;
 
 		return (
 			<div className="due-date-list">
@@ -26,7 +26,7 @@ export default class DueDateListComponent extends React.Component<IDueDateListCo
 					{
 						dueItems.map(item =>
 							<li key={generateGuid()}>
-								{item.notepadTitle} > <a
+								{item.notepadTitle} {'>'} <a
 									href="#!"
 									onClick={() => loadNote({
 										notepadTitle: item.notepadTitle,

@@ -8,8 +8,8 @@ import { actions } from '../actions';
 export function mapStateToProps({ notepads, sync }: IStoreState) {
 	return {
 		syncState: sync,
-		syncId: ((notepads || <INotepadsStoreState> {}).notepad || <INotepadStoreState> {}).activeSyncId,
-		notepad: ((notepads || <INotepadsStoreState> {}).notepad || <INotepadStoreState> {}).item
+		syncId: ((notepads || {} as INotepadsStoreState).notepad || {} as INotepadStoreState).activeSyncId,
+		notepad: ((notepads || {} as INotepadsStoreState).notepad || {} as INotepadStoreState).item
 	};
 }
 

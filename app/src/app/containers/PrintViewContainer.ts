@@ -15,12 +15,12 @@ export function mapStateToProps({ notepads, currentNote, print, app }: IStoreSta
 		note = notepads.notepad!.item!.notes[currentNote.ref];
 	}
 
-	return <IPrintViewComponentProps & IAppProps> {
+	return {
 		note,
 		printElement: print.elementToPrint,
 		theme: ThemeValues[app.theme],
 		themeName: app.theme
-	};
+	} as IPrintViewComponentProps & IAppProps;
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IPrintViewComponentProps> {

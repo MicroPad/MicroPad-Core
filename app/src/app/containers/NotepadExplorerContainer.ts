@@ -14,7 +14,7 @@ export function mapStateToProps({ notepads, explorer, app, currentNote }: IStore
 		note = notepads.notepad!.item!.notes[currentNote.ref];
 	}
 
-	notepad = ((notepads || <INotepadsStoreState> {}).notepad || <INotepadStoreState> {}).item;
+	notepad = ((notepads || {} as INotepadsStoreState).notepad || {} as INotepadStoreState).item;
 
 	return {
 		notepad: (!!notepad) ? notepad.toNotepad() : undefined,

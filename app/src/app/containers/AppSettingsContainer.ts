@@ -4,7 +4,7 @@ import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 import AppSettingsComponent, { IAppSettingsComponentProps } from '../components/explorer/AppSettingsComponent';
 
-export function mapStateToProps({}: IStoreState): IAppSettingsComponentProps {
+export function mapStateToProps(_state: IStoreState): IAppSettingsComponentProps {
 	return {};
 }
 

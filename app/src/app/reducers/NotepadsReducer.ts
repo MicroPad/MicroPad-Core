@@ -316,7 +316,7 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 				}
 			};
 		} else if (isType(action, actions.updateCurrentSyncId)) {
-			if (!(state.notepad || <INotepadStoreState> {}).item) return state;
+			if (!(state.notepad || {} as INotepadStoreState).item) return state;
 			const title = state.notepad!.item!.title;
 
 			const id = action.payload[title];

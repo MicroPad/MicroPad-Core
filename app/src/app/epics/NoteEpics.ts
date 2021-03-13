@@ -18,7 +18,7 @@ const loadNote$ = (action$, store) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.loadNote.started)),
 		tap(() => Materialize.Toast.removeAll()),
-		map((action: Action<string>) => [action.payload, { ...(store.getState().notepads.notepad || <INotepadStoreState> {}).item }]),
+		map((action: Action<string>) => [action.payload, { ...(store.getState().notepads.notepad || {} as INotepadStoreState).item }]),
 		filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
 		map(([ref, notepad]: [string, FlatNotepad]) => notepad.notes[ref]),
 		filter(Boolean),
@@ -36,7 +36,7 @@ const checkNoteAssets$ = (action$, store) =>
 			from(getNoteAssets(elements))
 				.pipe(map((res) => [ref, res.elements, res.blobUrls]))
 		),
-		map(([ref, elements, blobUrls]: [string, NoteElement[], object, FlatNotepad]) => [ref, elements, blobUrls, (store.getState().notepads.notepad || <INotepadStoreState> {}).item]),
+		map(([ref, elements, blobUrls]: [string, NoteElement[], object, FlatNotepad]) => [ref, elements, blobUrls, (store.getState().notepads.notepad || {} as INotepadStoreState).item]),
 		filter(([ref, elements, blobUrls, notepad]: [string, NoteElement[], object, FlatNotepad]) => !!notepad),
 		mergeMap(([ref, elements, blobUrls, notepad]: [string, NoteElement[], object, FlatNotepad]) => {
 			let newNotepad = notepad.clone({
@@ -55,7 +55,7 @@ const checkNoteAssets$ = (action$, store) =>
 			newNotepad.clone({ notepadAssets: Array.from(notepadAssets) });
 
 			return [
-				actions.checkNoteAssets.done({ params: <any> [], result: newNotepad }),
+				actions.checkNoteAssets.done({ params: [] as any, result: newNotepad }),
 				actions.loadNote.done({ params: ref, result: blobUrls })
 			];
 		})
@@ -121,7 +121,7 @@ const reloadNote$ = (action$, store) =>
 const autoLoadNewNote$ = (action$, store) =>
 	action$.pipe(
 		isAction(actions.newNote),
-		map((action: Action<NewNotepadObjectAction>) => [action.payload, (<IStoreState> store.getState()).notepads.notepad!.item]),
+		map((action: Action<NewNotepadObjectAction>) => [action.payload, (store.getState() as IStoreState).notepads.notepad!.item]),
 		filter(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!insertAction.parent && !!notepad),
 		map(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) =>
 			// Get a note with the new title that is in the expected parent
@@ -160,6 +160,7 @@ const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IS
 		concatMap(note => {
 			let count = note.elements.filter(e => e.type === 'markdown').length + 1;
 			let id = `markdown${count}`;
+			// eslint-disable-next-line no-loop-func
 			while (note.elements.some(e => e.args.id === id)) id = `markdown${++count}`;
 
 			return [
@@ -195,6 +196,7 @@ const imagePasted$ = (action$: Observable<Action<string>>, store: Store<IStoreSt
 					const note = store.getState().notepads.notepad!.item!.notes[store.getState().currentNote.ref];
 					let count = note.elements.filter(e => e.type === 'image').length + 1;
 					let id = `image${count}`;
+					// eslint-disable-next-line no-loop-func
 					while (note.elements.some(e => e.args.id === id)) id = `image${++count}`;
 
 					const element: NoteElement = {

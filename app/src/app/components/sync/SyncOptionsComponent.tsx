@@ -59,7 +59,7 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 									</li>
 
 									<li style={{ paddingTop: '1em' }}>
-										<a target="_blank" href={`${MICROPAD_URL}/sync/manage`}>Collaboration/Sharing Options</a>
+										<a target="_blank" rel="noopener noreferrer nofollow" href={`${MICROPAD_URL}/sync/manage`}>Collaboration/Sharing Options</a>
 										<ul className="sync-settings-component__action-list">
 											{!!syncState.sharedNotepadList![notepad.title] && <li>Scribe: <em>{syncState.sharedNotepadList![notepad.title].scribe}</em></li>}
 										</ul>

@@ -32,6 +32,7 @@ export const search$ = (action$, store: Store<IStoreState>) =>
 	action$.pipe(
 		filter((action: Action<string>) => isType(action, actions.search)),
 		map((action: Action<string>) => action.payload),
+		filter((query: string) => Object.keys(store.getState().search.hashTagResults).length > 0 || !(query.length <= 1 || query.substring(0, 1) !== '#')),
 		switchMap((query: string) => from((async () => {
 			if (query.length <= 1 || query.substring(0, 1) !== '#') return actions.displayHashTagSearchResults({});
 

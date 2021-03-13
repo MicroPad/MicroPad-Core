@@ -19,6 +19,7 @@ type WhatsNewNote = {
 
 export default class WhatsNewModalComponent extends React.Component {
 	render() {
+		/* eslint-disable jsx-a11y/anchor-has-content */
 		return (
 			<ModalAsync promise={this.getHtml()} then={note =>
 				<Modal

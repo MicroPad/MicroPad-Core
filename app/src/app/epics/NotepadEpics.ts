@@ -178,7 +178,7 @@ const exportNotepad$ = (action$, store) =>
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads),
 		filter(Boolean),
-		map((state: INotepadsStoreState) => (state.notepad || <INotepadStoreState> {}).item),
+		map((state: INotepadsStoreState) => (state.notepad || {} as INotepadStoreState).item),
 		filter(Boolean),
 		switchMap((notepad: FlatNotepad) =>
 			from(getNotepadXmlWithAssets(notepad.toNotepad()))
@@ -267,7 +267,7 @@ const exportAllToMarkdown$ = (action$, store) =>
 					const zip: JSZip = new JSZip();
 
 					exportNotepads.forEach((exportedNotepad: IExportedNotepad) => {
-						(<MarkdownNote[]> exportedNotepad.content).forEach(mdNote =>
+						(exportedNotepad.content as MarkdownNote[]).forEach(mdNote =>
 							zip.file(
 								`${fixFileName(exportedNotepad.title)}/${fixFileName(mdNote.title)}.md`,
 								new Blob([mdNote.md], { type: 'text/markdown;charset=utf-8' })
@@ -375,8 +375,8 @@ const loadNotepadByIndex$ = (action$: Observable<Action<number>>, store) =>
 	action$.pipe(
 		isAction(actions.loadNotepadByIndex),
 		map((action: Action<number>) => action.payload),
-		filter(index => !!(<IStoreState> store.getState()).notepads && (<IStoreState> store.getState()).notepads.savedNotepadTitles!.length >= index),
-		map((index: number) => (<IStoreState> store.getState()).notepads.savedNotepadTitles![index - 1]),
+		filter(index => !!(store.getState() as IStoreState).notepads && (store.getState() as IStoreState).notepads.savedNotepadTitles!.length >= index),
+		map((index: number) => (store.getState() as IStoreState).notepads.savedNotepadTitles![index - 1]),
 		map((title: string) => actions.openNotepadFromStorage.started(title))
 	);
 
