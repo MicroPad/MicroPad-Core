@@ -153,8 +153,9 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		}, 250);
 	}
 
-	componentWillUpdate(newProps: INoteViewerComponentProps) {
-		const { note } = this.props;
+	componentDidUpdate(oldProps: INoteViewerComponentProps) {
+		const newProps = this.props;
+		const { note } = oldProps;
 
 		if ((!!newProps.note && !!note) && newProps.note.internalRef !== note.internalRef) {
 			try {
@@ -186,7 +187,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				// Flash notepads drop-down
 				const explorer = document.getElementById('notepad-dropdown')!;
 				explorer.style.backgroundColor = theme.accent;
-				setTimeout(() => explorer.style.backgroundColor = null, 150);
+				setTimeout(() => explorer.style.backgroundColor = '', 150);
 
 				// Create quick notepad
 				if (!!makeQuickNotepad) makeQuickNotepad();

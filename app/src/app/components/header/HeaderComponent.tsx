@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { CSSProperties } from 'react';
 import AppNameComponent from '../../containers/header/AppNameContainer';
-import { Dropdown, Icon, Navbar, NavItem } from 'react-materialize';
+import { Icon, Navbar, NavItem } from 'react-materialize';
 import NotepadDropdownComponent from '../../containers/header/NotepadDropdownContainer';
 import { INotepadStoreState } from '../../types/NotepadTypes';
 import NotepadBreadcrumbs from '../../containers/header/NotepadBreadcrumbsContainer';

@@ -1,7 +1,7 @@
 import { Notepad } from 'upad-parse/dist';
 
 export interface ISyncWorker {
-	getAssetInfo(notepad: Notepad): Promise<{ assets: Record<string, ArrayBuffer>, notepadAssets: string[] }>;
+	getAssetInfo(notepad: Notepad): Promise<{ assets: Record<string, SharedArrayBuffer>, notepadAssets: string[] }>;
 }
 
 export type SyncLoginRequest = {

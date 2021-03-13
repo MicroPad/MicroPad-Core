@@ -1,4 +1,4 @@
-import { getAsBase64, getBytes, getUsedAssets } from '../util';
+import { getBytes, getUsedAssets } from '../util';
 import { Translators } from 'upad-parse';
 import * as localforage from 'localforage';
 
@@ -32,5 +32,4 @@ export async function getAssetInfo(notepad) {
 	}
 
 	return { assets: assets, notepadAssets: npAssets }
-	// return Object.assign({}, notepad, { assetHashList: assetHashes, notepadAssets: npAssets });
 }

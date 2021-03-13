@@ -14,7 +14,7 @@ export const generateMarkdownForPrint$ = (action$, store) =>
 	action$.pipe(
 		isAction(actions.print.started),
 		map(() => store.getState()),
-		map((state: IStoreState) => [(state.notepads.notepad || <INotepadStoreState> {}).item, state.currentNote.ref]),
+		map((state: IStoreState) => [(state.notepads.notepad || {} as INotepadStoreState).item, state.currentNote.ref]),
 		filter(([notepad, noteRef]: [FlatNotepad, string]) => !!notepad && !!noteRef),
 		map(([notepad, noteRef]: [FlatNotepad, string]) => notepad.notes[noteRef]),
 		filter(Boolean),
@@ -24,7 +24,7 @@ export const generateMarkdownForPrint$ = (action$, store) =>
 					.filter(e => e.type === 'drawing' || e.type === 'image')
 					.filter(e => !!e.args.ext)
 					.map(async e => {
-						const blob: Blob = <Blob> await ASSET_STORAGE.getItem(e.args.ext!);
+						const blob: Blob = await ASSET_STORAGE.getItem(e.args.ext!) as Blob;
 						const data = (e.type === 'drawing') ? dataURItoBlob(await getTrimmedDrawing(blob)) : blob;
 						return { uuid: e.args.ext!, data };
 					}));
@@ -38,18 +38,18 @@ export const generateMarkdownForPrint$ = (action$, store) =>
 			})())
 		),
 		switchMap(([note, assets]: [Note, Asset[]]) => from((note as Note).toMarkdown(assets))),
-		map((mdNote: MarkdownNote) => <NoteElement> {
+		map((mdNote: MarkdownNote) => ({
 			content: mdNote.md,
 			args: {
 				id: 'markdown1_print',
 				width: 'auto',
 				height: 'auto',
-				fontSize: (<IStoreState> store.getState()).app.defaultFontSize,
+				fontSize: (store.getState() as IStoreState).app.defaultFontSize,
 				x: '0px',
 				y: '0px'
 			},
 			type: 'markdown'
-		}),
+		} as NoteElement)),
 		map((element: NoteElement) => actions.print.done({ params: undefined, result: element }))
 	);
 

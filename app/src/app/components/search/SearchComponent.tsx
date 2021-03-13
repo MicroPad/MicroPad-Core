@@ -44,7 +44,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						if (this.supportsDataElement) {
 							return (
 								<option key={note.internalRef} data-value={note.internalRef}>
-									{notepad.sections[note.parent as string].title} > {note.title}
+									{notepad.sections[note.parent as string].title} {'>'} {note.title}
 								</option>
 							);
 						}
@@ -52,7 +52,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						return (
 							<li key={note.internalRef} data-value={note.internalRef}>
 								<a href="#!" onClick={() => this.loadNoteFromInput(note.internalRef)}>
-									{notepad.sections[note.parent as string].title} > {note.title}
+									{notepad.sections[note.parent as string].title} {'>'} {note.title}
 								</a>
 							</li>
 						);
@@ -89,7 +89,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 					!this.supportsDataElement
 					&& <div>
 						<ul className="browser-default">{this.results}</ul>
-						<em>Searching in basic mode. You can try a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noreferrer">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="nofollow noreferrer">Mozilla Firefox</a>.</em>
+						<em>Searching in basic mode. You can try a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer nofollow">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="noopener noreferrer nofollow">Mozilla Firefox</a>.</em>
 					</div>
 				}
 
@@ -184,7 +184,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 								loadNoteFromHashTagResults({ notepadTitle, noteRef: result.noteRef });
 								setTimeout(() => this.closeModal(), 0);
 							}}>
-							{result.parentTitle} > {result.title}
+							{result.parentTitle} {'>'} {result.title}
 						</CollectionItem>
 					))
 				}</Collection>

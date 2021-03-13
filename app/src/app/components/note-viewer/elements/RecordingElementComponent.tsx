@@ -80,12 +80,11 @@ export default class RecordingElementComponent extends React.Component<IFileElem
 		};
 	}
 
-	componentWillUpdate() {
+	componentDidUpdate() {
 		this.recorder.stop();
 	}
 
 	shouldComponentUpdate() {
-		const { element, elementEditing } = this.props;
 		return !this.buttonContainer || !this.buttonContainer.classList.contains('recording-active');
 	}
 

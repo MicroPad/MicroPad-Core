@@ -9,7 +9,7 @@ let noteRef: string = '';
 export function mapStateToProps({ notepads, currentNote }: IStoreState) {
 	noteRef = currentNote.ref;
 
-	let note = <Note> {};
+	let note = {} as Note;
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
 	}

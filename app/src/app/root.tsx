@@ -13,7 +13,7 @@ import './theme-styles/Purple.css';
 import * as React from 'react';
 import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed
 import 'materialize-css/dist/js/materialize.js';
-import * as serviceWorker from '../serviceWorker';
+import * as serviceWorker from '../registerServiceWorker';
 import { APP_NAME, IAppWindow, IStoreState, MICROPAD_URL } from './types';
 import { applyMiddleware, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
@@ -154,10 +154,10 @@ async function compatibilityCheck(): Promise<boolean> {
 	if (!doesSupportSrcDoc()) {
 		ReactDOM.render(
 			<div style={{ margin: '10px' }}>
-				<h1>Bad news 😢</h1>
+				<h1>Bad news <span role="img" aria-label="sad face">😢</span></h1>
 				<p>
 					Your web-browser doesn't support important features required for {APP_NAME} to function.<br />
-					You can try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noreferrer">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="nofollow noreferrer">Mozilla Firefox</a>.
+					You can try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer nofollow">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="noopener noreferrer nofollow">Mozilla Firefox</a>.
 				</p>
 				<p>
 					You could also download {APP_NAME} <a href="https://getmicropad.com/#download">here</a>.

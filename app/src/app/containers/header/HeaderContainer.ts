@@ -1,7 +1,7 @@
 import { Action, Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from '../../actions';
-import HeaderComponent, { IHeaderComponentProps } from '../../components/header/HeaderComponent';
+import HeaderComponent from '../../components/header/HeaderComponent';
 import { IStoreState } from '../../types';
 import { ThemeValues } from '../../ThemeValues';
 

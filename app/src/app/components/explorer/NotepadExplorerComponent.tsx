@@ -16,6 +16,13 @@ import { NEW_SECTION_HELP, OPEN_NOTE_HELP, OPEN_NOTEPAD_HELP } from '../../types
 import DueDateListComponent from '../../containers/DueDateListContainer';
 import AppSettingsComponent from '../../containers/AppSettingsContainer';
 
+// @ts-ignore
+import NewSectionVideo from '../../assets/instructions/new-section.mp4';
+// @ts-ignore
+import OpenNoteVideo from '../../assets/instructions/open-note.mp4';
+// @ts-ignore
+import OpenNotepadVideo from '../../assets/instructions/open-notepad.mp4';
+
 export interface INotepadExplorerComponentProps {
 	notepad?: Notepad;
 	openSections: string[];
@@ -126,7 +133,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 									) &&
 									<HelpMessageComponent
 										message={NEW_SECTION_HELP}
-										video={require('../../assets/instructions/new-section.mp4')} />
+										video={NewSectionVideo} />
 								}
 								{
 									(
@@ -135,7 +142,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 									) &&
 									<HelpMessageComponent
 										message={OPEN_NOTE_HELP}
-										video={require('../../assets/instructions/open-note.mp4')} />
+										video={OpenNoteVideo} />
 								}
 							</React.Fragment>
 						}
@@ -146,7 +153,7 @@ export default class NotepadExplorerComponent extends React.Component<INotepadEx
 					!notepad &&
 					<HelpMessageComponent
 						message={OPEN_NOTEPAD_HELP}
-						video={require('../../assets/instructions/open-notepad.mp4')} />
+						video={OpenNotepadVideo} />
 				}
 
 				{!!notepad && <hr />}
