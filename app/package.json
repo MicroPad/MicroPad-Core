@@ -1,9 +1,9 @@
 {
   "name": "micropad",
-  "version": "3.26.2",
+  "version": "3.27.0",
   "private": true,
   "scripts": {
-    "preinstall": "python3 ../libs/build-libs.py; ./get_precache_files.py > src/extra_precache_files.ts",
+    "preinstall": "python3 ../libs/build-libs.py; ./get_precache_files.py > src/extraPrecacheFiles.ts",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "echo \"Tests are coming soon, hopefully.\"",
@@ -43,8 +43,8 @@
     "redux-devtools-extension": "^2.13.2",
     "redux-observable": "^0.19.0",
     "redux-typescript-actions": "^1.3.0",
-    "rxjs": "^6.2.1",
-    "rxjs-compat": "^6.2.1",
+    "rxjs": "^6.6.6",
+    "rxjs-compat": "^6.6.6",
     "save-as": "^0.1.8",
     "semver": "^5.6.0",
     "showdown": "^1.8.6",
@@ -54,7 +54,15 @@
     "vex-js": "^4.1.0"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "overrides": [
+      {
+        "files": ["**/*.ts?(x)"],
+        "rules": {
+          "@typescript-eslint/no-use-before-define": "off"
+        }
+      }
+    ]
   },
   "browserslist": {
     "production": [

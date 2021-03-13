@@ -8,12 +8,14 @@ def recursive_path_walker(root_path, version, path_to_url):
 		if not Path(path).is_file():
 			continue
 
-		yield f'{{ url: \'{path_to_url(path)}\', version: \'{version}\' }}'
+		yield f'{{ url: \'{path_to_url(path)}\', revision: \'{version}\' }}'
 
 replace_public = lambda path: path.replace('public/', '/')
 
 precache_lines = itertools.chain(
-	recursive_path_walker('public/assets/mathjax', '2018', replace_public),
+#   TODO: MathJax prefetch is pointless because it looks like reqs from within an iframe aren't caught. There are
+#         active chromium bugs on this issue.
+# 	recursive_path_walker('public/assets/mathjax', '2018', replace_public),
 	recursive_path_walker('public/assets/recorder', '2018', replace_public)
 )
 

@@ -9,9 +9,6 @@ import noteInstructionsDark from './assets/click-to-make-open-dark.png';
 import elementInstructionsLight from './assets/click-to-insert.png';
 import elementInstructionsDark from './assets/click-to-insert-dark.png';
 
-console.log(classicBackground);
-console.log(filledBackground);
-
 export const ThemeValues: { [K in ThemeName]: ITheme } = {
 	Classic: {
 		background: '#fff',

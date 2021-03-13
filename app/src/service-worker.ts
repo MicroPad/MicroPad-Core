@@ -13,7 +13,7 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
-import { EXTRA_PRECACHE_FILES } from './extra_precache_files';
+import { EXTRA_PRECACHE_FILES } from './extraPrecacheFiles';
 
 declare const self: ServiceWorkerGlobalScope;
 
