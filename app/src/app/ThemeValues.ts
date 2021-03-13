@@ -1,13 +1,16 @@
 import { ITheme, ThemeName } from './types/Themes';
 
-const classicBackground = require('./assets/background.png');
-const filledBackground = require('./assets/dark-background.png');
-const instructionImageLight = require('./assets/click-to-make.png');
-const instructionImageDark = require('./assets/click-to-make-dark.png');
-const noteInstructionsLight = require('./assets/click-to-make-open.png');
-const noteInstructionsDark = require('./assets/click-to-make-open-dark.png');
-const elementInstructionsLight = require('./assets/click-to-insert.png');
-const elementInstructionsDark = require('./assets/click-to-insert-dark.png');
+import classicBackground from './assets/background.png';
+import filledBackground from './assets/dark-background.png';
+import instructionImageLight from './assets/click-to-make.png';
+import instructionImageDark from './assets/click-to-make-dark.png';
+import noteInstructionsLight from './assets/click-to-make-open.png';
+import noteInstructionsDark from './assets/click-to-make-open-dark.png';
+import elementInstructionsLight from './assets/click-to-insert.png';
+import elementInstructionsDark from './assets/click-to-insert-dark.png';
+
+console.log(classicBackground);
+console.log(filledBackground);
 
 export const ThemeValues: { [K in ThemeName]: ITheme } = {
 	Classic: {

@@ -187,7 +187,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				// Flash notepads drop-down
 				const explorer = document.getElementById('notepad-dropdown')!;
 				explorer.style.backgroundColor = theme.accent;
-				setTimeout(() => explorer.style.backgroundColor = null, 150);
+				setTimeout(() => explorer.style.backgroundColor = '', 150);
 
 				// Create quick notepad
 				if (!!makeQuickNotepad) makeQuickNotepad();

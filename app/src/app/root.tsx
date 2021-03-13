@@ -13,7 +13,7 @@ import './theme-styles/Purple.css';
 import * as React from 'react';
 import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed
 import 'materialize-css/dist/js/materialize.js';
-import * as serviceWorker from '../serviceWorker';
+import * as serviceWorker from '../registerServiceWorker';
 import { APP_NAME, IAppWindow, IStoreState, MICROPAD_URL } from './types';
 import { applyMiddleware, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';

@@ -26,7 +26,7 @@ export default class DueDateListComponent extends React.Component<IDueDateListCo
 					{
 						dueItems.map(item =>
 							<li key={generateGuid()}>
-								{item.notepadTitle} > <a
+								{item.notepadTitle} {'>'} <a
 									href="#!"
 									onClick={() => loadNote({
 										notepadTitle: item.notepadTitle,

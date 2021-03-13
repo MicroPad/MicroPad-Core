@@ -50,7 +50,7 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 						<p>
 							It's completely free for any notepad that's mostly text,
 							and it costs less than a cup of coffee for up to twenty of your more advanced
-							notepads. <a target="_blank" rel="noopener noreferrer nofollow" href={`${MICROPAD_URL}/sync`}>More information >></a>
+							notepads. <a target="_blank" rel="noopener noreferrer nofollow" href={`${MICROPAD_URL}/sync`}>More information »</a>
 						</p>
 					</div>
 

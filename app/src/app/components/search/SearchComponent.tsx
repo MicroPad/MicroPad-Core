@@ -44,7 +44,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						if (this.supportsDataElement) {
 							return (
 								<option key={note.internalRef} data-value={note.internalRef}>
-									{notepad.sections[note.parent as string].title} > {note.title}
+									{notepad.sections[note.parent as string].title} {'>'} {note.title}
 								</option>
 							);
 						}
@@ -52,7 +52,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						return (
 							<li key={note.internalRef} data-value={note.internalRef}>
 								<a href="#!" onClick={() => this.loadNoteFromInput(note.internalRef)}>
-									{notepad.sections[note.parent as string].title} > {note.title}
+									{notepad.sections[note.parent as string].title} {'>'} {note.title}
 								</a>
 							</li>
 						);
@@ -184,7 +184,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 								loadNoteFromHashTagResults({ notepadTitle, noteRef: result.noteRef });
 								setTimeout(() => this.closeModal(), 0);
 							}}>
-							{result.parentTitle} > {result.title}
+							{result.parentTitle} {'>'} {result.title}
 						</CollectionItem>
 					))
 				}</Collection>

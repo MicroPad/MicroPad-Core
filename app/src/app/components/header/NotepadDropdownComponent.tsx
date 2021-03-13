@@ -9,9 +9,8 @@ import ManageSyncComponent from '../../containers/ManageSyncContainer';
 import { FlatNotepad, Note } from 'upad-parse/dist';
 import ImportMarkdownComponent from '../../containers/header/ImportMarkdownContainer';
 import { ISyncState } from '../../reducers/SyncReducer';
-
-const NPX_ICON = require('../../assets/npx.png');
-const MD_ICON = require('../../assets/md.svg');
+import NpxIcon from '../../assets/npx.png';
+import MarkdownIcon from '../../assets/md.svg';
 
 export interface INotepadDropdownProps {
 	isExporting: boolean;
@@ -55,11 +54,11 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 						trigger={<NavItem id="export-all-notepads-trigger" href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}>
 						<Row>
 							<Col s={12} m={6} style={{cursor: 'pointer'}} onClick={exportAll}>
-								<img src={NPX_ICON} style={iconStyles} title="Export notepads as a zip archive of NPX files" alt="" />
+								<img src={NpxIcon} style={iconStyles} title="Export notepads as a zip archive of NPX files" alt="" />
 								<p style={{textAlign: 'center'}}>Export notepads as a zip archive of NPX files</p>
 							</Col>
 							<Col s={12} m={6} style={{cursor: 'pointer'}} onClick={exportToMarkdown}>
-								<img src={MD_ICON} style={iconStyles} title="Export notepads as a zip archive of markdown files" alt="" />
+								<img src={MarkdownIcon} style={iconStyles} title="Export notepads as a zip archive of markdown files" alt="" />
 								<p style={{textAlign: 'center'}}>Export notepads as a zip archive of markdown files</p>
 							</Col>
 							{this.props.isExporting && <ProgressBar className="amber" />}
