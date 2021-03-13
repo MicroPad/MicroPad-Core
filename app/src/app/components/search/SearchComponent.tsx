@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { Collection, CollectionItem, Icon, Input, Modal, NavItem, Row } from 'react-materialize';
-import { shareReplay } from 'rxjs/operators';
+import { debounceTime, shareReplay, takeUntil } from 'rxjs/operators';
 import { FlatNotepad } from 'upad-parse/dist';
-import { Subscription } from 'rxjs/Subscription';
-import { fromEvent } from 'rxjs';
+import { fromEvent, Subject, Subscription } from 'rxjs';
 import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../../types/ActionTypes';
 import { HashTagSearchResult, HashTagSearchResults } from '../../reducers/SearchReducer';
 
@@ -22,6 +21,8 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	private results!: JSX.Element[];
 	private triggerClickedSub!: Subscription;
 	private readonly supportsDataElement = !!window['HTMLDataListElement'];
+	private readonly currentValue$: Subject<string> = new Subject<string>();
+	private readonly destroy$: Subject<void> = new Subject<void>();
 
 	render() {
 		const { notepad, query, hashTagResults, indices } = this.props;
@@ -71,7 +72,9 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						ref={e => this.searchInput = e!}
 						s={12}
 						label={`Search by ${(!!notepad && `note title or a`) || ''} hashtag`}
-						onChange={this.onInput}
+						onChange={(event, value) => {
+							this.currentValue$.next(value)
+						}}
 						value={query}
 						autoComplete="off"
 						data-lpignore="true" />
@@ -116,6 +119,18 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	}
 
 	componentDidMount() {
+		const { search } = this.props;
+		if (!search) throw new Error('Missing search prop.');
+
+		this.currentValue$.pipe(
+			takeUntil(this.destroy$)
+		).subscribe(search);
+
+		this.currentValue$.pipe(
+			takeUntil(this.destroy$),
+			debounceTime(150)
+		).subscribe(value => this.onInput(value));
+
 		this.componentDidUpdate();
 	}
 
@@ -137,13 +152,11 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	}
 
 	componentWillUnmount() {
+		this.destroy$.next();
 		this.triggerClickedSub.unsubscribe();
 	}
 
-	private onInput = (event, value: string) => {
-		const { search } = this.props;
-		if (!search) return;
-
+	private onInput = (value: string) => {
 		let result;
 		if (this.supportsDataElement) {
 			result = this.results
@@ -155,8 +168,6 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 			this.loadNoteFromInput(result['data-value']);
 			return;
 		}
-
-		search(value);
 	}
 
 	private loadNoteFromInput = (ref: string) => {
