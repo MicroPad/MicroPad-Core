@@ -15,7 +15,7 @@
     "@material-ui/icons": "^4.0.1",
     "asset-checksum": "../libs/asset-checksum/pkg",
     "date-fns": "^1.29.0",
-    "deep-equal": "^1.0.1",
+    "deep-equal": "^2.0.5",
     "deep-freeze": "0.0.1",
     "fend-wasm": "^0.1.14",
     "jquery": "^3.5.1",
