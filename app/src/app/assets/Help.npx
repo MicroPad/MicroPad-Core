@@ -17,7 +17,7 @@ of power and openness.
 **Release notes for v3.27.0 (13th of March 2021)**
 - A number of improvements to the drawing editor
 - The latest version of [fend](https://fend.printfn.nz) with fancy temperature conversions
-like getting 15°C in Fahrenheit ([[15 degrees C in F to 0dp]])
+like getting 15°C in Fahrenheit ([[15C in F]])
 - A number of under-the-hood upgrades to increase stability *and* recording now works in offline mode!
 - Search is a little less laggy (although there is still work to do in that area)
 
