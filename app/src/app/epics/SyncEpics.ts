@@ -232,7 +232,7 @@ export const upload$ = (action$, store: Store<IStoreState>) =>
 				catchError((error): Observable<Action<any>> => {
 					uploadCount$.next(0);
 
-					if (error === 'too many assets') {
+					if (error && error.message === 'too many assets') {
 						return of(actions.syncProError(undefined));
 					}
 
