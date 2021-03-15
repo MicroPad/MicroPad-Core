@@ -281,7 +281,9 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					if (isSafariLike) {
 						// Safari currently opens links in a new window if noopener/noreferrer are set
 						// eslint-disable-next-line no-script-url
-						if (!url.startsWith('javascript:')) {
+						if (url.startsWith('javascript:') || url.startsWith('vbscript:') || url.startsWith('data:')) {
+							window.open('about:blank', '_blank');
+						} else {
 							window.open(url, '_blank');
 						}
 					} else {
