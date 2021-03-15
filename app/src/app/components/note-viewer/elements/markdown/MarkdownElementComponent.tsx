@@ -275,13 +275,19 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				break;
 
 			case 'link':
-				const newWindow = window.open(message.payload, '_blank');
-				if (!!newWindow) {
-					newWindow.opener = null;
-					newWindow.focus();
-				} else {
-					if (!(window as unknown as IAppWindow).isElectron) Dialog.alert('Your browser blocked opening the link');
-				}
+				// this returns null due to the 'noopener' argument
+				(() => {
+					const isSafariLike = navigator.vendor === 'Apple Computer, Inc.';
+					const url = message.payload;
+					if (isSafariLike) {
+						// Safari currently opens links in a new window if noopener/noreferrer are set
+						if (!url.startsWith('javascript:')) {
+							window.open(url, '_blank');
+						}
+					} else {
+						window.open(url, '_blank', 'noopener,noreferrer');
+					}
+				})();
 				break;
 
 			case 'edit':
