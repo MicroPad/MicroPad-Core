@@ -4,7 +4,7 @@ from pathlib import Path
 import itertools
 
 def recursive_path_walker(root_path, version, path_to_url):
-	for path in glob.iglob(root_path + '/**/*', recursive=True):
+	for path in sorted(glob.iglob(root_path + '/**/*', recursive=True)):
 		if not Path(path).is_file():
 			continue
 
