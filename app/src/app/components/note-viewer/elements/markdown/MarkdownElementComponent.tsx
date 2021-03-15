@@ -2,7 +2,7 @@ import * as React from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
 import * as MarkDownViewer from './MarkdownViewerHtml';
-import { IAppWindow, UNSUPPORTED_MESSAGE } from '../../../../types';
+import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
@@ -10,7 +10,6 @@ import Grid from '@material-ui/core/Grid';
 import { Input } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
 import Resizable from 're-resizable';
-import { Dialog } from '../../../../services/dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
 import { colourTransformer, fendTransformer } from './MarkdownTransformers';
@@ -275,13 +274,20 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				break;
 
 			case 'link':
-				const newWindow = window.open(message.payload, '_blank');
-				if (!!newWindow) {
-					newWindow.opener = null;
-					newWindow.focus();
-				} else {
-					if (!(window as unknown as IAppWindow).isElectron) Dialog.alert('Your browser blocked opening the link');
-				}
+				// this returns null due to the 'noopener' argument
+				(() => {
+					const isSafariLike = navigator.vendor === 'Apple Computer, Inc.';
+					const url = message.payload;
+					if (isSafariLike) {
+						// Safari currently opens links in a new window if noopener/noreferrer are set
+						// eslint-disable-next-line no-script-url
+						if (!url.startsWith('javascript:')) {
+							window.open(url, '_blank');
+						}
+					} else {
+						window.open(url, '_blank', 'noopener,noreferrer');
+					}
+				})();
 				break;
 
 			case 'edit':
