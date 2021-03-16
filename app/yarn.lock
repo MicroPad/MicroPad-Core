@@ -7972,10 +7972,10 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-material-icons-font@^1.1.1:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/material-icons-font/-/material-icons-font-1.4.2.tgz#b4d159436320301400a0426022a23ff8350776af"
-  integrity sha512-+Ff24oX8Qgg/v+rjV38Y6pD+zzak2/gmZbKPmyRVQw28fJthqtWKswF1R6WS9lpcnh8+DjZwtuLpjuqzpFXLVA==
+material-icons-font@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/material-icons-font/-/material-icons-font-2.1.0.tgz#6160e832f65a91b8d4eb3083523465cc0a36a5a1"
+  integrity sha512-Nv36UacYjodGc15HJDehJcfrYFioq5p6sQD7kcpBVoFLdUgTnv/kzM5BamTIi0W/i3BaeouunzfBOkUzjicT3Q==
 
 materialize-css@^0.100.2:
   version "0.100.2"
