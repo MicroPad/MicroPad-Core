@@ -1,6 +1,6 @@
 {
   "name": "micropad",
-  "version": "3.27.3",
+  "version": "3.27.4",
   "private": true,
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py; ./get_precache_files.py > src/extraPrecacheFiles.ts",
@@ -57,7 +57,9 @@
     "extends": "react-app",
     "overrides": [
       {
-        "files": ["**/*.ts?(x)"],
+        "files": [
+          "**/*.ts?(x)"
+        ],
         "rules": {
           "@typescript-eslint/no-use-before-define": "off"
         }
