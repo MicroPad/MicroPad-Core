@@ -1909,10 +1909,10 @@
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.4.tgz#f0ec25dbf2f0e4b18647313ac031134ca5b24b21"
   integrity sha512-1z8k4wzFnNjVK/tlxvrWuK5WMt6mydWWP7+zvH5eFep4oj+UkrfiJTRtjCeBXNpwaA/FYqqtb4/QS4ianFpIRA==
 
-"@types/mousetrap@^1.6.0":
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/@types/mousetrap/-/mousetrap-1.6.5.tgz#e95569aa6273dbe0ed1814f86287547cc06e93c9"
-  integrity sha512-OwVhKFim9Y/MprzCe4I6a59p31pMy8+LrtP6qS7J0kaOxYmW6VVJPBw5NYm+g7nSbgPUz22FvqU1F1hC5YGTfg==
+"@types/mousetrap@^1.6.7":
+  version "1.6.7"
+  resolved "https://registry.yarnpkg.com/@types/mousetrap/-/mousetrap-1.6.7.tgz#362411f89ef78a9ece3a5ff71361e85e3ce6febf"
+  integrity sha512-VGAfynzXjVzqx2TzLTrdXURhgn+N/66IgEFFt4LYCJ0JIzRGcFUCX9sTAqgJGnyHKYt/vvlo+B9sJHhpEWaP5w==
 
 "@types/node@*", "@types/node@^14.14.37":
   version "14.14.37"
