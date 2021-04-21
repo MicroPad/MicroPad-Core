@@ -48,7 +48,7 @@
     "save-as": "^0.1.8",
     "semver": "^7.3.4",
     "showdown": "^1.8.6",
-    "typescript": "~4.2.3",
+    "typescript": "~4.2.4",
     "upad-parse": "^7.0.0",
     "vex-dialog": "^1.1.0",
     "vex-js": "^4.1.0"
