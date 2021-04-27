@@ -45,7 +45,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						if (this.supportsDataElement) {
 							return (
 								<option key={note.internalRef} data-value={note.internalRef}>
-									{notepad.sections[note.parent as string].title} {'>'} {note.title}
+									{`${notepad.sections[note.parent as string].title.trim()} > ${note.title.trim()}`}
 								</option>
 							);
 						}
@@ -53,7 +53,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						return (
 							<li key={note.internalRef} data-value={note.internalRef}>
 								<a href="#!" onClick={() => this.loadNoteFromInput(note.internalRef)}>
-									{notepad.sections[note.parent as string].title} {'>'} {note.title}
+									{`${notepad.sections[note.parent as string].title} > ${note.title}`}
 								</a>
 							</li>
 						);
@@ -160,8 +160,12 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 		let result;
 		if (this.supportsDataElement) {
 			result = this.results
-				.map(e => e.props)
-				.find(e => e.children.join('') === value);
+				.map(datalistElement => datalistElement.props)
+				.find(datalistElement => {
+					console.log(datalistElement);
+					console.log(value);
+					return datalistElement.children === value;
+				});
 		}
 
 		if (!!result) {
