@@ -17,7 +17,7 @@
     "date-fns": "^1.29.0",
     "deep-equal": "^2.0.5",
     "deep-freeze": "0.0.1",
-    "fend-wasm": "^0.1.14",
+https://github.com/MicroPad/MicroPad-Core/pull/332/conflict?name=app%252Fyarn.lock&ancestor_oid=43f350947398742c638b0b017c15db6cf4a03e19&base_oid=71f4fc13a868a6c1238435facb088a9a5aedecd0&head_oid=5309d7d085f309459b1fa8b7456ebf4e4d485afb    "fend-wasm": "^0.1.14",
     "jquery": "^3.5.1",
     "json-stringify-safe": "^5.0.1",
     "jszip": "^3.1.5",
