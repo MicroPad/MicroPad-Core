@@ -3,7 +3,7 @@ import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
-import PathChangeComponent from '../../containers/PathChangeContainer';
+import PathChangeComponent from './path-change/PathChangeContainer';
 import { Dialog } from '../../services/dialogs';
 
 export interface IExplorerOptionsComponentProps {
