@@ -44,35 +44,38 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 		return (
 			<div id="notepad-explorer" style={notepadExplorerStyle}>
 				<div style={{ paddingRight: '5px' }}>
-					<a href="#!" onClick={this.props.flipFullScreenState} style={{ paddingRight: '5px', fontSize: '24px' }}>»</a>
-					<DueDateListComponent />
+					<a href="#!" onClick={this.props.flipFullScreenState}
+					   style={{ paddingRight: '5px', fontSize: '24px' }}>»</a>
+					<DueDateListComponent/>
 				</div>
 
 				{
 					!!notepad &&
 					<div>
-						<strong style={{ display: 'inline-flex' }}>
+						<strong style={{ display: 'inline-flex' }}
+						        onContextMenu={NotepadExplorerComponent.handleRightClick}>
 							<span style={{ paddingRight: '5px' }}>{notepad.title}</span>
-							<ExplorerOptionsComponent objToEdit={notepad} type="notepad" />
+							<ExplorerOptionsComponent objToEdit={notepad} type="notepad"/>
 						</strong>
 
 						<p style={{ marginTop: '0px' }}>
 							(<a href="#!" onClick={this.props.expandAll}>Expand All</a> | <a href="#!" onClick={() => {
-								if (!!this.props.openNote) {
-									this.props.collapseAll();
-									this.props.expandFromNote(this.props.openNote);
-								}
-							}}>Focus</a> | <a href="#!" onClick={this.props.collapseAll}>Collapse All</a>)
+							if (!!this.props.openNote) {
+								this.props.collapseAll();
+								this.props.expandFromNote(this.props.openNote);
+							}
+						}}>Focus</a> | <a href="#!" onClick={this.props.collapseAll}>Collapse All</a>)
 						</p>
 
-						<div className="explorer-note add-button" key={generateGuid()} style={{margin: 0}}>
-							<a href="#!" style={{ color: theme.explorerContent }} onClick={() => this.newNotepadObject('section', notepad)}> <Icon>add</Icon> Section</a>
+						<div className="explorer-note add-button" key={generateGuid()} style={{ margin: 0 }}>
+							<a href="#!" style={{ color: theme.explorerContent }}
+							   onClick={() => this.newNotepadObject('section', notepad)}> <Icon>add</Icon> Section</a>
 						</div>
 
 						{treeViews}
 
 						<div style={{ paddingLeft: '10px', marginTop: '10px' }}>
-							<SyncOptionsComponent />
+							<SyncOptionsComponent/>
 						</div>
 
 						{
@@ -86,7 +89,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 									) &&
 									<HelpMessageComponent
 										message={NEW_SECTION_HELP}
-										video={NewSectionVideo} />
+										video={NewSectionVideo}/>
 								}
 								{
 									(
@@ -95,7 +98,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 									) &&
 									<HelpMessageComponent
 										message={OPEN_NOTE_HELP}
-										video={OpenNoteVideo} />
+										video={OpenNoteVideo}/>
 								}
 							</React.Fragment>
 						}
@@ -106,18 +109,18 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 					!notepad &&
 					<HelpMessageComponent
 						message={OPEN_NOTEPAD_HELP}
-						video={OpenNotepadVideo} />
+						video={OpenNotepadVideo}/>
 				}
 
-				{!!notepad && <hr />}
+				{!!notepad && <hr/>}
 				<div style={{ paddingBottom: '200px' }}>
-					<AppSettingsComponent />
+					<AppSettingsComponent/>
 				</div>
 			</div>
 		);
 	}
 
-	private async newNotepadObject (type: 'note' | 'section', parent: Parent) {
+	private async newNotepadObject(type: 'note' | 'section', parent: Parent) {
 		const { newNote, newSection } = this.props;
 		const title = await Dialog.prompt('Title:');
 
@@ -150,8 +153,13 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 			.forEach((child: Note) => childNotes.push(
 				<div className="explorer-note" key={generateGuid()}>
 					<span>
-						<a href="#!" style={{ color: theme.explorerContent }} onClick={() => loadNote(child.internalRef)}><Icon>note</Icon> {child.title}</a>
-						<ExplorerOptionsComponent objToEdit={child} type="note" />
+						<a
+							href="#!"
+							style={{ color: theme.explorerContent }} onClick={() => loadNote(child.internalRef)}
+							onContextMenu={NotepadExplorerComponent.handleRightClick}>
+							<Icon>note</Icon> {child.title}
+						</a>
+						<ExplorerOptionsComponent objToEdit={child} type="note"/>
 					</span>
 				</div>
 			));
@@ -162,17 +170,26 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 				onClick={() => this.sectionArrowClick(section.internalRef, openSections)}
 				nodeLabel={
 					<span>
-						<span style={nodeLabelStyle} onClick={() => this.sectionArrowClick(section.internalRef, openSections)}>
+						<span
+							style={nodeLabelStyle}
+							onClick={() => this.sectionArrowClick(section.internalRef, openSections)}
+							onContextMenu={NotepadExplorerComponent.handleRightClick}>
 							<Icon>book</Icon> {section.title}
 						</span>
 
-						<ExplorerOptionsComponent objToEdit={section} type="section" />
+						<ExplorerOptionsComponent objToEdit={section} type="section"/>
 					</span>
 				}
 				collapsed={!openSections.has(section.internalRef)}>
 				<div className="explorer-note add-button" key={generateGuid()}>
-					<a href="#!" style={{ color: theme.explorerContent, paddingRight: '3px' }} onClick={() => this.newNotepadObject('note', section)}><Icon>add</Icon> Note </a>
-					<a href="#!" style={{ color: theme.explorerContent, paddingLeft: '3px' }} onClick={() => this.newNotepadObject('section', section)}> <Icon>add</Icon> Section</a>
+					<a href="#!" style={{ color: theme.explorerContent, paddingRight: '3px' }}
+					   onClick={() => this.newNotepadObject('note', section)}>
+						<Icon>add</Icon> Note
+					</a>
+					<a href="#!" style={{ color: theme.explorerContent, paddingLeft: '3px' }}
+					   onClick={() => this.newNotepadObject('section', section)}>
+						<Icon>add</Icon> Section
+					</a>
 				</div>
 
 				{childSections}
@@ -181,7 +198,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 		);
 	}
 
-	private sectionArrowClick (guid: string, openSections: Set<string>) {
+	private sectionArrowClick(guid: string, openSections: Set<string>) {
 		const { expandSection, collapseSection } = this.props;
 
 		if (openSections.has(guid)) {
@@ -189,5 +206,11 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 		} else {
 			expandSection(guid);
 		}
+	}
+
+	private static handleRightClick(e: React.MouseEvent<HTMLElement, MouseEvent>): boolean {
+		e.preventDefault();
+		(e.target as Node).parentElement?.querySelector<HTMLAnchorElement>('.exp-options-trigger')?.click();
+		return false;
 	}
 }

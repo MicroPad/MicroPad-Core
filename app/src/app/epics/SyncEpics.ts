@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { isAction } from '../util';
+import { filterTruthy, isAction } from '../util';
 import { actions } from '../actions';
 import {
 	catchError,
@@ -362,7 +362,7 @@ export const openSyncProErrorModal$ = action$ =>
 	action$.pipe(
 		isAction(actions.syncProError),
 		map(() => document.getElementById('sync-pro-error-trigger')),
-		filter(Boolean),
+		filterTruthy(),
 		tap((trigger: HTMLAnchorElement) => trigger.click()),
 		filter(() => false)
 	);
