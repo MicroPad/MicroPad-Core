@@ -11,25 +11,30 @@ import {
 	tap,
 	throttleTime
 } from 'rxjs/operators';
-import { Action, isType, Success } from 'redux-typescript-actions';
-import { combineEpics } from 'redux-observable';
+import { Action, Failure, isType, Success } from 'redux-typescript-actions';
+import { combineEpics, ofType } from 'redux-observable';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
 import JSZip from 'jszip';
-import { filterTruthy, fixFileName, generateGuid, isAction } from '../util';
+import { filterTruthy, fixFileName, generateGuid, isAction, unreachable } from '../util';
 import { Dialog } from '../services/dialogs';
 import { CombinedNotepadSyncList, ISyncedNotepad, SyncUser } from '../types/SyncTypes';
-import { Asset, FlatNotepad, Note, Notepad, Translators } from 'upad-parse/dist';
+import { Asset, FlatNotepad, moveNote, moveSection, Note, Notepad, Translators } from 'upad-parse/dist';
 import { MarkdownNote } from 'upad-parse/dist/Note';
 import { from, Observable, of } from 'rxjs';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
-import { RestoreJsonNotepadAndLoadNoteAction } from '../types/ActionTypes';
-import { Store } from 'redux';
+import {
+	MoveAcrossNotepadsAction,
+	MoveAcrossNotepadsObjType,
+	RestoreJsonNotepadAndLoadNoteAction
+} from '../types/ActionTypes';
+import { MiddlewareAPI, Store } from 'redux';
 import { format } from 'date-fns';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { fromShell } from '../services/CryptoService';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
+import { EpicDeps } from './index';
 
 const parseQueue: string[] = [];
 
@@ -446,6 +451,50 @@ const autoFillNewNotepads$ = (action$: Observable<Action<FlatNotepad>>) =>
 		})
 	);
 
+const moveObjAcrossNotepads$ = (actions$: Observable<Action<MoveAcrossNotepadsAction>>, store: MiddlewareAPI<IStoreState>, { getStorage }: EpicDeps) =>
+	actions$.pipe(
+		ofType<Action<MoveAcrossNotepadsAction>>(actions.moveObjAcrossNotepads.started.type),
+		switchMap(action => from(getStorage().notepadStorage.getItem<string | undefined>(action.payload.newNotepadTitle)).pipe(
+			switchMap(notepadShellJson => {
+				if (!notepadShellJson) throw new Error('No notepad found with that name');
+				const shell: NotepadShell = JSON.parse(notepadShellJson);
+
+				return from(fromShell(
+					shell,
+					store.getState().notepadPasskeys[action.payload.newNotepadTitle]
+				)).pipe(map(decryptedShell => decryptedShell.notepad.flatten()));
+			}),
+			map(destNotepad => {
+				const payload = action.payload;
+
+				switch (payload.type) {
+					case MoveAcrossNotepadsObjType.SECTION:
+						return moveSection(payload.internalRef, payload.oldNotepad, destNotepad);
+					case MoveAcrossNotepadsObjType.NOTE:
+						return moveNote(payload.internalRef, payload.oldNotepad, destNotepad);
+					default:
+						throw unreachable();
+				}
+			}),
+			filter(movedNotepads => {
+				// TODO: Save the updated notebooks, open the dest one, change this to a sync action, etc.
+				console.log(movedNotepads);
+				return false;
+			}),
+			catchError(error => of(actions.moveObjAcrossNotepads.failed({ params: action.payload, error })))
+		))
+	);
+
+const moveObjAcrossNotepadsFailure$ = (actions$: Observable<Action<Failure<MoveAcrossNotepadsAction, Error>>>) =>
+	actions$.pipe(
+		ofType<Action<Failure<MoveAcrossNotepadsAction, Error>>>(actions.moveObjAcrossNotepads.failed.type),
+		tap(action => {
+			console.error(`Error moving notepad object: ${action}`);
+			Dialog.alert(`There was an error moving this ${action.payload.params.type}`);
+		}),
+		filter(() => false)
+	);
+
 export const notepadEpics$ = combineEpics(
 	parseNpx$,
 	syncOnNotepadParsed$ as any,
@@ -468,7 +517,9 @@ export const notepadEpics$ = combineEpics(
 	quickNote$,
 	loadQuickNote$,
 	quickNotepad$,
-	autoFillNewNotepads$
+	autoFillNewNotepads$,
+	moveObjAcrossNotepads$,
+	moveObjAcrossNotepadsFailure$
 );
 
 interface IExportedNotepad {

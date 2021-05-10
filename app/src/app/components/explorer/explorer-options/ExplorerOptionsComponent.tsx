@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
-import { Note, Notepad } from 'upad-parse/dist';
+import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import PathChangeComponent from '../path-change/PathChangeContainer';
 import { Dialog } from '../../../services/dialogs';
 import { ConnectedProps } from 'react-redux';
 import { explorerOptionsConnector } from './ExplorerOptionsContainer';
-import MoveComponent from '../move/MoveComponent';
+import MoveComponent from '../move/MoveContainer';
 
 type Props = ConnectedProps<typeof explorerOptionsConnector> & {
 	objToEdit: NPXObject | Notepad;
@@ -52,7 +52,7 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 		const noteOptions: JSX.Element = (
 			<div>
 				<Row><Button className="blue" waves="light" onClick={() => {
-					if (!!loadNote) loadNote((objToEdit as Note).internalRef);
+					if (!!loadNote) loadNote((objToEdit as NPXObject).internalRef);
 					this.closeModal();
 					setTimeout(() => print!(), 500);
 				}}>Export/Print Note (PDF)</Button></Row>
@@ -79,7 +79,8 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 						(type === 'note' || type === 'section') &&
 							<React.Fragment>
 								<PathChangeComponent objToEdit={objToEdit as NPXObject} type={type} changed={() => this.closeModal()} />
-								<MoveComponent />
+								<br />
+								<MoveComponent internalRef={(objToEdit as NPXObject).internalRef} type={type} changed={() => this.closeModal()} />
 							</React.Fragment>
 					}
 				</div>

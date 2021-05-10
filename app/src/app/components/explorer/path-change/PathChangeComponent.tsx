@@ -16,7 +16,7 @@ const PathChangeComponent = (props: Props) => {
 
 	return (
 		<div>
-			<strong>Move {type}</strong><br />
+			<h5>Move {type}</h5>
 			<select
 				defaultValue={(objToEdit.parent as any).internalRef || 'notepad'}
 				style={{ display: 'block', width: 'max-content' }}
