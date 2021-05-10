@@ -2,26 +2,25 @@ import * as React from 'react';
 import { FlatNotepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
+import { ConnectedProps } from 'react-redux';
+import { pathChangeConnector } from './PathChangeContainer';
 
-export interface IPathChangeComponentProps {
-	notepad?: FlatNotepad;
-	moveObj?: (ref: string, newParent: string, type: 'section' | 'note') => void;
-}
-export const PathChangeComponent = (props: IPathChangeComponentProps & {
+type Props = ConnectedProps<typeof pathChangeConnector> & {
 	objToEdit: NPXObject;
 	type: 'section' | 'note';
-	changed?: () => void;
-}) => {
-	const { notepad, objToEdit, type, moveObj, changed } = props;
-	if (!notepad || !moveObj) return null;
+	changed: () => void;
+};
 
-	const parentList: (FlatNotepad|FlatSection)[][] = [
+export const PathChangeComponent = (props: Props) => {
+	const { notepad, objToEdit, type, moveObj, changed } = props;
+	if (!notepad) return null;
+
+	const parentList: Array<Array<FlatNotepad | FlatSection>> = [
 		[notepad],
 		...Object.values(notepad.sections)
-			.map(section => [...notepad.pathFrom(section), section])
-
-			// Exclude any options which could result on a section being moved into itself
+			.map((section: FlatSection) => [...notepad.pathFrom(section), section])
 			.filter(items => !items.some((item: unknown) => {
+				// Exclude any options which could result on a section being moved into itself
 				const section = item as FlatSection;
 				return !!section.internalRef && section.internalRef === objToEdit.internalRef;
 			}))

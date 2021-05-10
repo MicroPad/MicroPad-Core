@@ -1,19 +1,18 @@
-import { INotepadsStoreState, INotepadStoreState } from '../../../types/NotepadTypes';
 import { IStoreState } from '../../../types';
 import { connect } from 'react-redux';
-import PathChangeComponent, { IPathChangeComponentProps } from './PathChangeComponent';
+import PathChangeComponent from './PathChangeComponent';
 import { Action, Dispatch } from 'redux';
 import { actions } from '../../../actions';
 
-export function mapStateToProps({ notepads }: IStoreState): IPathChangeComponentProps {
-	const notepad = ((notepads || {} as INotepadsStoreState).notepad || {} as INotepadStoreState).item;
+type DispatchProps = {
+	moveObj: (ref: string, newParent: string, type: 'section' | 'note') => void
+};
 
-	return {
-		notepad: notepad
-	};
+function mapStateToProps({ notepads }: IStoreState) {
+	return { notepad: notepads?.notepad?.item };
 }
 
-export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IPathChangeComponentProps> {
+function mapDispatchToProps(dispatch: Dispatch<Action>): DispatchProps {
 	return {
 		moveObj: (ref, newParent, type) => dispatch(actions.moveNotepadObject({
 			objectRef: ref,
@@ -23,4 +22,5 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IPathCha
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PathChangeComponent);
+export const pathChangeConnector = connect(mapStateToProps, mapDispatchToProps);
+export default pathChangeConnector(PathChangeComponent);

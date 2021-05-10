@@ -1,26 +1,18 @@
 import * as React from 'react';
-import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
-import { Notepad } from 'upad-parse/dist';
+import { Note, Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
-import PathChangeComponent from './path-change/PathChangeContainer';
-import { Dialog } from '../../services/dialogs';
+import PathChangeComponent from '../path-change/PathChangeContainer';
+import { Dialog } from '../../../services/dialogs';
+import { ConnectedProps } from 'react-redux';
+import { explorerOptionsConnector } from './ExplorerOptionsContainer';
 
-export interface IExplorerOptionsComponentProps {
+type Props = ConnectedProps<typeof explorerOptionsConnector> & {
 	objToEdit: NPXObject | Notepad;
 	type: 'notepad' | 'section' | 'note';
-	colour: string;
-	deleteNotepad?: (title: string) => void;
-	exportNotepad?: () => void;
-	renameNotepad?: (newTitle: string) => void;
-	deleteNotepadObject?: (internalId: string) => void;
-	renameNotepadObject?: (params: IRenameNotepadObjectAction) => void;
-	loadNote?: () => void;
-	print?: () => void;
-	encrypt?: (notepad: Notepad, passkey: string) => void;
-}
+};
 
-export default class ExplorerOptionsComponent extends React.Component<IExplorerOptionsComponentProps> {
+export default class ExplorerOptionsComponent extends React.Component<Props> {
 	private titleInput: Input;
 
 	render() {
@@ -55,7 +47,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 		const noteOptions: JSX.Element = (
 			<div>
 				<Row><Button className="blue" waves="light" onClick={() => {
-					if (!!loadNote) loadNote();
+					if (!!loadNote) loadNote((objToEdit as Note).internalRef);
 					this.closeModal();
 					setTimeout(() => print!(), 500);
 				}}>Export/Print Note (PDF)</Button></Row>
