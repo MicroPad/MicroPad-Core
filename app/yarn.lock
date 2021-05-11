@@ -8730,10 +8730,10 @@ optionator@^0.9.1:
     type-check "^0.4.0"
     word-wrap "^1.2.3"
 
-opus-recorder@^4.1.0:
-  version "4.1.4"
-  resolved "https://registry.yarnpkg.com/opus-recorder/-/opus-recorder-4.1.4.tgz#83dc5ef434a524775475e40f578710febc7949f0"
-  integrity sha512-q2RM9yufhMfo3q5ASJ+dVVRvSzsrngZp3xtxdZppYbXCAjkJ4fmu1VX+5P8Y3kO7bmlmhS+vPNg/5gUDqLio/A==
+opus-recorder@^8.0.3:
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/opus-recorder/-/opus-recorder-8.0.3.tgz#f7b44f8f68500c9b96a15042a69f915fd9c1716d"
+  integrity sha512-8vXGiRwlJAavT9D3yYzukNVXQ8vEcKHcsQL/zXO24DQtJ0PLXvoPHNQPJrbMCdB4ypJgWDExvHF4JitQDL7dng==
 
 original@^1.0.0:
   version "1.0.2"
@@ -9814,9 +9814,10 @@ pretty-bytes@^5.3.0:
   resolved "https://registry.yarnpkg.com/pretty-bytes/-/pretty-bytes-5.6.0.tgz#356256f643804773c82f64723fe78c92c62beaeb"
   integrity sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==
 
-"pretty-data@git+https://github.com/vkiryukhin/pretty-data.git#22a34a534745714ea974f72db2e9bf7561b3fdc7":
+"pretty-data@https://github.com/vkiryukhin/pretty-data#22a34a534745714ea974f72db2e9bf7561b3fdc7":
   version "0.50.0"
-  resolved "git+https://github.com/vkiryukhin/pretty-data.git#22a34a534745714ea974f72db2e9bf7561b3fdc7"
+  uid "22a34a534745714ea974f72db2e9bf7561b3fdc7"
+  resolved "https://github.com/vkiryukhin/pretty-data#22a34a534745714ea974f72db2e9bf7561b3fdc7"
 
 pretty-error@^2.1.1:
   version "2.1.2"
