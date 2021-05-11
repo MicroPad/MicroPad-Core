@@ -11,7 +11,7 @@ import {
 	tap
 } from 'rxjs/operators';
 import { Action, isType, Success } from 'redux-typescript-actions';
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ofType } from 'redux-observable';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';
 import * as localforage from 'localforage';
@@ -20,21 +20,21 @@ import { Dialog } from '../services/dialogs';
 import { ISyncedNotepad } from '../types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { elvis, getUsedAssets, isAction, resolveElvis } from '../util';
-import { Store } from 'redux';
+import { elvis, filterTruthy, getUsedAssets, isAction, resolveElvis } from '../util';
+import { MiddlewareAPI } from 'redux';
 import { fromShell } from '../services/CryptoService';
-import { AddCryptoPasskeyAction, EncryptNotepadAction } from '../types/ActionTypes';
+import { AddCryptoPasskeyAction, DeleteElementAction, EncryptNotepadAction } from '../types/ActionTypes';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
 
 let currentNotepadTitle = '';
 
-const saveNotepad$ = (action$: Observable<Action<Notepad>>, store: Store<IStoreState>) =>
-	action$.pipe(
-		filter((action: Action<Notepad>) => isType(action, actions.saveNotepad.started)),
+const saveNotepad$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>) =>
+	actions$.pipe(
+		ofType<Action<Notepad>>(actions.saveNotepad.started.type),
 		map((action: Action<Notepad>) => action.payload),
-		switchMap((notepad: Notepad) =>
+		concatMap((notepad: Notepad) =>
 			from((async () =>
 					await NOTEPAD_STORAGE.setItem(
 						notepad.title,
@@ -47,7 +47,7 @@ const saveNotepad$ = (action$: Observable<Action<Notepad>>, store: Store<IStoreS
 		)
 	);
 
-const saveOnChanges$ = (action$, store) =>
+const saveOnChanges$ = (action$, store: MiddlewareAPI<IStoreState>) =>
 	action$.pipe(
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads.notepad),
@@ -79,7 +79,7 @@ const saveOnChanges$ = (action$, store) =>
 		})
 	);
 
-const saveDefaultFontSize$ = (action$, store) =>
+const saveDefaultFontSize$ = (action$, store: MiddlewareAPI<IStoreState>) =>
 	action$.pipe(
 		map(() => store.getState()),
 		map((state: IStoreState) => [state.notepads.notepad, state.currentNote]),
@@ -108,9 +108,9 @@ const getNotepadList$ = action$ =>
 		)
 	);
 
-const openNotepadFromStorage$ = (action$: Observable<Action<String>>, store: Store<IStoreState>) =>
-	action$.pipe(
-		isAction(actions.openNotepadFromStorage.started),
+const openNotepadFromStorage$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>) =>
+	actions$.pipe(
+		ofType<Action<string>>(actions.openNotepadFromStorage.started.type),
 		map((action: Action<string>) => action.payload),
 		switchMap((notepadTitle: string) =>
 			from(NOTEPAD_STORAGE.getItem<string>(notepadTitle)).pipe(
@@ -131,16 +131,16 @@ const openNotepadFromStorage$ = (action$: Observable<Action<String>>, store: Sto
 		)
 	);
 
-const cleanUnusedAssets$ = (action$, store) =>
-	action$
+const cleanUnusedAssets$ = (actions$: Observable<Action<Success<string, FlatNotepad>> | Action<DeleteElementAction>>, store: MiddlewareAPI<IStoreState>) =>
+	actions$
 		.pipe(
-			filter((action: Action<any>) => isType(action, actions.parseNpx.done) || isType(action, actions.deleteElement)),
+			ofType<Action<Success<string, FlatNotepad>> | Action<DeleteElementAction>>(actions.parseNpx.done.type, actions.deleteElement.type),
 			map(() => store.getState()),
 			map((state: IStoreState) => state.notepads.notepad),
-			filter(Boolean),
+			filterTruthy(),
 			map((notepadState: INotepadStoreState) => notepadState.item),
-			filter(Boolean),
-			map((notepad: FlatNotepad) => [getUsedAssets(notepad), notepad.notepadAssets]),
+			filterTruthy(),
+			map((notepad: FlatNotepad): [Set<string>, string[]] => [getUsedAssets(notepad), notepad.notepadAssets]),
 			filter(([usedAssets, npAssets]: [Set<string>, string[]]) => !!usedAssets && !!npAssets),
 			switchMap(([usedAssets, npAssets]: [Set<string>, string[]]) => {
 				const unusedAssets = npAssets.filter(guid => !usedAssets.has(guid));
@@ -183,11 +183,11 @@ const clearLastOpenedNotepad$ = (action$: Observable<Action<Success<string, Flat
 		filter(() => false)
 	);
 
-const clearOldData$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+const clearOldData$ = (action$: Observable<Action<void>>, store: MiddlewareAPI<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.clearOldData.started),
 		concatMap(() =>
-			from(cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store)).pipe(
+			from(cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store.getState())).pipe(
 				mergeMap((addPasskeyActions: Action<AddCryptoPasskeyAction>[]) => [
 					actions.clearOldData.done({ params: undefined, result: undefined }),
 					...addPasskeyActions
@@ -211,7 +211,7 @@ const notifyOnClearOldDataSuccess$ = (action$: Observable<Action<Success<void, v
 export const storageEpics$ = combineEpics(
 	saveNotepad$,
 	getNotepadList$,
-	openNotepadFromStorage$ as any,
+ 	openNotepadFromStorage$ as any,
 	deleteNotepad$,
 	saveOnChanges$,
 	saveDefaultFontSize$,
@@ -225,13 +225,13 @@ export const storageEpics$ = combineEpics(
 /**
  *  Clean up all the assets that aren't in any notepads yet
  */
-async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage, store: Store<IStoreState>): Promise<Action<AddCryptoPasskeyAction>[]> {
+async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage, state: IStoreState): Promise<Action<AddCryptoPasskeyAction>[]> {
 	const cryptoPasskeys: Action<AddCryptoPasskeyAction>[] = [];
 
 	const notepads: Promise<EncryptNotepadAction>[] = [];
 	await notepadStorage.iterate((json: string) => {
 		const shell: NotepadShell = JSON.parse(json);
-		notepads.push(fromShell(shell, store.getState().notepadPasskeys[shell.title]));
+		notepads.push(fromShell(shell, state.notepadPasskeys[shell.title]));
 
 		return;
 	});

@@ -135,3 +135,7 @@ export function debounce(callback: (...args: any[]) => void, time: number) {
 		}, time);
 	};
 }
+
+export function unreachable() {
+	return new Error('Unreachable Error!');
+}
