@@ -86,7 +86,7 @@ jobs:
       - run: sudo apt install rsync
       - run: rsync -aue "ssh -p 1276 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" app/build/* $SSH_PATH
 
-  deploy:
+  canary-deploy:
     docker:
       - image: circleci/rust:latest-node
 
