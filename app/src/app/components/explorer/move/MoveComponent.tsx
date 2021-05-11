@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ConnectedProps } from 'react-redux';
 import { moveConnector } from './MoveContainer';
+import { SYNC_NAME } from '../../../types';
 
 export type Props = ConnectedProps<typeof moveConnector> & MoveComponentExplicitProps;
 export type MoveComponentExplicitProps = {
@@ -16,6 +17,12 @@ const MoveComponent = (props: Props) => {
 	return (
 		<div>
 			<h5>Move {props.type} to another notebook</h5>
+			<p>
+				<em>
+					If you use {SYNC_NAME}, make sure to open both notebooks after transferring the item
+					to ensure that all changes have synced fully.
+				</em>
+			</p>
 			<select
 				defaultValue={currentNotepad.title}
 				style={{ display: 'block', width: 'max-content' }}

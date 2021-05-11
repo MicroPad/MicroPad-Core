@@ -20,11 +20,21 @@ import JSZip from 'jszip';
 import { filterTruthy, fixFileName, generateGuid, isAction, unreachable } from '../util';
 import { Dialog } from '../services/dialogs';
 import { CombinedNotepadSyncList, ISyncedNotepad, SyncUser } from '../types/SyncTypes';
-import { Asset, FlatNotepad, moveNote, moveSection, Note, Notepad, Translators } from 'upad-parse/dist';
+import {
+	Asset,
+	FlatNotepad,
+	moveNote,
+	moveSection,
+	Note,
+	Notepad,
+	RestructuredNotepads,
+	Translators
+} from 'upad-parse/dist';
 import { MarkdownNote } from 'upad-parse/dist/Note';
 import { from, Observable, of } from 'rxjs';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import {
+	EncryptNotepadAction,
 	MoveAcrossNotepadsAction,
 	MoveAcrossNotepadsObjType,
 	RestoreJsonNotepadAndLoadNoteAction
@@ -462,24 +472,37 @@ const moveObjAcrossNotepads$ = (actions$: Observable<Action<MoveAcrossNotepadsAc
 				return from(fromShell(
 					shell,
 					store.getState().notepadPasskeys[action.payload.newNotepadTitle]
-				)).pipe(map(decryptedShell => decryptedShell.notepad.flatten()));
+				));
 			}),
-			map(destNotepad => {
+			map((decryptedShell): [EncryptNotepadAction, RestructuredNotepads] => {
 				const payload = action.payload;
+				const destNotepad = decryptedShell.notepad.flatten();
 
 				switch (payload.type) {
 					case MoveAcrossNotepadsObjType.SECTION:
-						return moveSection(payload.internalRef, payload.oldNotepad, destNotepad);
+						return [decryptedShell, moveSection(payload.internalRef, payload.oldNotepad, destNotepad)];
 					case MoveAcrossNotepadsObjType.NOTE:
-						return moveNote(payload.internalRef, payload.oldNotepad, destNotepad);
+						return [decryptedShell, moveNote(payload.internalRef, payload.oldNotepad, destNotepad)];
 					default:
 						throw unreachable();
 				}
 			}),
-			filter(movedNotepads => {
-				// TODO: Save the updated notebooks, open the dest one, change this to a sync action, etc.
-				console.log(movedNotepads);
-				return false;
+			concatMap(([decryptedShell, movedNotepads]: [EncryptNotepadAction, RestructuredNotepads]) => {
+				return [
+					actions.addCryptoPasskey({
+						notepadTitle: decryptedShell.notepad.title,
+						passkey: decryptedShell.passkey
+					}),
+					actions.parseNpx.done({
+						params: '',
+						result: movedNotepads.source
+					}),
+					actions.parseNpx.done({
+						params: '',
+						result: movedNotepads.destination
+					}),
+					actions.moveObjAcrossNotepads.done({ params: action.payload, result: undefined })
+				];
 			}),
 			catchError(error => of(actions.moveObjAcrossNotepads.failed({ params: action.payload, error })))
 		))
