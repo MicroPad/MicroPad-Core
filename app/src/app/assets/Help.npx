@@ -18,9 +18,10 @@ of power and openness.
 This is a really exciting release, it's got some fan favourite quality-of-life improvements and features:
 - Notes and sections can be moved between notebooks now! Well, the library has had the feature for a week or two but now it's in the main app!
 In the note/section options modal, there's a new option to move the item to another notebook. The old way to do this was by manually editing the NPX files, which I think a total of only two people (myself included) have dared to do.
-<img alt="UI for moving a section" style="width: 100%;" src="https://user-images.githubusercontent.com/3462055/117777945-37bbf900-b291-11eb-820e-764f5ce85969.png" />
+<img alt="UI for moving a section" style="max-width: 100%;" src="https://user-images.githubusercontent.com/3462055/117777945-37bbf900-b291-11eb-820e-764f5ce85969.png" />
 
 - Right clicking on a notebook title, section title, and note title will bring up the options! No more scrolling to get to the cog (unless you want to).
+- When you're renaming a note/section you can just hit enter instead of clicking the button to perform the rename.
 
 **Release notes for v3.27.0 (13th of March 2021)**
 - A number of improvements to the drawing editor
