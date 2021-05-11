@@ -84,3 +84,15 @@ export enum ZoomChange {
 	INCREASE,
 	DECREASE
 }
+
+export enum MoveAcrossNotepadsObjType {
+	SECTION = 'section',
+	NOTE = 'note'
+}
+
+export type MoveAcrossNotepadsAction = {
+	newNotepadTitle: string,
+	oldNotepad: FlatNotepad,
+	internalRef: string,
+	type: MoveAcrossNotepadsObjType
+};

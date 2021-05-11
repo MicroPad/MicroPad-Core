@@ -22,9 +22,7 @@ export async function indexNotepads(indices: SearchIndices, passkeys: NotepadPas
 
 		notepads.push(
 			Translators.Json.toFlatNotepadFromNotepad(shell, passkeys[shell.title])
-				.catch(e =>
-					console.warn(`Couldn't parse notepad: ${e}`)
-				)
+				.catch(e => console.warn(`Couldn't parse notepad: ${e}`))
 		);
 		return;
 	});

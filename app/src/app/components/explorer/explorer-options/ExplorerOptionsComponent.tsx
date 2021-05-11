@@ -1,26 +1,19 @@
 import * as React from 'react';
-import { IRenameNotepadObjectAction } from '../../types/NotepadTypes';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
-import PathChangeComponent from '../../containers/PathChangeContainer';
-import { Dialog } from '../../services/dialogs';
+import PathChangeComponent from '../path-change/PathChangeContainer';
+import { Dialog } from '../../../services/dialogs';
+import { ConnectedProps } from 'react-redux';
+import { explorerOptionsConnector } from './ExplorerOptionsContainer';
+import MoveComponent from '../move/MoveContainer';
 
-export interface IExplorerOptionsComponentProps {
+type Props = ConnectedProps<typeof explorerOptionsConnector> & {
 	objToEdit: NPXObject | Notepad;
 	type: 'notepad' | 'section' | 'note';
-	colour: string;
-	deleteNotepad?: (title: string) => void;
-	exportNotepad?: () => void;
-	renameNotepad?: (newTitle: string) => void;
-	deleteNotepadObject?: (internalId: string) => void;
-	renameNotepadObject?: (params: IRenameNotepadObjectAction) => void;
-	loadNote?: () => void;
-	print?: () => void;
-	encrypt?: (notepad: Notepad, passkey: string) => void;
-}
+};
 
-export default class ExplorerOptionsComponent extends React.Component<IExplorerOptionsComponentProps> {
+export default class ExplorerOptionsComponent extends React.Component<Props> {
 	private titleInput: Input;
 
 	render() {
@@ -46,7 +39,11 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 					</p>}
 
 					<p>
-						<em>Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.</em>
+						<em>
+							Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.<br />
+							Only titles, sources, markdown text, etc. are encrypted. Images and other binary items will not be encrypted. Exporting
+							to NPX files will export to plain-text.
+						</em>
 					</p>
 				</Row>
 			</div>
@@ -55,7 +52,7 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 		const noteOptions: JSX.Element = (
 			<div>
 				<Row><Button className="blue" waves="light" onClick={() => {
-					if (!!loadNote) loadNote();
+					if (!!loadNote) loadNote((objToEdit as NPXObject).internalRef);
 					this.closeModal();
 					setTimeout(() => print!(), 500);
 				}}>Export/Print Note (PDF)</Button></Row>
@@ -66,11 +63,13 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 			<Modal
 				key={`npeo-${objToEdit.title}`}
 				header={`Options for ${objToEdit.title}`}
-				trigger={<a href="#!" className="exp-options-trigger" style={{ color: colour }}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}>
+				trigger={<a href="#!" className="exp-options-trigger" style={{ color: colour }} data-handle={`npeo-${objToEdit.title}`}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}>
 				<div id="explorer-options-modal">
 					<Row>
-						<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>
-						<Col s={6}><Button className="blue" waves="light" onClick={this.rename}>Rename {displayType}</Button></Col>
+						<form action="#" onSubmit={this.rename}>
+							<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>
+							<Col s={6}><Button className="blue" waves="light">Rename {displayType}</Button></Col>
+						</form>
 					</Row>
 					<Row><Button className="red" waves="light" onClick={this.delete}><Icon
 						left={true}>delete_forever</Icon> Delete {displayType}</Button></Row>
@@ -78,7 +77,11 @@ export default class ExplorerOptionsComponent extends React.Component<IExplorerO
 					{(type === 'note') && noteOptions}
 					{
 						(type === 'note' || type === 'section') &&
-						<PathChangeComponent objToEdit={objToEdit as NPXObject} type={type} changed={() => this.closeModal()} />
+							<React.Fragment>
+								<PathChangeComponent objToEdit={objToEdit as NPXObject} type={type} changed={() => this.closeModal()} />
+								<br />
+								<MoveComponent internalRef={(objToEdit as NPXObject).internalRef} type={type} changed={() => this.closeModal()} />
+							</React.Fragment>
 					}
 				</div>
 			</Modal>

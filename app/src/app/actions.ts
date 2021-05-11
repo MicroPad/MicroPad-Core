@@ -6,6 +6,7 @@ import {
 	DeleteElementAction,
 	ExpandFromNoteAction,
 	InsertElementAction,
+	MoveAcrossNotepadsAction,
 	MoveNotepadObjectAction,
 	NewNotepadObjectAction,
 	NotepadToSyncNotepadAction,
@@ -52,6 +53,7 @@ export const actions = {
 	clearOldData: actionCreator.async<void, void, Error>('CLEAR_OLD_DATA'),
 	getHelp: actionCreator.async<void, void, Error>('GET_HELP'),
 	getDueDates: actionCreator.async<string[], DueItem[], Error>('GET_DUE_DATES'),
+	moveObjAcrossNotepads: actionCreator.async<MoveAcrossNotepadsAction, void, Error>('CROSS_NOTEPAD_MOVE'),
 
 	started: actionCreator<void>('APP_STARTED'),
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
