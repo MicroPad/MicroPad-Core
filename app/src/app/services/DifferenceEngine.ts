@@ -5,16 +5,10 @@ import SyncWorker from '!workerize-loader!../workers/SyncWorker.js';
 import { from, Observable, of } from 'rxjs';
 import { MICROPAD_URL } from '../types';
 import { concatMap, map, retry } from 'rxjs/operators';
-import {
-	AssetList,
-	INotepadSharingData,
-	ISyncedNotepad,
-	ISyncWorker,
-	SyncedNotepadList
-} from '../types/SyncTypes';
+import { AssetList, INotepadSharingData, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from '../types/SyncTypes';
 import { parse } from 'date-fns';
 import * as QueryString from 'querystring';
-import { Notepad } from 'upad-parse/dist';
+import { LAST_MODIFIED_FORMAT, Notepad } from 'upad-parse/dist';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { encrypt } from 'upad-parse/dist/crypto';
 import { checksum } from 'asset-checksum';
@@ -58,7 +52,7 @@ export const SyncService = (() => {
 	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('sync', endpoint, resource, payload);
 
 	const getLastModified = (syncId: string): Observable<Date> =>
-		call<{ title: string, lastModified: string }>('info', syncId).pipe(map(res => parse(res.lastModified)));
+		call<{ title: string, lastModified: string }>('info', syncId).pipe(map(res => parse(res.lastModified, LAST_MODIFIED_FORMAT, new Date())));
 
 	const downloadNotepad = (syncId: string): Observable<ISyncedNotepad> =>
 		call<{ notepad: string }>('download', syncId).pipe(map(res => JSON.parse(res.notepad)));

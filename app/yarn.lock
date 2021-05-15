@@ -4300,11 +4300,6 @@ data-urls@^2.0.0:
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
 
-date-fns@^1.29.0:
-  version "1.30.1"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.30.1.tgz#2e71bf0b119153dbb4cc4e88d9ea5acfb50dc05c"
-  integrity sha512-hBSVCvSmWC+QypYObzwGOd9wqdDpOt+0wl0KbU+R+uuZBS1jN8VsD1ss3irQDknRj5NvxiTF6oj/nDRnN/UQNw==
-
 date-fns@^2.21.3:
   version "2.21.3"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.21.3.tgz#8f5f6889d7a96bbcc1f0ea50239b397a83357f9b"
@@ -12204,10 +12199,10 @@ unset-value@^1.0.0:
     has-value "^0.3.1"
     isobject "^3.0.0"
 
-upad-parse@^7.1.3:
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-7.1.4.tgz#9bef272c6d459c43422b902d9e81e5e613e962cd"
-  integrity sha512-Xmha3rbrEHXakf3xi79OddrjSbeLBUzH6wZXe6fZ/g1/jwHNxX7j1S7IM3ncVvjWNstNDkSGiWeJsjCPpq9p7A==
+upad-parse@^7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-7.2.0.tgz#440f38d249512931d0f36c4276658e13f183a80b"
+  integrity sha512-gyRcj1kRfM9pH2NfgQgrmD1NFTakOt5BRW5c1ZAad9XfLHgkjEMDMqPZvNtnT8+7G2XRNouq7Ms8GovQRagfBA==
   dependencies:
     aes-js "^3.1.2"
     buffer "^6.0.3"

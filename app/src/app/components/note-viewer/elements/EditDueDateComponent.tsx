@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../types/Themes';
-import { distanceInWordsStrict, format } from 'date-fns';
+import { format, formatDistanceStrict } from 'date-fns';
 
 export const DueInMessageComponent = (props: { dueDate: Date }) => {
 	const { dueDate } = props;
 
-	const distance = distanceInWordsStrict(new Date(), dueDate);
+	const distance = formatDistanceStrict(dueDate, new Date());
 	return <span>{(dueDate.getTime() < new Date().getTime()) ? `Was due ${distance} ago` : `Due in ${distance}`}</span>;
 };
 
@@ -53,7 +53,7 @@ export class EditDueDateComponent extends React.Component<IEditDueDateComponentP
 		);
 	}
 
-	private updateDueDate = (event: React.ChangeEvent<HTMLInputElement>): void => {
+	private updateDueDate = (_event: React.ChangeEvent<HTMLInputElement>): void => {
 		const { element, updateElement } = this.props;
 		if (!updateElement) return;
 
