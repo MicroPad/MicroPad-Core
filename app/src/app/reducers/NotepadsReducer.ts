@@ -393,7 +393,7 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 
 			// Make the quick note
 			const ref = action.payload.result;
-			const note = new Note(format(new Date(), 'dddd, D MMMM YYYY h:mm:ss A')).clone({
+			const note = new Note(format(new Date(), 'EEEE, d LLLL yyyy pp')).clone({
 				internalRef: ref,
 				parent: (parent || newParent!).internalRef
 			});

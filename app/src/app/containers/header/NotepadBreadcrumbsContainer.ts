@@ -38,7 +38,7 @@ export function mapStateToProps({ notepads, currentNote, app }: IStoreState): IN
 		];
 
 		if (breadcrumbs.length > 1) {
-			time = format(new Date(note.time), 'dddd, D MMMM YYYY h:mm A');
+			time = format(new Date(note.time), 'EEEE, d LLLL yyyy p');
 		}
 	}
 

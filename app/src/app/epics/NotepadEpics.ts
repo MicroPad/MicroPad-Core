@@ -435,7 +435,7 @@ const quickNotepad$ = (action$: Observable<Action<void>>) =>
 	action$.pipe(
 		isAction(actions.quickNotepad),
 		map(() => {
-			let notepad = new FlatNotepad(`Untitled Notepad (${format(new Date(), 'dddd, D MMMM YYYY h:mm:ss A')})`);
+			let notepad = new FlatNotepad(`Untitled Notepad (${format(new Date(), 'EEEE, d LLLL yyyy pp')})`);
 			let section = FlatNotepad.makeFlatSection('Unorganised Notes');
 			let note = new Note('Untitled Note').clone({ parent: section.internalRef });
 
