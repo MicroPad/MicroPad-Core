@@ -1,31 +1,40 @@
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ofType } from 'redux-observable';
 import { catchError, concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
-import { dataURItoBlob, generateGuid, isAction } from '../util';
+import { dataURItoBlob, filterTruthy, generateGuid, isAction } from '../util';
 import saveAs from 'save-as';
 import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { Store } from 'redux';
+import { MiddlewareAPI, Store } from 'redux';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { ASSET_STORAGE } from '../root';
 
-const loadNote$ = (action$, store) =>
-	action$.pipe(
-		filter((action: Action<string>) => isType(action, actions.loadNote.started)),
+const loadNote$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>) =>
+	actions$.pipe(
+		ofType<Action<string>>(actions.loadNote.started.type),
 		tap(() => Materialize.Toast.removeAll()),
-		map((action: Action<string>) => [action.payload, { ...(store.getState().notepads.notepad || {} as INotepadStoreState).item }]),
+		map((action: Action<string>): [string, FlatNotepad] => [action.payload, store.getState().notepads.notepad?.item!]),
 		filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
-		map(([ref, notepad]: [string, FlatNotepad]) => notepad.notes[ref]),
-		filter(Boolean),
-		mergeMap((note: Note) => [actions.expandFromNote({
-			note,
-			notepad: (store.getState() as IStoreState).notepads.notepad!.item!
-		}), actions.checkNoteAssets.started([note.internalRef, note.elements])])
+		map(([ref, notepad]: [string, FlatNotepad]) => ({ ref: ref, note: notepad.notes[ref] })),
+		mergeMap(({ ref, note }: { ref: string, note: Note | undefined }) => {
+			if (note) {
+				return [
+					actions.expandFromNote({
+						note,
+						notepad: store.getState().notepads.notepad!.item!
+					}), actions.checkNoteAssets.started([note.internalRef, note.elements])
+				];
+			}
+
+			const error = new Error(`MicroPad couldn't load the current note`);
+			console.warn(error);
+			return [actions.loadNote.failed({ params: ref, error })];
+		})
 	);
 
 const checkNoteAssets$ = (action$, store) =>
@@ -135,7 +144,7 @@ const closeNoteOnDeletedParent$ = (action$, store: Store<IStoreState>) =>
 	action$.pipe(
 		isAction(actions.deleteNotepadObject),
 		map(() => store.getState().notepads.notepad),
-		filter(Boolean),
+		filterTruthy(),
 		map((notepadState: INotepadStoreState) => notepadState.item),
 
 		// Has the currently opened note been deleted?
@@ -231,7 +240,7 @@ const imagePasted$ = (action$: Observable<Action<string>>, store: Store<IStoreSt
 	);
 
 export const noteEpics$ = combineEpics(
-	loadNote$,
+	loadNote$ as any,
 	checkNoteAssets$,
 	downloadAsset$,
 	binaryElementUpdate$,

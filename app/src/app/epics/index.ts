@@ -10,7 +10,7 @@ import { appEpics$ } from './AppEpics';
 import { Action } from 'redux-typescript-actions';
 import { cryptoEpics$ } from './CryptoEpics';
 import { Dialog } from '../services/dialogs';
-import { getStorage } from '../root';
+import { getStorage, StorageMap } from '../root';
 import { printEpics$ } from './PrintEpics';
 import { helpEpics$ } from './HelpEpics';
 import { searchEpics$ } from './SearchEpics';
@@ -34,7 +34,7 @@ const baseEpic$ = combineEpics(
 
 export type EpicDeps = {
 	helpNpx: string,
-	getStorage: () => { [name: string]: LocalForage },
+	getStorage: () => StorageMap,
 	Dialog: Dialog
 };
 
