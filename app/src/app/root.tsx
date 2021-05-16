@@ -38,6 +38,7 @@ import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from './types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './services/ToastEventHandler';
+import { LastOpenedNotepad } from './epics/StorageEpics';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -51,6 +52,8 @@ export const store = createStore<IStoreState>(
 	baseReducer.initialState,
 	composeWithDevTools(applyMiddleware(epicMiddleware))
 );
+
+export const TOAST_HANDLER = new ToastEventHandler();
 
 export const NOTEPAD_STORAGE = localforage.createInstance({
 	name: 'MicroPad',
@@ -67,13 +70,19 @@ export const SYNC_STORAGE = localforage.createInstance({
 	storeName: 'sync'
 });
 
-export const TOAST_HANDLER = new ToastEventHandler();
+export type StorageMap = {
+	notepadStorage: LocalForage,
+	assetStorage: LocalForage,
+	syncStorage: LocalForage,
+	generalStorage: LocalForage
+};
 
-export function getStorage(): { [name: string]: LocalForage } {
+export function getStorage(): StorageMap {
 	return {
 		notepadStorage: NOTEPAD_STORAGE,
 		assetStorage: ASSET_STORAGE,
-		syncStorage: SYNC_STORAGE
+		syncStorage: SYNC_STORAGE,
+		generalStorage: localforage
 	};
 }
 
@@ -140,8 +149,18 @@ async function hydrateStoreFromLocalforage() {
 	const theme = await localforage.getItem<ThemeName>('theme');
 	if (!!theme) store.dispatch(actions.selectTheme(theme));
 
-	const lastOpenedNotepad = await localforage.getItem<string>('last opened notepad');
-	if (!!lastOpenedNotepad) store.dispatch(actions.openNotepadFromStorage.started(lastOpenedNotepad));
+	// Reopen the last notebook + note
+	const lastOpenedNotepad = await localforage.getItem<string | LastOpenedNotepad>('last opened notepad');
+	if (typeof lastOpenedNotepad === 'string') {
+		store.dispatch(actions.openNotepadFromStorage.started(lastOpenedNotepad));
+	} else if (!!lastOpenedNotepad) {
+		const { notepadTitle, noteRef } = lastOpenedNotepad;
+		if (noteRef) {
+			store.dispatch(actions.restoreJsonNotepadAndLoadNote({ notepadTitle, noteRef }));
+		} else {
+			store.dispatch(actions.openNotepadFromStorage.started(notepadTitle));
+		}
+	}
 }
 
 async function compatibilityCheck(): Promise<boolean> {

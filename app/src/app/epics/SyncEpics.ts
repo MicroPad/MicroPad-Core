@@ -25,7 +25,7 @@ import { parse } from 'date-fns';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { Store } from 'redux';
-import { FlatNotepad } from 'upad-parse/dist';
+import { FlatNotepad, LAST_MODIFIED_FORMAT } from 'upad-parse/dist';
 import stringify from 'json-stringify-safe';
 
 export const uploadCount$ = new BehaviorSubject<number>(0);
@@ -91,10 +91,10 @@ export const sync$ = action$ =>
 		),
 		filter(([syncAction, lastModified]: [SyncAction, Date]) => !!syncAction && !!lastModified),
 		map(([syncAction, lastModified]: [SyncAction, Date]) => {
-			if (parse(syncAction.notepad.lastModified).getTime() < lastModified.getTime()) {
+			if (parse(syncAction.notepad.lastModified, LAST_MODIFIED_FORMAT, new Date()).getTime() < lastModified.getTime()) {
 				// Local notepad is older than remote
 				return actions.requestSyncDownload(syncAction.syncId);
-			} else if (parse(syncAction.notepad.lastModified).getTime() > lastModified.getTime()) {
+			} else if (parse(syncAction.notepad.lastModified, LAST_MODIFIED_FORMAT, new Date()).getTime() > lastModified.getTime()) {
 				// Local notepad is newer than remote
 				return actions.syncUpload.started(syncAction);
 			}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { distanceInWordsStrict } from 'date-fns';
+import { formatDistanceStrict } from 'date-fns';
 import { generateGuid } from '../../../util';
 import { dueDateListConnector } from './DueDateListContainer';
 import { ConnectedProps } from 'react-redux';
@@ -29,7 +29,7 @@ const DueDateListComponent = (props: AllProps) => {
 								textDecoration: 'underline'
 							}}>
 							{item.note.title}
-						</a> ({distanceInWordsStrict(new Date(), item.date)})
+						</a> ({formatDistanceStrict(item.date, new Date())})
 						</li>
 					)
 				}

@@ -27,6 +27,7 @@ import { AddCryptoPasskeyAction, DeleteElementAction, EncryptNotepadAction } fro
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
+import { EpicDeps } from './index';
 
 let currentNotepadTitle = '';
 
@@ -160,15 +161,54 @@ const deleteNotepad$ = action$ =>
 		filter(() => false)
 	);
 
-const persistLastOpenedNotepad$ = (action$: Observable<Action<Success<string, FlatNotepad>>>) =>
-	action$.pipe(
-		isAction(actions.parseNpx.done),
+export type LastOpenedNotepad = { notepadTitle: string, noteRef?: string };
+const persistLastOpenedNotepad$ = (actions$: Observable<Action<any>>, _store, { getStorage }: EpicDeps) =>
+	actions$.pipe(
+		ofType<Action<Success<string, FlatNotepad>>>(actions.parseNpx.done.type),
 		map(action => action.payload.result),
 		tap((notepad: FlatNotepad) =>
-			localforage
-				.setItem('last opened notepad', notepad.title)
+			getStorage()
+				.generalStorage
+				.setItem<LastOpenedNotepad>('last opened notepad', { notepadTitle: notepad.title, noteRef: undefined })
 				.catch(() => { return; })
 		),
+		filter(() => false)
+	);
+
+const persistLastOpenedNote$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>, { getStorage }: EpicDeps) =>
+	actions$.pipe(
+		ofType<Action<Success<string, object>>>(actions.loadNote.done.type),
+		filter(() => !!store.getState().notepads.notepad?.item),
+		map((action): LastOpenedNotepad => ({
+			notepadTitle: store.getState().notepads.notepad?.item?.title!,
+			noteRef: action.payload.params
+		})),
+		tap(lastOpened =>
+			getStorage()
+				.generalStorage
+				.setItem<LastOpenedNotepad>('last opened notepad', lastOpened)
+				.catch(() => { return; })
+		),
+		filter(() => false)
+	);
+
+const clearLastOpenNoteOnClose$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>, { getStorage }: EpicDeps) =>
+	actions$.pipe(
+		ofType<Action<void>>(actions.closeNote.type),
+		map(() => store.getState().notepads.notepad?.item?.title),
+		tap(currentNotepad => {
+			if (currentNotepad) {
+				getStorage()
+					.generalStorage
+					.setItem<LastOpenedNotepad>('last opened notepad', { notepadTitle: currentNotepad })
+					.catch(() => { return; })
+			} else {
+				getStorage()
+					.generalStorage
+					.removeItem('last opened notepad')
+					.catch(() => { return; })
+			}
+		}),
 		filter(() => false)
 	);
 
@@ -217,6 +257,8 @@ export const storageEpics$ = combineEpics(
 	saveDefaultFontSize$,
 	cleanUnusedAssets$,
 	persistLastOpenedNotepad$,
+	persistLastOpenedNote$,
+	clearLastOpenNoteOnClose$,
 	clearLastOpenedNotepad$,
 	clearOldData$,
 	notifyOnClearOldDataSuccess$
