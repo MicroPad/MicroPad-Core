@@ -7,7 +7,9 @@ import { FlatNotepad } from 'upad-parse/dist';
 export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
 
-export const filterTruthy = <T>() => filter((a: T | undefined | null): a is T => !!a);
+export const filterTruthy = <T>() => filter((a: T | undefined | null | false): a is T => !!a);
+
+export const noEmit = () => filter((_a): _a is never => false);
 
 export function isDev(): boolean {
 	/* eslint-disable no-restricted-globals */

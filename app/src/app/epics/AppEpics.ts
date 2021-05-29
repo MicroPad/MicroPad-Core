@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { isAction } from '../util';
+import { isAction, noEmit } from '../util';
 import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
 import * as localforage from 'localforage';
@@ -28,7 +28,7 @@ export const saveHelpPreference$ = action$ =>
 	action$.pipe(
 		isAction(actions.setHelpPref),
 		switchMap((action: Action<boolean>) => localforage.setItem('show help', action.payload)),
-		filter(() => false)
+		noEmit()
 	);
 
 export const revertHelpPrefOnHelpLoad$ = action$ =>
@@ -66,14 +66,14 @@ export const checkVersion$ = (action$, store) =>
 				})
 			)
 		),
-		filter(() => false)
+		noEmit()
 	);
 
 export const persistTheme$ = action$ =>
 	action$.pipe(
 		isAction(actions.selectTheme),
 		switchMap((action: Action<ThemeName>) => localforage.setItem('theme', action.payload)),
-		filter(() => false)
+		noEmit()
 	);
 
 export const appEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(

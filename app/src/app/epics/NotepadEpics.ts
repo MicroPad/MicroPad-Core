@@ -17,7 +17,7 @@ import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';
 import saveAs from 'save-as';
 import JSZip from 'jszip';
-import { filterTruthy, fixFileName, generateGuid, isAction, unreachable } from '../util';
+import { filterTruthy, fixFileName, generateGuid, isAction, noEmit, unreachable } from '../util';
 import { Dialog } from '../services/dialogs';
 import { CombinedNotepadSyncList, ISyncedNotepad, SyncUser } from '../types/SyncTypes';
 import {
@@ -202,7 +202,7 @@ const exportNotepad$ = (action$, store) =>
 			const blob = new Blob([exportedNotepad.content as BlobPart], { type: 'text/xml;charset=utf-8' });
 			saveAs(blob, `${fixFileName(exportedNotepad.title)}.npx`);
 		}),
-		filter(() => false)
+		noEmit()
 	);
 
 const exportAll$ = (action$, store: EpicStore) =>
@@ -515,7 +515,7 @@ const moveObjAcrossNotepadsFailure$ = (actions$: Observable<MicroPadAction>) =>
 			console.error(`Error moving notepad object: ${action}`);
 			Dialog.alert(`There was an error moving this ${action.payload.params.type}`);
 		}),
-		filter(() => false)
+		noEmit()
 	);
 
 export const notepadEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(

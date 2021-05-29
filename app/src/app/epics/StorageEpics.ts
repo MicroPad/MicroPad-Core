@@ -20,7 +20,7 @@ import { Dialog } from '../services/dialogs';
 import { ISyncedNotepad } from '../types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { elvis, filterTruthy, getUsedAssets, isAction, resolveElvis } from '../util';
+import { elvis, filterTruthy, getUsedAssets, isAction, noEmit, resolveElvis } from '../util';
 import { fromShell } from '../services/CryptoService';
 import { AddCryptoPasskeyAction, DeleteElementAction, EncryptNotepadAction } from '../types/ActionTypes';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
@@ -157,7 +157,7 @@ const deleteNotepad$ = action$ =>
 		filter((action: Action<string>) => isType(action, actions.deleteNotepad)),
 		map((action: Action<string>) => action.payload),
 		tap((notepadTitle: string) => from(NOTEPAD_STORAGE.removeItem(notepadTitle))),
-		filter(() => false)
+		noEmit()
 	);
 
 export type LastOpenedNotepad = { notepadTitle: string, noteRef?: string };
@@ -171,7 +171,7 @@ const persistLastOpenedNotepad$ = (actions$: Observable<Action<any>>, _store, { 
 				.setItem<LastOpenedNotepad>('last opened notepad', { notepadTitle: notepad.title, noteRef: undefined })
 				.catch(() => { return; })
 		),
-		filter(() => false)
+		noEmit()
 	);
 
 const persistLastOpenedNote$ = (actions$: Observable<Action<any>>, store: EpicStore, { getStorage }: EpicDeps) =>
@@ -188,7 +188,7 @@ const persistLastOpenedNote$ = (actions$: Observable<Action<any>>, store: EpicSt
 				.setItem<LastOpenedNotepad>('last opened notepad', lastOpened)
 				.catch(() => { return; })
 		),
-		filter(() => false)
+		noEmit()
 	);
 
 const clearLastOpenNoteOnClose$ = (actions$: Observable<Action<any>>, store: EpicStore, { getStorage }: EpicDeps) =>
@@ -208,7 +208,7 @@ const clearLastOpenNoteOnClose$ = (actions$: Observable<Action<any>>, store: Epi
 					.catch(() => { return; })
 			}
 		}),
-		filter(() => false)
+		noEmit()
 	);
 
 const clearLastOpenedNotepad$ = (action$: Observable<Action<Success<string, FlatNotepad>>>) =>
@@ -219,7 +219,7 @@ const clearLastOpenedNotepad$ = (action$: Observable<Action<Success<string, Flat
 				.setItem('last opened notepad', undefined)
 				.catch(() => { return; })
 		),
-		filter(() => false)
+		noEmit()
 	);
 
 const clearOldData$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
@@ -244,7 +244,7 @@ const notifyOnClearOldDataSuccess$ = (action$: Observable<Action<Success<void, v
 	action$.pipe(
 		isAction(actions.clearOldData.done),
 		tap(() => Dialog.alert('The spring cleaning has been done!')),
-		filter(() => false)
+		noEmit()
 	);
 
 export const storageEpics$ = combineEpics(

@@ -1,6 +1,6 @@
-import { combineEpics } from 'redux-observable';
-import { filterTruthy, isAction } from '../util';
-import { actions } from '../actions';
+import { combineEpics, ofType } from 'redux-observable';
+import { filterTruthy, isAction, noEmit } from '../util';
+import { actions, MicroPadAction } from '../actions';
 import {
 	catchError,
 	combineLatest,
@@ -26,20 +26,19 @@ import { INotepadStoreState } from '../types/NotepadTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { FlatNotepad, LAST_MODIFIED_FORMAT } from 'upad-parse/dist';
 import stringify from 'json-stringify-safe';
-import { EpicStore } from './index';
+import { EpicDeps, EpicStore } from './index';
+import { Dispatch } from 'redux';
 
 export const uploadCount$ = new BehaviorSubject<number>(0);
 
-export const persistOnLogin$ = action$ =>
+export const persistOnLogin$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.syncLogin.done),
-		switchMap((action: Action<Success<SyncLoginRequest, SyncUser>>) =>
-			SYNC_STORAGE.setItem('sync user', action.payload.result)
-		),
-		filter(() => false)
+		ofType<MicroPadAction, Action<Success<SyncLoginRequest, SyncUser>>>(actions.syncLogin.done.type),
+		switchMap(action => SYNC_STORAGE.setItem('sync user', action.payload.result)),
+		noEmit()
 	);
 
-export const login$ = action$ =>
+export const login$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		isAction(actions.syncLogin.started),
 		map((action: Action<SyncLoginRequest>) => action.payload),
@@ -61,7 +60,7 @@ export const login$ = action$ =>
 		)
 	);
 
-export const actWithSyncNotepad$ = (action$, store: EpicStore) =>
+export const actWithSyncNotepad$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.actWithSyncNotepad),
 		filter(() => !!store.getState().sync.user),
@@ -75,7 +74,7 @@ export const actWithSyncNotepad$ = (action$, store: EpicStore) =>
 		)
 	);
 
-export const sync$ = action$ =>
+export const sync$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		isAction(actions.sync),
 		tap(() => Materialize.Toast.removeAll()),
@@ -104,17 +103,17 @@ export const sync$ = action$ =>
 		filterTruthy()
 	);
 
-export const requestDownload$ = action$ =>
+export const requestDownload$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		isAction(actions.requestSyncDownload),
 		tap((action: Action<string>) => {
 			const guid = TOAST_HANDLER.register(() => STORE.dispatch(actions.syncDownload.started(action.payload)));
 			Materialize.toast(`A newer copy of your notepad is online <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">DOWNLOAD</a>`);
 		}),
-		filter(() => false)
+		noEmit()
 	);
 
-export const download$ = (action$, store) =>
+export const download$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.syncDownload.started),
 		map((action: Action<string>) => action.payload),
@@ -177,12 +176,11 @@ export const download$ = (action$, store) =>
 		)
 	);
 
-export const upload$ = (action$, store: EpicStore) =>
+export const upload$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.syncUpload.started),
+		ofType<MicroPadAction, Action<SyncAction>>(actions.syncUpload.started.type),
 		tap(() => uploadCount$.next(uploadCount$.getValue() + 1)),
-		map((action: Action<SyncAction>) => action.payload),
-		map((payload: SyncAction) => [payload, (store.getState() as IStoreState).sync.user]),
+		map((action): [SyncAction, SyncUser] => [action.payload, store.getState().sync.user!]),
 		filter(([payload, user]: [SyncAction, SyncUser]) => !!payload && !!user),
 		concatMap(([payload, user]: [SyncAction, SyncUser]) =>
 			DifferenceEngine.AccountService.isPro(user.username, user.token).pipe(
@@ -250,14 +248,14 @@ export const upload$ = (action$, store: EpicStore) =>
 		)
 	);
 
-export const getNotepadListOnLogin$ = action$ =>
+export const getNotepadListOnLogin$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		isAction(actions.syncLogin.done),
 		map((action: Action<Success<SyncLoginRequest, SyncUser>>) => action.payload.result),
 		map((user: SyncUser) => actions.getSyncedNotepadList.started(user))
 	);
 
-export const getNotepadListOnNotepadLoad$ = (action$, store) =>
+export const getNotepadListOnNotepadLoad$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.parseNpx.done),
 		map(() => store.getState()),
@@ -266,7 +264,7 @@ export const getNotepadListOnNotepadLoad$ = (action$, store) =>
 		map((user: SyncUser) => actions.getSyncedNotepadList.started(user))
 	);
 
-export const getNotepadList$ = action$ =>
+export const getNotepadList$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		isAction(actions.getSyncedNotepadList.started),
 		map((action: Action<SyncUser>) => action.payload),
@@ -290,7 +288,7 @@ export const getNotepadList$ = action$ =>
 		)
 	);
 
-export const deleteNotepad$ = action$ =>
+export const deleteNotepad$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		isAction(actions.deleteFromSync.started),
 		switchMap((action: Action<string>) =>
@@ -305,7 +303,7 @@ export const deleteNotepad$ = action$ =>
 		)
 	);
 
-export const addNotepad$ = action$ =>
+export const addNotepad$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		isAction(actions.addToSync.started),
 		switchMap((action: Action<AddToSyncAction>) =>
@@ -328,7 +326,7 @@ export const addNotepad$ = action$ =>
 		)
 	);
 
-export const syncOnAdded$ = (action$, store) =>
+export const syncOnAdded$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.addToSync.done),
 		map(() => store.getState()),
@@ -341,7 +339,7 @@ export const syncOnAdded$ = (action$, store) =>
 		}))
 	);
 
-export const refreshNotepadListOnAction$ = (action$, store) =>
+export const refreshNotepadListOnAction$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.deleteFromSync.done),
 		map(() => store.getState()),
@@ -350,24 +348,24 @@ export const refreshNotepadListOnAction$ = (action$, store) =>
 		map((user: SyncUser) => actions.getSyncedNotepadList.started(user))
 	);
 
-export const clearStorageOnLogout$ = action$ =>
+export const clearStorageOnLogout$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		isAction(actions.syncLogout),
 		switchMap(() => from(SYNC_STORAGE.removeItem('sync user'))),
 		tap(() => Dialog.alert(`You have been logged out of ${SYNC_NAME}`)),
-		filter(() => false)
+		noEmit()
 	);
 
-export const openSyncProErrorModal$ = action$ =>
+export const openSyncProErrorModal$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		isAction(actions.syncProError),
 		map(() => document.getElementById('sync-pro-error-trigger')),
 		filterTruthy(),
-		tap((trigger: HTMLAnchorElement) => trigger.click()),
-		filter(() => false)
+		tap(trigger => trigger.click()),
+		noEmit()
 	);
 
-export const syncEpics$ = combineEpics(
+export const syncEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	persistOnLogin$,
 	login$,
 	actWithSyncNotepad$,

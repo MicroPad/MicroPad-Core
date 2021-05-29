@@ -3,7 +3,7 @@ import { concatMap, filter, map, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions, MicroPadAction } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
-import { filterTruthy, isAction } from '../util';
+import { filterTruthy, isAction, noEmit } from '../util';
 import { NewNotepadObjectAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { FlatNotepad, Note } from 'upad-parse/dist';
@@ -73,7 +73,7 @@ export const flashExplorer$ = (action$: Observable<MicroPadAction>, store: EpicS
 			explorer.style.backgroundColor = theme.accent;
 			setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);
 		}),
-		filter(() => false)
+		noEmit()
 	);
 
 export const explorerEpics$ = combineEpics(
