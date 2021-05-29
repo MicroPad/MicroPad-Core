@@ -9,7 +9,7 @@ import { debounce } from '../../../../util';
 import Grid from '@material-ui/core/Grid';
 import { Input } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
-import Resizable from 're-resizable';
+import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
 import { colourTransformer, fendTransformer } from './MarkdownTransformers';

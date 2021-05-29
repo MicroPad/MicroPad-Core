@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { SyntheticEvent } from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
-import { Row, Col, Input } from 'react-materialize';
-import Resizable from 're-resizable';
+import { Col, Input, Row } from 'react-materialize';
+import { Resizable } from 're-resizable';
 import { dataURItoBlob } from '../../../util';
 import { Dialog } from '../../../services/dialogs';
 import * as PDFObject from 'pdfobject';
@@ -20,7 +20,7 @@ export default class PdfElementComponent extends React.Component<INoteElementCom
 		this.isEditing = elementEditing === element.args.id;
 
 		// The PDF.js viewer must have a fixed height so disallow auto and set to the minimum (500px)
-		const elementHeight = element.args.height === 'auto' ? '500px' : element.args.height;
+		const elementHeight = element.args.height === 'auto' ? '500px' : (element.args.height ?? '500px');
 
 		return (
 			<div style={{

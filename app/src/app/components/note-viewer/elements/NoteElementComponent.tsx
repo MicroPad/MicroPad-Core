@@ -46,7 +46,8 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 		const backgroundColour = theme.background === '#000' ? ThemeValues.Midnight.background : theme.background;
 		const elementStyles = {
 			width: (element.type !== 'image' && element.type !== 'markdown') ? element.args.width : 'auto',
-			backgroundColor: (isEditing) ? backgroundColour : undefined
+			backgroundColor: (isEditing) ? backgroundColour : undefined,
+			overflow: 'hidden'
 		};
 
 		let elementComponent: JSX.Element | undefined = undefined;

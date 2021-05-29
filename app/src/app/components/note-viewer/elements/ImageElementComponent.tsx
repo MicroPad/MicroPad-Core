@@ -3,7 +3,7 @@ import { SyntheticEvent } from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
 import { dataURItoBlob } from '../../../util';
 import { Col, Input, Row } from 'react-materialize';
-import Resizable from 're-resizable';
+import { Resizable } from 're-resizable';
 import { Dialog } from '../../../services/dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
 

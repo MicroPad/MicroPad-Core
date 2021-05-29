@@ -2,7 +2,7 @@ import { INoteElementComponentProps } from '../NoteElementComponent';
 import * as React from 'react';
 import { dataURItoBlob } from '../../../../util';
 import { trim } from './trim-canvas';
-import Resizable from 're-resizable';
+import { Resizable } from 're-resizable';
 import { Input, Row } from 'react-materialize';
 import stringify from 'json-stringify-safe';
 import * as FullScreenService from '../../../../services/FullscreenService';
