@@ -13,7 +13,7 @@ export function isDev(): boolean {
 	/* eslint-disable no-restricted-globals */
 	return (
 		!QueryString.parse(location.search.slice(1)).prod
-		&& (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+		&& (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'next.getmicropad.com')
 	);
 	/* eslint-enable no-restricted-globals */
 }
