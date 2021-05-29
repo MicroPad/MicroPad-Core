@@ -51,9 +51,9 @@ const saveOnChanges$ = (action$, store: EpicStore) =>
 	action$.pipe(
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads.notepad),
-		filter(Boolean),
+		filterTruthy(),
 		map((notepadState: INotepadStoreState) => notepadState.item),
-		filter(Boolean),
+		filterTruthy(),
 		debounceTime(1000),
 		distinctUntilChanged(),
 		filter((notepad: FlatNotepad) => {
@@ -87,9 +87,9 @@ const saveDefaultFontSize$ = (action$, store: EpicStore) =>
 		map(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => [notepad.item!.notes[current.ref], current.elementEditing]),
 		filter(([note, id]: [Note, string]) => !!note && id.length > 0),
 		map(([note, id]: [Note, string]) => note.elements.filter((element: NoteElement) => element.args.id === id)[0]),
-		filter(Boolean),
+		filterTruthy(),
 		map((element: NoteElement) => element.args.fontSize),
-		filter(Boolean),
+		filterTruthy(),
 		distinctUntilChanged(),
 		tap((fontSize: string) => localforage.setItem('font size', fontSize)),
 		map((fontSize: string) => actions.updateDefaultFontSize(fontSize))

@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { dataURItoBlob, isAction } from '../util';
+import { dataURItoBlob, filterTruthy, isAction } from '../util';
 import { actions } from '../actions';
 import { filter, map, switchMap } from 'rxjs/operators';
 import { INotepadStoreState } from '../types/NotepadTypes';
@@ -17,7 +17,7 @@ export const generateMarkdownForPrint$ = (action$, store) =>
 		map((state: IStoreState) => [(state.notepads.notepad || {} as INotepadStoreState).item, state.currentNote.ref]),
 		filter(([notepad, noteRef]: [FlatNotepad, string]) => !!notepad && !!noteRef),
 		map(([notepad, noteRef]: [FlatNotepad, string]) => notepad.notes[noteRef]),
-		filter(Boolean),
+		filterTruthy(),
 		switchMap((note: Note) =>
 			from((async () => {
 				const resolvedAssets = await Promise.all(note.elements

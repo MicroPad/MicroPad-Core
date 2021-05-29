@@ -9,6 +9,18 @@ export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
 
 export const filterTruthy = <T>() => filter((a: T | undefined | null): a is T => !!a);
 
+function filterTruthyArray<T>(this: (T | undefined | null)[]): T[] {
+	return this.filter((a: T | undefined | null): a is T => !!a);
+}
+declare global {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	interface Array<T> {
+		filterTruthy: typeof filterTruthyArray;
+	}
+}
+// eslint-disable-next-line no-extend-native
+Array.prototype.filterTruthy = filterTruthyArray;
+
 export function isDev(): boolean {
 	/* eslint-disable no-restricted-globals */
 	return (
@@ -77,7 +89,7 @@ export function getUsedAssets(notepad: FlatNotepad): Set<string> {
 		.map(
 			n => n.elements
 				.map(e => e.args.ext!)
-				.filter(Boolean)
+				.filterTruthy()
 		)
 		.reduce((used, cur) => used.concat(cur), [])
 	);

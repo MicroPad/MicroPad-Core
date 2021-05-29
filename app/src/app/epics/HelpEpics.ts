@@ -1,9 +1,9 @@
 import { combineEpics } from 'redux-observable';
-import { concatMap, filter, map } from 'rxjs/operators';
+import { concatMap, map } from 'rxjs/operators';
 import { from, Observable } from 'rxjs';
 import { Dispatch } from 'redux';
 import { EpicDeps, EpicStore } from './index';
-import { isAction } from '../util';
+import { filterTruthy, isAction } from '../util';
 import { actions, MicroPadAction } from '../actions';
 import { Dialog } from '../services/dialogs';
 
@@ -18,7 +18,7 @@ export const getHelp$ = (action$: Observable<MicroPadAction>, store: EpicStore) 
 				return Dialog.confirm(`You have already imported the Help notebook. It can be accessed from the notebooks dropdown. If you continue you will lose any changes made to the notebook.`);
 			})())
 		),
-		filter(Boolean),
+		filterTruthy(),
 		map(() => actions.getHelp.done({ params: undefined, result: undefined }))
 	);
 

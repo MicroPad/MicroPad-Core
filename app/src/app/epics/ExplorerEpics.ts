@@ -3,7 +3,7 @@ import { concatMap, filter, map, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
 import { actions, MicroPadAction } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
-import { isAction } from '../util';
+import { filterTruthy, isAction } from '../util';
 import { NewNotepadObjectAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { FlatNotepad, Note } from 'upad-parse/dist';
@@ -16,7 +16,7 @@ export const expandAll$ = (action$, store) =>
 	action$.pipe(
 		filter((action: Action<void>) => isType(action, actions.expandAllExplorer.started)),
 		map(() => (store.getState().notepads.notepad || {} as INotepadStoreState).item),
-		filter(Boolean),
+		filterTruthy(),
 		map((notepad: FlatNotepad) => [
 			...Object.keys(notepad.sections),
 			...Object.keys(notepad.notes)
@@ -34,7 +34,7 @@ export const autoLoadNewSection$ = (action$, store) =>
 
 			return Object.values((notepad as FlatNotepad).sections).find(s => s.title === insertAction.title && s.parentRef === parentRef);
 		}),
-		filter(Boolean),
+		filterTruthy(),
 		map((newSection: FlatSection) => actions.expandSection(newSection.internalRef))
 	);
 

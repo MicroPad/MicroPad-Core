@@ -80,7 +80,7 @@ const downloadAsset$ = action$ =>
 					map(blob => [blob as Blob, filename])
 				)
 		),
-		filter(Boolean),
+		filterTruthy(),
 		tap(([blob, filename]: [Blob, string]) => saveAs(blob, filename)),
 		map(([blob, filename]: [Blob, string]) => actions.downloadAsset.done({ params: { filename, uuid: '' }, result: undefined }))
 	);
@@ -136,7 +136,7 @@ const autoLoadNewNote$ = (action$, store) =>
 			// Get a note with the new title that is in the expected parent
 			Object.values((notepad as FlatNotepad).notes).find(n => n.parent === insertAction.parent && n.title === insertAction.title)
 		),
-		filter(Boolean),
+		filterTruthy(),
 		map((newNote: Note) => actions.loadNote.started(newNote.internalRef))
 	);
 

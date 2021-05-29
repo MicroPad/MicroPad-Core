@@ -180,7 +180,7 @@ const restoreJsonNotepadAndLoadNote$ = (action$, store: EpicStore, { getStorage 
 				})
 			)
 		),
-		filter(Boolean),
+		filterTruthy(),
 		concatMap(([noteRef, notepad]: [string, FlatNotepad]) => [
 			actions.parseNpx.done({ params: '', result: notepad }),
 			actions.loadNote.started(noteRef)
@@ -192,9 +192,9 @@ const exportNotepad$ = (action$, store) =>
 		filter((action: Action<void>) => isType(action, actions.exportNotepad)),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads),
-		filter(Boolean),
+		filterTruthy(),
 		map((state: INotepadsStoreState) => (state.notepad || {} as INotepadStoreState).item),
-		filter(Boolean),
+		filterTruthy(),
 		switchMap((notepad: FlatNotepad) =>
 			from(getNotepadXmlWithAssets(notepad.toNotepad()))
 		),
@@ -210,9 +210,9 @@ const exportAll$ = (action$, store: EpicStore) =>
 		filter((action: Action<void>) => isType(action, actions.exportAll.started)),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads),
-		filter(Boolean),
+		filterTruthy(),
 		map((state: INotepadsStoreState) => state.savedNotepadTitles),
-		filter(Boolean),
+		filterTruthy(),
 		switchMap((titles: string[]) => {
 			const notepadsInStorage: Promise<string | null>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
@@ -259,9 +259,9 @@ const exportAllToMarkdown$ = (action$, store) =>
 		filter((action: Action<void>) => isType(action, actions.exportToMarkdown.started)),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads),
-		filter(Boolean),
+		filterTruthy(),
 		map((state: INotepadsStoreState) => state.savedNotepadTitles),
-		filter(Boolean),
+		filterTruthy(),
 		switchMap((titles: string[]) => {
 			const notepadsInStorage: Promise<string | null>[] = [];
 			titles.forEach((title: string) => notepadsInStorage.push(NOTEPAD_STORAGE.getItem(title)));
@@ -405,9 +405,9 @@ const saveNotepadOnCreation$ = (action$, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.newNotepad),
 		map(() => store.getState().notepads.notepad),
-		filter(Boolean),
+		filterTruthy(),
 		map((notepadState: INotepadStoreState) => notepadState.item),
-		filter(Boolean),
+		filterTruthy(),
 		map((notepad: FlatNotepad) => notepad.toNotepad()),
 		map((notepad: Notepad) => actions.saveNotepad.started(notepad))
 	);

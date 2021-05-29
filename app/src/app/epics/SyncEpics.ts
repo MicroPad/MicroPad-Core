@@ -101,7 +101,7 @@ export const sync$ = action$ =>
 
 			return false;
 		}),
-		filter(Boolean)
+		filterTruthy()
 	);
 
 export const requestDownload$ = action$ =>
@@ -262,7 +262,7 @@ export const getNotepadListOnNotepadLoad$ = (action$, store) =>
 		isAction(actions.parseNpx.done),
 		map(() => store.getState()),
 		map((state:  IStoreState) => state.sync.user),
-		filter(Boolean),
+		filterTruthy(),
 		map((user: SyncUser) => actions.getSyncedNotepadList.started(user))
 	);
 
@@ -333,7 +333,7 @@ export const syncOnAdded$ = (action$, store) =>
 		isAction(actions.addToSync.done),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads.notepad),
-		filter(Boolean),
+		filterTruthy(),
 		filter((notepadState: INotepadStoreState) => !!notepadState.item && !!notepadState.activeSyncId),
 		map((notepadState: INotepadStoreState) => actions.actWithSyncNotepad({
 			notepad: notepadState.item!.toNotepad(),
@@ -346,7 +346,7 @@ export const refreshNotepadListOnAction$ = (action$, store) =>
 		isAction(actions.deleteFromSync.done),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.sync.user),
-		filter(Boolean),
+		filterTruthy(),
 		map((user: SyncUser) => actions.getSyncedNotepadList.started(user))
 	);
 
