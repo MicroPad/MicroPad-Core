@@ -1,10 +1,10 @@
 import { Store } from 'redux';
 import { IStoreState } from '../types';
 import * as mousetrap from 'mousetrap';
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 
-export function enableKeyboardShortcuts(store: Store<IStoreState>) {
+export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction>) {
 	// Fullscreen
 	mousetrap.bind('f', () => store.dispatch(actions.flipFullScreenState(undefined)));
 

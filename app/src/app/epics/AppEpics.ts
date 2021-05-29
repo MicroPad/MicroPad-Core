@@ -11,7 +11,9 @@ import { lt as versionLessThan } from 'semver';
 import { ThemeName } from '../types/Themes';
 import { EpicDeps } from './index';
 import { IVersion } from '../reducers/AppReducer';
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
+import { Dispatch } from 'redux';
+import { Dialog } from '../services/dialogs';
 
 export const closeDrawingEditorOnZoom$ = (action$, store) =>
 	action$.pipe(
@@ -37,7 +39,7 @@ export const revertHelpPrefOnHelpLoad$ = action$ =>
 		map(() => actions.setHelpPref(true))
 	);
 
-export const checkVersion$ = (action$, store, { Dialog }) =>
+export const checkVersion$ = (action$, store) =>
 	action$.pipe(
 		isAction(actions.checkVersion),
 		map(() => store.getState()),
@@ -74,7 +76,7 @@ export const persistTheme$ = action$ =>
 		filter(() => false)
 	);
 
-export const appEpics$ = combineEpics<any, any, EpicDeps>(
+export const appEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	closeDrawingEditorOnZoom$,
 	saveHelpPreference$,
 	revertHelpPrefOnHelpLoad$,

@@ -1,4 +1,4 @@
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
 import {
 	catchError,
 	concatMap,
@@ -21,19 +21,18 @@ import { ISyncedNotepad } from '../types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { elvis, filterTruthy, getUsedAssets, isAction, resolveElvis } from '../util';
-import { MiddlewareAPI } from 'redux';
 import { fromShell } from '../services/CryptoService';
 import { AddCryptoPasskeyAction, DeleteElementAction, EncryptNotepadAction } from '../types/ActionTypes';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
-import { EpicDeps } from './index';
+import { EpicDeps, EpicStore } from './index';
 
 let currentNotepadTitle = '';
 
-const saveNotepad$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>) =>
+const saveNotepad$ = (actions$: Observable<Action<any>>, store: EpicStore) =>
 	actions$.pipe(
-		ofType<Action<Notepad>>(actions.saveNotepad.started.type),
+		ofType<MicroPadAction, Action<Notepad>>(actions.saveNotepad.started.type),
 		map((action: Action<Notepad>) => action.payload),
 		concatMap((notepad: Notepad) =>
 			from((async () =>
@@ -48,7 +47,7 @@ const saveNotepad$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IS
 		)
 	);
 
-const saveOnChanges$ = (action$, store: MiddlewareAPI<IStoreState>) =>
+const saveOnChanges$ = (action$, store: EpicStore) =>
 	action$.pipe(
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads.notepad),
@@ -80,7 +79,7 @@ const saveOnChanges$ = (action$, store: MiddlewareAPI<IStoreState>) =>
 		})
 	);
 
-const saveDefaultFontSize$ = (action$, store: MiddlewareAPI<IStoreState>) =>
+const saveDefaultFontSize$ = (action$, store: EpicStore) =>
 	action$.pipe(
 		map(() => store.getState()),
 		map((state: IStoreState) => [state.notepads.notepad, state.currentNote]),
@@ -109,9 +108,9 @@ const getNotepadList$ = action$ =>
 		)
 	);
 
-const openNotepadFromStorage$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>) =>
+const openNotepadFromStorage$ = (actions$: Observable<Action<any>>, store: EpicStore) =>
 	actions$.pipe(
-		ofType<Action<string>>(actions.openNotepadFromStorage.started.type),
+		ofType<MicroPadAction, Action<string>>(actions.openNotepadFromStorage.started.type),
 		map((action: Action<string>) => action.payload),
 		switchMap((notepadTitle: string) =>
 			from(NOTEPAD_STORAGE.getItem<string>(notepadTitle)).pipe(
@@ -132,10 +131,10 @@ const openNotepadFromStorage$ = (actions$: Observable<Action<any>>, store: Middl
 		)
 	);
 
-const cleanUnusedAssets$ = (actions$: Observable<Action<Success<string, FlatNotepad>> | Action<DeleteElementAction>>, store: MiddlewareAPI<IStoreState>) =>
+const cleanUnusedAssets$ = (actions$: Observable<Action<Success<string, FlatNotepad>> | Action<DeleteElementAction>>, store: EpicStore) =>
 	actions$
 		.pipe(
-			ofType<Action<Success<string, FlatNotepad>> | Action<DeleteElementAction>>(actions.parseNpx.done.type, actions.deleteElement.type),
+			ofType<MicroPadAction, Action<Success<string, FlatNotepad>> | Action<DeleteElementAction>>(actions.parseNpx.done.type, actions.deleteElement.type),
 			map(() => store.getState()),
 			map((state: IStoreState) => state.notepads.notepad),
 			filterTruthy(),
@@ -164,7 +163,7 @@ const deleteNotepad$ = action$ =>
 export type LastOpenedNotepad = { notepadTitle: string, noteRef?: string };
 const persistLastOpenedNotepad$ = (actions$: Observable<Action<any>>, _store, { getStorage }: EpicDeps) =>
 	actions$.pipe(
-		ofType<Action<Success<string, FlatNotepad>>>(actions.parseNpx.done.type),
+		ofType<MicroPadAction, Action<Success<string, FlatNotepad>>>(actions.parseNpx.done.type),
 		map(action => action.payload.result),
 		tap((notepad: FlatNotepad) =>
 			getStorage()
@@ -175,9 +174,9 @@ const persistLastOpenedNotepad$ = (actions$: Observable<Action<any>>, _store, { 
 		filter(() => false)
 	);
 
-const persistLastOpenedNote$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>, { getStorage }: EpicDeps) =>
+const persistLastOpenedNote$ = (actions$: Observable<Action<any>>, store: EpicStore, { getStorage }: EpicDeps) =>
 	actions$.pipe(
-		ofType<Action<Success<string, object>>>(actions.loadNote.done.type),
+		ofType<MicroPadAction, Action<Success<string, object>>>(actions.loadNote.done.type),
 		filter(() => !!store.getState().notepads.notepad?.item),
 		map((action): LastOpenedNotepad => ({
 			notepadTitle: store.getState().notepads.notepad?.item?.title!,
@@ -192,9 +191,9 @@ const persistLastOpenedNote$ = (actions$: Observable<Action<any>>, store: Middle
 		filter(() => false)
 	);
 
-const clearLastOpenNoteOnClose$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>, { getStorage }: EpicDeps) =>
+const clearLastOpenNoteOnClose$ = (actions$: Observable<Action<any>>, store: EpicStore, { getStorage }: EpicDeps) =>
 	actions$.pipe(
-		ofType<Action<void>>(actions.closeNote.type),
+		ofType<MicroPadAction, Action<void>>(actions.closeNote.type),
 		map(() => store.getState().notepads.notepad?.item?.title),
 		tap(currentNotepad => {
 			if (currentNotepad) {
@@ -223,7 +222,7 @@ const clearLastOpenedNotepad$ = (action$: Observable<Action<Success<string, Flat
 		filter(() => false)
 	);
 
-const clearOldData$ = (action$: Observable<Action<void>>, store: MiddlewareAPI<IStoreState>) =>
+const clearOldData$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.clearOldData.started),
 		concatMap(() =>

@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
 import { concatMap, filter, map, tap } from 'rxjs/operators';
 import { Action, isType } from 'redux-typescript-actions';
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { isAction } from '../util';
 import { NewNotepadObjectAction } from '../types/ActionTypes';
@@ -9,8 +9,8 @@ import { IStoreState } from '../types';
 import { FlatNotepad, Note } from 'upad-parse/dist';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { Observable } from 'rxjs';
-import { Store } from 'redux';
 import { ThemeValues } from '../ThemeValues';
+import { EpicStore } from './index';
 
 export const expandAll$ = (action$, store) =>
 	action$.pipe(
@@ -38,7 +38,7 @@ export const autoLoadNewSection$ = (action$, store) =>
 		map((newSection: FlatSection) => actions.expandSection(newSection.internalRef))
 	);
 
-export const openBreadcrumb$ = (action$: Observable<Action<string>>, store: Store<IStoreState>) =>
+export const openBreadcrumb$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.openBreadcrumb),
 		map(action => action.payload),
@@ -63,7 +63,7 @@ export const openBreadcrumb$ = (action$: Observable<Action<string>>, store: Stor
 		)
 	);
 
-export const flashExplorer$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+export const flashExplorer$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.flashExplorer),
 		tap(() => {

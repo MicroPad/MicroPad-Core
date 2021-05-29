@@ -1,4 +1,4 @@
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
 import {
 	catchError,
 	combineLatest,
@@ -39,16 +39,16 @@ import {
 	MoveAcrossNotepadsObjType,
 	RestoreJsonNotepadAndLoadNoteAction
 } from '../types/ActionTypes';
-import { MiddlewareAPI, Store } from 'redux';
+import { Dispatch } from 'redux';
 import { format } from 'date-fns';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { fromShell } from '../services/CryptoService';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
-import { EpicDeps } from './index';
+import { EpicDeps, EpicStore } from './index';
 
 const parseQueue: string[] = [];
 
-const parseNpx$ = (action$: Observable<Action<string>>) =>
+const parseNpx$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		isAction(actions.parseNpx.started),
 		switchMap((action: Action<string>) =>
@@ -74,7 +74,7 @@ const parseNpx$ = (action$: Observable<Action<string>>) =>
 		)
 	);
 
-const syncOnNotepadParsed$ = (action$, store: Store<IStoreState>) =>
+const syncOnNotepadParsed$ = (action$, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.updateCurrentSyncId),
 		map(() => store.getState()),
@@ -112,9 +112,9 @@ const parseEnex$ = action$ =>
 		)
 	);
 
-const parseMarkdownImport$ = (action$: Observable<Action<Translators.Markdown.MarkdownImport[]>>) =>
+const parseMarkdownImport$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.importMarkdown),
+		ofType<MicroPadAction, Action<Translators.Markdown.MarkdownImport[]>>(actions.importMarkdown.type),
 		map((action: Action<Translators.Markdown.MarkdownImport[]>) => action.payload),
 		map(markdownNotes => {
 			try {
@@ -160,7 +160,7 @@ const restoreJsonNotepad$ = action$ =>
 		mergeMap((restoreActions: Action<any>[]) => [...restoreActions])
 	);
 
-const restoreJsonNotepadAndLoadNote$ = (action$, store: Store<IStoreState>, { getStorage }) =>
+const restoreJsonNotepadAndLoadNote$ = (action$, store: EpicStore, { getStorage }) =>
 	action$.pipe(
 		isAction(actions.restoreJsonNotepadAndLoadNote),
 		map((action: Action<RestoreJsonNotepadAndLoadNoteAction>) => action.payload),
@@ -205,7 +205,7 @@ const exportNotepad$ = (action$, store) =>
 		filter(() => false)
 	);
 
-const exportAll$ = (action$, store: Store<IStoreState>) =>
+const exportAll$ = (action$, store: EpicStore) =>
 	action$.pipe(
 		filter((action: Action<void>) => isType(action, actions.exportAll.started)),
 		map(() => store.getState()),
@@ -307,12 +307,12 @@ const exportAllToMarkdown$ = (action$, store) =>
 		})
 	);
 
-const exportAllDone$ = (action$: Observable<Action<Success<void, Blob>>>) =>
+const exportAllDone$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.exportAll.done, actions.exportToMarkdown.done),
+		ofType<MicroPadAction, Action<Success<void, Blob>>>(actions.exportAll.done.type, actions.exportToMarkdown.done.type),
 		map((action: Action<Success<void, Blob>>) => action.payload.result),
 		tap(zip => saveAs(zip, `notepads.zip`)),
-		filter(() => false)
+		filter((_a): _a is never => false)
 	);
 
 const renameNotepad$ = (action$, store) =>
@@ -386,7 +386,7 @@ const getNextParse$ = action$ =>
 		map(() => actions.parseNpx.started(parseQueue[0]))
 	);
 
-const loadNotepadByIndex$ = (action$: Observable<Action<number>>, store) =>
+const loadNotepadByIndex$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.loadNotepadByIndex),
 		map((action: Action<number>) => action.payload),
@@ -401,7 +401,7 @@ const updateSyncedNotepadIdOnSyncListLoad$ = action$ =>
 		map((action: Action<Success<SyncUser, CombinedNotepadSyncList>>) => actions.updateCurrentSyncId(action.payload.result))
 	);
 
-const saveNotepadOnCreation$ = (action$, store: Store<IStoreState>) =>
+const saveNotepadOnCreation$ = (action$, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.newNotepad),
 		map(() => store.getState().notepads.notepad),
@@ -412,7 +412,7 @@ const saveNotepadOnCreation$ = (action$, store: Store<IStoreState>) =>
 		map((notepad: Notepad) => actions.saveNotepad.started(notepad))
 	);
 
-const quickNote$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+const quickNote$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.quickNote.started),
 		map(() => store.getState().notepads.notepad),
@@ -424,16 +424,16 @@ const quickNote$ = (action$: Observable<Action<void>>, store: Store<IStoreState>
 		map(guid => actions.quickNote.done({ params: undefined, result: guid}))
 	);
 
-const loadQuickNote$ = (action$: Observable<Action<Success<void, string>>>) =>
+const loadQuickNote$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.quickNote.done),
+		ofType<MicroPadAction, Action<Success<void, string>>>(actions.quickNote.done.type),
 		map(action => action.payload.result),
 		map((ref: string) => actions.loadNote.started(ref))
 	);
 
-const quickNotepad$ = (action$: Observable<Action<void>>) =>
+const quickNotepad$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.quickNotepad),
+		ofType<MicroPadAction, Action<void>>(actions.quickNotepad.type),
 		map(() => {
 			let notepad = new FlatNotepad(`Untitled Notepad (${format(new Date(), 'EEEE, d LLLL yyyy pp')})`);
 			let section = FlatNotepad.makeFlatSection('Unorganised Notes');
@@ -444,9 +444,9 @@ const quickNotepad$ = (action$: Observable<Action<void>>) =>
 		map(notepad => actions.newNotepad(notepad))
 	);
 
-const autoFillNewNotepads$ = (action$: Observable<Action<FlatNotepad>>) =>
+const autoFillNewNotepads$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.newNotepad),
+		ofType<MicroPadAction, Action<FlatNotepad>>(actions.newNotepad.type),
 		map(action => action.payload),
 		concatMap((notepad: FlatNotepad) => {
 			const noteRef = Object.values(notepad.notes)[0].internalRef;
@@ -461,9 +461,9 @@ const autoFillNewNotepads$ = (action$: Observable<Action<FlatNotepad>>) =>
 		})
 	);
 
-const moveObjAcrossNotepads$ = (actions$: Observable<Action<MoveAcrossNotepadsAction>>, store: MiddlewareAPI<IStoreState>, { getStorage }: EpicDeps) =>
+const moveObjAcrossNotepads$ = (actions$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
 	actions$.pipe(
-		ofType<Action<MoveAcrossNotepadsAction>>(actions.moveObjAcrossNotepads.started.type),
+		ofType<MicroPadAction, Action<MoveAcrossNotepadsAction>>(actions.moveObjAcrossNotepads.started.type),
 		switchMap(action => from(getStorage().notepadStorage.getItem<string | undefined>(action.payload.newNotepadTitle)).pipe(
 			switchMap(notepadShellJson => {
 				if (!notepadShellJson) throw new Error('No notepad found with that name');
@@ -508,9 +508,9 @@ const moveObjAcrossNotepads$ = (actions$: Observable<Action<MoveAcrossNotepadsAc
 		))
 	);
 
-const moveObjAcrossNotepadsFailure$ = (actions$: Observable<Action<Failure<MoveAcrossNotepadsAction, Error>>>) =>
+const moveObjAcrossNotepadsFailure$ = (actions$: Observable<MicroPadAction>) =>
 	actions$.pipe(
-		ofType<Action<Failure<MoveAcrossNotepadsAction, Error>>>(actions.moveObjAcrossNotepads.failed.type),
+		ofType<MicroPadAction, Action<Failure<MoveAcrossNotepadsAction, Error>>>(actions.moveObjAcrossNotepads.failed.type),
 		tap(action => {
 			console.error(`Error moving notepad object: ${action}`);
 			Dialog.alert(`There was an error moving this ${action.payload.params.type}`);
@@ -518,7 +518,7 @@ const moveObjAcrossNotepadsFailure$ = (actions$: Observable<Action<Failure<MoveA
 		filter(() => false)
 	);
 
-export const notepadEpics$ = combineEpics(
+export const notepadEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	parseNpx$,
 	syncOnNotepadParsed$ as any,
 	restoreJsonNotepad$,

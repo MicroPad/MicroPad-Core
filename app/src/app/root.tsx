@@ -14,7 +14,7 @@ import * as React from 'react';
 import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed
 import 'materialize-css/dist/js/materialize.js';
 import * as serviceWorker from '../registerServiceWorker';
-import { APP_NAME, IAppWindow, IStoreState, MICROPAD_URL } from './types';
+import { APP_NAME, IAppWindow, MICROPAD_URL } from './types';
 import { applyMiddleware, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
@@ -47,8 +47,8 @@ try {
 }
 
 const baseReducer: BaseReducer = new BaseReducer();
-export const store = createStore<IStoreState>(
-	baseReducer.reducer as any,
+export const store = createStore(
+	baseReducer.reducer,
 	baseReducer.initialState,
 	composeWithDevTools(applyMiddleware(epicMiddleware))
 );

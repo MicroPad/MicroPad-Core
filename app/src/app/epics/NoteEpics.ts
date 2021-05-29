@@ -2,7 +2,7 @@ import { combineEpics, ofType } from 'redux-observable';
 import { catchError, concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
 import { Action, isType } from 'redux-typescript-actions';
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { dataURItoBlob, filterTruthy, generateGuid, isAction } from '../util';
 import saveAs from 'save-as';
@@ -10,13 +10,13 @@ import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } 
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { MiddlewareAPI, Store } from 'redux';
 import * as Materialize from 'materialize-css/dist/js/materialize';
 import { ASSET_STORAGE } from '../root';
+import { EpicStore } from './index';
 
-const loadNote$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>) =>
+const loadNote$ = (actions$: Observable<Action<any>>, store: EpicStore) =>
 	actions$.pipe(
-		ofType<Action<string>>(actions.loadNote.started.type),
+		ofType<MicroPadAction, Action<string>>(actions.loadNote.started.type),
 		tap(() => Materialize.Toast.removeAll()),
 		map((action: Action<string>): [string, FlatNotepad] => [action.payload, store.getState().notepads.notepad?.item!]),
 		filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
@@ -140,7 +140,7 @@ const autoLoadNewNote$ = (action$, store) =>
 		map((newNote: Note) => actions.loadNote.started(newNote.internalRef))
 	);
 
-const closeNoteOnDeletedParent$ = (action$, store: Store<IStoreState>) =>
+const closeNoteOnDeletedParent$ = (action$, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.deleteNotepadObject),
 		map(() => store.getState().notepads.notepad),
@@ -160,7 +160,7 @@ const loadNoteOnMove$ = action$ =>
 		map((payload: MoveNotepadObjectAction) => actions.loadNote.started(payload.objectRef))
 	);
 
-const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+const quickMarkdownInsert$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.quickMarkdownInsert),
 		map(() => store.getState().currentNote.ref),
@@ -194,7 +194,7 @@ const quickMarkdownInsert$ = (action$: Observable<Action<void>>, store: Store<IS
 		})
 	);
 
-const imagePasted$ = (action$: Observable<Action<string>>, store: Store<IStoreState>) =>
+const imagePasted$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.imagePasted.started),
 		filter(() => store.getState().currentNote.ref.length > 0),

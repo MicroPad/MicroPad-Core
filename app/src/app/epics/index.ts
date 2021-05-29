@@ -9,7 +9,6 @@ import { noteEpics$ } from './NoteEpics';
 import { appEpics$ } from './AppEpics';
 import { Action } from 'redux-typescript-actions';
 import { cryptoEpics$ } from './CryptoEpics';
-import { Dialog } from '../services/dialogs';
 import { getStorage, StorageMap } from '../root';
 import { printEpics$ } from './PrintEpics';
 import { helpEpics$ } from './HelpEpics';
@@ -17,6 +16,8 @@ import { searchEpics$ } from './SearchEpics';
 import { syncEpics$ } from './SyncEpics';
 import { explorerEpics$ } from './ExplorerEpics';
 import { dueDatesEpics$ } from './DueDatesEpics';
+import { Dispatch, MiddlewareAPI } from 'redux';
+import { IStoreState } from '../types';
 
 const baseEpic$ = combineEpics(
 	notepadEpics$,
@@ -34,14 +35,14 @@ const baseEpic$ = combineEpics(
 
 export type EpicDeps = {
 	helpNpx: string,
-	getStorage: () => StorageMap,
-	Dialog: Dialog
+	getStorage: () => StorageMap
 };
 
 export const epicMiddleware = createEpicMiddleware<Action<any>, any, EpicDeps>(baseEpic$, {
 	dependencies: {
 		helpNpx,
-		getStorage: getStorage,
-		Dialog: Dialog
+		getStorage: getStorage
 	}
 });
+
+export type EpicStore = MiddlewareAPI<Dispatch, IStoreState>

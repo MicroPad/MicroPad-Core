@@ -1,4 +1,4 @@
-import actionCreatorFactory from 'redux-typescript-actions';
+import actionCreatorFactory, { ActionCreator, AsyncActionCreators } from 'redux-typescript-actions';
 import { IRenameNotepadObjectAction } from './types/NotepadTypes';
 import {
 	AddCryptoPasskeyAction,
@@ -24,6 +24,18 @@ import { NoteElement } from 'upad-parse/dist/Note';
 import { HashTagSearchResults } from './reducers/SearchReducer';
 import { ThemeName } from './types/Themes';
 import { DueItem } from './services/DueDates';
+
+export type MicroPadAction = ActionTypes[keyof ActionTypes];
+export type ActionNames = keyof ActionFactories;
+
+type ActionFactories = typeof actions;
+type ActionTypes = {
+	[ActionName in ActionNames]: ActionFactories[ActionName] extends ActionCreator<any>
+		? ReturnType<ActionFactories[ActionName]>
+		: ActionFactories[ActionName] extends AsyncActionCreators<any, any, any>
+			? (ReturnType<ActionFactories[ActionName]['started']> | ReturnType<ActionFactories[ActionName]['done']> | ReturnType<ActionFactories[ActionName]['failed']>)
+			: never;
+};
 
 const actionCreator = actionCreatorFactory();
 

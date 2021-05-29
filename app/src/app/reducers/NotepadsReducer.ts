@@ -460,6 +460,6 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 			}
 		}
 
-		return Object.freeze(state);
+		return state;
 	}
 }

@@ -1,14 +1,13 @@
 import { combineEpics } from 'redux-observable';
 import { concatMap, filter, map } from 'rxjs/operators';
-import { Action, Success } from 'redux-typescript-actions';
 import { from, Observable } from 'rxjs';
-import { IStoreState } from '../types';
-import { Store } from 'redux';
-import { EpicDeps } from './index';
+import { Dispatch } from 'redux';
+import { EpicDeps, EpicStore } from './index';
 import { isAction } from '../util';
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
+import { Dialog } from '../services/dialogs';
 
-export const getHelp$ = (action$: Observable<Action<void>>, store: Store<IStoreState>, { Dialog }) =>
+export const getHelp$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.getHelp.started),
 		concatMap(() =>
@@ -23,13 +22,13 @@ export const getHelp$ = (action$: Observable<Action<void>>, store: Store<IStoreS
 		map(() => actions.getHelp.done({ params: undefined, result: undefined }))
 	);
 
-export const getHelpSuccess$ = (action$: Observable<Action<Success<void, void>>>, store: Store<IStoreState>, { helpNpx }) =>
+export const getHelpSuccess$ = (action$: Observable<MicroPadAction>, store: EpicStore, { helpNpx }) =>
 	action$.pipe(
 		isAction(actions.getHelp.done),
 		map(() => actions.parseNpx.started(helpNpx))
 	);
 
-export const helpEpics$ = combineEpics<Action<any>, any, EpicDeps>(
-	getHelp$ as any,
-	getHelpSuccess$ as any
+export const helpEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
+	getHelp$,
+	getHelpSuccess$
 );

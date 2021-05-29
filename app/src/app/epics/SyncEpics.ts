@@ -24,9 +24,9 @@ import { BehaviorSubject, EMPTY, forkJoin, from, Observable, of } from 'rxjs';
 import { parse } from 'date-fns';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import * as Materialize from 'materialize-css/dist/js/materialize';
-import { Store } from 'redux';
 import { FlatNotepad, LAST_MODIFIED_FORMAT } from 'upad-parse/dist';
 import stringify from 'json-stringify-safe';
+import { EpicStore } from './index';
 
 export const uploadCount$ = new BehaviorSubject<number>(0);
 
@@ -61,7 +61,7 @@ export const login$ = action$ =>
 		)
 	);
 
-export const actWithSyncNotepad$ = (action$, store: Store<IStoreState>) =>
+export const actWithSyncNotepad$ = (action$, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.actWithSyncNotepad),
 		filter(() => !!store.getState().sync.user),
@@ -177,7 +177,7 @@ export const download$ = (action$, store) =>
 		)
 	);
 
-export const upload$ = (action$, store: Store<IStoreState>) =>
+export const upload$ = (action$, store: EpicStore) =>
 	action$.pipe(
 		isAction(actions.syncUpload.started),
 		tap(() => uploadCount$.next(uploadCount$.getValue() + 1)),
