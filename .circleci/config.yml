@@ -38,6 +38,7 @@ jobs:
         
       # run tests!
       - run: cd app && yarn typecheck
+      - run: cd app && yarn lint
       - run: cd app && yarn test
 
   build:

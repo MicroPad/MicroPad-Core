@@ -1,23 +1,23 @@
-import { combineEpics } from 'redux-observable';
-import { dataURItoBlob, isAction } from '../util';
-import { actions } from '../actions';
+import { combineEpics, ofType } from 'redux-observable';
+import { dataURItoBlob, filterTruthy } from '../util';
+import { actions, MicroPadAction } from '../actions';
 import { filter, map, switchMap } from 'rxjs/operators';
-import { INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';
 import { trim } from '../components/note-viewer/elements/drawing/trim-canvas';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist';
 import { MarkdownNote, NoteElement } from 'upad-parse/dist/Note';
-import { from } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { ASSET_STORAGE } from '../root';
+import { EpicStore } from './index';
 
-export const generateMarkdownForPrint$ = (action$, store) =>
+export const generateMarkdownForPrint$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.print.started),
+		ofType<MicroPadAction>(actions.print.started.type),
 		map(() => store.getState()),
-		map((state: IStoreState) => [(state.notepads.notepad || {} as INotepadStoreState).item, state.currentNote.ref]),
+		map((state: IStoreState): [FlatNotepad, string] => [state.notepads.notepad?.item!, state.currentNote.ref]),
 		filter(([notepad, noteRef]: [FlatNotepad, string]) => !!notepad && !!noteRef),
 		map(([notepad, noteRef]: [FlatNotepad, string]) => notepad.notes[noteRef]),
-		filter(Boolean),
+		filterTruthy(),
 		switchMap((note: Note) =>
 			from((async () => {
 				const resolvedAssets = await Promise.all(note.elements
@@ -34,7 +34,7 @@ export const generateMarkdownForPrint$ = (action$, store) =>
 				return [
 					note,
 					assets
-				];
+				] as [Note, Asset[]];
 			})())
 		),
 		switchMap(([note, assets]: [Note, Asset[]]) => from((note as Note).toMarkdown(assets))),

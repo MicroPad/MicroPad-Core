@@ -1,4 +1,4 @@
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
 import {
 	catchError,
 	concatMap,
@@ -10,7 +10,7 @@ import {
 	switchMap,
 	tap
 } from 'rxjs/operators';
-import { Action, isType, Success } from 'redux-typescript-actions';
+import { Action, Success } from 'redux-typescript-actions';
 import { combineEpics, ofType } from 'redux-observable';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';
@@ -20,20 +20,19 @@ import { Dialog } from '../services/dialogs';
 import { ISyncedNotepad } from '../types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { elvis, filterTruthy, getUsedAssets, isAction, resolveElvis } from '../util';
-import { MiddlewareAPI } from 'redux';
+import { elvis, filterTruthy, getUsedAssets, noEmit, resolveElvis } from '../util';
 import { fromShell } from '../services/CryptoService';
 import { AddCryptoPasskeyAction, DeleteElementAction, EncryptNotepadAction } from '../types/ActionTypes';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
-import { EpicDeps } from './index';
+import { EpicDeps, EpicStore } from './index';
 
 let currentNotepadTitle = '';
 
-const saveNotepad$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>) =>
-	actions$.pipe(
-		ofType<Action<Notepad>>(actions.saveNotepad.started.type),
+const saveNotepad$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+	action$.pipe(
+		ofType<MicroPadAction, Action<Notepad>>(actions.saveNotepad.started.type),
 		map((action: Action<Notepad>) => action.payload),
 		concatMap((notepad: Notepad) =>
 			from((async () =>
@@ -48,13 +47,13 @@ const saveNotepad$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IS
 		)
 	);
 
-const saveOnChanges$ = (action$, store: MiddlewareAPI<IStoreState>) =>
+const saveOnChanges$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		map(() => store.getState()),
 		map((state: IStoreState) => state.notepads.notepad),
-		filter(Boolean),
+		filterTruthy(),
 		map((notepadState: INotepadStoreState) => notepadState.item),
-		filter(Boolean),
+		filterTruthy(),
 		debounceTime(1000),
 		distinctUntilChanged(),
 		filter((notepad: FlatNotepad) => {
@@ -80,25 +79,25 @@ const saveOnChanges$ = (action$, store: MiddlewareAPI<IStoreState>) =>
 		})
 	);
 
-const saveDefaultFontSize$ = (action$, store: MiddlewareAPI<IStoreState>) =>
+const saveDefaultFontSize$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		map(() => store.getState()),
-		map((state: IStoreState) => [state.notepads.notepad, state.currentNote]),
+		map((state: IStoreState): [INotepadStoreState, ICurrentNoteState] => [state.notepads.notepad!, state.currentNote]),
 		filter(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => !!notepad && !!notepad.item && !!current && current.ref.length > 0),
-		map(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => [notepad.item!.notes[current.ref], current.elementEditing]),
+		map(([notepad, current]: [INotepadStoreState, ICurrentNoteState]): [Note, string] => [notepad.item!.notes[current.ref], current.elementEditing]),
 		filter(([note, id]: [Note, string]) => !!note && id.length > 0),
 		map(([note, id]: [Note, string]) => note.elements.filter((element: NoteElement) => element.args.id === id)[0]),
-		filter(Boolean),
+		filterTruthy(),
 		map((element: NoteElement) => element.args.fontSize),
-		filter(Boolean),
+		filterTruthy(),
 		distinctUntilChanged(),
 		tap((fontSize: string) => localforage.setItem('font size', fontSize)),
 		map((fontSize: string) => actions.updateDefaultFontSize(fontSize))
 	);
 
-const getNotepadList$ = action$ =>
+const getNotepadList$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		filter((action: Action<void>) => isType(action, actions.getNotepadList.started)),
+		ofType<MicroPadAction, Action<void>>(actions.getNotepadList.started.type),
 		switchMap(() =>
 			from(NOTEPAD_STORAGE.keys()).pipe(
 				map((keys: string[]) => {
@@ -109,9 +108,9 @@ const getNotepadList$ = action$ =>
 		)
 	);
 
-const openNotepadFromStorage$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>) =>
-	actions$.pipe(
-		ofType<Action<string>>(actions.openNotepadFromStorage.started.type),
+const openNotepadFromStorage$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+	action$.pipe(
+		ofType<MicroPadAction, Action<string>>(actions.openNotepadFromStorage.started.type),
 		map((action: Action<string>) => action.payload),
 		switchMap((notepadTitle: string) =>
 			from(NOTEPAD_STORAGE.getItem<string>(notepadTitle)).pipe(
@@ -132,10 +131,10 @@ const openNotepadFromStorage$ = (actions$: Observable<Action<any>>, store: Middl
 		)
 	);
 
-const cleanUnusedAssets$ = (actions$: Observable<Action<Success<string, FlatNotepad>> | Action<DeleteElementAction>>, store: MiddlewareAPI<IStoreState>) =>
-	actions$
+const cleanUnusedAssets$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+	action$
 		.pipe(
-			ofType<Action<Success<string, FlatNotepad>> | Action<DeleteElementAction>>(actions.parseNpx.done.type, actions.deleteElement.type),
+			ofType<MicroPadAction, Action<Success<string, FlatNotepad>> | Action<DeleteElementAction>>(actions.parseNpx.done.type, actions.deleteElement.type),
 			map(() => store.getState()),
 			map((state: IStoreState) => state.notepads.notepad),
 			filterTruthy(),
@@ -153,18 +152,18 @@ const cleanUnusedAssets$ = (actions$: Observable<Action<Success<string, FlatNote
 			filter((res: Action<any>[]) => res.length > 0)
 		);
 
-const deleteNotepad$ = action$ =>
+const deleteNotepad$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		filter((action: Action<string>) => isType(action, actions.deleteNotepad)),
+		ofType<MicroPadAction, Action<string>>(actions.deleteNotepad.type),
 		map((action: Action<string>) => action.payload),
 		tap((notepadTitle: string) => from(NOTEPAD_STORAGE.removeItem(notepadTitle))),
-		filter(() => false)
+		noEmit()
 	);
 
 export type LastOpenedNotepad = { notepadTitle: string, noteRef?: string };
-const persistLastOpenedNotepad$ = (actions$: Observable<Action<any>>, _store, { getStorage }: EpicDeps) =>
-	actions$.pipe(
-		ofType<Action<Success<string, FlatNotepad>>>(actions.parseNpx.done.type),
+const persistLastOpenedNotepad$ = (action$: Observable<MicroPadAction>, _store, { getStorage }: EpicDeps) =>
+	action$.pipe(
+		ofType<MicroPadAction, Action<Success<string, FlatNotepad>>>(actions.parseNpx.done.type),
 		map(action => action.payload.result),
 		tap((notepad: FlatNotepad) =>
 			getStorage()
@@ -172,12 +171,12 @@ const persistLastOpenedNotepad$ = (actions$: Observable<Action<any>>, _store, { 
 				.setItem<LastOpenedNotepad>('last opened notepad', { notepadTitle: notepad.title, noteRef: undefined })
 				.catch(() => { return; })
 		),
-		filter(() => false)
+		noEmit()
 	);
 
-const persistLastOpenedNote$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>, { getStorage }: EpicDeps) =>
-	actions$.pipe(
-		ofType<Action<Success<string, object>>>(actions.loadNote.done.type),
+const persistLastOpenedNote$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
+	action$.pipe(
+		ofType<MicroPadAction, Action<Success<string, object>>>(actions.loadNote.done.type),
 		filter(() => !!store.getState().notepads.notepad?.item),
 		map((action): LastOpenedNotepad => ({
 			notepadTitle: store.getState().notepads.notepad?.item?.title!,
@@ -189,12 +188,12 @@ const persistLastOpenedNote$ = (actions$: Observable<Action<any>>, store: Middle
 				.setItem<LastOpenedNotepad>('last opened notepad', lastOpened)
 				.catch(() => { return; })
 		),
-		filter(() => false)
+		noEmit()
 	);
 
-const clearLastOpenNoteOnClose$ = (actions$: Observable<Action<any>>, store: MiddlewareAPI<IStoreState>, { getStorage }: EpicDeps) =>
-	actions$.pipe(
-		ofType<Action<void>>(actions.closeNote.type),
+const clearLastOpenNoteOnClose$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
+	action$.pipe(
+		ofType<MicroPadAction, Action<void>>(actions.closeNote.type),
 		map(() => store.getState().notepads.notepad?.item?.title),
 		tap(currentNotepad => {
 			if (currentNotepad) {
@@ -209,23 +208,28 @@ const clearLastOpenNoteOnClose$ = (actions$: Observable<Action<any>>, store: Mid
 					.catch(() => { return; })
 			}
 		}),
-		filter(() => false)
+		noEmit()
 	);
 
-const clearLastOpenedNotepad$ = (action$: Observable<Action<Success<string, FlatNotepad>>>) =>
+const clearLastOpenedNotepad$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.closeNotepad, actions.parseNpx.failed, actions.deleteNotepad, actions.renameNotepad.done),
+		ofType(
+			actions.closeNotepad.type,
+			actions.parseNpx.failed.type,
+			actions.deleteNotepad.type,
+			actions.renameNotepad.done.type
+		),
 		tap(() =>
 			localforage
 				.setItem('last opened notepad', undefined)
 				.catch(() => { return; })
 		),
-		filter(() => false)
+		noEmit()
 	);
 
-const clearOldData$ = (action$: Observable<Action<void>>, store: MiddlewareAPI<IStoreState>) =>
+const clearOldData$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.clearOldData.started),
+		ofType<MicroPadAction>(actions.clearOldData.started.type),
 		concatMap(() =>
 			from(cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store.getState())).pipe(
 				mergeMap((addPasskeyActions: Action<AddCryptoPasskeyAction>[]) => [
@@ -243,9 +247,9 @@ const clearOldData$ = (action$: Observable<Action<void>>, store: MiddlewareAPI<I
 
 const notifyOnClearOldDataSuccess$ = (action$: Observable<Action<Success<void, void>>>) =>
 	action$.pipe(
-		isAction(actions.clearOldData.done),
+		ofType<MicroPadAction>(actions.clearOldData.done.type),
 		tap(() => Dialog.alert('The spring cleaning has been done!')),
-		filter(() => false)
+		noEmit()
 	);
 
 export const storageEpics$ = combineEpics(

@@ -17,7 +17,7 @@ export default class FileElementComponent extends React.Component<IFileElementCo
 		const isEditing = elementEditing === element.args.id;
 
 		return (
-			<div style={{padding: '5px', width: 'max-content'}} onClick={this.openEditor}>
+			<div style={{ padding: '5px', width: 'max-content' }} onClick={this.openEditor}>
 				<em style={{ color: theme.text }}>
 					{!isEditing && element.args.filename}
 					{(isEditing || !element.args.filename) && `Upload a file...`}

@@ -80,7 +80,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 		return (
 			<Resizable
-				style={{overflow: 'hidden'}}
+				style={{ overflow: 'hidden' }}
 				size={{ width, height }}
 				minWidth={minWidth}
 				enable={{

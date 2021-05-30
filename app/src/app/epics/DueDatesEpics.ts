@@ -1,31 +1,30 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { forkJoin, from, Observable, of } from 'rxjs';
 import { Action, Success } from 'redux-typescript-actions';
-import { IStoreState } from '../types';
-import { MiddlewareAPI } from 'redux';
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { EpicDeps } from './index';
+import { EpicDeps, EpicStore } from './index';
 import { Notepad, Translators } from 'upad-parse/dist';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { getDueDates, sortDueDates } from '../services/DueDates';
+import { Dispatch } from 'redux';
 
-export const getDueDatesOnInit$ = (action$: Observable<Action<Success<void, string[]>>>) =>
+export const getDueDatesOnInit$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		ofType<Action<Success<void, string[]>>>(actions.getNotepadList.done.type),
+		ofType<MicroPadAction, Action<Success<void, string[]>>>(actions.getNotepadList.done.type),
 		map((action: Action<Success<void, string[]>>) => actions.getDueDates.started(action.payload.result))
 	);
 
-export const getDueDatesOnSave$ = (action$: Observable<Action<Success<Notepad, void>>>, store: MiddlewareAPI<IStoreState>) =>
+export const getDueDatesOnSave$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		ofType<Action<Success<Notepad, void>>>(actions.saveNotepad.done.type),
+		ofType<MicroPadAction, Action<Success<Notepad, void>>>(actions.saveNotepad.done.type),
 		map(() => store.getState().notepads.savedNotepadTitles!),
 		map(titles => actions.getDueDates.started(titles))
 	);
 
-export const getDueDates$ = (action$: Observable<Action<string[]>>, store: MiddlewareAPI<IStoreState>, { getStorage }: EpicDeps) =>
+export const getDueDates$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
 	action$.pipe(
-		ofType<Action<string[]>>(actions.getDueDates.started.type),
+		ofType<MicroPadAction, Action<string[]>>(actions.getDueDates.started.type),
 		map((action: Action<string[]>) =>
 			action.payload.map(name =>
 				getStorage().notepadStorage.getItem<string>(name)
@@ -58,7 +57,7 @@ export const getDueDates$ = (action$: Observable<Action<string[]>>, store: Middl
 		)
 	);
 
-export const dueDatesEpics$ = combineEpics<Action<any>, IStoreState, EpicDeps>(
+export const dueDatesEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	getDueDatesOnInit$,
 	getDueDatesOnSave$,
 	getDueDates$

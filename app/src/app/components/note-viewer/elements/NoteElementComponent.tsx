@@ -166,11 +166,11 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 								<EditDueDateComponent element={element} theme={theme} updateElement={updateElement!} />
 
 								<Row style={{ paddingLeft: '5px', paddingTop: '10px' }}>
-									<Button className="red" waves="light" onClick={this.delete} style={{marginRight: '5px'}}><Icon left={true}>delete_forever</Icon> Delete</Button>
+									<Button className="red" waves="light" onClick={this.delete} style={{ marginRight: '5px' }}><Icon left={true}>delete_forever</Icon> Delete</Button>
 								</Row>
 
 								<Row style={{ paddingLeft: '5px' }}>
-									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{marginRight: '5px', float: 'right'}}>Close editor (autosaved)</Button>
+									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{ marginRight: '5px', float: 'right' }}>Close editor (autosaved)</Button>
 								</Row>
 							</div>
 						}
