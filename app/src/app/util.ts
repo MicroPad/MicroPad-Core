@@ -1,11 +1,7 @@
-import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
 import { FlatNotepad } from 'upad-parse/dist';
-
-export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
-	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
 
 export const filterTruthy = <T>() => filter((a: T | undefined | null | false): a is T => !!a);
 

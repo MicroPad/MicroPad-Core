@@ -1,24 +1,24 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
-import { Action } from 'redux-typescript-actions';
+import { Action, Success } from 'redux-typescript-actions';
 import { actions, MicroPadAction } from '../actions';
 import { HashTagSearchResult, HashTagSearchResults } from '../reducers/SearchReducer';
 import { Dispatch } from 'redux';
 import { SearchIndices } from '../types/ActionTypes';
-import { isAction } from '../util';
 import { indexNotepads } from '../workers/SearchWorker';
 import { EpicDeps, EpicStore } from './index';
+import { Notepad } from 'upad-parse/dist';
 
 export const refreshIndices$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.saveNotepad.done, actions.deleteNotepad),
+		ofType<MicroPadAction, Action<Success<Notepad, void> | string>>(actions.saveNotepad.done.type, actions.deleteNotepad.type),
 		map(() => actions.indexNotepads.started(undefined))
 	);
 
 export const indexNotepads$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.indexNotepads.started),
+		ofType<MicroPadAction>(actions.indexNotepads.started.type),
 		map(() => store.getState().search.indices),
 		switchMap((indices: SearchIndices) =>
 			from(indexNotepads(indices, store.getState().notepadPasskeys)).pipe(
