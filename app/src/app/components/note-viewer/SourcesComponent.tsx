@@ -19,7 +19,7 @@ export default class SourcesComponent extends React.Component<ISourcesComponent>
 		bibliography.forEach(source => sources.push(
 			<div key={`${note.title}-source-${source.id}`}>
 				<a href={source.content} rel="noopener noreferrer" target="_blank">Open URL</a><br />
-				<Autocomplete type="url" value={source.content} label="URL" onChange={(e, v) => this.onSourceEdit(source.id, v)}  data={{}} />
+				<Autocomplete type="url" value={source.content} label="URL" onChange={(e, v) => this.onSourceEdit(source.id, v)} data={{}} />
 			</div>
 		));
 

@@ -74,7 +74,7 @@ const downloadAsset$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<{ filename: string, uuid: string }>>(actions.downloadAsset.started.type),
 		map((action: Action<{ filename: string, uuid: string }>) => action.payload),
-		switchMap(({filename, uuid}: { filename: string, uuid: string }) =>
+		switchMap(({ filename, uuid }: { filename: string, uuid: string }) =>
 			from(ASSET_STORAGE.getItem(uuid))
 				.pipe(
 					map((blob): [Blob, string] => [blob as Blob, filename])

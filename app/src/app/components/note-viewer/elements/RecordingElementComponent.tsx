@@ -29,10 +29,10 @@ export default class RecordingElementComponent extends React.Component<IFileElem
 		const { element, noteAssets, downloadAsset, elementEditing } = this.props;
 		const isEditing = elementEditing === element.args.id;
 
-		if (isEditing && !this.canRecord) return <div style={{padding: '5px', width: '400px'}}><p>Recording is not supported</p></div>;
+		if (isEditing && !this.canRecord) return <div style={{ padding: '5px', width: '400px' }}><p>Recording is not supported</p></div>;
 
 		return (
-			<div style={{padding: '5px', width: (!isEditing) ? 'max-content' : '400px'}}>
+			<div style={{ padding: '5px', width: (!isEditing) ? 'max-content' : '400px' }}>
 				{
 					isEditing &&
 					<div ref={e => this.buttonContainer = e!} className="recording-inactive">
@@ -57,7 +57,7 @@ export default class RecordingElementComponent extends React.Component<IFileElem
 	}
 
 	componentDidMount() {
-		const { updateElement, element, edit} = this.props;
+		const { updateElement, element, edit } = this.props;
 
 		this.recorder.onstart = () => {
 			this.buttonContainer.classList.remove('recording-inactive');

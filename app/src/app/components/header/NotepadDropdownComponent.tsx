@@ -53,13 +53,13 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 						header="Export All Notepads"
 						trigger={<NavItem id="export-all-notepads-trigger" href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}>
 						<Row>
-							<Col s={12} m={6} style={{cursor: 'pointer'}} onClick={exportAll}>
+							<Col s={12} m={6} style={{ cursor: 'pointer' }} onClick={exportAll}>
 								<img src={NpxIcon} style={iconStyles} title="Export notepads as a zip archive of NPX files" alt="" />
-								<p style={{textAlign: 'center'}}>Export notepads as a zip archive of NPX files</p>
+								<p style={{ textAlign: 'center' }}>Export notepads as a zip archive of NPX files</p>
 							</Col>
-							<Col s={12} m={6} style={{cursor: 'pointer'}} onClick={exportToMarkdown}>
+							<Col s={12} m={6} style={{ cursor: 'pointer' }} onClick={exportToMarkdown}>
 								<img src={MarkdownIcon} style={iconStyles} title="Export notepads as a zip archive of markdown files" alt="" />
-								<p style={{textAlign: 'center'}}>Export notepads as a zip archive of markdown files</p>
+								<p style={{ textAlign: 'center' }}>Export notepads as a zip archive of markdown files</p>
 							</Col>
 							{this.props.isExporting && <ProgressBar className="amber" />}
 						</Row>
@@ -76,7 +76,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 
 					<NavItem divider={true} />
 					{syncState.isLoading && <NavItem href="#!">Loading...</NavItem>}
-					{!!syncState.sharedNotepadList &&  Object.keys(syncState.sharedNotepadList).map(title =>
+					{!!syncState.sharedNotepadList && Object.keys(syncState.sharedNotepadList).map(title =>
 						<NavItem key={generateGuid()} href="#!" onClick={() => {
 							downloadNotepad!(syncState.sharedNotepadList![title].notepad);
 						}}>

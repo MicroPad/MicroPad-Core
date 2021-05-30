@@ -327,7 +327,7 @@ const renameNotepad$ = (action$: Observable<MicroPadAction>, store: EpicStore) =
 					map(() => { return { newTitle: action.payload, oldTitle }; })
 				);
 		}),
-		map((res: { newTitle: string, oldTitle: string }) => actions.renameNotepad.done({params: res.newTitle, result: res.oldTitle}))
+		map((res: { newTitle: string, oldTitle: string }) => actions.renameNotepad.done({ params: res.newTitle, result: res.oldTitle }))
 	);
 
 const saveNotepadOnRenameOrNew$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
@@ -422,7 +422,7 @@ const quickNote$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 		filterTruthy(),
 		throttleTime(1000),
 		map(() => generateGuid()),
-		map(guid => actions.quickNote.done({ params: undefined, result: guid}))
+		map(guid => actions.quickNote.done({ params: undefined, result: guid }))
 	);
 
 const loadQuickNote$ = (action$: Observable<MicroPadAction>) =>

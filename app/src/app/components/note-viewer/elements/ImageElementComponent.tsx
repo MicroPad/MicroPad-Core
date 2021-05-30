@@ -15,7 +15,7 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 		const isEditing = elementEditing === element.args.id;
 
 		return (
-			<div style={{overflow: 'hidden', height: (isEditing) ? element.args.height! : 'auto', width: (isEditing) ? element.args.width : 'auto', minHeight: '130px'}} onClick={this.openEditor}>
+			<div style={{ overflow: 'hidden', height: (isEditing) ? element.args.height! : 'auto', width: (isEditing) ? element.args.width : 'auto', minHeight: '130px' }} onClick={this.openEditor}>
 				{
 					!isEditing &&
 					<Resizable
@@ -28,12 +28,12 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 							this.onSizeEdit('width', ref.style.width!);
 							this.onSizeEdit('height', ref.style.height!);
 						}}>
-						<img style={{height: (element.args.height !== 'auto') ? '100%' : undefined, width: (element.args.width !== 'auto') ? '100%' : undefined }} src={noteAssets[element.args.ext!]} alt="" />
+						<img style={{ height: (element.args.height !== 'auto') ? '100%' : undefined, width: (element.args.width !== 'auto') ? '100%' : undefined }} src={noteAssets[element.args.ext!]} alt="" />
 					</Resizable>
 				}
 				{
 					isEditing &&
-					<div style={{height: '100%'}}>
+					<div style={{ height: '100%' }}>
 						<em style={{ color: theme.text }}>Upload a new image...</em><br />
 						<input type="file" onChange={this.fileSelected} style={{ padding: '5px', color: theme.text }} />
 

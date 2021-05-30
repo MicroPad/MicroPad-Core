@@ -52,7 +52,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 			return (
 				<div>
 					<Resizable
-						style={{padding: '5px', overflow: 'hidden'}}
+						style={{ padding: '5px', overflow: 'hidden' }}
 						minWidth={410}
 						minHeight={130}
 						lockAspectRatio={true}
@@ -82,10 +82,10 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 							ref={e => this.canvasElement = e!}
 							width="500"
 							height="450"
-							style={{border: 'solid black 1px', touchAction: 'none'}} />
+							style={{ border: 'solid black 1px', touchAction: 'none' }} />
 					</Resizable>
 
-					<Row style={{padding: '5px'}}>
+					<Row style={{ padding: '5px' }}>
 						<Input label="Erase Mode" type="checkbox" className="filled-in" onChange={(e, v) => this.isErasing = v} />
 						<Input label={<a target="_blank" rel="noopener noreferrer nofollow" href="https://pride.codes">Rainbow Mode</a>} type="checkbox" className="filled-in" onChange={(e, v) => this.isRainbow = v} />
 					</Row>
@@ -103,7 +103,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 				minHeight: '130px',
 				backgroundColor: !isEditing ? theme.drawingBackground : undefined
 			}} onClick={this.openEditor}>
-				<img ref={elm => this.imageElement = elm!} style={{height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px'}} src={noteAssets[element.args.ext!]} alt="" />
+				<img ref={elm => this.imageElement = elm!} style={{ height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px' }} src={noteAssets[element.args.ext!]} alt="" />
 			</div>
 		);
 	}
