@@ -74,7 +74,7 @@ function registerValidSW(swUrl: string, config?: Config) {
 							// At this point, the updated precached content has been fetched,
 							// but the previous service worker will still serve the older
 							// content until all client tabs are closed.
-							Materialize.toast('An update is available. Close all tabs and <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="location.reload();">refresh</a>');
+							Materialize.toast('An update is available. Close all MicroPad tabs and launch MicroPad to update.');
 
 							// Execute callback
 							if (config && config.onUpdate) {
