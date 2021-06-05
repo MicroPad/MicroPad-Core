@@ -7,8 +7,8 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "echo \"Tests are coming soon, hopefully.\"",
-    "typecheck": "yarn tsc --noEmit --p ./tsconfig.json",
-    "lint": "yarn eslint src/",
+    "typecheck": "tsc --noEmit --p ./tsconfig.json",
+    "lint": "eslint src/",
     "eject": "react-scripts eject"
   },
   "dependencies": {
