@@ -2,7 +2,6 @@ import { MicroPadReducer } from '../types/ReducerType';
 import { IStoreState } from '../types';
 import * as deepFreeze from 'deep-freeze';
 import { isDev } from '../util';
-import { Action } from 'redux-typescript-actions';
 import { NotepadsReducer } from './NotepadsReducer';
 import { NoteReducer } from './NoteReducer';
 import { ExplorerReducer } from './ExplorerReducer';
@@ -12,6 +11,8 @@ import { SyncReducer } from './SyncReducer';
 import { AppReducer } from './AppReducer';
 import { IsExportingReducer } from './IsExportingReducer';
 import { NotepadPasskeysReducer } from './NotepadPasskeysReducer';
+import { MicroPadAction } from '../actions';
+import { Action, Reducer } from 'redux';
 
 export const REDUCERS: Array<MicroPadReducer<any>> = [
 	new AppReducer(),
@@ -25,7 +26,11 @@ export const REDUCERS: Array<MicroPadReducer<any>> = [
 	new IsExportingReducer()
 ];
 
-export class BaseReducer {
+interface ReduxReducer<S, A extends Action> {
+	reducer: Reducer<S, A>
+}
+
+export class BaseReducer implements ReduxReducer<IStoreState, MicroPadAction> {
 	public readonly initialState: IStoreState;
 	public readonly key = '';
 
@@ -35,12 +40,16 @@ export class BaseReducer {
 		this.initialState = Object.freeze(initialState as IStoreState);
 	}
 
-	public reducer(state: IStoreState, action: Action<any>): IStoreState {
+	public reducer(state: IStoreState | undefined, action: MicroPadAction): IStoreState {
+		if (!state) {
+			return this.initialState;
+		}
+
 		let newState = {
 			...state
 		};
-		REDUCERS.forEach(reducer => newState[reducer.key] = Object.freeze(reducer.reducer(Object.freeze(state[reducer.key]), action)));
+		REDUCERS.forEach(reducer => newState[reducer.key] = reducer.reducer(state[reducer.key], action));
 		
-		return (!isDev) ? Object.freeze(newState) : deepFreeze(newState);
+		return isDev() ? deepFreeze(newState) : newState;
 	}
 }

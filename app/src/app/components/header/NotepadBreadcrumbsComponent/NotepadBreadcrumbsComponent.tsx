@@ -23,7 +23,7 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 	private readonly timeStyle: CSSProperties = {
 		paddingLeft: '20px',
 		fontFamily: 'Roboto',
-		fontWeight:  200 as 200
+		fontWeight: 200 as 200
 	};
 
 	render() {

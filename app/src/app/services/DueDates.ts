@@ -11,7 +11,7 @@ export function getDueDates(notepad: FlatNotepad): DueItem[] {
 		.map(note => {
 			const earliestDueDate = note.elements
 				.map(element => element.args.dueDate)
-				.filter(Boolean)
+				.filter((a?: string): a is string => !!a)
 				.map(dueDate => parseInt(dueDate!, 10))
 				.filter(due => due >= new Date().getTime())
 				.sort()[0];

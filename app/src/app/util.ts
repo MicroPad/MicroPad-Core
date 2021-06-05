@@ -1,19 +1,17 @@
-import { Action, ActionCreator, isType } from 'redux-typescript-actions';
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import * as QueryString from 'querystring';
 import { FlatNotepad } from 'upad-parse/dist';
 
-export const isAction = (...typesOfAction: ActionCreator<any>[]) =>
-	filter((action: Action<any>) => typesOfAction.some(type => isType(action, type)));
+export const filterTruthy = <T>() => filter((a: T | undefined | null | false): a is T => !!a);
 
-export const filterTruthy = <T>() => filter((a: T | undefined | null): a is T => !!a);
+export const noEmit = () => filter((_a): _a is never => false);
 
 export function isDev(): boolean {
 	/* eslint-disable no-restricted-globals */
 	return (
 		!QueryString.parse(location.search.slice(1)).prod
-		&& (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+		&& (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'next.getmicropad.com')
 	);
 	/* eslint-enable no-restricted-globals */
 }
@@ -76,8 +74,8 @@ export function getUsedAssets(notepad: FlatNotepad): Set<string> {
 		Object.values(notepad.notes)
 		.map(
 			n => n.elements
-				.map(e => e.args.ext!)
-				.filter(Boolean)
+				.map(e => e.args.ext)
+				.filter((a?: string): a is string => !!a)
 		)
 		.reduce((used, cur) => used.concat(cur), [])
 	);

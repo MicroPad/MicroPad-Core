@@ -10,7 +10,7 @@ export const fendTransformer: MarkdownTransformer = {
 			// e.g. [[1+1]] -> 2
 			text.replace(/\[\[([^]+?)\]\]/gi, (match, content) => {
 				let result = evaluateFendWithTimeout(content, 500);
-				if (result === "Error: Interrupted") {
+				if (result === "Error: interrupted") {
 					result = "Error: Calculation timed out";
 				}
 				if (result.startsWith("Error:")) {

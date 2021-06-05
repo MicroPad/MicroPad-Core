@@ -1,22 +1,21 @@
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ofType } from 'redux-observable';
 import { concatMap, filter, map, tap } from 'rxjs/operators';
-import { Action, isType } from 'redux-typescript-actions';
-import { actions } from '../actions';
+import { Action } from 'redux-typescript-actions';
+import { actions, MicroPadAction } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
-import { isAction } from '../util';
+import { filterTruthy, noEmit } from '../util';
 import { NewNotepadObjectAction } from '../types/ActionTypes';
-import { IStoreState } from '../types';
 import { FlatNotepad, Note } from 'upad-parse/dist';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { Observable } from 'rxjs';
-import { Store } from 'redux';
 import { ThemeValues } from '../ThemeValues';
+import { EpicStore } from './index';
 
-export const expandAll$ = (action$, store) =>
+export const expandAll$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		filter((action: Action<void>) => isType(action, actions.expandAllExplorer.started)),
+		ofType<MicroPadAction>(actions.expandAllExplorer.started.type),
 		map(() => (store.getState().notepads.notepad || {} as INotepadStoreState).item),
-		filter(Boolean),
+		filterTruthy(),
 		map((notepad: FlatNotepad) => [
 			...Object.keys(notepad.sections),
 			...Object.keys(notepad.notes)
@@ -24,23 +23,23 @@ export const expandAll$ = (action$, store) =>
 		map((allRefs: string[]) => actions.expandAllExplorer.done({ params: undefined, result: allRefs }))
 	);
 
-export const autoLoadNewSection$ = (action$, store) =>
+export const autoLoadNewSection$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.newSection),
-		map((action: Action<NewNotepadObjectAction>) => [action.payload, (store.getState() as IStoreState).notepads.notepad!.item]),
+		ofType<MicroPadAction, Action<NewNotepadObjectAction>>(actions.newSection.type),
+		map((action: Action<NewNotepadObjectAction>): [NewNotepadObjectAction, FlatNotepad] => [action.payload, store.getState().notepads.notepad?.item!]),
 		filter(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!notepad),
 		map(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => {
 			const parentRef = insertAction.parent || undefined;
 
 			return Object.values((notepad as FlatNotepad).sections).find(s => s.title === insertAction.title && s.parentRef === parentRef);
 		}),
-		filter(Boolean),
+		filterTruthy(),
 		map((newSection: FlatSection) => actions.expandSection(newSection.internalRef))
 	);
 
-export const openBreadcrumb$ = (action$: Observable<Action<string>>, store: Store<IStoreState>) =>
+export const openBreadcrumb$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.openBreadcrumb),
+		ofType<MicroPadAction, Action<string>>(actions.openBreadcrumb.type),
 		map(action => action.payload),
 		filter(() => !!store.getState().notepads.notepad && !!store.getState().notepads.notepad!.item),
 		map((ref: string) =>
@@ -63,9 +62,9 @@ export const openBreadcrumb$ = (action$: Observable<Action<string>>, store: Stor
 		)
 	);
 
-export const flashExplorer$ = (action$: Observable<Action<void>>, store: Store<IStoreState>) =>
+export const flashExplorer$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.flashExplorer),
+		ofType<MicroPadAction>(actions.flashExplorer.type),
 		tap(() => {
 			const theme = ThemeValues[store.getState().app.theme];
 			const explorer = document.getElementById('notepad-explorer')!;
@@ -73,7 +72,7 @@ export const flashExplorer$ = (action$: Observable<Action<void>>, store: Store<I
 			explorer.style.backgroundColor = theme.accent;
 			setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);
 		}),
-		filter(() => false)
+		noEmit()
 	);
 
 export const explorerEpics$ = combineEpics(

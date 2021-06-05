@@ -1,45 +1,47 @@
-import { combineEpics } from 'redux-observable';
-import { isAction } from '../util';
+import { combineEpics, ofType } from 'redux-observable';
+import { noEmit } from '../util';
 import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
 import * as localforage from 'localforage';
 import { Action, Success } from 'redux-typescript-actions';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { FlatNotepad } from 'upad-parse/dist';
-import { EMPTY } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { lt as versionLessThan } from 'semver';
 import { ThemeName } from '../types/Themes';
-import { EpicDeps } from './index';
+import { EpicDeps, EpicStore } from './index';
 import { IVersion } from '../reducers/AppReducer';
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
+import { Dispatch } from 'redux';
+import { Dialog } from '../services/dialogs';
 
-export const closeDrawingEditorOnZoom$ = (action$, store) =>
+export const closeDrawingEditorOnZoom$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.updateZoomLevel),
+		ofType<MicroPadAction>(actions.updateZoomLevel.type),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.currentNote.elementEditing),
 		filter((elementId: string) => elementId.includes('drawing')),
 		map(() => actions.openEditor(''))
 	);
 
-export const saveHelpPreference$ = action$ =>
+export const saveHelpPreference$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.setHelpPref),
+		ofType<MicroPadAction, Action<boolean>>(actions.setHelpPref.type),
 		switchMap((action: Action<boolean>) => localforage.setItem('show help', action.payload)),
-		filter(() => false)
+		noEmit()
 	);
 
-export const revertHelpPrefOnHelpLoad$ = action$ =>
+export const revertHelpPrefOnHelpLoad$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.parseNpx.done),
+		ofType<MicroPadAction, Action<Success<string, FlatNotepad>>>(actions.parseNpx.done.type),
 		map((action: Action<Success<string, FlatNotepad>>) => action.payload.result.title),
 		filter((title: string) => title === 'Help'),
 		map(() => actions.setHelpPref(true))
 	);
 
-export const checkVersion$ = (action$, store, { Dialog }) =>
+export const checkVersion$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.checkVersion),
+		ofType<MicroPadAction>(actions.checkVersion.type),
 		map(() => store.getState()),
 		map((state: IStoreState) => state.app.version),
 		map((version: IVersion) => `${version.major}.${version.minor}.${version.patch}`),
@@ -64,17 +66,17 @@ export const checkVersion$ = (action$, store, { Dialog }) =>
 				})
 			)
 		),
-		filter(() => false)
+		noEmit()
 	);
 
-export const persistTheme$ = action$ =>
+export const persistTheme$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		isAction(actions.selectTheme),
+		ofType<MicroPadAction, Action<ThemeName>>(actions.selectTheme.type),
 		switchMap((action: Action<ThemeName>) => localforage.setItem('theme', action.payload)),
-		filter(() => false)
+		noEmit()
 	);
 
-export const appEpics$ = combineEpics<any, any, EpicDeps>(
+export const appEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	closeDrawingEditorOnZoom$,
 	saveHelpPreference$,
 	revertHelpPrefOnHelpLoad$,

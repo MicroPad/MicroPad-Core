@@ -1,16 +1,15 @@
-import { combineEpics } from 'redux-observable';
-import { Action } from 'redux-typescript-actions';
-import { elvis, isAction, resolveElvis } from '../util';
+import { combineEpics, ofType } from 'redux-observable';
+import { elvis, resolveElvis } from '../util';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AddCryptoPasskeyAction } from '../types/ActionTypes';
-import { IStoreState } from '../types';
-import { Store } from 'redux';
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
+import { Action } from 'redux-typescript-actions';
+import { EpicStore } from './index';
 
-export const encryptNotepad$ = (action$: Observable<Action<string>>, store: Store<IStoreState>) =>
+export const encryptNotepad$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.encryptNotepad),
+		ofType<MicroPadAction, Action<string>>(actions.encryptNotepad.type),
 		map(action => ({
 			passkey: action.payload,
 			notepadTitle: resolveElvis(elvis(store.getState().notepads).notepad.item.title)

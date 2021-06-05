@@ -1,16 +1,15 @@
-import { combineEpics } from 'redux-observable';
-import { concatMap, filter, map } from 'rxjs/operators';
-import { Action, Success } from 'redux-typescript-actions';
+import { combineEpics, ofType } from 'redux-observable';
+import { concatMap, map } from 'rxjs/operators';
 import { from, Observable } from 'rxjs';
-import { IStoreState } from '../types';
-import { Store } from 'redux';
-import { EpicDeps } from './index';
-import { isAction } from '../util';
-import { actions } from '../actions';
+import { Dispatch } from 'redux';
+import { EpicDeps, EpicStore } from './index';
+import { filterTruthy } from '../util';
+import { actions, MicroPadAction } from '../actions';
+import { Dialog } from '../services/dialogs';
 
-export const getHelp$ = (action$: Observable<Action<void>>, store: Store<IStoreState>, { Dialog }) =>
+export const getHelp$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		isAction(actions.getHelp.started),
+		ofType<MicroPadAction>(actions.getHelp.started.type),
 		concatMap(() =>
 			from((async () => {
 				const notepadList = store.getState().notepads.savedNotepadTitles;
@@ -19,17 +18,17 @@ export const getHelp$ = (action$: Observable<Action<void>>, store: Store<IStoreS
 				return Dialog.confirm(`You have already imported the Help notebook. It can be accessed from the notebooks dropdown. If you continue you will lose any changes made to the notebook.`);
 			})())
 		),
-		filter(Boolean),
+		filterTruthy(),
 		map(() => actions.getHelp.done({ params: undefined, result: undefined }))
 	);
 
-export const getHelpSuccess$ = (action$: Observable<Action<Success<void, void>>>, store: Store<IStoreState>, { helpNpx }) =>
+export const getHelpSuccess$ = (action$: Observable<MicroPadAction>, store: EpicStore, { helpNpx }) =>
 	action$.pipe(
-		isAction(actions.getHelp.done),
+		ofType<MicroPadAction>(actions.getHelp.done.type),
 		map(() => actions.parseNpx.started(helpNpx))
 	);
 
-export const helpEpics$ = combineEpics<Action<any>, any, EpicDeps>(
-	getHelp$ as any,
-	getHelpSuccess$ as any
+export const helpEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
+	getHelp$,
+	getHelpSuccess$
 );

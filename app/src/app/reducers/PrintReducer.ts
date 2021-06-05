@@ -13,15 +13,11 @@ export class PrintReducer extends MicroPadReducer<IPrintStoreState> {
 	constructor() {
 		super();
 
-		this.handle((state, action) => {
-			return {
-				...state,
-				elementToPrint: action.payload.result
-			};
-		}, actions.print.done);
+		this.handle((state, action) => ({
+			...state,
+			elementToPrint: action.payload.result
+		}), actions.print.done);
 
-		this.handle(() => {
-			return { ...this.initialState };
-		}, actions.clearPrintView);
+		this.handle(() => ({ ...this.initialState }), actions.clearPrintView);
 	}
 }
