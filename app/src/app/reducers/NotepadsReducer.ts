@@ -114,7 +114,11 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 			return {
 				...state,
 				notepad: undefined,
-				savedNotepadTitles: (state.savedNotepadTitles || []).filter(title => title !== action.payload)
+				savedNotepadTitles: state.savedNotepadTitles?.filter(title => title !== action.payload) ?? [],
+				dueDates: {
+					...state.dueDates,
+					dueItems: state.dueDates.dueItems.filter(item => item.notepadTitle !== action.payload)
+				}
 			};
 		} else if (isType(action, actions.renameNotepad.done)) {
 			return {

@@ -85,10 +85,7 @@ export class NoteReducer extends MicroPadReducer<ICurrentNoteState> {
 				}
 			};
 		} else if (isType(action, actions.closeNote) || isType(action, actions.closeNotepad)) {
-			return {
-				...state,
-				ref: ''
-			};
+			return this.initialState;
 		}
 
 		return state;

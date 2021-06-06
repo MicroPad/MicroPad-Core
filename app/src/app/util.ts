@@ -1,6 +1,5 @@
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
-import * as QueryString from 'querystring';
 import { FlatNotepad } from 'upad-parse/dist';
 
 export const filterTruthy = <T>() => filter((a: T | undefined | null | false): a is T => !!a);
@@ -9,8 +8,9 @@ export const noEmit = () => filter((_a): _a is never => false);
 
 export function isDev(): boolean {
 	/* eslint-disable no-restricted-globals */
+	const params = new URLSearchParams(location.search);
 	return (
-		!QueryString.parse(location.search.slice(1)).prod
+		!params.get('prod')
 		&& (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'next.getmicropad.com')
 	);
 	/* eslint-enable no-restricted-globals */

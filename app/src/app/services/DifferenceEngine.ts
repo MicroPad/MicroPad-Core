@@ -7,7 +7,6 @@ import { MICROPAD_URL } from '../types';
 import { concatMap, map, retry } from 'rxjs/operators';
 import { AssetList, INotepadSharingData, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from '../types/SyncTypes';
 import { parse } from 'date-fns';
-import * as QueryString from 'querystring';
 import { LAST_MODIFIED_FORMAT, Notepad } from 'upad-parse/dist';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { encrypt } from 'upad-parse/dist/crypto';
@@ -128,7 +127,7 @@ export function uploadAsset(url: string, asset: Blob): Observable<void> {
 
 function callApi<T>(parent: string, endpoint: string, resource: string, payload?: object, method?: string): Observable<T> {
 	return ajax({
-		url: `${devServer() ? 'http://localhost:48025' : MICROPAD_URL}/diffeng/${parent}/${endpoint}/${resource}`,
+		url: `${shouldUseDevApi() ? 'http://localhost:48025' : MICROPAD_URL}/diffeng/${parent}/${endpoint}/${resource}`,
 		method: method || (!payload) ? 'GET' : 'POST',
 		body: payload,
 		crossDomain: true,
@@ -143,7 +142,7 @@ function callApi<T>(parent: string, endpoint: string, resource: string, payload?
 	);
 }
 
-function devServer(): boolean {
+function shouldUseDevApi(): boolean {
 	// eslint-disable-next-line no-restricted-globals
-	return !!QueryString.parse(location.search.slice(1)).local;
+	return !!new URLSearchParams(location.search).get('local');
 }

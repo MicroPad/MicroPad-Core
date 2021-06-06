@@ -9,6 +9,7 @@ import { ThemeName } from '../types/Themes';
 import { parse } from 'semver';
 import { isDev } from '../util';
 import { ZoomChange } from '../types/ActionTypes';
+import { ThemeValues } from '../ThemeValues';
 
 export interface IAppStoreState {
 	version: IVersion;
@@ -87,9 +88,10 @@ export class AppReducer extends MicroPadReducer<IAppStoreState> {
 				showHelp: action.payload
 			};
 		} else if (isType(action, actions.selectTheme)) {
+			const themeName = action.payload;
 			return {
 				...state,
-				theme: action.payload
+				theme: ThemeValues[themeName] ? action.payload : 'Classic'
 			};
 		}
 

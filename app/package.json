@@ -1,6 +1,6 @@
 {
   "name": "micropad",
-  "version": "3.29.0",
+  "version": "3.29.1",
   "private": true,
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py; ./get_precache_files.py > src/extraPrecacheFiles.ts",
@@ -17,7 +17,7 @@
     "asset-checksum": "../libs/asset-checksum/pkg",
     "date-fns": "^2.21.3",
     "deep-equal": "^2.0.5",
-    "deep-freeze": "0.0.1",
+    "deep-freeze": "~0.0.1",
     "fend-wasm": "^0.1.15",
     "jquery": "^3.5.1",
     "json-stringify-safe": "^5.0.1",
@@ -29,8 +29,7 @@
     "opus-recorder": "^4.1.0",
     "paste-image": "^0.0.3",
     "pdfobject": "^2.1.1",
-    "querystring": "^0.2.0",
-    "raw-loader": "^0.5.1",
+    "raw-loader": "^4.0.2",
     "re-resizable": "^6.9.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -63,10 +62,19 @@
         ],
         "rules": {
           "@typescript-eslint/no-use-before-define": "off",
-          "eqeqeq": ["error", "smart"],
+          "eqeqeq": [
+            "error",
+            "smart"
+          ],
           "no-multi-spaces": "error",
-          "array-bracket-spacing": ["error", "never"],
-          "object-curly-spacing": ["error", "always"],
+          "array-bracket-spacing": [
+            "error",
+            "never"
+          ],
+          "object-curly-spacing": [
+            "error",
+            "always"
+          ],
           "key-spacing": "error"
         }
       }
@@ -98,11 +106,11 @@
     "@types/react-redux": "^7.1.2",
     "@types/semver": "^7.3.4",
     "@types/showdown": "^1.7.3",
+    "cypress": "^7.4.0",
+    "eslint": "^7.27.0",
     "react-app-rewired": "^2.1.6",
     "react-codemod": "^5.4.3",
     "wasm-loader": "^1.3.0",
-    "workerize-loader": "^1.1.0",
-    "eslint": "^7.27.0",
-    "cypress": "^7.4.0"
+    "workerize-loader": "^1.1.0"
   }
 }

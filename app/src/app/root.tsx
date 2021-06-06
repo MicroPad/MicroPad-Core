@@ -5,10 +5,13 @@ import './root.css';
 /* Themes */
 import './theme-styles/Classic.css';
 import './theme-styles/Solarized.css';
-import './theme-styles/IanPad.css';
 import './theme-styles/Midnight.css';
 import './theme-styles/Void.css';
+import './theme-styles/Wellington.css';
+import './theme-styles/Peach.css';
+import './theme-styles/Pastel.css';
 import './theme-styles/Purple.css';
+import './theme-styles/IanPad.css';
 /* JS Imports */
 import * as React from 'react';
 import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed
@@ -27,7 +30,6 @@ import HeaderComponent from './containers/header/HeaderContainer';
 import NotepadExplorerComponent from './components/explorer/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './services/shortcuts';
-import * as QueryString from 'querystring';
 import * as PasteImage from 'paste-image';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
@@ -202,8 +204,8 @@ async function displayWhatsNew() {
 
 function notepadDownloadHandler() {
 	// eslint-disable-next-line no-restricted-globals
-	const downloadNotepadUrl = QueryString.parse(location.search.slice(1)).download;
-	if (!!downloadNotepadUrl && typeof downloadNotepadUrl === 'string') store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
+	const downloadNotepadUrl = new URLSearchParams(location.search).get('download');
+	if (!!downloadNotepadUrl) store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
 }
 
 function pasteWatcher() {
