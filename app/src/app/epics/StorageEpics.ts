@@ -21,7 +21,7 @@ import { ISyncedNotepad } from '../types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { elvis, filterTruthy, getUsedAssets, noEmit, resolveElvis } from '../util';
-import { fromShell } from '../services/CryptoService';
+import { DecryptionError, fromShell } from '../services/CryptoService';
 import { AddCryptoPasskeyAction, DeleteElementAction, EncryptNotepadAction } from '../types/ActionTypes';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
@@ -124,7 +124,13 @@ const openNotepadFromStorage$ = (action$: Observable<MicroPadAction>, store: Epi
 				]),
 				catchError(err => {
 					console.error(err);
-					Dialog.alert(`Error opening notepad`);
+
+					if (err instanceof DecryptionError) {
+						Dialog.alert(err.message);
+					} else {
+						Dialog.alert(`There was an error opening your notebook`);
+					}
+
 					return of(actions.openNotepadFromStorage.failed(err));
 				})
 			)

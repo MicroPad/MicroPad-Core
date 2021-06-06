@@ -42,7 +42,7 @@ import {
 import { Dispatch } from 'redux';
 import { format } from 'date-fns';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
-import { fromShell } from '../services/CryptoService';
+import { DecryptionError, fromShell } from '../services/CryptoService';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
 import { EpicDeps, EpicStore } from './index';
 
@@ -149,7 +149,12 @@ const restoreJsonNotepad$ = (action$: Observable<MicroPadAction>) =>
 					})
 				];
 			} catch (err) {
-				Dialog.alert(`Error restoring notepad`);
+				if (err instanceof DecryptionError) {
+					Dialog.alert(err.message);
+				} else {
+					Dialog.alert(`Error restoring notepad`);
+				}
+
 				console.error(err);
 				return [actions.parseNpx.failed({
 					params: '',
@@ -165,23 +170,27 @@ const restoreJsonNotepadAndLoadNote$ = (action$: Observable<MicroPadAction>, sto
 		ofType<MicroPadAction, Action<RestoreJsonNotepadAndLoadNoteAction>>(actions.restoreJsonNotepadAndLoadNote.type),
 		map(action => action.payload),
 		switchMap(result =>
-			from((getStorage().notepadStorage as LocalForage).getItem(result.notepadTitle)).pipe(
+			from((getStorage().notepadStorage as LocalForage).getItem<string>(result.notepadTitle)).pipe(
 				switchMap(notepadJson =>
-					from(Translators.Json.toFlatNotepadFromNotepad(
-						notepadJson as string,
-						store.getState().notepadPasskeys[result.notepadTitle]
-					))
+					from(fromShell(JSON.parse(notepadJson!), store.getState().notepadPasskeys[result.notepadTitle]))
 				),
-				map((notepad: FlatNotepad): [string, FlatNotepad] => [result.noteRef, notepad]),
+				map(({ notepad, passkey }) => ({ notepad: notepad.flatten(), passkey })),
+				map(({ notepad, passkey }): [string, FlatNotepad, string] => [result.noteRef, notepad, passkey]),
 				catchError(err => {
 					console.error(err);
-					Dialog.alert(`Error opening notepad`);
+
+					if (err instanceof DecryptionError) {
+						Dialog.alert(err.message);
+					} else {
+						Dialog.alert(`There was an error opening your notebook`);
+					}
 					return of(null);
 				})
 			)
 		),
 		filterTruthy(),
-		concatMap(([noteRef, notepad]: [string, FlatNotepad]) => [
+		concatMap(([noteRef, notepad, passkey]: [string, FlatNotepad, string]) => [
+			actions.addCryptoPasskey({ notepadTitle: notepad.title, passkey }),
 			actions.parseNpx.done({ params: '', result: notepad }),
 			actions.loadNote.started(noteRef)
 		])
