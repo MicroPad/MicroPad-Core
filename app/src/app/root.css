@@ -81,6 +81,15 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 	color: #607d8b;
 }
 
+/* Materialize modals need to always be on top. MicroPad doesn't go over 5000 for anything native. */
+.modal.open {
+	z-index: 5002 !important;
+}
+
+.modal-overlay {
+	z-index: 5001 !important;
+}
+
 .vex-dialog-prompt-input {
 	padding: 0 !important;
 }
