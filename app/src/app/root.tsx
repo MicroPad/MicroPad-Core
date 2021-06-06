@@ -5,10 +5,13 @@ import './root.css';
 /* Themes */
 import './theme-styles/Classic.css';
 import './theme-styles/Solarized.css';
-import './theme-styles/IanPad.css';
 import './theme-styles/Midnight.css';
 import './theme-styles/Void.css';
+import './theme-styles/Wellington.css';
+import './theme-styles/Peach.css';
+import './theme-styles/Pastel.css';
 import './theme-styles/Purple.css';
+import './theme-styles/IanPad.css';
 /* JS Imports */
 import * as React from 'react';
 import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed

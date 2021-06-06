@@ -6,6 +6,7 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import Link from '@material-ui/core/Link';
 import { generateGuid } from '../../../util';
 import { ThemeName } from '../../../types/Themes';
+import { ThemeValues } from '../../../ThemeValues';
 
 export type Breadcrumb = {
 	text: string;
@@ -46,10 +47,12 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 					href={!!crumb.ref ? '#!' : undefined}
 					onClick={() => !!focusItem && focusItem(crumb.ref)}
 					underline="none"
-					style={isLast ? { color: 'white' } : { color: 'hsla(0,0%, 100%, .7)' }}>
+					style={{
+						color: ThemeValues[themeName].explorerContent,
+						opacity: isLast ? 1 : 0.7
+					}}>
 
 					{crumb.text} {isLast && !!noteTime && <span style={this.timeStyle}>{noteTime}</span>}
-
 				</Link>
 			);
 		});
@@ -57,7 +60,10 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 		return (
 			<div id="breadcrumb-holder" style={breadcrumbStyle}>
 				<Breadcrumbs
-					separator={<NavigateNextIcon fontSize="small" style={{ color: 'hsla(0,0%, 100%, .7)' }} />}
+					separator={<NavigateNextIcon fontSize="small" style={{
+						color: ThemeValues[themeName].explorerContent,
+						opacity: 0.7
+					}} />}
 					className={themeName}
 					style={{ paddingLeft: '10px', paddingRight: '10px' }}>
 

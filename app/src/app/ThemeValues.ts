@@ -39,20 +39,6 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 			element: elementInstructionsDark
 		}
 	},
-	IanPad: {
-		background: '#B9F6CA',
-		accent: '#fdff19',
-		chrome: '#40af3a',
-		text: '#000',
-		links: '#039be5',
-		explorerContent: '#fff',
-		backgroundImage: filledBackground,
-		instructionImages: {
-			notepad: instructionImageLight,
-			note: noteInstructionsLight,
-			element: elementInstructionsLight
-		}
-	},
 	Midnight: {
 		background: '#212121',
 		accent: '#424242',
@@ -83,10 +69,66 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 			element: elementInstructionsDark
 		}
 	},
+	Peach: {
+		background: '#fdd1a4',
+		accent: '#fde7a4',
+		chrome: '#fdc3a4',
+		text: '#555',
+		links: '#231e23',
+		explorerContent: '#333',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
+	},
+	Pastel: {
+		background: '#f7f2e7',
+		accent: '#d8d3cd',
+		chrome: '#e0ece4',
+		text: '#555',
+		links: '#231e23',
+		explorerContent: '#333',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
+	},
+	Wellington: {
+		background: '#F4FFF8',
+		accent: '#5fa7a0',
+		chrome: '#a7ded8',
+		text: '#555',
+		links: '#231e23',
+		explorerContent: '#333',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
+	},
 	Purple: {
 		background: '#fff',
 		accent: '#ffcc00',
 		chrome: '#3d0066',
+		text: '#000',
+		links: '#039be5',
+		explorerContent: '#fff',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
+	},
+	IanPad: {
+		background: '#B9F6CA',
+		accent: '#fdff19',
+		chrome: '#40af3a',
 		text: '#000',
 		links: '#039be5',
 		explorerContent: '#fff',
