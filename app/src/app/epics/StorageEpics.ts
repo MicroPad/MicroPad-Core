@@ -8,6 +8,7 @@ import {
 	map,
 	mergeMap,
 	switchMap,
+	take,
 	tap
 } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
@@ -15,7 +16,7 @@ import { combineEpics, ofType } from 'redux-observable';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';
 import * as localforage from 'localforage';
-import { from, Observable, of } from 'rxjs';
+import { from, interval, Observable, of } from 'rxjs';
 import { Dialog } from '../services/dialogs';
 import { ISyncedNotepad } from '../types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
@@ -27,6 +28,9 @@ import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
 import { EpicDeps, EpicStore } from './index';
+import { Dispatch } from 'redux';
+
+const NOTEPAD_LIST_POLL_INTERVAL = 60 * 1000; // 1 minute
 
 let currentNotepadTitle = '';
 
@@ -50,9 +54,7 @@ const saveNotepad$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 const saveOnChanges$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		map(() => store.getState()),
-		map((state: IStoreState) => state.notepads.notepad),
-		filterTruthy(),
-		map((notepadState: INotepadStoreState) => notepadState.item),
+		map((state: IStoreState) => state.notepads.notepad?.item),
 		filterTruthy(),
 		debounceTime(1000),
 		distinctUntilChanged(),
@@ -64,13 +66,15 @@ const saveOnChanges$ = (action$: Observable<MicroPadAction>, store: EpicStore) =
 		}),
 		map((notepad: FlatNotepad) => notepad.toNotepad()),
 		mergeMap((notepad: Notepad) => {
-			const actionsToReturn: Action<any>[] = [];
+			const actionsToReturn: MicroPadAction[] = [];
 
-			const syncId = (store.getState() as IStoreState).notepads.notepad!.activeSyncId;
-			if (syncId) actionsToReturn.push(actions.actWithSyncNotepad({
-				notepad,
-				action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId })
-			}));
+			const syncId = store.getState().notepads.notepad?.activeSyncId;
+			if (syncId) {
+				actionsToReturn.push(actions.actWithSyncNotepad({
+					notepad,
+					action: (np: ISyncedNotepad) => actions.sync({ notepad: np, syncId })
+				}));
+			}
 
 			return [
 				...actionsToReturn,
@@ -83,12 +87,10 @@ const saveDefaultFontSize$ = (action$: Observable<MicroPadAction>, store: EpicSt
 	action$.pipe(
 		map(() => store.getState()),
 		map((state: IStoreState): [INotepadStoreState, ICurrentNoteState] => [state.notepads.notepad!, state.currentNote]),
-		filter(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => !!notepad && !!notepad.item && !!current && current.ref.length > 0),
+		filter(([notepad, current]: [INotepadStoreState, ICurrentNoteState]) => !!notepad?.item && !!current && current.ref.length > 0),
 		map(([notepad, current]: [INotepadStoreState, ICurrentNoteState]): [Note, string] => [notepad.item!.notes[current.ref], current.elementEditing]),
 		filter(([note, id]: [Note, string]) => !!note && id.length > 0),
-		map(([note, id]: [Note, string]) => note.elements.filter((element: NoteElement) => element.args.id === id)[0]),
-		filterTruthy(),
-		map((element: NoteElement) => element.args.fontSize),
+		map(([note, id]: [Note, string]) => note.elements.filter((element: NoteElement) => element.args.id === id)[0]?.args?.fontSize),
 		filterTruthy(),
 		distinctUntilChanged(),
 		tap((fontSize: string) => localforage.setItem('font size', fontSize)),
@@ -106,6 +108,15 @@ const getNotepadList$ = (action$: Observable<MicroPadAction>) =>
 				catchError(err => of(actions.getNotepadList.failed({ params: undefined, error: err })))
 			)
 		)
+	);
+
+const pollNotepadList$ = (action$: Observable<MicroPadAction>) =>
+	action$.pipe(
+		ofType<MicroPadAction, Action<Success<void, string[]>>>(actions.getNotepadList.done.type),
+		take(1),
+		switchMap(() => interval(NOTEPAD_LIST_POLL_INTERVAL).pipe(
+			map(() => actions.getNotepadList.started())
+		))
 	);
 
 const openNotepadFromStorage$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
@@ -258,20 +269,21 @@ const notifyOnClearOldDataSuccess$ = (action$: Observable<Action<Success<void, v
 		noEmit()
 	);
 
-export const storageEpics$ = combineEpics(
+export const storageEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	saveNotepad$,
 	getNotepadList$,
- 	openNotepadFromStorage$ as any,
+	pollNotepadList$,
+ 	openNotepadFromStorage$,
 	deleteNotepad$,
 	saveOnChanges$,
-	saveDefaultFontSize$,
-	cleanUnusedAssets$,
+	saveDefaultFontSize$ as (a: Observable<MicroPadAction>, s: EpicStore) => Observable<MicroPadAction>,
+	cleanUnusedAssets$ as (a: Observable<MicroPadAction>, s: EpicStore) => Observable<MicroPadAction>,
 	persistLastOpenedNotepad$,
 	persistLastOpenedNote$,
 	clearLastOpenNoteOnClose$,
 	clearLastOpenedNotepad$,
 	clearOldData$,
-	notifyOnClearOldDataSuccess$
+	notifyOnClearOldDataSuccess$ as (a: Observable<MicroPadAction>, s: EpicStore) => Observable<MicroPadAction>
 );
 
 /**

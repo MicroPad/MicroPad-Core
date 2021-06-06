@@ -1,7 +1,7 @@
 import { ISyncedNotepad, SyncUser } from './SyncTypes';
-import { Action } from 'redux-typescript-actions';
 import { NoteElement, Source } from 'upad-parse/dist/Note';
 import { FlatNotepad, Note, Notepad, Trie } from 'upad-parse/dist';
+import { MicroPadAction } from '../actions';
 
 export type UpdateElementAction = {
 	noteRef: string;
@@ -47,7 +47,7 @@ export type UploadAssetAction = {
 
 export type NotepadToSyncNotepadAction = {
 	notepad: Notepad;
-	action: (notepad: ISyncedNotepad) => Action<any>;
+	action: (notepad: ISyncedNotepad) => MicroPadAction;
 };
 
 export type ExpandFromNoteAction = {
