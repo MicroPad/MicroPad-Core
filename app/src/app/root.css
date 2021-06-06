@@ -85,9 +85,11 @@ input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]),
 .modal.open {
 	z-index: 5002 !important;
 }
-
 .modal-overlay {
 	z-index: 5001 !important;
+}
+.vex, .vex-overlay {
+	z-index: 5003 !important;
 }
 
 .vex-dialog-prompt-input {
