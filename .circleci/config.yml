@@ -22,7 +22,7 @@ jobs:
     steps:
       - checkout
 
-      - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+      - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
       - restore_cache:
           name: Restore Yarn Package Cache
