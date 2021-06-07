@@ -23,6 +23,7 @@ jobs:
       - checkout
 
       - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      - run: source $HOME/.cargo/env
 
       - restore_cache:
           name: Restore Yarn Package Cache
