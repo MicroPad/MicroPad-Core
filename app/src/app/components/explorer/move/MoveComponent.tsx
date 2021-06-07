@@ -15,7 +15,7 @@ const MoveComponent = (props: Props) => {
 	if (!currentNotepad) return null;
 
 	return (
-		<div>
+		<div className="explorer-options-modal__move">
 			<h5>Move {props.type} to another notebook</h5>
 			<p>
 				<em>

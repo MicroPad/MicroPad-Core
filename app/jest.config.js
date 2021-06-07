@@ -4,7 +4,7 @@ module.exports = {
 		'jest-playwright': {
 			browsers: ['chromium', 'firefox'],
 			launchOptions: {
-				headless: false
+				headless: true
 			}
 		}
 	},
@@ -16,5 +16,6 @@ module.exports = {
 			tsconfig: 'integration/tsconfig.json'
 		}
 	},
-	'roots': ['<rootDir>/src/', '<rootDir>/integration/src/']
+	'roots': ['<rootDir>/src/', '<rootDir>/integration/src/'],
+	setupFilesAfterEnv: ['<rootDir>/integration/src/utils/jest-image.ts']
 };

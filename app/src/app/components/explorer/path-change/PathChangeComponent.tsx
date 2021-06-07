@@ -15,7 +15,7 @@ const PathChangeComponent = (props: Props) => {
 	if (!notepad) return null;
 
 	return (
-		<div>
+		<div className="explorer-options-modal__path-change">
 			<h5>Move {type}</h5>
 			<select
 				defaultValue={(objToEdit.parent as any).internalRef || 'notepad'}
