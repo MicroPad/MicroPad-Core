@@ -1,12 +1,13 @@
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import { FlatNotepad } from 'upad-parse/dist';
+import { ModalOptions } from 'react-materialize/lib/Modal';
 
-export const DEFAULT_MODAL_OPTIONS = {
-	ready: (modal: HTMLElement[] /* This is a JQuery object containing a https://archives.materializecss.com/0.100.2/modals.html */) => {
-		window.MicroPadGlobals.currentModalId = modal[0].id;
+export const DEFAULT_MODAL_OPTIONS: ModalOptions = {
+	onOpenEnd: (modal: HTMLElement) => {
+		window.MicroPadGlobals.currentModalId = modal.id;
 	},
-	complete: () => {
+	onCloseEnd: () => {
 		delete window.MicroPadGlobals.currentModalId;
 	}
 };
@@ -145,4 +146,13 @@ export function debounce(callback: (...args: any[]) => void, time: number) {
 
 export function unreachable() {
 	return new Error('Unreachable Error!');
+}
+
+export function openModal(id: string) {
+	const modalEl = document.getElementById(id);
+	if (!modalEl) {
+		throw new Error(`${id} is not a modal because it doesn't exist in th DOM.`);
+	}
+
+	M.Modal.getInstance(modalEl).open();
 }

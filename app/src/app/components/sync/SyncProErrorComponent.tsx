@@ -8,7 +8,7 @@ export const SyncProErrorComponent = () => (
 	<Modal
 		trigger={<a id="sync-pro-error-trigger" href="#!" />}
 		header="Good and bad news"
-		modalOptions={DEFAULT_MODAL_OPTIONS}>
+		options={DEFAULT_MODAL_OPTIONS}>
 		<div>
 			<p>
 				The good news is that you're using your notepad well with lots of images, recordings, files, and/or drawings!

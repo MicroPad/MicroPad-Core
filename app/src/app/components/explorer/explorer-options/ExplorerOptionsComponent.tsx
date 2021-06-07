@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
+import { Button, Col, Icon, Modal, Row, TextInput } from 'react-materialize';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import PathChangeComponent from '../path-change/PathChangeContainer';
@@ -15,7 +15,12 @@ type Props = ConnectedProps<typeof explorerOptionsConnector> & {
 };
 
 export default class ExplorerOptionsComponent extends React.Component<Props> {
-	private titleInput: Input;
+	private title: string;
+
+	constructor(props: Props) {
+		super(props);
+		this.title = props.objToEdit.title;
+	}
 
 	render() {
 		const { objToEdit, type, colour, exportNotepad, loadNote, print } = this.props;
@@ -68,11 +73,11 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 				key={modalId}
 				header={`Options for ${objToEdit.title}`}
 				trigger={<a href="#!" className="exp-options-trigger" style={{ color: colour }}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}
-				modalOptions={DEFAULT_MODAL_OPTIONS}>
+				options={DEFAULT_MODAL_OPTIONS}>
 				<div className="explorer-options-modal">
 					<Row>
 						<form action="#" onSubmit={this.rename}>
-							<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>
+							<TextInput s={6} label="Title" defaultValue={this.title} />
 							<Col s={6}><Button className="blue" waves="light">Rename {displayType}</Button></Col>
 						</form>
 					</Row>
@@ -95,18 +100,17 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 
 	private rename = () => {
 		const { objToEdit, type, renameNotepad, renameNotepadObject } = this.props;
-		const value = this.titleInput.state.value;
 
 		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
 
 		switch (type) {
 			case 'notepad':
-				renameNotepad!(value);
+				renameNotepad!(this.title);
 				break;
 
 			case 'section':
 			case 'note':
-				renameNotepadObject!({ internalRef: (objToEdit as NPXObject).internalRef, newName: value });
+				renameNotepadObject!({ internalRef: (objToEdit as NPXObject).internalRef, newName: this.title });
 				break;
 
 			default:

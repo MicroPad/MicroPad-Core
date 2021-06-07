@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Collection, CollectionItem, Icon, Input, Modal, NavItem, Row } from 'react-materialize';
-import { debounceTime, shareReplay, takeUntil } from 'rxjs/operators';
+import { Collection, Icon, Modal, NavItem, Row, TextInput } from 'react-materialize';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 import { FlatNotepad } from 'upad-parse/dist';
-import { fromEvent, Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../../types/ActionTypes';
 import { HashTagSearchResult, HashTagSearchResults } from '../../reducers/SearchReducer';
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
@@ -18,9 +18,8 @@ export interface ISearchComponentProps {
 }
 
 export default class SearchComponent extends React.Component<ISearchComponentProps> {
-	private searchInput: Input;
+	private searchInput: React.RefObject<HTMLInputElement> = { current: null };
 	private results!: JSX.Element[];
-	private triggerClickedSub!: Subscription;
 	private readonly supportsDataElement = !!window['HTMLDataListElement'];
 	private readonly currentValue$: Subject<string> = new Subject<string>();
 	private readonly destroy$: Subject<void> = new Subject<void>();
@@ -64,21 +63,27 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 
 		return (
 			<Modal
+				id="search-modal"
 				key={`search-${(notepad || { title: 'all' }).title}`}
 				header="Search"
-				trigger={<NavItem id={`search-button`} href="#!"><Icon left={true}>search</Icon> Search</NavItem>}
-				modalOptions={DEFAULT_MODAL_OPTIONS}>
+				trigger={<NavItem href="#!"><Icon left={true}>search</Icon> Search</NavItem>}
+				options={{
+					...DEFAULT_MODAL_OPTIONS,
+					onOpenEnd: modal => {
+						DEFAULT_MODAL_OPTIONS.onOpenEnd?.(modal);
+						setTimeout(() => this.searchInput.current?.focus(), 0);
+					}
+				}}>
 				<Row>
-					<Input
-						list="search-results"
-						ref={e => this.searchInput = e!}
+					<TextInput
+						inputClassName="search-results"
+						ref={this.searchInput}
 						s={12}
 						label={`Search by ${(!!notepad && `note title or a`) || ''} hashtag`}
-						onChange={(event, value) => {
-							this.currentValue$.next(value)
+						onChange={event => {
+							this.currentValue$.next(event.target.value)
 						}}
 						value={query}
-						autoComplete="off"
 						data-lpignore="true" />
 
 					{
@@ -132,30 +137,10 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 			takeUntil(this.destroy$),
 			debounceTime(150)
 		).subscribe(value => this.onInput(value));
-
-		this.componentDidUpdate();
-	}
-
-	componentDidUpdate() {
-		const searchTrigger = document.querySelector(`#search-button > a`);
-		if (!searchTrigger) return;
-
-		if (!!this.triggerClickedSub) this.triggerClickedSub.unsubscribe();
-		this.triggerClickedSub = fromEvent(searchTrigger, 'click')
-			.pipe(
-				shareReplay()
-			)
-			.subscribe(() => {
-				const input = this.searchInput;
-				if (!input) return;
-
-				setTimeout(() => input.input.focus(), 0);
-			});
 	}
 
 	componentWillUnmount() {
 		this.destroy$.next();
-		this.triggerClickedSub.unsubscribe();
 	}
 
 	private onInput = (value: string) => {
@@ -194,7 +179,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 				<h5 key={`res-collection-header-${notepadTitle}`}>{notepadTitle}</h5>
 				<Collection key={`res-collection-${notepadTitle}`}>{
 					results.map(result => (
-						<CollectionItem
+						<a
 							key={`res-${notepadTitle}-${result.parentTitle}-${result.title}-item`}
 							href="#!"
 							onClick={() => {
@@ -202,7 +187,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 								setTimeout(() => this.closeModal(), 0);
 							}}>
 							{result.parentTitle} {'>'} {result.title}
-						</CollectionItem>
+						</a>
 					))
 				}</Collection>
 			</div>

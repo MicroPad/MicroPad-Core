@@ -1,4 +1,3 @@
-import * as Materialize from 'materialize-css/dist/js/materialize';
 import { generateGuid } from '../util';
 
 type ToastHandler = () => void;
@@ -8,7 +7,7 @@ export default class ToastEventHandler {
 
 	constructor() {
 		window['toastEvent'] = (guid: string) => {
-			Materialize.Toast.removeAll();
+			M.Toast.dismissAll();
 
 			const handler = this.handlers[guid];
 			delete this.handlers[guid];

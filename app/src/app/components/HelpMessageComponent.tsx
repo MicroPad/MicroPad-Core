@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { CSSProperties } from 'react';
 import { isMobile } from '../util';
-import * as Materialize from 'materialize-css/dist/js/materialize';
 import { ITheme } from '../types/Themes';
 
 export interface IHelpMessageComponentProps {
@@ -55,7 +54,7 @@ export default class HelpMessageComponent extends React.Component<IHelpMessageCo
 
 				<br /><span>(<a style={{ textDecoration: 'underline' }} href="#!" onClick={() => {
 					hide!(false);
-					Materialize.toast('You can get the videos to appear again by opening the help notepad', 5000);
+					M.toast({ html: `You can get the videos to appear again by opening the help notepad`, displayLength: 5000 });
 				}}>Don't show me these again</a>)</span>
 			</div>
 		);

@@ -27,7 +27,7 @@ export default class MarkdownHelpComponent extends React.Component {
 					header={note.title}
 					trigger={<a href="#!">Formatting Help</a>}
 					fixedFooter={true}
-					modalOptions={DEFAULT_MODAL_OPTIONS}>
+					options={DEFAULT_MODAL_OPTIONS}>
 					<div id="markdown-help" dangerouslySetInnerHTML={{
 						__html: note.html
 

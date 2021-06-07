@@ -2,7 +2,7 @@ import * as React from 'react';
 import { SyntheticEvent } from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
 import { dataURItoBlob } from '../../../util';
-import { Col, Input, Row } from 'react-materialize';
+import { Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { Dialog } from '../../../services/dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
@@ -39,20 +39,20 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 
 						<Row>
 							<Col s={6}>
-								<Input
+								<TextInput
 									label="Width"
 									defaultValue={element.args.width}
-									onChange={(e, v) => this.onSizeEdit('width', v)}
-									style={{ color: theme.text }}
+									onChange={e => this.onSizeEdit('width', e.target.value)}
+									// style={{ color: theme.text }} TODO
 								/>
 							</Col>
 
 							<Col s={6}>
-								<Input
+								<TextInput
 									label="Height"
 									defaultValue={element.args.height}
-									onChange={(e, v) => this.onSizeEdit('height', v)}
-									style={{ color: theme.text }}
+									onChange={e => this.onSizeEdit('height', e.target.value)}
+									// style={{ color: theme.text }} TODO
 								/>
 							</Col>
 						</Row>

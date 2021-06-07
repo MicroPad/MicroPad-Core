@@ -1,4 +1,4 @@
-import * as Materialize from 'materialize-css/dist/js/materialize.js';
+import 'materialize-css/dist/js/materialize.min.js';
 
 // This optional code is used to register a service worker.
 // register() is not called by default.
@@ -74,7 +74,7 @@ function registerValidSW(swUrl: string, config?: Config) {
 							// At this point, the updated precached content has been fetched,
 							// but the previous service worker will still serve the older
 							// content until all client tabs are closed.
-							Materialize.toast('An update is available. Close all MicroPad tabs and launch MicroPad to update.');
+							M.toast({ html: 'An update is available. Close all MicroPad tabs and launch MicroPad to update.' });
 
 							// Execute callback
 							if (config && config.onUpdate) {

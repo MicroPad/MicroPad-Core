@@ -7,7 +7,7 @@ import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
 import Grid from '@material-ui/core/Grid';
-import { Input } from 'react-materialize';
+import { TextInput } from 'react-materialize';
 import MarkdownHelpComponent from './MarkdownHelpComponent';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
@@ -106,7 +106,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					isEditing &&
 					<Grid style={{ paddingLeft: '5px', paddingRight: '5px', marginBottom: 0, color: theme.text }} container={true} spacing={3}>
 						<Grid item={true} xs={6}>
-							<Input
+							<TextInput
 								label="Font Size"
 								defaultValue={element.args.fontSize}
 								onChange={this.onFontSizeEdit}
@@ -114,11 +114,11 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 						</Grid>
 
 						<Grid item={true} xs={6}>
-							<Input
-								style={{ width: '100%', color: theme.text }}
+							<TextInput
+								// style={{ width: '100%', color: theme.text }} TODO
 								label="Width"
 								defaultValue={element.args.width}
-								onChange={(e, v) => this.onSizeEdit('width', v)}
+								onChange={e => this.onSizeEdit('width', e.target.value)}
 							/>
 						</Grid>
 					</Grid>

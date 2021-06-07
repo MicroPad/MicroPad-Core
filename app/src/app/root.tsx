@@ -1,6 +1,6 @@
 /* CSS Imports */
 import 'material-icons-font/material-icons-font.css';
-import 'materialize-css/dist/css/materialize.min.css'; // TODO: Roboto will need to be imported here when this isn't
+import 'materialize-css/dist/css/materialize.min.css';
 import './root.css';
 /* Themes */
 import './theme-styles/Classic.css';
@@ -14,7 +14,6 @@ import './theme-styles/Purple.css';
 import './theme-styles/IanPad.css';
 /* JS Imports */
 import * as React from 'react';
-import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed
 import 'materialize-css/dist/js/materialize.js';
 import * as serviceWorker from '../registerServiceWorker';
 import { APP_NAME, MICROPAD_URL } from './types';

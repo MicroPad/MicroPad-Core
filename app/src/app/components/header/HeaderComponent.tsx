@@ -32,8 +32,8 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 			transition: 'background-color .3s'
 		};
 
-		let saveText: string = (!!notepad && !!notepad.item)
-			? (notepad.saving)
+		let saveText: string = !!notepad?.item
+			? notepad.saving
 				? 'Saving...'
 				: 'All changes saved'
 			: '';
@@ -42,8 +42,8 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 
 		return (
 			<header style={{ position: 'fixed', color: theme.explorerContent, zIndex: 1000 }}>
-				<Navbar className="menu-items" brand={<AppNameComponent />} href="#!" style={navStyle} right={true}>
-					<li style={{ marginRight: '10px', color: theme.explorerContent }}>{saveText}</li>
+				<Navbar className="menu-items" brand={<AppNameComponent />} style={navStyle} alignLinks="right" menuIcon={<Icon>menu</Icon>}>
+					<span style={{ marginRight: '10px', color: theme.explorerContent }}>{saveText}</span>
 					<ThemeDropdownComponent />
 					<NotepadDropdownComponent />
 					<SearchComponent />

@@ -1,9 +1,9 @@
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import * as React from 'react';
-import { dataURItoBlob } from '../../../../util';
+import { dataURItoBlob, generateGuid } from '../../../../util';
 import { trim } from './trim-canvas';
 import { Resizable } from 're-resizable';
-import { Input, Row } from 'react-materialize';
+import { Checkbox, Row } from 'react-materialize';
 import stringify from 'json-stringify-safe';
 import * as FullScreenService from '../../../../services/FullscreenService';
 
@@ -86,8 +86,8 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 					</Resizable>
 
 					<Row style={{ padding: '5px' }}>
-						<Input label="Erase Mode" type="checkbox" className="filled-in" onChange={(e, v) => this.isErasing = v} />
-						<Input label={<a target="_blank" rel="noopener noreferrer nofollow" href="https://pride.codes">Rainbow Mode</a>} type="checkbox" className="filled-in" onChange={(e, v) => this.isRainbow = v} />
+						<Checkbox id={generateGuid()} label="Erase Mode" value="1" checked={this.isErasing} filledIn onChange={e => this.isErasing = (e.target as HTMLInputElement).checked} />
+						<Checkbox id={generateGuid()} label="Rainbow Mode 🏳️‍🌈" value="1" checked={this.isRainbow} filledIn onChange={e => this.isRainbow = (e.target as HTMLInputElement).checked} />
 					</Row>
 
 					{!this.supportsPointerEvents && <p><em>Your browser seems to not support pointer events. Drawing may not work.</em></p>}

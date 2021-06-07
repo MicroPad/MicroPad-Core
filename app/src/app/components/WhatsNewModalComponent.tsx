@@ -27,7 +27,7 @@ export default class WhatsNewModalComponent extends React.Component {
 					trigger={<a id="whats-new-modal-trigger" href="#!" />}
 					fixedFooter={true}
 					header={note.title}
-					modalOptions={DEFAULT_MODAL_OPTIONS}>
+					options={DEFAULT_MODAL_OPTIONS}>
 					<div id="markdown-help" dangerouslySetInnerHTML={{
 						__html: note.html
 					}} />

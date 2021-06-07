@@ -2,7 +2,6 @@ import * as React from 'react';
 import { CSSProperties } from 'react';
 import './NoteViewerComponent.css';
 import NoteElementComponent from './elements/NoteElementComponent';
-import * as Materialize from 'materialize-css/dist/js/materialize.js';
 import { ProgressBar } from 'react-materialize';
 import { filter, map } from 'rxjs/operators';
 import { fromEvent, Observable } from 'rxjs';
@@ -166,7 +165,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		}
 
 		if (!newProps.isLoading && (!note || note.elements.length > 0) && !!newProps.note && newProps.note.elements.length === 0) {
-			Materialize.toast('Welcome to your note! Press anywhere on the white area to insert an element.', 8000);
+			M.toast({ html: 'Welcome to your note! Press anywhere on the white area to insert an element.', displayLength: 8000 });
 		}
 	}
 
@@ -193,7 +192,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				if (!!makeQuickNotepad) makeQuickNotepad();
 
 				const guid = TOAST_HANDLER.register(() => deleteNotepad!());
-				Materialize.toast(`Created notebook <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`, 6000);
+				M.toast({ html: `Created notebook <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`, displayLength: 6000 });
 			}
 
 			return;

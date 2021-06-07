@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Autocomplete, Button, Icon, Modal } from 'react-materialize';
+import { Button, Icon, Modal, TextInput } from 'react-materialize';
 import { Dialog } from '../../services/dialogs';
 import { NoteElement, Source } from 'upad-parse/dist/Note';
 import { Note } from 'upad-parse/dist';
@@ -20,7 +20,7 @@ export default class SourcesComponent extends React.Component<ISourcesComponent>
 		bibliography.forEach(source => sources.push(
 			<div key={`${note.title}-source-${source.id}`}>
 				<a href={source.content} rel="noopener noreferrer" target="_blank">Open URL</a><br />
-				<Autocomplete type="url" value={source.content} label="URL" onChange={(e, v) => this.onSourceEdit(source.id, v)} data={{}} />
+				<TextInput type="url" value={source.content} label="URL" onChange={e => this.onSourceEdit(source.id, e.target.value)} />
 			</div>
 		));
 
@@ -28,7 +28,7 @@ export default class SourcesComponent extends React.Component<ISourcesComponent>
 			<Modal
 				header="Bibliography"
 				trigger={<a href="#!" style={{ display: 'inline-flex', verticalAlign: 'middle' }}><Icon>school</Icon> <span style={{ marginLeft: '5px' }}>Bibliography ({bibliography.length})</span></a>}
-				modalOptions={DEFAULT_MODAL_OPTIONS}>
+				options={DEFAULT_MODAL_OPTIONS}>
 				<Button className="blue" waves="light" onClick={this.addSource}><Icon left={true}>add</Icon> Add Source</Button>
 				<br /><br />
 
