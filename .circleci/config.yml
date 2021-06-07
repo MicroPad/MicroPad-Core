@@ -33,7 +33,8 @@ jobs:
             - yarn-packages-master
             - yarn-packages-
 
-      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - run: wget https://rustwasm.github.io/wasm-pack/installer/init.sh
+      - run: chmod +x init.sh && ./init.sh
       - run: cd app && yarn
       - run: cd app && yarn playwright install-deps
 
