@@ -39,16 +39,19 @@ jobs:
           key: yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
           paths:
             - app/node_modules/
-      
-      # start the dev server
-      - run:
-          command: yarn start
-          background: true
-          working_directory: app/
 
       # run tests!
       - run: cd app && yarn typecheck
       - run: cd app && yarn lint
+
+      # build MicroPad to run e2e tests
+      - run:
+          command: yarn build
+          working_directory: app/
+      - run:
+          command: python3 http.server 3000
+          working_directory: app/build
+          background: true
       - run: cd app && yarn test
 
   build:
