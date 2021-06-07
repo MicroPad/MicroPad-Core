@@ -3,6 +3,7 @@ import { Autocomplete, Button, Icon, Modal } from 'react-materialize';
 import { Dialog } from '../../services/dialogs';
 import { NoteElement, Source } from 'upad-parse/dist/Note';
 import { Note } from 'upad-parse/dist';
+import { DEFAULT_MODAL_OPTIONS } from '../../util';
 
 export interface ISourcesComponent {
 	element: NoteElement;
@@ -26,7 +27,8 @@ export default class SourcesComponent extends React.Component<ISourcesComponent>
 		return (
 			<Modal
 				header="Bibliography"
-				trigger={<a href="#!" style={{ display: 'inline-flex', verticalAlign: 'middle' }}><Icon>school</Icon> <span style={{ marginLeft: '5px' }}>Bibliography ({bibliography.length})</span></a>}>
+				trigger={<a href="#!" style={{ display: 'inline-flex', verticalAlign: 'middle' }}><Icon>school</Icon> <span style={{ marginLeft: '5px' }}>Bibliography ({bibliography.length})</span></a>}
+				modalOptions={DEFAULT_MODAL_OPTIONS}>
 				<Button className="blue" waves="light" onClick={this.addSource}><Icon left={true}>add</Icon> Add Source</Button>
 				<br /><br />
 

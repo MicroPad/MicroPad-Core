@@ -10,6 +10,7 @@ import './MarkdownHelpComponent.css';
 import Async, { Props as AsyncProps } from 'react-promise';
 import { Translators } from 'upad-parse/dist';
 import { colourTransformer, fendTransformer } from './MarkdownTransformers';
+import { DEFAULT_MODAL_OPTIONS } from '../../../../util';
 
 const ModalAsync = Async as { new (props: AsyncProps<FormattingHelpNote>): Async<FormattingHelpNote> };
 
@@ -25,7 +26,8 @@ export default class MarkdownHelpComponent extends React.Component {
 				<Modal
 					header={note.title}
 					trigger={<a href="#!">Formatting Help</a>}
-					fixedFooter={true}>
+					fixedFooter={true}
+					modalOptions={DEFAULT_MODAL_OPTIONS}>
 					<div id="markdown-help" dangerouslySetInnerHTML={{
 						__html: note.html
 

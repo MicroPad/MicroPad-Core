@@ -7,6 +7,7 @@ import { Dialog } from '../../../services/dialogs';
 import { ConnectedProps } from 'react-redux';
 import { explorerOptionsConnector } from './ExplorerOptionsContainer';
 import MoveComponent from '../move/MoveContainer';
+import { DEFAULT_MODAL_OPTIONS } from '../../../util';
 
 type Props = ConnectedProps<typeof explorerOptionsConnector> & {
 	objToEdit: NPXObject | Notepad;
@@ -59,12 +60,16 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 			</div>
 		);
 
+		const modalId = `notepad-edit-object-modal-${(objToEdit as NPXObject)?.internalRef ?? objToEdit.title}`
+
 		return (
 			<Modal
-				key={`npeo-${objToEdit.title}`}
+				id={modalId}
+				key={modalId}
 				header={`Options for ${objToEdit.title}`}
-				trigger={<a href="#!" className="exp-options-trigger" style={{ color: colour }} data-handle={`npeo-${objToEdit.title}`}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}>
-				<div id="explorer-options-modal">
+				trigger={<a href="#!" className="exp-options-trigger" style={{ color: colour }}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}
+				modalOptions={DEFAULT_MODAL_OPTIONS}>
+				<div className="explorer-options-modal">
 					<Row>
 						<form action="#" onSubmit={this.rename}>
 							<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>

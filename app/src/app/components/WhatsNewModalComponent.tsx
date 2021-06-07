@@ -9,6 +9,7 @@ import { Modal } from 'react-materialize';
 import Async, { Props as AsyncProps } from 'react-promise';
 import { Translators } from 'upad-parse';
 import { colourTransformer, fendTransformer } from './note-viewer/elements/markdown/MarkdownTransformers';
+import { DEFAULT_MODAL_OPTIONS } from '../util';
 
 const ModalAsync = Async as { new (props: AsyncProps<WhatsNewNote>): Async<WhatsNewNote> };
 
@@ -25,7 +26,8 @@ export default class WhatsNewModalComponent extends React.Component {
 				<Modal
 					trigger={<a id="whats-new-modal-trigger" href="#!" />}
 					fixedFooter={true}
-					header={note.title}>
+					header={note.title}
+					modalOptions={DEFAULT_MODAL_OPTIONS}>
 					<div id="markdown-help" dangerouslySetInnerHTML={{
 						__html: note.html
 					}} />

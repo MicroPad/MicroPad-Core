@@ -2,6 +2,15 @@ import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import { FlatNotepad } from 'upad-parse/dist';
 
+export const DEFAULT_MODAL_OPTIONS = {
+	ready: (modal: HTMLElement[] /* This is a JQuery object containing a https://archives.materializecss.com/0.100.2/modals.html */) => {
+		window.MicroPadGlobals.currentModalId = modal[0].id;
+	},
+	complete: () => {
+		delete window.MicroPadGlobals.currentModalId;
+	}
+};
+
 export const filterTruthy = <T>() => filter((a: T | undefined | null | false): a is T => !!a);
 
 export const noEmit = () => filter((_a): _a is never => false);

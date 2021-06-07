@@ -4,6 +4,7 @@ import { Button, Input, Modal } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL, SYNC_NAME } from '../../types';
 import { SyncUser } from '../../types/SyncTypes';
 import { Dialog } from '../../services/dialogs';
+import { DEFAULT_MODAL_OPTIONS } from '../../util';
 
 export interface ILoginComponentProps {
 	syncUser?: SyncUser;
@@ -35,7 +36,8 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 					</React.Fragment>
 				}
 				trigger={trigger}
-				fixedFooter={true}>
+				fixedFooter={true}
+				modalOptions={DEFAULT_MODAL_OPTIONS}>
 				<React.Fragment>
 					<div className="login-component__promo">
 						<p>

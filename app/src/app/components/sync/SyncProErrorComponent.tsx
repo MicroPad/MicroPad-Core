@@ -1,12 +1,14 @@
 import * as React from 'react';
 import { Button, Modal } from 'react-materialize';
 import { MICROPAD_URL, SYNC_NAME } from '../../types';
+import { DEFAULT_MODAL_OPTIONS } from '../../util';
 
 export const SyncProErrorComponent = () => (
 	/* eslint-disable jsx-a11y/anchor-has-content */
 	<Modal
 		trigger={<a id="sync-pro-error-trigger" href="#!" />}
-		header="Good and bad news">
+		header="Good and bad news"
+		modalOptions={DEFAULT_MODAL_OPTIONS}>
 		<div>
 			<p>
 				The good news is that you're using your notepad well with lots of images, recordings, files, and/or drawings!

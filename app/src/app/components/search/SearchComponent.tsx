@@ -5,6 +5,7 @@ import { FlatNotepad } from 'upad-parse/dist';
 import { fromEvent, Subject, Subscription } from 'rxjs';
 import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../../types/ActionTypes';
 import { HashTagSearchResult, HashTagSearchResults } from '../../reducers/SearchReducer';
+import { DEFAULT_MODAL_OPTIONS } from '../../util';
 
 export interface ISearchComponentProps {
 	notepad?: FlatNotepad;
@@ -65,7 +66,8 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 			<Modal
 				key={`search-${(notepad || { title: 'all' }).title}`}
 				header="Search"
-				trigger={<NavItem id={`search-button`} href="#!"><Icon left={true}>search</Icon> Search</NavItem>}>
+				trigger={<NavItem id={`search-button`} href="#!"><Icon left={true}>search</Icon> Search</NavItem>}
+				modalOptions={DEFAULT_MODAL_OPTIONS}>
 				<Row>
 					<Input
 						list="search-results"

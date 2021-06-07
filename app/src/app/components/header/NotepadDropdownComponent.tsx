@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Col, Dropdown, Icon, Modal, NavItem, ProgressBar, Row } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
-import { generateGuid } from '../../util';
+import { DEFAULT_MODAL_OPTIONS, generateGuid } from '../../util';
 import { Dialog } from '../../services/dialogs';
 import { SYNC_NAME } from '../../types';
 import LoginComponent from '../../containers/LoginContainer';
@@ -51,7 +51,8 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 
 					<Modal
 						header="Export All Notepads"
-						trigger={<NavItem id="export-all-notepads-trigger" href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}>
+						trigger={<NavItem id="export-all-notepads-trigger" href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}
+						modalOptions={DEFAULT_MODAL_OPTIONS}>
 						<Row>
 							<Col s={12} m={6} style={{ cursor: 'pointer' }} onClick={exportAll}>
 								<img src={NpxIcon} style={iconStyles} title="Export notepads as a zip archive of NPX files" alt="" />
