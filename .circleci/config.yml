@@ -7,7 +7,7 @@ jobs:
   test:
     docker:
       # specify the version you desire here
-      - image: circleci/rust:latest-node
+      - image: cimg/rust:1.52-node
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
