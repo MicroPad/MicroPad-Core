@@ -32,14 +32,20 @@ jobs:
 
       - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: cd app && yarn
-      - run: cd app && yarn playwright install-deps
+      - run: cd app && yarn global add playwright && yarn playwright install-deps
 
       - save_cache:
           name: Save Yarn Package Cache
           key: yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
           paths:
             - app/node_modules/
-        
+      
+      # start the dev server
+      - run:
+        command: yarn start
+        background: true
+        working_directory: app/
+
       # run tests!
       - run: cd app && yarn typecheck
       - run: cd app && yarn lint
