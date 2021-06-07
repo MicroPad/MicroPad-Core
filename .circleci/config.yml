@@ -33,6 +33,7 @@ jobs:
             - yarn-packages-master
             - yarn-packages-
 
+      - run: sudo apt install wget
       - run: wget https://rustwasm.github.io/wasm-pack/installer/init.sh
       - run: chmod +x init.sh && ./init.sh
       - run: cd app && yarn
