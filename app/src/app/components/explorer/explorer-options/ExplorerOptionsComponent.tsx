@@ -7,7 +7,7 @@ import { Dialog } from '../../../services/dialogs';
 import { ConnectedProps } from 'react-redux';
 import { explorerOptionsConnector } from './ExplorerOptionsContainer';
 import MoveComponent from '../move/MoveContainer';
-import { DEFAULT_MODAL_OPTIONS } from '../../../util';
+import { DEFAULT_MODAL_OPTIONS, generateGuid } from '../../../util';
 
 type Props = ConnectedProps<typeof explorerOptionsConnector> & {
 	objToEdit: NPXObject | Notepad;
@@ -60,7 +60,7 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 			</div>
 		);
 
-		const modalId = `notepad-edit-object-modal-${(objToEdit as NPXObject)?.internalRef ?? objToEdit.title}`
+		const modalId = `notepad-edit-object-modal-${(objToEdit as NPXObject).internalRef ?? generateGuid()}`
 
 		return (
 			<Modal
