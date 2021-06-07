@@ -49,7 +49,7 @@ jobs:
           command: yarn build
           working_directory: app/
       - run:
-          command: python3 http.server 3000
+          command: python3 -m http.server 3000
           working_directory: app/build
           background: true
       - run: cd app && yarn test
