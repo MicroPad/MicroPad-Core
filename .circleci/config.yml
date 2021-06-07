@@ -29,7 +29,7 @@ jobs:
 
       - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: cd app && yarn
-      - run: yarn playwright install-deps
+      - run: cd app && yarn playwright install-deps
 
       - save_cache:
           name: Save Yarn Package Cache
