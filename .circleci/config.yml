@@ -7,17 +7,22 @@ jobs:
   test:
     docker:
       # specify the version you desire here
-      - image: cimg/rust:1.52-node
+      - image: mcr.microsoft.com/playwright:focal
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/mongo:3.4.4
 
+    environment:
+      NODE_ENV: development
+
     working_directory: ~/repo
 
     steps:
       - checkout
+
+      - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
       - restore_cache:
           name: Restore Yarn Package Cache
