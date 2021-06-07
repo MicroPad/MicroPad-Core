@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["jest-playwright-preset", "expect-playwright", "jest"],
+    "isolatedModules": false
+  },
+  "include": ["src"]
+}

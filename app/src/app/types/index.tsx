@@ -21,9 +21,16 @@ export interface IStoreState {
 	readonly isExporting: IsExportingState;
 }
 
-export type IAppWindow = Window & typeof globalThis & {
-	isElectron: boolean
+export type MicroPadGlobals = {
+	currentModalId?: string
 };
+declare global {
+	interface Window {
+		MicroPadGlobals: MicroPadGlobals
+		isElectron?: boolean,
+		toastEvent: (guid: string) => void
+	}
+}
 
 export const APP_NAME = 'µPad';
 export const SYNC_NAME = 'µSync';

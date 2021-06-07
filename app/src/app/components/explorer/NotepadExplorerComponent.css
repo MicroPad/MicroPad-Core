@@ -87,11 +87,11 @@
 	display: inline-block;
 }
 
-#explorer-options-modal button {
+.explorer-options-modal button {
 	width: 260px;
 }
 
-#explorer-options-modal .col > button {
+.explorer-options-modal .col > button {
 	width: initial;
 }
 

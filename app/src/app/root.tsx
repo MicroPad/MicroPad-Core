@@ -17,7 +17,7 @@ import * as React from 'react';
 import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed
 import 'materialize-css/dist/js/materialize.js';
 import * as serviceWorker from '../registerServiceWorker';
-import { APP_NAME, IAppWindow, MICROPAD_URL } from './types';
+import { APP_NAME, MICROPAD_URL } from './types';
 import { applyMiddleware, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
@@ -41,6 +41,8 @@ import { ThemeName } from './types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './services/ToastEventHandler';
 import { LastOpenedNotepad } from './epics/StorageEpics';
+
+window.MicroPadGlobals = {};
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -92,7 +94,7 @@ export function getStorage(): StorageMap {
 	if (!await compatibilityCheck()) return;
 	await hydrateStoreFromLocalforage();
 
-	if ((window as IAppWindow).isElectron) store.dispatch(actions.checkVersion(undefined));
+	if (window.isElectron) store.dispatch(actions.checkVersion(undefined));
 	store.dispatch(actions.getNotepadList.started(undefined));
 	store.dispatch(actions.indexNotepads.started(undefined));
 
@@ -171,8 +173,14 @@ async function compatibilityCheck(): Promise<boolean> {
 		testIframe.srcdoc = 'test';
 		return testIframe.getAttribute('srcdoc') === 'test';
 	}
+	function hasUrlHelperClasses(): boolean {
+		try {
+			const url = new URL('https://example.com');
+			return !!new URLSearchParams(url.search);
+		} catch (_) { return false; }
+	}
 
-	if (!doesSupportSrcDoc()) {
+	if (!(doesSupportSrcDoc() && hasUrlHelperClasses())) {
 		ReactDOM.render(
 			<div style={{ margin: '10px' }}>
 				<h1>Bad news <span role="img" aria-label="sad face">😢</span></h1>
@@ -224,7 +232,7 @@ function pasteWatcher() {
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-if ((window as IAppWindow).isElectron) {
+if (window.isElectron) {
 	serviceWorker.unregister();
 } else {
 	serviceWorker.register();
