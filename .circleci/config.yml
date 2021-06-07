@@ -7,22 +7,20 @@ jobs:
   test:
     docker:
       # specify the version you desire here
-      - image: mcr.microsoft.com/playwright:focal
+      - image: cimg/rust:1.52-node
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/mongo:3.4.4
 
+    working_directory: ~/repo
+
     environment:
       NODE_ENV: development
 
-    working_directory: ~/repo
-
     steps:
       - checkout
-
-      - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
       - restore_cache:
           name: Restore Yarn Package Cache
@@ -32,7 +30,7 @@ jobs:
             - yarn-packages-master
             - yarn-packages-
 
-      - run: source $HOME/.cargo/env && cargo install wasm-pack
+      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: cd app && yarn
       - run: cd app && yarn playwright install-deps
 
