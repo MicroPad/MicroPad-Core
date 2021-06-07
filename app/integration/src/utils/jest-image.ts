@@ -8,7 +8,7 @@ export const IMG_SNAPSHOT_OPTS: MatchImageSnapshotOptions = {
 	// https://github.com/americanexpress/jest-image-snapshot#recommendations-when-using-ssim-comparison
 	comparisonMethod: 'ssim',
 	failureThresholdType: 'percent',
-	failureThreshold: 0
+	failureThreshold: 0.05
 };
 
 expect.extend({ toMatchImageSnapshot });
