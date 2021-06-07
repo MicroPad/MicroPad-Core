@@ -42,9 +42,9 @@ jobs:
       
       # start the dev server
       - run:
-        command: yarn start
-        background: true
-        working_directory: app/
+          command: yarn start
+          background: true
+          working_directory: app/
 
       # run tests!
       - run: cd app && yarn typecheck
