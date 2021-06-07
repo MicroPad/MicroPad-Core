@@ -33,9 +33,7 @@ jobs:
             - yarn-packages-master
             - yarn-packages-
 
-      - run: apt install wget
-      - run: wget https://rustwasm.github.io/wasm-pack/installer/init.sh
-      - run: chmod +x init.sh && ./init.sh
+      - run: cargo install wasm-pack
       - run: cd app && yarn
       - run: cd app && yarn playwright install-deps
 
