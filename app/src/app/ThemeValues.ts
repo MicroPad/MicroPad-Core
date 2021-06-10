@@ -73,8 +73,8 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		background: '#fdd1a4',
 		accent: '#fde7a4',
 		chrome: '#fdc3a4',
-		text: '#444',
-		links: '#231e23',
+		text: '#000',
+		links: '#444',
 		explorerContent: '#333',
 		backgroundImage: filledBackground,
 		instructionImages: {
@@ -87,8 +87,8 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		background: '#f7f2e7',
 		accent: '#d8d3cd',
 		chrome: '#e0ece4',
-		text: '#444',
-		links: '#231e23',
+		text: '#000',
+		links: '#444',
 		explorerContent: '#333',
 		backgroundImage: filledBackground,
 		instructionImages: {
@@ -101,8 +101,8 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		background: '#F4FFF8',
 		accent: '#5fa7a0',
 		chrome: '#a7ded8',
-		text: '#444',
-		links: '#231e23',
+		text: '#000',
+		links: '#444',
 		explorerContent: '#333',
 		backgroundImage: filledBackground,
 		instructionImages: {
