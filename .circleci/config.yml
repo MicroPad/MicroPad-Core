@@ -117,8 +117,8 @@ workflows:
     jobs:
       - build
       - test
-        requires:
-          - build
+          requires:
+            - build
       - publish-github-release:
           requires:
             - test
