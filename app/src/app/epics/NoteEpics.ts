@@ -163,10 +163,7 @@ const quickMarkdownInsert$ = (action$: Observable<MicroPadAction>, store: EpicSt
 		filter(ref => ref.length > 0 && !!store.getState().notepads.notepad && !!store.getState().notepads.notepad!.item),
 		map(ref => store.getState().notepads.notepad!.item!.notes[ref]),
 		concatMap(note => {
-			let count = note.elements.filter(e => e.type === 'markdown').length + 1;
-			let id = `markdown${count}`;
-			// eslint-disable-next-line no-loop-func
-			while (note.elements.some(e => e.args.id === id)) id = `markdown${++count}`;
+			const id = `markdown${generateGuid()}`;
 
 			return [
 				actions.insertElement({
@@ -198,11 +195,7 @@ const imagePasted$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 		switchMap(imageUrl =>
 			from(fetch(imageUrl).then(res => res.blob())).pipe(
 				concatMap(image => {
-					const note = store.getState().notepads.notepad!.item!.notes[store.getState().currentNote.ref];
-					let count = note.elements.filter(e => e.type === 'image').length + 1;
-					let id = `image${count}`;
-					// eslint-disable-next-line no-loop-func
-					while (note.elements.some(e => e.args.id === id)) id = `image${++count}`;
+					let id = `image${generateGuid()}`;
 
 					const element: NoteElement = {
 						type: 'image',

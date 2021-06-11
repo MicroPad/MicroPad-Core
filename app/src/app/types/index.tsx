@@ -28,7 +28,10 @@ declare global {
 	interface Window {
 		MicroPadGlobals: MicroPadGlobals
 		isElectron?: boolean,
-		toastEvent: (guid: string) => void
+		toastEvent: (guid: string) => void,
+
+		/** This is just missing from TS typings */
+		crossOriginIsolated?: boolean
 	}
 }
 

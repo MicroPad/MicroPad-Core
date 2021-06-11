@@ -10,7 +10,6 @@ import { parse } from 'date-fns';
 import { LAST_MODIFIED_FORMAT, Notepad } from 'upad-parse/dist';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { encrypt } from 'upad-parse/dist/crypto';
-import { checksum } from 'asset-checksum';
 
 const SyncThread = new SyncWorker() as ISyncWorker;
 
@@ -78,14 +77,8 @@ export const SyncService = (() => {
 	const deleteNotepad = (syncId: string): Observable<void> => call<void>('delete', syncId);
 
 	async function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
-		const { assets, notepadAssets } = await SyncThread.getAssetInfo(notepad);
-
-		const assetHashList = {};
-		for (const [assetId, buffer] of Object.entries(assets)) {
-			assetHashList[assetId] = checksum(new Uint8Array(buffer));
-		}
-
-		return Object.assign({}, notepad, { assetHashList, notepadAssets });
+		const { assets } = await SyncThread.getAssetInfo(notepad.flatten());
+		return Object.assign({}, notepad, { assetHashList: assets });
 	}
 
 	return {

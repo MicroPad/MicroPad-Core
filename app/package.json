@@ -14,7 +14,6 @@
   "dependencies": {
     "@material-ui/core": "^4.0.2",
     "@material-ui/icons": "^4.0.1",
-    "asset-checksum": "../libs/asset-checksum/pkg",
     "date-fns": "^2.21.3",
     "deep-equal": "^2.0.5",
     "deep-freeze": "~0.0.1",

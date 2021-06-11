@@ -1,8 +1,14 @@
-import { getBytes, getUsedAssets } from '../util';
-import { Translators } from 'upad-parse';
 import * as localforage from 'localforage';
+import { getUsedAssets } from '../util';
+import { crc32 } from '../services/crc';
 
-export async function getAssetInfo(notepad) {
+/** @typedef {typeof import('upad-parse/dist/FlatNotepad')} FlatNotepad*/
+
+/**
+ * @param {FlatNotepad} flatNotepad
+ * @returns {Promise<{ assets: Object.<string, number> }>}>}>}
+ */
+export async function getAssetInfo(flatNotepad) {
 	// Setup access to our binary assets
 	const ASSET_STORAGE = localforage.createInstance({
 		name: 'MicroPad',
@@ -10,26 +16,18 @@ export async function getAssetInfo(notepad) {
 	});
 	await ASSET_STORAGE.ready();
 
-	notepad = await Translators.Json.toNotepadFromNotepad(notepad);
-	const npAssets = Array.from(getUsedAssets(notepad.flatten()));
+	const notepadAssets = Array.from(getUsedAssets(flatNotepad));
 
 	// Get assets from storage as byte arrays
-	let assetBytes = await Promise.all((await Promise.all(npAssets.map(uuid => ASSET_STORAGE.getItem(uuid))))
-		.map((blob) => {
-			try {
-				return getBytes(blob);
-			} catch (e) {
-				return null;
-			}
-		}));
+	const assetBlobs = await Promise.all(notepadAssets.map(uuid => ASSET_STORAGE.getItem(uuid)))
 
 	const assets = {};
-	for (let i = 0; i < npAssets.length; ++i) {
-		const bytes = assetBytes[i];
-		if (!bytes) continue;
+	for (let i = 0; i < notepadAssets.length; ++i) {
+		const blob = assetBlobs[i];
+		if (!blob || !blob.size) continue;
 
-		assets[npAssets[i]] = bytes;
+		assets[notepadAssets[i]] = crc32(new Uint8Array(await blob.arrayBuffer()));
 	}
 
-	return { assets: assets, notepadAssets: npAssets }
+	return { assets };
 }
