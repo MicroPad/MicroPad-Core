@@ -116,7 +116,7 @@ workflows:
   test-and-deploy:
     jobs:
       - build
-      - test
+      - test:
           requires:
             - build
       - publish-github-release:
