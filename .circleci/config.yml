@@ -25,10 +25,6 @@ jobs:
       - run: cd app && yarn
       - run: cd app && yarn global add playwright && yarn playwright install-deps
 
-      # run tests!
-      - run: cd app && yarn typecheck
-      - run: cd app && yarn lint
-
       # Load in the built MicroPad to run an instance for testing
       - attach_workspace:
           at: /tmp/mp-build
@@ -64,6 +60,11 @@ jobs:
           paths:
             - app/node_modules/
 
+      # Validate if we're building good code
+      - run: cd app && yarn typecheck
+      - run: cd app && yarn lint
+
+      # Actually build the code, and then persist the result
       - run: cd app && yarn build && tar cfJ micropad.tar.xz build/*
       - store_artifacts:
           path: app/micropad.tar.xz
@@ -116,7 +117,7 @@ workflows:
   test-and-deploy:
     jobs:
       - build
-      - test
+      - test:
           requires:
             - build
       - publish-github-release:
