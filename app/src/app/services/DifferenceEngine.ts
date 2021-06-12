@@ -1,6 +1,6 @@
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import SyncWorker from '!workerize-loader!../workers/SyncWorker.js';
+import SyncWorker from '!workerize-loader!../workers/sync-worker/sync-worker.js';
 
 import { from, Observable, of } from 'rxjs';
 import { MICROPAD_URL } from '../types';

@@ -18,7 +18,7 @@ import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is remo
 import 'materialize-css/dist/js/materialize.js';
 import * as serviceWorker from '../registerServiceWorker';
 import { APP_NAME, MICROPAD_URL } from './types';
-import { applyMiddleware, createStore } from 'redux';
+import { applyMiddleware, compose, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
 import { composeWithDevTools } from 'redux-devtools-extension';
@@ -41,6 +41,7 @@ import { ThemeName } from './types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './services/ToastEventHandler';
 import { LastOpenedNotepad } from './epics/StorageEpics';
+import { createSentryReduxEnhancer } from '../sentry';
 
 window.MicroPadGlobals = {};
 
@@ -54,7 +55,7 @@ const baseReducer: BaseReducer = new BaseReducer();
 export const store = createStore(
 	baseReducer.reducer,
 	baseReducer.initialState,
-	composeWithDevTools(applyMiddleware(epicMiddleware))
+	composeWithDevTools(compose(applyMiddleware(epicMiddleware), createSentryReduxEnhancer()))
 );
 
 export const TOAST_HANDLER = new ToastEventHandler();

@@ -1,7 +1,8 @@
-import { FlatNotepad, Notepad } from 'upad-parse/dist';
+import { Notepad } from 'upad-parse/dist';
+import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
 
 export interface ISyncWorker {
-	getAssetInfo(notepad: FlatNotepad): Promise<{ assets: Record<string, number> }>;
+	getAssetInfo: typeof getAssetInfoImpl;
 }
 
 export type SyncLoginRequest = {

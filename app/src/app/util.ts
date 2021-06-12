@@ -80,9 +80,8 @@ export function getBytes(blob: Blob): Promise<ArrayBuffer> {
 
 export function getUsedAssets(notepad: FlatNotepad): Set<string> {
 	return new Set(
-		Object.values(notepad.notes)
-		.map(
-			n => n.elements
+		Object.values(notepad.notes).map(n =>
+			n.elements
 				.map(e => e.args.ext)
 				.filter((a?: string): a is string => !!a)
 		)
