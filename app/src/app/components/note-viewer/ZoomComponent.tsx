@@ -17,7 +17,8 @@ export default class ZoomComponent extends React.Component<IZoomComponentProps> 
 
 		const buttonStyle: React.CSSProperties = {
 			backgroundColor: theme.chrome,
-			transition: 'background-color .3s'
+			transition: 'background-color .3s',
+			color: theme.explorerContent
 		};
 
 		const offset = isMobile() ? 5 : 25;
