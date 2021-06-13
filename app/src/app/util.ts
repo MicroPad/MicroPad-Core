@@ -1,7 +1,7 @@
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
 import { FlatNotepad } from 'upad-parse/dist';
-import { ModalOptions } from 'react-materialize/lib/Modal';
+import { ModalOptions } from 'react-materialize';
 
 export const DEFAULT_MODAL_OPTIONS: ModalOptions = {
 	onOpenEnd: (modal: HTMLElement) => {

@@ -10625,10 +10625,9 @@ react-is@^16.13.1, react-is@^16.7.0, react-is@^16.8.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-materialize@^3.9.8:
+"react-materialize@git+https://github.com/MicroPad/react-materialize.git#temp-fix":
   version "3.9.8"
-  resolved "https://registry.yarnpkg.com/react-materialize/-/react-materialize-3.9.8.tgz#f2884e32a2682c3cf74a7713ee0598d47f5287c4"
-  integrity sha512-fKgG/gGeVe/6V3msd/4hsPAlUkhlLpX37g+N31mqYhUffTsYo7V7AG5WGTnrZYEwQbIc+fC9dj+Utw1FjCW8PQ==
+  resolved "git+https://github.com/MicroPad/react-materialize.git#065e6fd0de8ec7df1c460a7f5d098dc350319212"
   dependencies:
     classnames "^2.2.6"
 
