@@ -1,7 +1,8 @@
 import { Notepad } from 'upad-parse/dist';
+import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
 
 export interface ISyncWorker {
-	getAssetInfo(notepad: Notepad): Promise<{ assets: Record<string, SharedArrayBuffer>, notepadAssets: string[] }>;
+	getAssetInfo: typeof getAssetInfoImpl;
 }
 
 export type SyncLoginRequest = {
@@ -30,5 +31,5 @@ export interface INotepadSharingData {
 export type CombinedNotepadSyncList = Record<string, INotepadSharingData>;
 
 export interface ISyncedNotepad extends Notepad {
-	assetHashList: AssetList;
+	assetHashList: { [uuid: string]: number };
 }

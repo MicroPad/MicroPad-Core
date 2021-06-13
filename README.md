@@ -1,8 +1,5 @@
 # µPad
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMicroPad%2FWeb.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FMicroPad%2FWeb?ref=badge_shield)
-
-
-µPad is an open digital note taking app.
+µPad is an open digital note-taking app.
 
 Try it today at https://web.getmicropad.com
 
@@ -13,9 +10,7 @@ There are a couple [GitHub Project boards](https://github.com/orgs/MicroPad/proj
 You will need the following:  
 - [Yarn](https://classic.yarnpkg.com/lang/en/) classic
 - [Node.js](https://nodejs.org/en/)
-- [Rust and Cargo](https://rustup.rs/)
 - [Python 3](https://www.python.org/)
-- [`wasm-bindgen`](https://rustwasm.github.io/docs/wasm-bindgen/)
 
 ### Installing dependencies
 ```bash
@@ -32,7 +27,3 @@ yarn start
 ```bash
 yarn build
 ```
-
-
-## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMicroPad%2FWeb.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FMicroPad%2FWeb?ref=badge_large)
