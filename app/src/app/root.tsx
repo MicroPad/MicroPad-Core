@@ -75,10 +75,18 @@ export const SYNC_STORAGE = localforage.createInstance({
 	storeName: 'sync'
 });
 
+export const SETTINGS_STORAGE = localforage.createInstance({
+	name: 'MicroPad',
+	storeName: 'settings'
+});
+
 export type StorageMap = {
 	notepadStorage: LocalForage,
 	assetStorage: LocalForage,
 	syncStorage: LocalForage,
+	settingsStorage: LocalForage,
+
+	/** @deprecated Use settingsStorage instead */
 	generalStorage: LocalForage
 };
 
@@ -87,6 +95,7 @@ export function getStorage(): StorageMap {
 		notepadStorage: NOTEPAD_STORAGE,
 		assetStorage: ASSET_STORAGE,
 		syncStorage: SYNC_STORAGE,
+		settingsStorage: SETTINGS_STORAGE,
 		generalStorage: localforage
 	};
 }
@@ -140,7 +149,7 @@ export function getStorage(): StorageMap {
 })();
 
 async function hydrateStoreFromLocalforage() {
-	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), SYNC_STORAGE.ready()]);
+	await Promise.all(Object.values(getStorage()).map(storage => storage.ready()));
 
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
