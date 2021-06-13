@@ -358,9 +358,9 @@ export const clearStorageOnLogout$ = (action$: Observable<MicroPadAction>) =>
 export const openSyncProErrorModal$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		ofType<MicroPadAction>(actions.syncProError.type),
-		map(() => document.getElementById('sync-pro-error-trigger')),
+		map(() => document.getElementById('sync-pro-error-modal')),
 		filterTruthy(),
-		tap(trigger => trigger.click()),
+		tap(modalEl => M.Modal.getInstance(modalEl).open()),
 		noEmit()
 	);
 

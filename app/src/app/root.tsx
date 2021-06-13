@@ -1,3 +1,7 @@
+/* Special Imports */
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import helpNpx from '!raw-loader!./assets/Help.npx';
 /* CSS Imports */
 import 'material-icons-font/material-icons-font.css';
 import 'materialize-css/dist/css/materialize.min.css';
@@ -31,7 +35,7 @@ import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './services/shortcuts';
 import * as PasteImage from 'paste-image';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
-import WhatsNewModalComponent from './components/WhatsNewModalComponent';
+import NoteElementModalComponent from './components/note-element-modal/NoteElementModalComponent';
 import { SyncUser } from './types/SyncTypes';
 import { INotepadStoreState } from './types/NotepadTypes';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
@@ -41,6 +45,7 @@ import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './services/ToastEventHandler';
 import { LastOpenedNotepad } from './epics/StorageEpics';
 import { createSentryReduxEnhancer } from '../sentry';
+import { createDynamicCss } from './DynamicAppCss';
 
 window.MicroPadGlobals = {};
 
@@ -102,6 +107,7 @@ export function getStorage(): StorageMap {
 (async function init() {
 	if (!await compatibilityCheck()) return;
 	await hydrateStoreFromLocalforage();
+	createDynamicCss(store);
 
 	if (window.isElectron) store.dispatch(actions.checkVersion(undefined));
 	store.dispatch(actions.getNotepadList.started(undefined));
@@ -119,7 +125,7 @@ export function getStorage(): StorageMap {
 				<AppBodyComponent>
 					<NoteViewerComponent />
 					<NotepadExplorerComponent />
-					<WhatsNewModalComponent />
+					<NoteElementModalComponent id={"whats-new-modal"} npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
 					<SyncProErrorComponent />
 					<InsertElementComponent />
 				</ AppBodyComponent>
@@ -215,7 +221,7 @@ async function displayWhatsNew() {
 	if (minorVersion === oldMinorVersion) return;
 
 	// Open "What's New"
-	document.getElementById('whats-new-modal-trigger')!.click();
+	M.Modal.getInstance(document.getElementById('whats-new-modal')!).open();
 	await localforage.setItem('oldMinorVersion', minorVersion);
 }
 

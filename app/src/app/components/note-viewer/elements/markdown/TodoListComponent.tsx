@@ -1,10 +1,7 @@
 import * as React from 'react';
-import Async, { Props as AsyncProps } from 'react-promise';
-
-const ProgressAsync = Async as { new (props: AsyncProps<IProgressValues>): Async<IProgressValues> };
 
 export interface ITodoListComponentProps {
-	html: Promise<string>;
+	html: string;
 	toggle: () => void;
 }
 
@@ -13,56 +10,44 @@ interface IProgressValues {
 	all: number;
 }
 
-export default class TodoListComponent extends React.Component<ITodoListComponentProps> {
-	render() {
-		const { toggle } = this.props;
+const TodoListComponent = (props: ITodoListComponentProps) => {
+	const { toggle, html } = props;
+	const progressValues = getProgress(html);
 
-		const meterStyle = {
-			width: '100%'
-		};
+	const meterStyle = {
+		width: '100%'
+	};
 
-		return (
-			<ProgressAsync promise={this.getProgress()} then={(progressValues) =>
-				<div
-					className="markdown-element__todo-list-tracker"
-					style={{
-						marginLeft: '5px',
-						marginRight: '5px',
-						textAlign: 'center',
-						display: (progressValues.all > 0) ? undefined : 'none'
-					}}>
-					<meter
-						value={progressValues.done}
-						min={0}
-						max={progressValues.all}
-						style={meterStyle}>
-						{Math.round((progressValues.done / progressValues.all) * 100)}%
-					</meter>
+	return (
+		<div
+			className="markdown-element__todo-list-tracker"
+			style={{
+				marginLeft: '5px',
+				marginRight: '5px',
+				textAlign: 'center',
+				display: (progressValues.all > 0) ? undefined : 'none'
+			}}>
+			<meter
+				value={progressValues.done}
+				min={0}
+				max={progressValues.all}
+				style={meterStyle}>
+				{Math.round((progressValues.done / progressValues.all) * 100)}%
+			</meter>
 
-					<br /><a href="#!" onClick={toggle}>Show/Hide Completed Items ({progressValues.done}/{progressValues.all})</a>
-				</div>
-			} />
-		);
-	}
+			<br /><a href="#!" onClick={toggle}>Show/Hide Completed Items ({progressValues.done}/{progressValues.all})</a>
+		</div>
+	);
+}
+export default TodoListComponent;
 
-	private getProgress: () => Promise<IProgressValues> = () => {
-		const { html } = this.props;
+function getProgress(html: string): IProgressValues {
+	// Create virtual element of the html given
+	const element = document.createElement('div');
+	element.innerHTML = html;
 
-		return new Promise<IProgressValues>(resolve => {
-			html
-				.then(htmlValue => {
-					// Create virtual element of the html given
-					const element = document.createElement('div');
-					element.innerHTML = htmlValue;
+	const done = element.querySelectorAll('.task-list-item input:checked').length;
+	const all = element.querySelectorAll('.task-list-item').length;
 
-					const done = element.querySelectorAll('.task-list-item input:checked').length;
-					const all = element.querySelectorAll('.task-list-item').length;
-
-					resolve({
-						done,
-						all
-					});
-				});
-		});
-	}
+	return { done, all };
 }

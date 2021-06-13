@@ -10631,13 +10631,6 @@ react-is@^16.13.1, react-is@^16.7.0, react-is@^16.8.1:
   dependencies:
     classnames "^2.2.6"
 
-react-promise@^2.0.2:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/react-promise/-/react-promise-2.1.0.tgz#8a8d590b4ec9dc8fca428859bafe65c6f04e151e"
-  integrity sha512-j9B97+RWlC/OS36asazn1mn24F+xfi5x6PP6b/vq1TyKZ9CfI8mFJGIvqEJCngO8orC2+OaUM4ZlvQiEsY19bQ==
-  dependencies:
-    prop-types "^15.6.2"
-
 react-redux@^7.1.0:
   version "7.2.4"
   resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-7.2.4.tgz#1ebb474032b72d806de2e0519cd07761e222e225"

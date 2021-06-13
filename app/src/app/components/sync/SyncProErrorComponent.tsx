@@ -6,7 +6,7 @@ import { DEFAULT_MODAL_OPTIONS } from '../../util';
 export const SyncProErrorComponent = () => (
 	/* eslint-disable jsx-a11y/anchor-has-content */
 	<Modal
-		trigger={<a id="sync-pro-error-trigger" href="#!" />}
+		id="sync-pro-error-modal"
 		header="Good and bad news"
 		options={DEFAULT_MODAL_OPTIONS}>
 		<div>
