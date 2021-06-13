@@ -57,7 +57,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 						minHeight={130}
 						lockAspectRatio={true}
 						onResizeStart={() => {
-							this.canvasElement.toBlob(result => this.canvasImage = result);
+							this.canvasElement.toBlob(result => this.canvasImage = result, 'image/png', 1);
 						}}
 						onResize={(e, d, ref) => {
 							this.canvasElement.width = parseInt(ref.style.width!, 10) - 10;
