@@ -46,7 +46,7 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 
 					<p>
 						<em>
-							Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.<br />
+							Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.
 							Only titles, sources, markdown text, etc. are encrypted. Images and other binary items will not be encrypted. Exporting
 							to NPX files will export to plain-text.
 						</em>

@@ -53,7 +53,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			strikethrough: true,
 			tables: true,
 			tasklists: true,
-			prefixHeaderId: 'mdheader_',
+			noHeaderId: true,
 			emoji: true,
 			extensions: ['maths', 'fend', 'graphs', 'hashtags', 'colour']
 		} as IShowdownOpts);

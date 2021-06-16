@@ -10,13 +10,16 @@ import hljsCss from '!raw-loader!../../../../assets/highlight.js/default.css';
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import hljsCssDark from '!raw-loader!../../../../assets/highlight.js/monokai.css';
+
 import { ITheme } from '../../../../types/Themes';
+import { isDev } from '../../../../util';
 
 export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): string => `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<style>${theme.text === '#000' ? hljsCss : hljsCssDark}</style>
+	<link href="${isDev() ? 'https://fonts.googleapis.com/css?family=Open+Sans' : 'assets/open-sans/index.css'}" rel="stylesheet" as="font">
 	<style>
 		html, body, #content {
 			margin: 0;
@@ -33,7 +36,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 			min-width: 170px;
 			min-height: 50px;
 			padding: 5px;
-			font-family: "Roboto", sans-serif;
+			font-family: "Open Sans", "Ubuntu", "Roboto", sans-serif;
 			line-height: 1.5;
 			color: ${theme.text}
 		}

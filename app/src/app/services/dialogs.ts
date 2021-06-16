@@ -7,20 +7,20 @@ Vex.registerPlugin(VexDialog);
 Vex.defaultOptions!.className = 'vex-theme-top';
 
 export class Dialog {
-	public static alert = (message: string) => Vex.dialog.alert(message);
+	public static alert = (message: string) => setTimeout(() => Vex.dialog.alert(message), 0);
 
 	public static confirm = (message: string): Promise<boolean> => new Promise(resolve =>
-		Vex.dialog.confirm({
+		setTimeout(() => Vex.dialog.confirm({
 			message,
 			callback: value => resolve(value)
-		})
+		}), 0)
 	)
 
 	public static confirmUnsafe = (unsafeMessage: string): Promise<boolean> => new Promise(resolve =>
-		Vex.dialog.confirm({
+		setTimeout(() => Vex.dialog.confirm({
 			unsafeMessage,
 			callback: value => resolve(value)
-		})
+		}), 0)
 	)
 
 	public static prompt = (message: string, placeholder?: string): Promise<string> =>

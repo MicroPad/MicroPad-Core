@@ -6,7 +6,7 @@
 	min-width: 170px;
 	min-height: 50px;
 	padding: 5px;
-	font-family: "Roboto", sans-serif;
+	font-family: "ABeeZee", "Roboto", sans-serif;
 	line-height: 1.5;
 
 	cursor: auto;
@@ -50,4 +50,8 @@
 
 #markdown-editor-label > div {
 	display: inline;
+}
+
+#markdown-help h1, #markdown-help h2, #markdown-help h3, #markdown-help h4, #markdown-help h5, #markdown-help h6 {
+	margin: 10px;
 }

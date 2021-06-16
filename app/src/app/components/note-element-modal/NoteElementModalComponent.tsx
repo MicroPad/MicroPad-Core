@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './NoteElementModalComponent.css';
 import { useState } from 'react';
 import { Converter, extension } from 'showdown';
 import { IShowdownOpts } from '../note-viewer/elements/markdown/MarkdownElementComponent';
@@ -81,7 +82,7 @@ async function renderNote({ npx, findNote }: Props): Promise<RenderedNote> {
 		strikethrough: true,
 		tables: true,
 		tasklists: true,
-		prefixHeaderId: 'mdheader_',
+		noHeaderId: true,
 		emoji: true,
 		extensions: ['mock', 'colour', 'fend']
 	} as IShowdownOpts)

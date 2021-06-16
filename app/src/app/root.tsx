@@ -3,6 +3,7 @@
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import helpNpx from '!raw-loader!./assets/Help.npx';
 /* CSS Imports */
+import '@fontsource/abeezee';
 import 'material-icons-font/material-icons-font.css';
 import 'materialize-css/dist/css/materialize.min.css';
 import './root.css';

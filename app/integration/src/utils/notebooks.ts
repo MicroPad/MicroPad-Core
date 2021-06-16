@@ -2,15 +2,16 @@ import { getCurrentModal } from './general-ui';
 
 export async function createNotebookUsingDropdown() {
 	// Click text=collections_bookmark Notebooks arrow_drop_down
-	await page.click('text=collections_bookmark Notebooks arrow_drop_down');
+	await page.click('#notepad-dropdown');
 	// Click text=add New
 	await page.click('text=add New');
 	// Fill input[name="vex"]
+	await page.waitForSelector('input[name="vex"]');
 	await page.fill('input[name="vex"]', 'Test Notebook');
 	// Press Enter
 	await page.press('input[name="vex"]', 'Enter');
 	// Click text=edit Text (with markdown formatting)
-	await page.click('text=edit Text (with markdown formatting)');
+	await page.click('#insert-element a:nth-child(1)');
 	// Fill textarea
 	await page.fill('textarea', 'Hello!');
 	// Wait for md to render

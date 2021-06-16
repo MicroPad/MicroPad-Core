@@ -33,6 +33,10 @@ export function createDynamicCss(store: Store<IStoreState, MicroPadAction>): voi
 				box-shadow: 0 1px 0 0 ${theme.accent} !important;
 				color: ${theme.text};
 			}
+			
+			input:not([type]):focus:not([readonly])+label, input[type=text]:not(.browser-default):focus:not([readonly])+label, input[type=password]:not(.browser-default):focus:not([readonly])+label, input[type=email]:not(.browser-default):focus:not([readonly])+label, input[type=url]:not(.browser-default):focus:not([readonly])+label, input[type=time]:not(.browser-default):focus:not([readonly])+label, input[type=date]:not(.browser-default):focus:not([readonly])+label, input[type=datetime]:not(.browser-default):focus:not([readonly])+label, input[type=datetime-local]:not(.browser-default):focus:not([readonly])+label, input[type=tel]:not(.browser-default):focus:not([readonly])+label, input[type=number]:not(.browser-default):focus:not([readonly])+label, input[type=search]:not(.browser-default):focus:not([readonly])+label, textarea.materialize-textarea:focus:not([readonly])+label {
+				color: ${theme.background === '#fff' ? theme.chrome : theme.text} !important;
+			}
 
 			.btn:hover, .btn-large:hover, .btn-small:hover {
 				background-color: ${theme.accent};
@@ -58,6 +62,21 @@ export function createDynamicCss(store: Store<IStoreState, MicroPadAction>): voi
 			
 			.modal .modal-content a, .modal .modal-content input {
 				color: ${theme.links};
+			}
+			
+			.vex-dialog-button-primary {
+				background-color: ${theme.accent} !important;
+				color: ${theme.accentContent} !important;
+			}
+			
+			.vex.vex-theme-top .vex-content {
+				background-color: ${theme.chrome};
+				color: ${theme.explorerContent};
+			}
+			
+			.vex.vex-theme-top .vex-content input {
+				background-color: ${theme.background} !important;
+				color: ${theme.text};
 			}
 		`;
 	});

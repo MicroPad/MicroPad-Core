@@ -8,6 +8,8 @@ body {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+
+	font-family: "ABeeZee", "Roboto", sans-serif;
 }
 
 #body {
@@ -60,8 +62,8 @@ nav .menu-items > div {
 	user-select: none;
 }
 
-.vex-dialog-button-primary {
-	background-color: #ffb300 !important;
+.vex .vex-content {
+	font-family: "ABeeZee", "Roboto", sans-serif !important;
 }
 
 .collection a.collection-item {
@@ -107,13 +109,17 @@ div.col.input-field {
 	cursor: se-resize;
 }
 
-input:not([type]):focus:not([readonly])+label, input[type=text]:not(.browser-default):focus:not([readonly])+label, input[type=password]:not(.browser-default):focus:not([readonly])+label, input[type=email]:not(.browser-default):focus:not([readonly])+label, input[type=url]:not(.browser-default):focus:not([readonly])+label, input[type=time]:not(.browser-default):focus:not([readonly])+label, input[type=date]:not(.browser-default):focus:not([readonly])+label, input[type=datetime]:not(.browser-default):focus:not([readonly])+label, input[type=datetime-local]:not(.browser-default):focus:not([readonly])+label, input[type=tel]:not(.browser-default):focus:not([readonly])+label, input[type=number]:not(.browser-default):focus:not([readonly])+label, input[type=search]:not(.browser-default):focus:not([readonly])+label, textarea.materialize-textarea:focus:not([readonly])+label {
-	color: #607d8b !important;
-}
-
 input[type=date]::-webkit-inner-spin-button, input[type=time]::-webkit-inner-spin-button {
 	-webkit-appearance: none;
 	display: none;
+}
+
+button, input[type=button] {
+	font-family: "ABeeZee", "Roboto", sans-serif;
+}
+
+strong {
+	font-weight: bolder;
 }
 
 #nav-mobile li {

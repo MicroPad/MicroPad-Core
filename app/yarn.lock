@@ -1276,6 +1276,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@fontsource/abeezee@^4.4.5":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@fontsource/abeezee/-/abeezee-4.4.5.tgz#39cd22a62201199d4083b669aef0ad62dcbe8105"
+  integrity sha512-1VXYhdZTKvV7hG7sDwJfpj3NJj1NvScbhQvA2CBaWoOL+mivn8lLW3bd2ZlGM2z8K98uefWpEOfElSxy/oSb4w==
+
 "@hapi/address@2.x.x":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.1.4.tgz#5d67ed43f3fd41a69d4b9ff7b56e7c0d1d0a81e5"

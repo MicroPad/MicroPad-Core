@@ -11,11 +11,11 @@ export const SyncProErrorComponent = () => (
 		options={DEFAULT_MODAL_OPTIONS}>
 		<div>
 			<p>
-				The good news is that you're using your notepad well with lots of images, recordings, files, and/or drawings!
+				The good news is that you're using your notebook well with lots of images, recordings, files, and/or drawings!
 			</p>
 
 			<p>
-				The bad news is that these notepads take up a lot more resources to keep in sync.<br />
+				The bad news is that these notepads take up a lot more resources to keep in-sync.<br />
 				To sync this notepad you'll need to upgrade to {SYNC_NAME} Pro for less than the price of a cup of coffee:
 			</p>
 
