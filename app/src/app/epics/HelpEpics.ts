@@ -7,7 +7,7 @@ import { filterTruthy } from '../util';
 import { actions, MicroPadAction } from '../actions';
 import { Dialog } from '../services/dialogs';
 
-const HELP_READONLY_DATE = new Date('2021-06-18T14:34:30.958+12:00');
+const HELP_READONLY_DATE = new Date('2021-08-18T14:34:30.958+12:00');
 
 export const getHelp$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
 	action$.pipe(
