@@ -32,13 +32,13 @@ import * as PasteImage from 'paste-image';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import WhatsNewModalComponent from './components/WhatsNewModalComponent';
 import { SyncUser } from './types/SyncTypes';
-import { INotepadStoreState } from './types/NotepadTypes';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from './types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './services/ToastEventHandler';
 import { LastOpenedNotepad } from './epics/StorageEpics';
+import { noop } from './util';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -115,8 +115,8 @@ export function getStorage(): StorageMap {
 		document.getElementById('app') as HTMLElement
 	);
 
-	if (!await localforage.getItem('hasRunBefore')) store.dispatch(actions.getHelp.started());
-	await localforage.setItem('hasRunBefore', true);
+	// Some clean up of an old storage item, this line can be deleted at some point in the future
+	localforage.removeItem('hasRunBefore').then(noop);
 
 	await displayWhatsNew();
 
@@ -126,12 +126,10 @@ export function getStorage(): StorageMap {
 
 	// Show a warning when closing before notepad save or sync is complete
 	store.subscribe(() => {
-		const isSaving = store.getState().notepads.isLoading || (store.getState().notepads.notepad || {} as INotepadStoreState).isLoading;
+		const isSaving = store.getState().notepads.isLoading || store.getState().notepads.notepad?.isLoading;
 		const isSyncing = store.getState().sync.isLoading;
 		window.onbeforeunload = (isSyncing || isSaving) ? () => true : null;
 	});
-
-	store.dispatch(actions.started());
 })();
 
 async function hydrateStoreFromLocalforage() {

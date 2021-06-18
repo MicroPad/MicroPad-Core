@@ -67,7 +67,6 @@ export const actions = {
 	getDueDates: actionCreator.async<string[], DueItem[], Error>('GET_DUE_DATES'),
 	moveObjAcrossNotepads: actionCreator.async<MoveAcrossNotepadsAction, void, Error>('CROSS_NOTEPAD_MOVE'),
 
-	started: actionCreator<void>('APP_STARTED'),
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
 	newNotepad: actionCreator<FlatNotepad>('NEW_NOTEPAD'),
@@ -120,3 +119,18 @@ export const actions = {
 	closeNotepad: actionCreator<void>('CLOSE_NOTEPAD'),
 	importMarkdown: actionCreator<Translators.Markdown.MarkdownImport[]>('IMPORT_FROM_MARKDOWN')
 };
+
+export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
+	actions.updateElement.type,
+	actions.quickNote.type,
+	actions.quickMarkdownInsert.type,
+	actions.insertElement.type,
+	actions.toggleInsertMenu.type,
+	actions.openEditor.type,
+	actions.renameNotepadObject.type,
+	actions.newSection.type,
+	actions.newNote.type,
+	actions.moveNotepadObject.type,
+	actions.deleteElement.type,
+	actions.deleteNotepadObject.type
+]);

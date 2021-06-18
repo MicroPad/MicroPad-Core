@@ -1,4 +1,4 @@
-import { actions, MicroPadAction } from '../actions';
+import { actions, MicroPadAction, READ_ONLY_ACTIONS } from '../actions';
 import {
 	catchError,
 	combineLatest,
@@ -45,6 +45,7 @@ import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { fromShell } from '../services/CryptoService';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
 import { EpicDeps, EpicStore } from './index';
+import * as Materialize from 'materialize-css/dist/js/materialize';
 
 const parseQueue: string[] = [];
 
@@ -519,6 +520,18 @@ const moveObjAcrossNotepadsFailure$ = (actions$: Observable<MicroPadAction>) =>
 		noEmit()
 	);
 
+const warnOnReadOnlyEdit$ = (actions$: Observable<MicroPadAction>, store: EpicStore) =>
+	actions$.pipe(
+		filter(() => !!store.getState().notepads.notepad?.isReadOnly),
+		filter(action => READ_ONLY_ACTIONS.has(action.type)),
+		tap(() => {
+			Materialize.Toast.removeAll();
+			Materialize.toast("This notepad is read-only. Changes will not be saved. Please create a notebook or " +
+				"open another one using the notebooks dropdown if you want to edit a notebook.");
+		}),
+		noEmit()
+	)
+
 export const notepadEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	parseNpx$,
 	syncOnNotepadParsed$ as any,
@@ -543,7 +556,8 @@ export const notepadEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	quickNotepad$,
 	autoFillNewNotepads$,
 	moveObjAcrossNotepads$,
-	moveObjAcrossNotepadsFailure$
+	moveObjAcrossNotepadsFailure$,
+	warnOnReadOnlyEdit$
 );
 
 interface IExportedNotepad {

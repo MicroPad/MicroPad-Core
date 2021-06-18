@@ -21,7 +21,8 @@ export function mapStateToProps({ notepads, explorer, app, currentNote }: IStore
 		openSections: explorer.openSections,
 		isFullScreen: app.isFullScreen,
 		openNote: note,
-		theme: ThemeValues[app.theme]
+		theme: ThemeValues[app.theme],
+		isReadOnly: !!notepads?.notepad?.isReadOnly
 	};
 }
 

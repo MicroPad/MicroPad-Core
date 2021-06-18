@@ -4,6 +4,7 @@ import {
 	concatMap,
 	debounceTime,
 	distinctUntilChanged,
+	distinctUntilKeyChanged,
 	filter,
 	map,
 	mergeMap,
@@ -27,6 +28,7 @@ import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
 import { EpicDeps, EpicStore } from './index';
+import { isReadOnlyNotebook } from '../ReadOnly';
 
 let currentNotepadTitle = '';
 
@@ -55,13 +57,14 @@ const saveOnChanges$ = (action$: Observable<MicroPadAction>, store: EpicStore) =
 		map((notepadState: INotepadStoreState) => notepadState.item),
 		filterTruthy(),
 		debounceTime(1000),
-		distinctUntilChanged(),
+		distinctUntilKeyChanged('lastModified'),
 		filter((notepad: FlatNotepad) => {
 			const condition = notepad.title === currentNotepadTitle;
 			currentNotepadTitle = notepad.title;
 
 			return condition;
 		}),
+		filter(notepad => !isReadOnlyNotebook(notepad.title)),
 		map((notepad: FlatNotepad) => notepad.toNotepad()),
 		mergeMap((notepad: Notepad) => {
 			const actionsToReturn: Action<any>[] = [];
