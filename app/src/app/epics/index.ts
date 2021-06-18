@@ -9,7 +9,7 @@ import { noteEpics$ } from './NoteEpics';
 import { appEpics$ } from './AppEpics';
 import { Action } from 'redux-typescript-actions';
 import { cryptoEpics$ } from './CryptoEpics';
-import { getStorage, StorageMap } from '../root';
+import { getStorage, StorageMap, TOAST_HANDLER } from '../root';
 import { printEpics$ } from './PrintEpics';
 import { helpEpics$ } from './HelpEpics';
 import { searchEpics$ } from './SearchEpics';
@@ -18,6 +18,7 @@ import { explorerEpics$ } from './ExplorerEpics';
 import { dueDatesEpics$ } from './DueDatesEpics';
 import { Dispatch, MiddlewareAPI } from 'redux';
 import { IStoreState } from '../types';
+import ToastEventHandler from '../services/ToastEventHandler';
 
 const baseEpic$ = combineEpics(
 	notepadEpics$,
@@ -35,13 +36,17 @@ const baseEpic$ = combineEpics(
 
 export type EpicDeps = {
 	helpNpx: string,
-	getStorage: () => StorageMap
+	getStorage: () => StorageMap,
+	now: () => Date,
+	getToastEventHandler: () => ToastEventHandler
 };
 
 export const epicMiddleware = createEpicMiddleware<Action<any>, any, EpicDeps>(baseEpic$, {
 	dependencies: {
 		helpNpx,
-		getStorage: getStorage
+		getStorage: getStorage,
+		now: () => new Date(),
+		getToastEventHandler: () => TOAST_HANDLER
 	}
 });
 

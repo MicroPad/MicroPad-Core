@@ -124,6 +124,8 @@ export function getStorage(): StorageMap {
 
 	pasteWatcher();
 
+	store.dispatch(actions.clearOldData.started({ silent: true }));
+
 	// Show a warning when closing before notepad save or sync is complete
 	store.subscribe(() => {
 		const isSaving = store.getState().notepads.isLoading || store.getState().notepads.notepad?.isLoading;

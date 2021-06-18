@@ -29,6 +29,7 @@ export interface INoteViewerComponentProps {
 	downloadAsset?: (filename: string, uuid: string) => void;
 	updateElement?: (id: string, changes: NoteElement, newAsset?: Blob) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
+	hideInsert?: () => void;
 	insert?: (element: NoteElement) => void;
 	deleteElement?: (id: string) => void;
 	deleteNotepad?: () => void;
@@ -141,14 +142,14 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	componentDidMount() {
-		const { edit, toggleInsertMenu } = this.props;
+		const { edit, hideInsert } = this.props;
 
 		this.escapeHit$.subscribe(() => edit!(''));
 
 		setInterval(() => {
 			if (this.scrolling) {
 				this.scrolling = false;
-				toggleInsertMenu!({ enabled: false });
+				hideInsert?.();
 			}
 		}, 250);
 	}

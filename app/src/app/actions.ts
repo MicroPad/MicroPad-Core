@@ -62,7 +62,7 @@ export const actions = {
 	imagePasted: actionCreator.async<string, void, Error>('IMAGE_PASTED'),
 	exportAll: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS'),
 	exportToMarkdown: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS_TO_MD'),
-	clearOldData: actionCreator.async<void, void, Error>('CLEAR_OLD_DATA'),
+	clearOldData: actionCreator.async<{ silent: boolean }, void, Error>('CLEAR_OLD_DATA'),
 	getHelp: actionCreator.async<void, void, Error>('GET_HELP'),
 	getDueDates: actionCreator.async<string[], DueItem[], Error>('GET_DUE_DATES'),
 	moveObjAcrossNotepads: actionCreator.async<MoveAcrossNotepadsAction, void, Error>('CROSS_NOTEPAD_MOVE'),
@@ -121,8 +121,15 @@ export const actions = {
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
+	actions.quickNote.started.type,
+	actions.quickNote.done.type,
+	actions.quickNote.failed.type,
+
+	actions.imagePasted.started.type,
+	actions.imagePasted.done.type,
+	actions.imagePasted.failed.type,
+
 	actions.updateElement.type,
-	actions.quickNote.type,
 	actions.quickMarkdownInsert.type,
 	actions.insertElement.type,
 	actions.toggleInsertMenu.type,

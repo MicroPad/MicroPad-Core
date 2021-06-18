@@ -15,14 +15,14 @@ of power and openness.
 - To see the future of MicroPad, take a look at our [GitHub Projects](https://github.com/orgs/MicroPad/projects).
 
 **Release notes for v3.30.0 (18th of June 2021)**  
-## c[IMPORTANT Information](red)
+### c[IMPORTANT Information](red)
 - There have been a few recent occurrences of people storing all of their notes inside the *Help* notebook.
 - This is dangerous because the Help notebook can be overwritten fairly easily.
 - From now on, the Help notebook will be **read-only**, so no changes to it can be made.
 - If you do have notes in the help:
     1. Open the options by clicking the cog next to the words `Help (Read-Only)`
     2. Enter a new name for the notebook
-    3. Hit `enter` or press `Rename Notebook` to rename your notebook
+    3. Hit `enter` or press *RENAME NOTEBOOK* to rename your notebook
 
 **Release notes for v3.29.0 (16th of May 2021)**  
 - Your last note is also reopened when launching MicroPad (not just the notebook). This was a MicroPad v2 feature that's taken
