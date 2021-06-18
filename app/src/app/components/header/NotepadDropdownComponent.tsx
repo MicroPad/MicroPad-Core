@@ -98,6 +98,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 
 	private createNotepad = async () => {
 		const title = await Dialog.prompt('Notebook/Notepad Title:');
+		if (!title) return;
 
 		let notepad = new FlatNotepad(title);
 		let section = FlatNotepad.makeFlatSection('Unorganised Notes');

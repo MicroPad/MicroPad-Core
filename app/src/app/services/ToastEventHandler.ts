@@ -21,6 +21,9 @@ export default class ToastEventHandler {
 		const guid = generateGuid();
 		this.handlers[guid] = handler;
 
+		// Let the collector get GC'd after 5 minutes if it hasn't been called
+		setTimeout(() => { delete this.handlers[guid]; }, 5 * 60 * 1000)
+
 		return guid;
 	}
 }

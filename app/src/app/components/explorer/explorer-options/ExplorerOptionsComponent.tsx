@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FormEvent } from 'react';
 import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
@@ -93,7 +94,8 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 		);
 	}
 
-	private rename = () => {
+	private rename = (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
 		const { objToEdit, type, renameNotepad, renameNotepadObject } = this.props;
 		const value = this.titleInput.state.value;
 
@@ -112,6 +114,8 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 			default:
 				break;
 		}
+
+		return false;
 	}
 
 	private delete = async () => {

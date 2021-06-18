@@ -145,3 +145,5 @@ export function debounce(callback: (...args: any[]) => void, time: number) {
 export function unreachable() {
 	return new Error('Unreachable Error!');
 }
+
+export function noop() {}

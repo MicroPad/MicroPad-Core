@@ -15,7 +15,7 @@ import {
 } from 'rxjs/operators';
 import { Action, Success } from 'redux-typescript-actions';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
-import { ASSET_STORAGE, store as STORE, SYNC_STORAGE, TOAST_HANDLER } from '../root';
+import { ASSET_STORAGE, store as STORE, SYNC_STORAGE } from '../root';
 import * as DifferenceEngine from '../services/DifferenceEngine';
 import { Dialog } from '../services/dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
@@ -103,11 +103,11 @@ export const sync$ = (action$: Observable<MicroPadAction>) =>
 		filterTruthy()
 	);
 
-export const requestDownload$ = (action$: Observable<MicroPadAction>) =>
+export const requestDownload$ = (action$: Observable<MicroPadAction>, _, { getToastEventHandler }: EpicDeps) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<string>>(actions.requestSyncDownload.type),
 		tap((action: Action<string>) => {
-			const guid = TOAST_HANDLER.register(() => STORE.dispatch(actions.syncDownload.started(action.payload)));
+			const guid = getToastEventHandler().register(() => STORE.dispatch(actions.syncDownload.started(action.payload)));
 			Materialize.toast(`A newer copy of your notepad is online <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">DOWNLOAD</a>`);
 		}),
 		noEmit()
