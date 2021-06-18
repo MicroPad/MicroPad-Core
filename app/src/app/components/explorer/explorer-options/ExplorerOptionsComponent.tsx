@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FormEvent } from 'react';
 import { Button, Col, Icon, Modal, Row, TextInput } from 'react-materialize';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
@@ -98,7 +99,8 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 		);
 	}
 
-	private rename = () => {
+	private rename = (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
 		const { objToEdit, type, renameNotepad, renameNotepadObject } = this.props;
 
 		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
@@ -116,6 +118,8 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 			default:
 				break;
 		}
+
+		return false;
 	}
 
 	private delete = async () => {

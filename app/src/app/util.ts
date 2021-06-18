@@ -147,6 +147,8 @@ export function unreachable() {
 	return new Error('Unreachable Error!');
 }
 
+export function noop() {}
+
 export function openModal(id: string) {
 	const modalEl = document.getElementById(id);
 	if (!modalEl) {

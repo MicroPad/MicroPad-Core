@@ -23,7 +23,7 @@ export class Dialog {
 		}), 0)
 	)
 
-	public static prompt = (message: string, placeholder?: string): Promise<string> =>
+	public static prompt = (message: string, placeholder?: string): Promise<string | undefined> =>
 		new Promise(resolve => {
 			setTimeout(() => {
 				Vex.dialog.prompt({
@@ -34,7 +34,7 @@ export class Dialog {
 			}, 0);
 		})
 
-	public static promptSecure = (message: string): Promise<string> =>
+	public static promptSecure = (message: string): Promise<string | undefined> =>
 		new Promise(resolve => {
 			setTimeout(() => {
 				Vex.dialog.open({

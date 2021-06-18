@@ -54,7 +54,10 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 					<div>
 						<strong style={{ display: 'inline-flex' }}
 						        onContextMenu={NotepadExplorerComponent.handleRightClick}>
-							<span style={{ paddingRight: '5px' }}>{notepad.title}</span>
+							<span style={{ paddingRight: '5px' }}>
+								{notepad.title}
+								{this.props.isReadOnly && <em style={{ paddingLeft: '5px' }}>(Read-Only)</em>}
+							</span>
 							<ExplorerOptionsComponent objToEdit={notepad} type="notepad"/>
 						</strong>
 

@@ -12,9 +12,11 @@ import { Note } from 'upad-parse/dist';
 let noteRef: string = '';
 let note: Note | null;
 let notepadTitle: string = '';
+let isInsertMenuOpen: boolean = false;
 
 export function mapStateToProps({ notepads, currentNote, app }: IStoreState) {
 	noteRef = currentNote.ref;
+	isInsertMenuOpen = currentNote.insertElement.enabled;
 
 	if (currentNote.ref.length !== 0) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
@@ -62,7 +64,11 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 		})),
 		makeQuickNotepad: () => dispatch(actions.quickNotepad(undefined)),
 		makeQuickNote: () => dispatch(actions.quickNote.started(undefined)),
-		deleteNotepad: () => dispatch(actions.deleteNotepad(notepadTitle))
+		deleteNotepad: () => dispatch(actions.deleteNotepad(notepadTitle)),
+		hideInsert: () => {
+			if (!isInsertMenuOpen) return;
+			return dispatch(actions.toggleInsertMenu({ enabled: false }));
+		}
 	};
 }
 
