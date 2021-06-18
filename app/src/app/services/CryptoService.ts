@@ -9,7 +9,7 @@ export async function fromShell(shell: NotepadShell, key?: string): Promise<Encr
 	if (typeof shell.sections === 'object') return { notepad: await Translators.Json.toNotepadFromNotepad(shell), passkey: '' };
 
 	// Prompt for decryption
-	const passkey = key || await Dialog.promptSecure(`Please enter the passkey for ${shell.title}:`);
+	const passkey = key ?? await Dialog.promptSecure(`Please enter the passkey for ${shell.title}:`);
 	if (!passkey) throw new Error(`Can't decrypt notepad: ${shell.title}`);
 
 	let notepad: Notepad;

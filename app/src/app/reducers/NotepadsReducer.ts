@@ -8,6 +8,7 @@ import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { FlatNotepad, Note } from 'upad-parse/dist';
 import { format } from 'date-fns';
 import { DueItem } from '../services/DueDates';
+import { isReadOnlyNotebook } from '../ReadOnly';
 
 export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 	public readonly key = 'notepads';
@@ -17,6 +18,15 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 	};
 
 	public reducer(state: INotepadsStoreState, action: Action): INotepadsStoreState {
+		const newState = this.reducerImpl(state, action);
+		if (newState.notepad && newState.notepad.item) {
+			newState.notepad.isReadOnly = isReadOnlyNotebook(newState.notepad?.item?.title ?? '');
+		}
+
+		return newState;
+	}
+
+	private reducerImpl(state: INotepadsStoreState, action: Action): INotepadsStoreState {
 		if (isType(action, actions.parseNpx.done)) {
 			const result = action.payload.result;
 
@@ -29,6 +39,7 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 				notepad: {
 					isLoading: false,
 					saving: false,
+					isReadOnly: isReadOnlyNotebook(result.title),
 					item: result
 				}
 			};
@@ -83,6 +94,7 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 				notepad: {
 					isLoading: false,
 					saving: false,
+					isReadOnly: isReadOnlyNotebook(notepad.title),
 					item: notepad
 				}
 			};

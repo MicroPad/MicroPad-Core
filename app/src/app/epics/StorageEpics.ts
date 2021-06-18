@@ -4,6 +4,7 @@ import {
 	concatMap,
 	debounceTime,
 	distinctUntilChanged,
+	distinctUntilKeyChanged,
 	filter,
 	map,
 	mergeMap,
@@ -27,6 +28,7 @@ import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
 import { ICurrentNoteState } from '../reducers/NoteReducer';
 import { EpicDeps, EpicStore } from './index';
+import { isReadOnlyNotebook } from '../ReadOnly';
 
 let currentNotepadTitle = '';
 
@@ -55,13 +57,14 @@ const saveOnChanges$ = (action$: Observable<MicroPadAction>, store: EpicStore) =
 		map((notepadState: INotepadStoreState) => notepadState.item),
 		filterTruthy(),
 		debounceTime(1000),
-		distinctUntilChanged(),
+		distinctUntilKeyChanged('lastModified'),
 		filter((notepad: FlatNotepad) => {
 			const condition = notepad.title === currentNotepadTitle;
 			currentNotepadTitle = notepad.title;
 
 			return condition;
 		}),
+		filter(notepad => !isReadOnlyNotebook(notepad.title)),
 		map((notepad: FlatNotepad) => notepad.toNotepad()),
 		mergeMap((notepad: Notepad) => {
 			const actionsToReturn: Action<any>[] = [];
@@ -157,7 +160,7 @@ const deleteNotepad$ = (action$: Observable<MicroPadAction>) =>
 		ofType<MicroPadAction, Action<string>>(actions.deleteNotepad.type),
 		map((action: Action<string>) => action.payload),
 		tap((notepadTitle: string) => from(NOTEPAD_STORAGE.removeItem(notepadTitle))),
-		noEmit()
+		map(() => actions.clearOldData.started({ silent: true }))
 	);
 
 export type LastOpenedNotepad = { notepadTitle: string, noteRef?: string };
@@ -229,17 +232,17 @@ const clearLastOpenedNotepad$ = (action$: Observable<MicroPadAction>) =>
 
 const clearOldData$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
-		ofType<MicroPadAction>(actions.clearOldData.started.type),
-		concatMap(() =>
-			from(cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store.getState())).pipe(
+		ofType<MicroPadAction, Action<{ silent: boolean }>>(actions.clearOldData.started.type),
+		concatMap(action =>
+			from(cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store.getState(), action.payload.silent)).pipe(
 				mergeMap((addPasskeyActions: Action<AddCryptoPasskeyAction>[]) => [
-					actions.clearOldData.done({ params: undefined, result: undefined }),
+					actions.clearOldData.done({ params: action.payload, result: undefined }),
 					...addPasskeyActions
 				]),
 				catchError(error => {
 					Dialog.alert('There was an error clearing old data');
 					console.error(error);
-					return of(actions.clearOldData.failed({ params: undefined, error }));
+					return of(actions.clearOldData.failed({ params: action.payload, error }));
 				})
 			)
 		)
@@ -247,8 +250,8 @@ const clearOldData$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 
 const notifyOnClearOldDataSuccess$ = (action$: Observable<Action<Success<void, void>>>) =>
 	action$.pipe(
-		ofType<MicroPadAction>(actions.clearOldData.done.type),
-		tap(() => Dialog.alert('The spring cleaning has been done!')),
+		ofType<MicroPadAction, Action<Success<{ silent: boolean }, void>>>(actions.clearOldData.done.type),
+		tap(action => !action.payload.params.silent && Dialog.alert('The spring cleaning has been done!')),
 		noEmit()
 	);
 
@@ -271,13 +274,18 @@ export const storageEpics$ = combineEpics(
 /**
  *  Clean up all the assets that aren't in any notepads yet
  */
-async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage, state: IStoreState): Promise<Action<AddCryptoPasskeyAction>[]> {
+async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: LocalForage, state: IStoreState, silent): Promise<Action<AddCryptoPasskeyAction>[]> {
 	const cryptoPasskeys: Action<AddCryptoPasskeyAction>[] = [];
 
-	const notepads: Promise<EncryptNotepadAction>[] = [];
+	const notepads: Promise<EncryptNotepadAction | Error>[] = [];
 	await notepadStorage.iterate((json: string) => {
 		const shell: NotepadShell = JSON.parse(json);
-		notepads.push(fromShell(shell, state.notepadPasskeys[shell.title]));
+		let passkey = state.notepadPasskeys[shell.title];
+		if (!passkey && silent) {
+			passkey = '';
+		}
+
+		notepads.push(fromShell(shell, passkey).catch(err => err));
 
 		return;
 	});
@@ -290,7 +298,7 @@ async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: Loc
 
 	const areNotepadsStillEncrypted = !!resolvedNotepadsOrErrors.find(res => res instanceof Error);
 
-	const resolvedNotepads = resolvedNotepadsOrErrors.filter(res => !(res instanceof Error)).map((cryptoInfo: EncryptNotepadAction) => {
+	const resolvedNotepads = resolvedNotepadsOrErrors.filter((res): res is EncryptNotepadAction => !(res instanceof Error)).map((cryptoInfo: EncryptNotepadAction) => {
 		cryptoPasskeys.push(actions.addCryptoPasskey({ notepadTitle: cryptoInfo.notepad.title, passkey: cryptoInfo.passkey }));
 		return cryptoInfo.notepad;
 	});

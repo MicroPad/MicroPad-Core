@@ -1,4 +1,4 @@
-import { actions, MicroPadAction } from '../actions';
+import { actions, MicroPadAction, READ_ONLY_ACTIONS } from '../actions';
 import {
 	catchError,
 	combineLatest,
@@ -43,8 +43,9 @@ import { Dispatch } from 'redux';
 import { format } from 'date-fns';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { fromShell } from '../services/CryptoService';
-import { ASSET_STORAGE, NOTEPAD_STORAGE } from '../root';
+import { ASSET_STORAGE, NOTEPAD_STORAGE, store as STORE } from '../root';
 import { EpicDeps, EpicStore } from './index';
+import * as Materialize from 'materialize-css/dist/js/materialize';
 
 const parseQueue: string[] = [];
 
@@ -519,6 +520,27 @@ const moveObjAcrossNotepadsFailure$ = (actions$: Observable<MicroPadAction>) =>
 		noEmit()
 	);
 
+const warnOnReadOnlyEdit$ = (actions$: Observable<MicroPadAction>, store: EpicStore, { getToastEventHandler }: EpicDeps) =>
+	actions$.pipe(
+		filter(() => !!store.getState().notepads.notepad?.isReadOnly),
+		filter(action => READ_ONLY_ACTIONS.has(action.type)),
+		tap(() => {
+			Materialize.Toast.removeAll();
+			const guid = getToastEventHandler().register(async () => {
+				const newTitle = await Dialog.prompt('New Title:');
+				if (!newTitle) return;
+
+				STORE.dispatch(actions.renameNotepad.started(newTitle));
+			})
+
+			Materialize.toast(`This notepad is read-only. Changes will not be saved.<br />` +
+				`Please create a notebook or open another one using the notebooks dropdown if you want to edit a notebook.<br />` +
+				`If you have made changes to this notebook, you can make it editable by renaming it.<br />` +
+				`<a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">RENAME</a>`, 10_000);
+		}),
+		noEmit()
+	)
+
 export const notepadEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	parseNpx$,
 	syncOnNotepadParsed$ as any,
@@ -543,7 +565,8 @@ export const notepadEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	quickNotepad$,
 	autoFillNewNotepads$,
 	moveObjAcrossNotepads$,
-	moveObjAcrossNotepadsFailure$
+	moveObjAcrossNotepadsFailure$,
+	warnOnReadOnlyEdit$
 );
 
 interface IExportedNotepad {

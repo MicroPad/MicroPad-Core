@@ -16,6 +16,7 @@ export interface INotepadStoreState {
 	saving: boolean;
 	activeSyncId?: string;
 	scribe?: string;
+	isReadOnly?: boolean;
 	item?: FlatNotepad;
 }
 

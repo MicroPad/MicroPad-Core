@@ -31,8 +31,8 @@ const loadNote$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 				];
 			}
 
-			const error = new Error(`MicroPad couldn't load the current note`);
-			console.warn(error);
+			const error = new Error(`MicroPad couldn't load the current note (handled in loadNote$)`);
+			console.error(error);
 			return [actions.loadNote.failed({ params: ref, error })];
 		})
 	);
