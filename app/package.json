@@ -1,6 +1,6 @@
 {
   "name": "micropad",
-  "version": "3.30.1",
+  "version": "4.0.0",
   "private": true,
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py; ./get_precache_files.py > src/extraPrecacheFiles.ts",

@@ -18,9 +18,15 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 	};
 
 	public reducer(state: INotepadsStoreState, action: Action): INotepadsStoreState {
-		const newState = this.reducerImpl(state, action);
+		let newState = this.reducerImpl(state, action);
 		if (newState.notepad && newState.notepad.item) {
-			newState.notepad.isReadOnly = isReadOnlyNotebook(newState.notepad?.item?.title ?? '');
+			newState = {
+				...newState,
+				notepad: {
+					...newState.notepad,
+					isReadOnly: isReadOnlyNotebook(newState.notepad?.item?.title ?? '')
+				}
+			};
 		}
 
 		return newState;
