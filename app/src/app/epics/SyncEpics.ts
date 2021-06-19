@@ -73,10 +73,10 @@ export const actWithSyncNotepad$ = (action$: Observable<MicroPadAction>, store: 
 		)
 	);
 
-export const sync$ = (action$: Observable<MicroPadAction>) =>
+export const sync$ = (action$: Observable<MicroPadAction>, _, { notificationService }: EpicDeps) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<SyncAction>>(actions.sync.type),
-		tap(() => M.Toast.dismissAll()),
+		tap(() => notificationService.dismissToasts()),
 		map((action: Action<SyncAction>) => action.payload),
 		filter((syncAction: SyncAction) => !!syncAction && !!syncAction.syncId && !!syncAction.notepad),
 		switchMap((syncAction: SyncAction) =>
@@ -102,12 +102,12 @@ export const sync$ = (action$: Observable<MicroPadAction>) =>
 		filterTruthy()
 	);
 
-export const requestDownload$ = (action$: Observable<MicroPadAction>, _, { getToastEventHandler }: EpicDeps) =>
+export const requestDownload$ = (action$: Observable<MicroPadAction>, _, { getToastEventHandler, notificationService }: EpicDeps) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<string>>(actions.requestSyncDownload.type),
 		tap((action: Action<string>) => {
 			const guid = getToastEventHandler().register(() => STORE.dispatch(actions.syncDownload.started(action.payload)));
-			M.toast({ html: `A newer copy of your notepad is online <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">DOWNLOAD</a>` });
+			notificationService.toast({ html: `A newer copy of your notepad is online <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">DOWNLOAD</a>` });
 		}),
 		noEmit()
 	);
