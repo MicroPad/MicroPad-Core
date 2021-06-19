@@ -78,7 +78,7 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 				<div className="explorer-options-modal">
 					<Row>
 						<form action="#" onSubmit={this.rename}>
-							<TextInput s={6} label="Title" defaultValue={this.title} />
+							<TextInput s={6} label="Title" defaultValue={this.title} onChange={e => this.title = e.target.value} />
 							<Col s={6}><Button className="blue" waves="light">Rename {displayType}</Button></Col>
 						</form>
 					</Row>

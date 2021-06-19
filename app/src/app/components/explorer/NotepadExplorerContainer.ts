@@ -1,28 +1,33 @@
 import { IStoreState } from '../../types';
 import { connect } from 'react-redux';
 import NotepadExplorerComponent from './NotepadExplorerComponent';
-import { INotepadsStoreState, INotepadStoreState } from '../../types/NotepadTypes';
 import { Action, Dispatch } from 'redux';
 import { actions } from '../../actions';
-import { FlatNotepad, Note } from 'upad-parse/dist';
+import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { ThemeValues } from '../../ThemeValues';
 
 let notepad: FlatNotepad | undefined;
+let memoisedFullNotepad: Notepad | undefined;
 export function mapStateToProps({ notepads, explorer, app, currentNote }: IStoreState) {
 	let note: Note | undefined = undefined;
 	if (currentNote.ref.length !== 0) {
-		note = notepads.notepad!.item!.notes[currentNote.ref];
+		note = notepads.notepad?.item?.notes[currentNote.ref];
 	}
 
-	notepad = ((notepads || {} as INotepadsStoreState).notepad || {} as INotepadStoreState).item;
+	const newNotepad = notepads.notepad?.item;
+	if (notepad !== newNotepad) {
+		memoisedFullNotepad = newNotepad?.toNotepad();
+	}
+	notepad = notepads.notepad?.item;
 
 	return {
-		notepad: (!!notepad) ? notepad.toNotepad() : undefined,
+		notepad: memoisedFullNotepad,
 		openSections: explorer.openSections,
 		isFullScreen: app.isFullScreen,
 		openNote: note,
 		theme: ThemeValues[app.theme],
-		isReadOnly: !!notepads?.notepad?.isReadOnly
+		isReadOnly: !!notepads?.notepad?.isReadOnly,
+		explorerWidth: app.explorerWidth
 	};
 }
 
@@ -42,7 +47,8 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 				notepad,
 				note: notepad.notes[note.internalRef]
 			}));
-		}
+		},
+		setExplorerWidth: (newWidth: string) => dispatch(actions.setExplorerWidth(newWidth))
 	};
 }
 

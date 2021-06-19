@@ -67,7 +67,7 @@ export const flashExplorer$ = (action$: Observable<MicroPadAction>, store: EpicS
 		ofType<MicroPadAction>(actions.flashExplorer.type),
 		tap(() => {
 			const theme = ThemeValues[store.getState().app.theme];
-			const explorer = document.getElementById('notepad-explorer')!;
+			const explorer: HTMLDivElement = document.querySelector('.notepad-explorer')!;
 
 			explorer.style.backgroundColor = theme.accent;
 			setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);

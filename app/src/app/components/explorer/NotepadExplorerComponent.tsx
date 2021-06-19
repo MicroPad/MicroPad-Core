@@ -3,7 +3,6 @@ import { CSSProperties } from 'react';
 import './NotepadExplorerComponent.css';
 import { Icon } from 'react-materialize';
 import TreeView from 'react-treeview';
-import { generateGuid } from '../../util';
 import ExplorerOptionsComponent from './explorer-options/ExplorerOptionsContainer';
 import { NewNotepadObjectAction } from '../../types/ActionTypes';
 import HelpMessageComponent from '../../containers/HelpMessageContainer';
@@ -22,6 +21,7 @@ import OpenNoteVideo from '../../assets/instructions/open-note.mp4';
 import OpenNotepadVideo from '../../assets/instructions/open-notepad.mp4';
 import { notepadExplorerConnector } from './NotepadExplorerContainer';
 import { ConnectedProps } from 'react-redux';
+import { Resizable } from 're-resizable';
 
 export default class NotepadExplorerComponent extends React.Component<ConnectedProps<typeof notepadExplorerConnector>> {
 	render() {
@@ -32,20 +32,32 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 			display: 'initial',
 			transition: 'background-color .3s',
 			backgroundColor: theme.chrome,
-			borderLeft: `2px solid ${theme.accent}`,
+			borderRight: `2px solid ${theme.accent}`,
 			color: theme.explorerContent
 		};
-		if (this.props.isFullScreen) notepadExplorerStyle.display = 'none';
+		if (this.props.isFullScreen) return null;
 
 		// Generate TreeViews
 		const treeViews: JSX.Element[] = [];
 		notepad?.sections?.forEach(section => treeViews.push(this.generateSectionTreeView(section, openSections)));
 
 		return (
-			<div id="notepad-explorer" style={notepadExplorerStyle}>
+			<Resizable
+				className="notepad-explorer"
+				style={notepadExplorerStyle}
+				size={{ width: this.props.explorerWidth, height: 'auto' }}
+				minWidth={100}
+				enable={{ right: true }}
+				onResizeStop={(_e, _d, ref) => {
+					if (ref.style.width === '100px') {
+						this.props.flipFullScreenState();
+					} else {
+						this.props.setExplorerWidth(ref.style.width)
+					}
+				}}>
 				<div style={{ paddingRight: '5px' }}>
 					<a href="#!" onClick={this.props.flipFullScreenState}
-					   style={{ paddingRight: '5px', fontSize: '24px' }}>»</a>
+					   style={{ paddingRight: '5px', fontSize: '24px' }}>«</a>
 					<DueDateListComponent/>
 				</div>
 
@@ -54,7 +66,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 					<div>
 						<strong style={{ display: 'inline-flex' }}
 						        onContextMenu={NotepadExplorerComponent.handleRightClick}>
-							<span style={{ paddingRight: '5px' }}>
+							<span>
 								{notepad.title}
 								{this.props.isReadOnly && <em style={{ paddingLeft: '5px' }}>(Read-Only)</em>}
 							</span>
@@ -70,7 +82,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 						}}>Focus</a> | <a href="#!" onClick={this.props.collapseAll}>Collapse All</a>)
 						</p>
 
-						<div className="explorer-note add-button" key={generateGuid()} style={{ margin: 0 }}>
+						<div className="explorer-note add-button" key={`${notepad.title}__new-section`} style={{ margin: 0 }}>
 							<a href="#!" style={{ color: theme.explorerContent }}
 							   onClick={() => this.newNotepadObject('section', notepad)}> <Icon>add</Icon> Section</a>
 						</div>
@@ -119,7 +131,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 				<div style={{ paddingBottom: '200px' }}>
 					<AppSettingsComponent/>
 				</div>
-			</div>
+			</Resizable>
 		);
 	}
 
@@ -154,7 +166,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 		const childNotes: JSX.Element[] = [];
 		((section || {} as Section).notes || [])
 			.forEach((child: Note) => childNotes.push(
-				<div className="explorer-note" key={generateGuid()}>
+				<div className="explorer-note" key={`${child.internalRef}__entry`}>
 					<span>
 						<a
 							href="#!"
@@ -169,7 +181,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 
 		return (
 			<TreeView
-				key={generateGuid()}
+				key={`${section.internalRef}__entry`}
 				onClick={() => this.sectionArrowClick(section.internalRef, openSections)}
 				nodeLabel={
 					<span>
@@ -184,7 +196,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 					</span>
 				}
 				collapsed={!openSections.has(section.internalRef)}>
-				<div className="explorer-note add-button" key={generateGuid()}>
+				<div className="explorer-note add-button" key={`${section.internalRef}__new-obj`}>
 					<a href="#!" style={{ color: theme.explorerContent, paddingRight: '3px' }}
 					   onClick={() => this.newNotepadObject('note', section)}>
 						<Icon>add</Icon> Note

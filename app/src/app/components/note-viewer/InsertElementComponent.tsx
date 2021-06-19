@@ -18,32 +18,37 @@ export interface IInsertElementComponentProps {
 	fontSize: string;
 	theme: ITheme;
 	isFullScreen: boolean;
+	explorerWidth: number;
 	insert?: (action: InsertElementAction) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
 	edit?: (id: string) => void;
 }
 
+// TODO: Moving the sidebar broke all the location guessing here (also drawing)
 export default class InsertElementComponent extends React.Component<IInsertElementComponentProps> {
 	render() {
-		const { note, x, y, enabled, fontSize, theme, isFullScreen } = this.props;
-		if (!note) return null;
+		const { note, y, enabled, fontSize, theme, isFullScreen } = this.props;
+		if (!enabled || !note) return null;
+
+		const noteContainer = document.getElementById('note-container');
+		if (!noteContainer) return null;
 
 		const elementHeight = 320;
 		const elementWidth = 286;
+		const x = !isFullScreen ? this.props.x - this.props.explorerWidth : this.props.x;
+
+		console.log(x < noteContainer.getBoundingClientRect().width - elementWidth);
 		const containerStyles = {
 			padding: 0,
 			height: elementHeight + 'px',
 			width: elementWidth + 'px',
-			left: (x < window.innerWidth - elementWidth - 200) ? x : x - elementWidth,
+			left: (x < noteContainer.getBoundingClientRect().width - elementWidth) ? x + elementWidth : x,
 			top: (y < window.innerHeight - elementHeight - 200) ? y : y - elementHeight,
 			zIndex: 5000,
 			display: (enabled) ? undefined : 'none'
 		};
 
-		const noteContainer = document.getElementById('note-container');
-		if (!noteContainer) return null;
-
-		const insertX = Math.abs(Math.floor(noteContainer.getBoundingClientRect().left)) + x;
+		const insertX = Math.abs(Math.floor(noteContainer.getBoundingClientRect().left) - x);
 		const insertY = (Math.abs(Math.floor(noteContainer.getBoundingClientRect().top)) + y) - FullScreenService.getOffset(isFullScreen);
 
 		const defaultArgs: ElementArgs = {

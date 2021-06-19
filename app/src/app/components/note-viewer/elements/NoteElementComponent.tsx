@@ -8,7 +8,7 @@ import DrawingElementComponent from './drawing/DrawingElementComponent';
 import { INoteViewerComponentProps } from '../NoteViewerComponent';
 import { Button, Icon, Row } from 'react-materialize';
 import Draggable, { DraggableData } from 'react-draggable';
-import SourcesComponent from '../../../containers/SourcesContainer';
+import SourcesComponent from '../sources/SourcesContainer';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { EditDueDateComponent } from './EditDueDateComponent';
 import PdfElementComponent from './PdfElementComponent';
