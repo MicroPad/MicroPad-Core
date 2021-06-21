@@ -291,10 +291,10 @@ export const getNotepadList$ = (action$: Observable<MicroPadAction>) =>
 export const deleteNotepad$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<string>>(actions.deleteFromSync.started.type),
-		map(action => ({ action, token: store.getState().sync.user?.token })),
-		filter(({ token }) => !!token),
-		switchMap(({ action, token }) =>
-			DifferenceEngine.SyncService.deleteNotepad(action.payload, token!).pipe(
+		map(action => ({ action, user: store.getState().sync.user })),
+		filter(({ user }) => !!user),
+		switchMap(({ action, user }) =>
+			DifferenceEngine.SyncService.deleteNotepad(action.payload, user!.username, user!.token).pipe(
 				map(() => actions.deleteFromSync.done({ params: '', result: undefined })),
 				catchError(error => {
 					console.error(error);
