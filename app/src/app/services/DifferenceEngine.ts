@@ -74,7 +74,9 @@ export const SyncService = (() => {
 			map(res => res.assetsToUpload)
 		);
 
-	const deleteNotepad = (syncId: string): Observable<void> => call<void>('delete', syncId);
+	const deleteNotepad = (syncId: string, token: string): Observable<void> => call<void>('delete', syncId, {
+		token
+	});
 
 	async function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
 		const { assets } = await SyncThread.getAssetInfo(notepad.flatten());
