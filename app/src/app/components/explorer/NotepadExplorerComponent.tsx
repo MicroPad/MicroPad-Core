@@ -46,11 +46,11 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 				className="notepad-explorer"
 				style={notepadExplorerStyle}
 				size={{ width: this.props.explorerWidth, height: 'auto' }}
-				minWidth={100}
+				minWidth={240}
 				enable={{ right: true }}
 				handleWrapperClass="notepad-explorer__drag-handle"
 				onResizeStop={(_e, _d, ref) => {
-					if (ref.style.width === '100px') {
+					if (ref.style.width === '240px') {
 						this.props.flipFullScreenState();
 					} else {
 						this.props.setExplorerWidth(ref.style.width)

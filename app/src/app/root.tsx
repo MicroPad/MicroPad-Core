@@ -7,8 +7,8 @@ import '@fontsource/abeezee';
 import 'material-icons-font/material-icons-font.css';
 import 'materialize-css/dist/css/materialize.min.css';
 import './root.css';
+import './ScrollbarPatch.css';
 /* Themes */
-import './theme-styles/Classic.css';
 import './theme-styles/Solarized.css';
 import './theme-styles/Midnight.css';
 import './theme-styles/Void.css';
@@ -16,7 +16,6 @@ import './theme-styles/Wellington.css';
 import './theme-styles/Peach.css';
 import './theme-styles/Pastel.css';
 import './theme-styles/Purple.css';
-import './theme-styles/IanPad.css';
 /* JS Imports */
 import * as React from 'react';
 import 'materialize-css/dist/js/materialize.js';

@@ -25,6 +25,7 @@ a {
 nav {
 	z-index: 1000 !important;
 	cursor: default;
+	background-color: var(--mp-theme-chrome);
 
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -122,6 +123,10 @@ button, input[type=button] {
 	font-family: "ABeeZee", "Roboto", sans-serif;
 }
 
+.noteElement input {
+	color: var(--mp-theme-text);
+}
+
 strong {
 	font-weight: bolder;
 }
@@ -134,7 +139,7 @@ strong {
 	word-break: break-word;
 }
 
-nav .material-icons {
+.header__top-level-item .material-icons {
 	height: 42px !important;
 	line-height: 42px !important;
 }

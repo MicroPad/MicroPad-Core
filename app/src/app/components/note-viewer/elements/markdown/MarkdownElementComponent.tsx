@@ -2,6 +2,7 @@
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import helpNpx from '!raw-loader!../../../../assets/Help.npx';
 
+import './MarkdownElementComponent.css';
 import * as React from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
@@ -10,8 +11,7 @@ import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
-import Grid from '@material-ui/core/Grid';
-import { Button, TextInput } from 'react-materialize';
+import { Button, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
@@ -110,24 +110,24 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 				{
 					isEditing &&
-					<Grid style={{ paddingLeft: '5px', paddingRight: '5px', marginBottom: 0, color: theme.text }} container={true} spacing={3}>
-						<Grid item={true} xs={6}>
+					<Row style={{ marginBottom: 0, color: theme.text }}>
+						<Col s={6}>
 							<TextInput
+								inputClassName="markdown-element__options-input"
 								label="Font Size"
 								defaultValue={element.args.fontSize}
 								onChange={this.onFontSizeEdit}
 							/>
-						</Grid>
-
-						<Grid item={true} xs={6}>
+						</Col>
+						<Col s={6}>
 							<TextInput
-								// style={{ width: '100%', color: theme.text }} TODO
+								inputClassName="markdown-element__options-input"
 								label="Width"
 								defaultValue={element.args.width}
 								onChange={e => this.onSizeEdit('width', e.target.value)}
 							/>
-						</Grid>
-					</Grid>
+						</Col>
+					</Row>
 				}
 
 				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>

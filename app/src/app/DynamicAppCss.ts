@@ -20,6 +20,10 @@ export function createDynamicCss(store: Store<IStoreState, MicroPadAction>): voi
 		distinctUntilChanged(),
 		map(themeName => ThemeValues[themeName])
 	).subscribe(theme => {
+		const rootStyles = document.documentElement.style;
+		Object.entries(theme)
+			.forEach(([k, v]: [string, string]) => rootStyles.setProperty(`--mp-theme-${k}`, v));
+
 		let styleEl: HTMLStyleElement | undefined = document.getElementById(STYLE_ELEMENT) as HTMLStyleElement | undefined;
 		if (!styleEl) {
 			styleEl = document.createElement('style');

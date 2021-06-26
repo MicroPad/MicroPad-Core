@@ -16,7 +16,7 @@ export default class ThemeDropdownComponent extends React.Component<IThemeDropdo
 		return (
 			<Dropdown trigger={
 				<ul>
-					<NavItem href="#!">
+					<NavItem href="#!" className="header__top-level-item">
 						<Icon left={true}>format_paint</Icon> Themes <Icon right={true}>arrow_drop_down</Icon>
 					</NavItem>
 				</ul>

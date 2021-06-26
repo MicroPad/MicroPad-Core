@@ -15,6 +15,10 @@
 	z-index: 10;
 }
 
+.notepad-explorer a {
+	color: var(--mp-theme-explorerContent);
+}
+
 .notepad-explorer .due-date-list {
 	margin-bottom: 20px;
 	display: inline;

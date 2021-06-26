@@ -66,7 +66,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 				id="search-modal"
 				key={`search-${(notepad || { title: 'all' }).title}`}
 				header="Search"
-				trigger={<NavItem href="#!"><Icon left={true}>search</Icon> Search</NavItem>}
+				trigger={<NavItem href="#!" className="header__top-level-item"><Icon left={true}>search</Icon> Search</NavItem>}
 				options={{
 					...DEFAULT_MODAL_OPTIONS,
 					onOpenEnd: modal => {

@@ -1,12 +1,6 @@
 import * as React from 'react';
-import { CSSProperties } from 'react';
 import './NotepadBreadcrumbsComponent.css';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import Link from '@material-ui/core/Link';
-import { generateGuid } from '../../../util';
-import { ThemeName } from '../../../types/Themes';
-import { ThemeValues } from '../../../ThemeValues';
+import { Breadcrumb as MaterialBreadcrumb, Icon } from 'react-materialize';
 
 export type Breadcrumb = {
 	text: string;
@@ -14,56 +8,41 @@ export type Breadcrumb = {
 };
 
 export interface INotepadBreadcrumbsProps {
-	themeName: ThemeName;
 	breadcrumbs: Breadcrumb[];
 	noteTime?: string;
 	focusItem?: (ref?: string) => void;
 }
 
 export default class NotepadBreadcrumbsComponent extends React.Component<INotepadBreadcrumbsProps> {
-	private readonly timeStyle: CSSProperties = {
-		paddingLeft: '20px',
-		fontFamily: 'Roboto',
-		fontWeight: 300
-	};
-
 	render() {
-		const { themeName, breadcrumbs, noteTime, focusItem } = this.props;
+		const { breadcrumbs, noteTime, focusItem } = this.props;
 
 		const crumbs: JSX.Element[] = [];
-		(breadcrumbs || []).forEach((crumb: Breadcrumb, i: number) => {
+		breadcrumbs.forEach((crumb: Breadcrumb, i: number) => {
 			const isLast = i === breadcrumbs.length - 1;
 
 			crumbs.push(
-				<Link
-					key={generateGuid()}
+				<a
+					key={`${crumb.ref ?? 'np'}-${crumb.text}`}
 					className="notepad-breadcrumbs__breadcrumb"
-					href={!!crumb.ref ? '#!' : undefined}
+					href="#!"
 					onClick={() => !!focusItem && focusItem(crumb.ref)}
-					underline="none"
 					style={{
-						color: ThemeValues[themeName].explorerContent,
 						opacity: isLast ? 1 : 0.7
 					}}>
 
-					{crumb.text} {isLast && !!noteTime && <span style={this.timeStyle}>{noteTime}</span>}
-				</Link>
+					{crumb.text} {isLast && !!noteTime && <span className="notepad-breadcrumbs__timestamp">
+						<Icon className="notepad-breadcrumbs__timestamp-icon" left>schedule</Icon> {noteTime}
+					</span>}
+				</a>
 			);
 		});
 
 		return (
 			<div id="breadcrumb-holder">
-				<Breadcrumbs
-					separator={<NavigateNextIcon fontSize="small" style={{
-						color: ThemeValues[themeName].explorerContent,
-						opacity: 0.7
-					}} />}
-					className={themeName}
-					style={{ paddingLeft: '10px', paddingRight: '10px' }}>
-
+				<MaterialBreadcrumb>
 					{crumbs}
-
-				</Breadcrumbs>
+				</MaterialBreadcrumb>
 			</div>
 		);
 	}
