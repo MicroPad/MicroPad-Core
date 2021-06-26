@@ -51,8 +51,9 @@ export function mapStateToProps({ notepads, currentNote }: IStoreState): INotepa
 		}
 	}
 
-	const res = {
+	const res: INotepadBreadcrumbsProps = {
 		breadcrumbs,
+		hasNotebookOpen: !!notepads?.notepad?.item,
 		noteTime: time
 	};
 	memoisedState = res;

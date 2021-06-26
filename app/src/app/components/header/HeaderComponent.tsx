@@ -48,7 +48,7 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 					<NotepadDropdownComponent />
 					<SearchComponent />
 					<NavItem href="#!" className="header__top-level-item" onClick={() => setTimeout(getHelp!, 0)}><Icon left={true}>help_outline</Icon> Help</NavItem>
-					{isFullScreen && <NavItem href="#!" onClick={flipFullScreenState}><Icon left={true}>fullscreen_exit</Icon> Exit Full Screen</NavItem>}
+					{isFullScreen && <NavItem href="#!" className="header__top-level-item" onClick={flipFullScreenState}><Icon left={true}>fullscreen_exit</Icon> Exit Full Screen</NavItem>}
 				</Navbar>
 				{!isFullScreen && <NotepadBreadcrumbs />}
 			</header>

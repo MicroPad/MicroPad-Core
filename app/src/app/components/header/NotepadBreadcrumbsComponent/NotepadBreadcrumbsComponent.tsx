@@ -9,13 +9,14 @@ export type Breadcrumb = {
 
 export interface INotepadBreadcrumbsProps {
 	breadcrumbs: Breadcrumb[];
+	hasNotebookOpen?: boolean;
 	noteTime?: string;
 	focusItem?: (ref?: string) => void;
 }
 
 export default class NotepadBreadcrumbsComponent extends React.Component<INotepadBreadcrumbsProps> {
 	render() {
-		const { breadcrumbs, noteTime, focusItem } = this.props;
+		const { breadcrumbs, hasNotebookOpen, noteTime, focusItem } = this.props;
 
 		const crumbs: JSX.Element[] = [];
 		breadcrumbs.forEach((crumb: Breadcrumb, i: number) => {
@@ -25,8 +26,8 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 				<a
 					key={`${crumb.ref ?? 'np'}-${crumb.text}`}
 					className="notepad-breadcrumbs__breadcrumb"
-					href="#!"
-					onClick={() => !!focusItem && focusItem(crumb.ref)}
+					href={hasNotebookOpen ? '#!' : undefined}
+					onClick={() => hasNotebookOpen && !!focusItem && focusItem(crumb.ref)}
 					style={{
 						opacity: isLast ? 1 : 0.7
 					}}>
