@@ -12,11 +12,13 @@ import ImportMarkdownComponent from '../../containers/header/ImportMarkdownConta
 import { ISyncState } from '../../reducers/SyncReducer';
 import NpxIcon from '../../assets/npx.png';
 import MarkdownIcon from '../../assets/md.svg';
+import { ITheme } from '../../types/Themes';
 
 export interface INotepadDropdownProps {
 	isExporting: boolean;
 	notepadTitles?: string[];
 	syncState: ISyncState;
+	theme: ITheme;
 	openNotepadFromStorage?: (title: string) => void;
 	newNotepad?: (notepad: FlatNotepad) => void;
 	exportAll?: () => void;
@@ -26,7 +28,7 @@ export interface INotepadDropdownProps {
 
 export default class NotepadDropdownComponent extends React.Component<INotepadDropdownProps> {
 	render() {
-		const { notepadTitles, syncState, exportAll, exportToMarkdown, downloadNotepad } = this.props;
+		const { notepadTitles, syncState, exportAll, exportToMarkdown, downloadNotepad, theme } = this.props;
 
 		const notepadNavItems: JSX.Element[] = [];
 		notepadTitles?.forEach(title => notepadNavItems.push(<NavItem key={generateGuid()} href="#!" onClick={this.openNotepad}>{title}</NavItem>));
@@ -64,7 +66,7 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 								return false;
 							}}>
 								<img src={NpxIcon} style={iconStyles} title="Export notepads as a zip archive of NPX files" alt="" />
-								<p style={{ textAlign: 'center', color: '#000' }}>Export notepads as a zip archive of NPX files</p>
+								<p style={{ textAlign: 'center' }}>Export notepads as a zip archive of NPX files</p>
 							</a>
 						</Col>
 						<Col s={12} m={6} style={{ cursor: 'pointer' }}>
@@ -73,8 +75,11 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 								exportToMarkdown?.();
 								return false;
 							}}>
-								<img src={MarkdownIcon} style={iconStyles} title="Export notepads as a zip archive of markdown files" alt="" />
-								<p style={{ textAlign: 'center', color: '#000' }}>Export notepads as a zip archive of markdown files</p>
+								<img src={MarkdownIcon} className="export-all__md-icon" style={{
+									...iconStyles,
+									filter: theme.text !== '#000' ? 'invert(100%)' : undefined
+								}} title="Export notepads as a zip archive of markdown files" alt="" />
+								<p style={{ textAlign: 'center' }}>Export notepads as a zip archive of markdown files</p>
 							</a>
 						</Col>
 						{this.props.isExporting && <ProgressBar className="amber" />}
