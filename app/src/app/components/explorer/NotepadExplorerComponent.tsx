@@ -48,6 +48,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 				size={{ width: this.props.explorerWidth, height: 'auto' }}
 				minWidth={100}
 				enable={{ right: true }}
+				handleWrapperClass="notepad-explorer__drag-handle"
 				onResizeStop={(_e, _d, ref) => {
 					if (ref.style.width === '100px') {
 						this.props.flipFullScreenState();
@@ -55,9 +56,9 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 						this.props.setExplorerWidth(ref.style.width)
 					}
 				}}>
-				<div style={{ paddingRight: '5px' }}>
+				<div>
 					<a href="#!" onClick={this.props.flipFullScreenState}
-					   style={{ paddingRight: '5px', fontSize: '24px' }}>«</a>
+					   style={{ fontSize: '24px' }}>«</a>
 					<DueDateListComponent/>
 				</div>
 
@@ -89,7 +90,7 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 
 						{treeViews}
 
-						<div style={{ paddingLeft: '10px', marginTop: '10px' }}>
+						<div style={{ marginTop: '10px' }}>
 							<SyncOptionsComponent/>
 						</div>
 
@@ -197,11 +198,11 @@ export default class NotepadExplorerComponent extends React.Component<ConnectedP
 				}
 				collapsed={!openSections.has(section.internalRef)}>
 				<div className="explorer-note add-button" key={`${section.internalRef}__new-obj`}>
-					<a href="#!" style={{ color: theme.explorerContent, paddingRight: '3px' }}
+					<a href="#!" style={{ color: theme.explorerContent }}
 					   onClick={() => this.newNotepadObject('note', section)}>
 						<Icon>add</Icon> Note
 					</a>
-					<a href="#!" style={{ color: theme.explorerContent, paddingLeft: '3px' }}
+					<a href="#!" style={{ color: theme.explorerContent }}
 					   onClick={() => this.newNotepadObject('section', section)}>
 						<Icon>add</Icon> Section
 					</a>

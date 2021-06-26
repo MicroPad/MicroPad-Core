@@ -25,7 +25,7 @@
 }
 
 .notepad-explorer .tree-view_children {
-	margin-left: 16px;
+	padding-left: 16px;
 }
 
 .notepad-explorer .tree-view_children-collapsed {
@@ -66,7 +66,7 @@
 	display: flex;
 	width: 100%;
 	white-space: nowrap;
-	margin-left: 16px;
+	padding-left: 16px;
 	padding-bottom: 10px;
 	padding-top: 10px;
 }
@@ -102,12 +102,12 @@
 }
 
 .app-settings-component__action-list > li {
-	margin-left: 1em;
+	padding-left: 1em;
 	text-decoration: underline;
 }
 
 .sync-settings-component__action-list > li {
-	margin-left: 1em;
+	padding-left: 1em;
 }
 
 .sync-settings-component__action-list > li > a {
@@ -117,4 +117,9 @@
 .notepad-explorer .tree-view_item {
 	width: 100%;
 	white-space: nowrap;
+}
+
+/* The drag handle is `right: -5px` so we need a margin on it to stop an overflow */
+.notepad-explorer .notepad-explorer__drag-handle > div {
+	margin-right: 5px;
 }
