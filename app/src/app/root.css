@@ -33,6 +33,10 @@ nav {
 	user-select: none;
 }
 
+#mobile-nav {
+	z-index: 1000;
+}
+
 .side-nav li {
 	color: rgba(0,0,0,0.87);
 }
@@ -128,4 +132,9 @@ strong {
 
 .modal-content > h4:first-of-type {
 	word-break: break-word;
+}
+
+nav .material-icons {
+	height: 42px !important;
+	line-height: 42px !important;
 }

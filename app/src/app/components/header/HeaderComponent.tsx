@@ -25,8 +25,8 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 
 		const navStyle: CSSProperties = {
 			position: 'fixed',
-			height: '64px',
-			lineHeight: '64px',
+			height: '52px',
+			lineHeight: '52px',
 			boxShadow: 'none',
 			backgroundColor: this.props.theme.chrome,
 			transition: 'background-color .3s'

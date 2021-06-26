@@ -30,12 +30,6 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 	render() {
 		const { themeName, breadcrumbs, noteTime, focusItem } = this.props;
 
-		const breadcrumbStyle: CSSProperties = {
-			position: 'fixed',
-			width: '100%',
-			top: '64px'
-		};
-
 		const crumbs: JSX.Element[] = [];
 		(breadcrumbs || []).forEach((crumb: Breadcrumb, i: number) => {
 			const isLast = i === breadcrumbs.length - 1;
@@ -58,7 +52,7 @@ export default class NotepadBreadcrumbsComponent extends React.Component<INotepa
 		});
 
 		return (
-			<div id="breadcrumb-holder" style={breadcrumbStyle}>
+			<div id="breadcrumb-holder">
 				<Breadcrumbs
 					separator={<NavigateNextIcon fontSize="small" style={{
 						color: ThemeValues[themeName].explorerContent,

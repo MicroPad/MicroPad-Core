@@ -1,10 +1,16 @@
+#breadcrumb-holder {
+	position: fixed;
+	width: 100%;
+	top: 52px;
+}
+
 #breadcrumb-holder > nav {
 	transition: background-color .3s;
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
-	height: 64px;
-	line-height: 64px;
+	height: 52px;
+	line-height: 52px;
 	margin-bottom: 0;
 }
 

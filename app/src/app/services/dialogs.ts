@@ -23,12 +23,12 @@ export class Dialog {
 		}), 0)
 	)
 
-	public static prompt = (message: string, placeholder?: string): Promise<string | undefined> =>
+	public static prompt = (message: string): Promise<string | undefined> =>
 		new Promise(resolve => {
 			setTimeout(() => {
 				Vex.dialog.prompt({
 					message,
-					placeholder,
+					input: '<input name="vex" type="text" class="vex-dialog-prompt-input" autocomplete="off">',
 					callback: value => resolve(value)
 				});
 			}, 0);
