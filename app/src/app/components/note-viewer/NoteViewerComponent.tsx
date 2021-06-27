@@ -199,11 +199,19 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			return;
 		}
 
+		// Insert a new element
 		if (elementEditing.length === 0) {
-			// Insert a new element
+			const noteViewer = document.getElementById('note-viewer')!;
+			const notepadExplorerWidth = document.querySelector<HTMLDivElement>('.notepad-explorer')?.offsetWidth ?? 0;
+
+			const offsets = {
+				left: notepadExplorerWidth - noteViewer.scrollLeft,
+				top: FullScreenService.getOffset(isFullscreen) - noteViewer.scrollTop
+			};
+
 			toggleInsertMenu!({
-				x: event.clientX,
-				y: event.clientY - FullScreenService.getOffset(isFullscreen)
+				x: event.clientX - offsets.left,
+				y: event.clientY - offsets.top
 			});
 		} else {
 			edit!('');

@@ -247,7 +247,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 		const notepadExplorerWidth = document.querySelector<HTMLDivElement>('.notepad-explorer')?.offsetWidth ?? 0;
 
 		const canvasOffset = {
-			left: (parseInt(element.args.x, 10) + notepadExplorerWidth) - (noteViewer.scrollLeft),
+			left: (parseInt(element.args.x, 10) + notepadExplorerWidth) - noteViewer.scrollLeft,
 			top: (parseInt(element.args.y, 10) + FullScreenService.getOffset(isFullScreen)) - noteViewer.scrollTop
 		};
 
