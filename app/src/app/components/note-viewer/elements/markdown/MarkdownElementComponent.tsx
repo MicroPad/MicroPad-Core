@@ -41,7 +41,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private editBox: HTMLTextAreaElement | undefined;
 	private converter: Converter;
 	private readonly updateWithDebounce: (element: NoteElement) => void;
-	private html: BehaviorSubject<string> = new BehaviorSubject<string>('');
+	private html$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
 	constructor(props: IMarkdownElementComponentProps, state: object) {
 		super(props, state);
@@ -102,7 +102,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				onResizeStop={(e, d, ref) => {
 					this.onSizeEdit('width', ref.style.width!);
 				}}>
-				<TodoListComponent html={this.html.value} toggle={() => this.sendMessage({
+				<TodoListComponent html$={this.html$} toggle={() => this.sendMessage({
 					id: element.args.id,
 					type: 'toggle',
 					payload: {}
@@ -257,7 +257,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 	private generateHtml = (element: NoteElement): string => {
 		const html = this.converter.makeHtml(element.content);
-		this.html.next(html);
+		this.html$.next(html);
 		return html;
 	}
 

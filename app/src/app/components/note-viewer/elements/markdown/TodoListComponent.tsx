@@ -1,7 +1,10 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface ITodoListComponentProps {
-	html: string;
+	html$: Observable<string>;
 	toggle: () => void;
 }
 
@@ -11,8 +14,14 @@ interface IProgressValues {
 }
 
 const TodoListComponent = (props: ITodoListComponentProps) => {
-	const { toggle, html } = props;
-	const progressValues = getProgress(html);
+	const { toggle } = props;
+
+	const [progressValues, setProgressValues] = useState<IProgressValues | null>(null);
+	useEffect(() => {
+		const watcher$ = props.html$.pipe(map(getProgress)).subscribe(setProgressValues);
+		return () => watcher$.unsubscribe();
+	}, [props.html$]);
+	if (!progressValues) return null;
 
 	const meterStyle = {
 		width: '100%'
