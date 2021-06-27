@@ -24,7 +24,9 @@ export interface IInsertElementComponentProps {
 	edit?: (id: string) => void;
 }
 
-// TODO: Moving the sidebar broke all the location guessing here (also drawing)
+/* TODO: Moving the sidebar broke all the location guessing here
+	It looks like full screen insertion is broken.
+ */
 export default class InsertElementComponent extends React.Component<IInsertElementComponentProps> {
 	render() {
 		const { note, y, enabled, fontSize, theme, isFullScreen } = this.props;

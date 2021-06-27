@@ -1,9 +1,9 @@
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import * as React from 'react';
-import { dataURItoBlob, generateGuid } from '../../../../util';
+import { dataURItoBlob } from '../../../../util';
 import { trim } from './trim-canvas';
 import { Resizable } from 're-resizable';
-import { Checkbox, Row } from 'react-materialize';
+import { Checkbox, Col, Row } from 'react-materialize';
 import stringify from 'json-stringify-safe';
 import * as FullScreenService from '../../../../services/FullscreenService';
 
@@ -86,8 +86,12 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 					</Resizable>
 
 					<Row style={{ padding: '5px' }}>
-						<Checkbox id={generateGuid()} label="Erase Mode" value="1" checked={this.isErasing} filledIn onChange={e => this.isErasing = (e.target as HTMLInputElement).checked} />
-						<Checkbox id={generateGuid()} label="Rainbow Mode 🏳️‍🌈" value="1" checked={this.isRainbow} filledIn onChange={e => this.isRainbow = (e.target as HTMLInputElement).checked} />
+						<Col>
+							<Checkbox label="Erase Mode" value="1" checked={this.isErasing} filledIn onChange={e => this.isErasing = (e.target as HTMLInputElement).checked} />
+						</Col>
+						<Col>
+							<Checkbox label="Rainbow Mode 🏳️‍🌈" value="1" checked={this.isRainbow} filledIn onChange={e => this.isRainbow = (e.target as HTMLInputElement).checked} />
+						</Col>
 					</Row>
 
 					{!this.supportsPointerEvents && <p><em>Your browser seems to not support pointer events. Drawing may not work.</em></p>}
@@ -240,9 +244,10 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 		const { element, isFullScreen } = this.props;
 
 		const noteViewer = document.getElementById('note-viewer')!;
+		const notepadExplorerWidth = document.querySelector<HTMLDivElement>('.notepad-explorer')?.offsetWidth ?? 0;
 
 		const canvasOffset = {
-			left: parseInt(element.args.x, 10) - noteViewer.scrollLeft,
+			left: (parseInt(element.args.x, 10) + notepadExplorerWidth) - (noteViewer.scrollLeft),
 			top: (parseInt(element.args.y, 10) + FullScreenService.getOffset(isFullScreen)) - noteViewer.scrollTop
 		};
 

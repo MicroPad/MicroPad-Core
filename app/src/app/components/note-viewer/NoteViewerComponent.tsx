@@ -166,7 +166,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		}
 
 		if (!newProps.isLoading && (!note || note.elements.length > 0) && !!newProps.note && newProps.note.elements.length === 0) {
-			M.toast({ html: 'Welcome to your note! Press anywhere on the white area to insert an element.', displayLength: 8000 });
+			M.toast({ html: 'Welcome to your note! Click anywhere on the empty area to insert an element.', displayLength: 8000 });
 		}
 	}
 
