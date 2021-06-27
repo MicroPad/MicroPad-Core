@@ -32,7 +32,7 @@ export function mapStateToProps({ notepads, currentNote, app }: IStoreState) {
 		noteAssets: currentNote.assetUrls,
 		elementEditing: currentNote.elementEditing,
 		isNotepadOpen: !!notepads.notepad && !!notepads.notepad.item,
-		isLoading: currentNote.isLoading || notepads.isLoading || (!!notepads.notepad && notepads.notepad.isLoading),
+		isLoading: currentNote.isLoading || notepads?.notepad?.isLoading,
 		theme: ThemeValues[app.theme]
 	} as INoteViewerComponentProps;
 }

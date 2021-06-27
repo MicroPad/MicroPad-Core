@@ -64,7 +64,11 @@ export function createDynamicCss(store: Store<IStoreState, MicroPadAction>): voi
 				color: ${theme.explorerContent} !important;
 			}
 			
-			.modal .modal-content a, .modal .modal-content input {
+			.modal, .modal .modal-content input {
+				color: ${theme.text};
+			}
+			
+			.modal-content a {
 				color: ${theme.links};
 			}
 			

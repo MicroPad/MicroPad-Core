@@ -103,7 +103,7 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 		e.preventDefault();
 		const { objToEdit, type, renameNotepad, renameNotepadObject } = this.props;
 
-		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
+		document.querySelector<HTMLDivElement>('.modal-overlay')?.click();
 
 		switch (type) {
 			case 'notepad':
