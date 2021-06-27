@@ -21,7 +21,8 @@ const TodoListComponent = (props: ITodoListComponentProps) => {
 		const watcher$ = props.html$.pipe(map(getProgress)).subscribe(setProgressValues);
 		return () => watcher$.unsubscribe();
 	}, [props.html$]);
-	if (!progressValues) return null;
+
+	if (!progressValues || progressValues.all < 1) return null;
 
 	const meterStyle = {
 		width: '100%'
@@ -33,8 +34,7 @@ const TodoListComponent = (props: ITodoListComponentProps) => {
 			style={{
 				marginLeft: '5px',
 				marginRight: '5px',
-				textAlign: 'center',
-				display: (progressValues.all > 0) ? undefined : 'none'
+				textAlign: 'center'
 			}}>
 			<meter
 				value={progressValues.done}
