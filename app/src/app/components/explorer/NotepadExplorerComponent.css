@@ -79,7 +79,13 @@
 	padding-right: 5px;
 }
 
-.add-button > a > .material-icons {
+.add-button > button {
+	color: var(--mp-theme-explorerContent);
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+.add-button > button > .material-icons {
 	vertical-align: bottom;
 }
 

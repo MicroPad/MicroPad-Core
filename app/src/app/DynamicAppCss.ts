@@ -42,7 +42,7 @@ export function createDynamicCss(store: Store<IStoreState, MicroPadAction>): voi
 				color: ${theme.background === '#fff' ? theme.chrome : theme.text} !important;
 			}
 
-			.btn:hover, .btn-large:hover, .btn-small:hover {
+			.btn:hover, .btn-flat:hover, .btn-large:hover, .btn-small:hover {
 				background-color: ${theme.accent};
 			}
 			
