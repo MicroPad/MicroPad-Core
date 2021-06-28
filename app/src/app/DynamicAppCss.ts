@@ -22,6 +22,7 @@ export function createDynamicCss(store: Store<IStoreState, MicroPadAction>): voi
 	).subscribe(theme => {
 		const rootStyles = document.documentElement.style;
 		Object.entries(theme)
+			.filter(([_k, v]) => typeof v === 'string')
 			.forEach(([k, v]: [string, string]) => rootStyles.setProperty(`--mp-theme-${k}`, v));
 
 		let styleEl: HTMLStyleElement | undefined = document.getElementById(STYLE_ELEMENT) as HTMLStyleElement | undefined;
@@ -44,6 +45,7 @@ export function createDynamicCss(store: Store<IStoreState, MicroPadAction>): voi
 
 			.btn:hover, .btn-flat:hover, .btn-large:hover, .btn-small:hover {
 				background-color: ${theme.accent};
+				color: ${theme.accentContent};
 			}
 			
 			.modal {

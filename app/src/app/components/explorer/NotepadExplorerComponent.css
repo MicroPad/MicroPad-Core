@@ -79,7 +79,7 @@
 	padding-right: 5px;
 }
 
-.add-button > button {
+.add-button > button, .notepad-explorer button {
 	color: var(--mp-theme-explorerContent);
 	padding-left: 3px;
 	padding-right: 3px;
@@ -127,9 +127,4 @@
 .notepad-explorer .tree-view_item {
 	width: 100%;
 	white-space: nowrap;
-}
-
-/* The drag handle is `right: -5px` so we need a margin on it to stop an overflow */
-.notepad-explorer .notepad-explorer__drag-handle > div {
-	margin-right: 5px;
 }

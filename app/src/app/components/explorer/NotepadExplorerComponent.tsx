@@ -50,6 +50,14 @@ const NotepadExplorerComponent = (props: Props) => {
 			minWidth={240}
 			enable={{ right: true }}
 			handleWrapperClass="notepad-explorer__drag-handle"
+			handleStyles={{
+				right: {
+					position: 'fixed',
+					left: props.explorerWidth,
+					right: 0,
+					height: '100vh'
+				}
+			}}
 			onResizeStop={(_e, _d, ref) => {
 				if (ref.style.width === '240px') {
 					props.flipFullScreenState();
