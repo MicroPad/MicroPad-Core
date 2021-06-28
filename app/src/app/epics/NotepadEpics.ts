@@ -45,7 +45,6 @@ import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { DecryptionError, fromShell } from '../services/CryptoService';
 import { ASSET_STORAGE, NOTEPAD_STORAGE, store as STORE } from '../root';
 import { EpicDeps, EpicStore } from './index';
-import * as Materialize from 'materialize-css/dist/js/materialize';
 
 const parseQueue: string[] = [];
 
@@ -529,12 +528,12 @@ const moveObjAcrossNotepadsFailure$ = (actions$: Observable<MicroPadAction>) =>
 		noEmit()
 	);
 
-const warnOnReadOnlyEdit$ = (actions$: Observable<MicroPadAction>, store: EpicStore, { getToastEventHandler }: EpicDeps) =>
+const warnOnReadOnlyEdit$ = (actions$: Observable<MicroPadAction>, store: EpicStore, { getToastEventHandler, notificationService }: EpicDeps) =>
 	actions$.pipe(
 		filter(() => !!store.getState().notepads.notepad?.isReadOnly),
 		filter(action => READ_ONLY_ACTIONS.has(action.type)),
 		tap(() => {
-			Materialize.Toast.removeAll();
+			notificationService.dismissToasts();
 			const guid = getToastEventHandler().register(async () => {
 				const newTitle = await Dialog.prompt('New Title:');
 				if (!newTitle) return;
@@ -542,10 +541,13 @@ const warnOnReadOnlyEdit$ = (actions$: Observable<MicroPadAction>, store: EpicSt
 				STORE.dispatch(actions.renameNotepad.started(newTitle));
 			})
 
-			Materialize.toast(`This notepad is read-only. Changes will not be saved.<br />` +
-				`Please create a notebook or open another one using the notebooks dropdown if you want to edit a notebook.<br />` +
-				`If you have made changes to this notebook, you can make it editable by renaming it.<br />` +
-				`<a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">RENAME</a>`, 10_000);
+			notificationService.toast({
+				html: `This notepad is read-only. Changes will not be saved.<br />` +
+					`Please create a notebook or open another one using the notebooks dropdown if you want to edit a notebook.<br />` +
+					`If you have made changes to this notebook, you can make it editable by renaming it.<br />` +
+					`<a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">RENAME</a>`,
+				displayLength: 10_000
+			});
 		}),
 		noEmit()
 	)

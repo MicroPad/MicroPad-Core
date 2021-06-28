@@ -1,0 +1,57 @@
+#markdown-help {
+	word-wrap: break-word;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	min-width: 170px;
+	min-height: 50px;
+	padding: 5px;
+	font-family: "ABeeZee", "Roboto", sans-serif;
+	line-height: 1.5;
+
+	cursor: auto;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
+}
+
+#markdown-help blockquote {
+	background: #f9f9f9;
+	border-left: 10px solid #ffb300;
+	margin: 1.5em 10px;
+	padding: 0.5em 10px;
+	quotes: "\201C""\201D""\2018""\2019";
+}
+
+#markdown-help blockquote:before {
+	color: #607d8b;
+	content: open-quote;
+	font-size: 4em;
+	line-height: 0.1em;
+	margin-right: 0.25em;
+	vertical-align: -0.4em;
+	font-family: serif;
+}
+
+#markdown-help blockquote:after {
+	content: no-close-quote;
+}
+
+#markdown-help blockquote > p {
+	display: inline;
+}
+
+#markdown-help [type="checkbox"]:not(:checked), #markdown-help [type="checkbox"]:checked {
+	position: static;
+	left: 0px;
+	opacity: 1;
+}
+
+#markdown-editor-label > div {
+	display: inline;
+}
+
+#markdown-help h1, #markdown-help h2, #markdown-help h3, #markdown-help h4, #markdown-help h5, #markdown-help h6 {
+	margin: 10px;
+}

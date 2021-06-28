@@ -1,10 +1,10 @@
 import * as React from 'react';
-import Async, { Props as AsyncProps } from 'react-promise';
-
-const ProgressAsync = Async as { new (props: AsyncProps<IProgressValues>): Async<IProgressValues> };
+import { useEffect, useState } from 'react';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface ITodoListComponentProps {
-	html: Promise<string>;
+	html$: Observable<string>;
 	toggle: () => void;
 }
 
@@ -13,56 +13,50 @@ interface IProgressValues {
 	all: number;
 }
 
-export default class TodoListComponent extends React.Component<ITodoListComponentProps> {
-	render() {
-		const { toggle } = this.props;
+const TodoListComponent = (props: ITodoListComponentProps) => {
+	const { toggle } = props;
 
-		const meterStyle = {
-			width: '100%'
-		};
+	const [progressValues, setProgressValues] = useState<IProgressValues | null>(null);
+	useEffect(() => {
+		const watcher$ = props.html$.pipe(map(getProgress)).subscribe(setProgressValues);
+		return () => watcher$.unsubscribe();
+	}, [props.html$]);
 
-		return (
-			<ProgressAsync promise={this.getProgress()} then={(progressValues) =>
-				<div
-					className="markdown-element__todo-list-tracker"
-					style={{
-						marginLeft: '5px',
-						marginRight: '5px',
-						textAlign: 'center',
-						display: (progressValues.all > 0) ? undefined : 'none'
-					}}>
-					<meter
-						value={progressValues.done}
-						min={0}
-						max={progressValues.all}
-						style={meterStyle}>
-						{Math.round((progressValues.done / progressValues.all) * 100)}%
-					</meter>
+	if (!progressValues || progressValues.all < 1) return null;
 
-					<br /><a href="#!" onClick={toggle}>Show/Hide Completed Items ({progressValues.done}/{progressValues.all})</a>
-				</div>
-			} />
-		);
-	}
+	const meterStyle = {
+		width: '100%'
+	};
 
-	private getProgress: () => Promise<IProgressValues> = () => {
-		const { html } = this.props;
+	return (
+		<div
+			className="markdown-element__todo-list-tracker"
+			style={{
+				marginLeft: '5px',
+				marginRight: '5px',
+				textAlign: 'center'
+			}}>
+			<meter
+				value={progressValues.done}
+				min={0}
+				max={progressValues.all}
+				style={meterStyle}>
+				{Math.round((progressValues.done / progressValues.all) * 100)}%
+			</meter>
 
-		return new Promise<IProgressValues>(resolve => {
-			html
-				.then(htmlValue => {
-					// Create virtual element of the html given
-					const element = document.createElement('div');
-					element.innerHTML = htmlValue;
+			<br /><a href="#!" onClick={toggle}>Show/Hide Completed Items ({progressValues.done}/{progressValues.all})</a>
+		</div>
+	);
+}
+export default TodoListComponent;
 
-					const done = element.querySelectorAll('.task-list-item input:checked').length;
-					const all = element.querySelectorAll('.task-list-item').length;
+function getProgress(html: string): IProgressValues {
+	// Create virtual element of the html given
+	const element = document.createElement('div');
+	element.innerHTML = html;
 
-					resolve({
-						done,
-						all
-					});
-				});
-		});
-	}
+	const done = element.querySelectorAll('.task-list-item input:checked').length;
+	const all = element.querySelectorAll('.task-list-item').length;
+
+	return { done, all };
 }

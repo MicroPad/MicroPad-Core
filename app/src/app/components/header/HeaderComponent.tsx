@@ -1,3 +1,4 @@
+import './HeaderComponent.css';
 import * as React from 'react';
 import { CSSProperties } from 'react';
 import AppNameComponent from '../../containers/header/AppNameContainer';
@@ -25,15 +26,15 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 
 		const navStyle: CSSProperties = {
 			position: 'fixed',
-			height: '64px',
-			lineHeight: '64px',
+			height: '52px',
+			lineHeight: '52px',
 			boxShadow: 'none',
 			backgroundColor: this.props.theme.chrome,
 			transition: 'background-color .3s'
 		};
 
-		let saveText: string = (!!notepad && !!notepad.item)
-			? (notepad.saving)
+		let saveText: string = !!notepad?.item
+			? notepad.saving
 				? 'Saving...'
 				: 'All changes saved'
 			: '';
@@ -42,13 +43,13 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 
 		return (
 			<header style={{ position: 'fixed', color: theme.explorerContent, zIndex: 1000 }}>
-				<Navbar className="menu-items" brand={<AppNameComponent />} href="#!" style={navStyle} right={true}>
-					<li style={{ marginRight: '10px', color: theme.explorerContent }}>{saveText}</li>
+				<Navbar className="menu-items" brand={<AppNameComponent />} style={navStyle} alignLinks="right" menuIcon={<Icon>menu</Icon>}>
+					<span style={{ marginRight: '10px', color: theme.explorerContent }}>{saveText}</span>
 					<ThemeDropdownComponent />
 					<NotepadDropdownComponent />
 					<SearchComponent />
-					<NavItem href="#!" onClick={getHelp}><Icon left={true}>help_outline</Icon> Help</NavItem>
-					{isFullScreen && <NavItem href="#!" onClick={flipFullScreenState}><Icon left={true}>fullscreen_exit</Icon> Exit Full Screen</NavItem>}
+					<NavItem href="#!" className="header__top-level-item" onClick={() => setTimeout(getHelp!, 0)}><Icon left={true}>help_outline</Icon> Help</NavItem>
+					{isFullScreen && <NavItem href="#!" className="header__top-level-item" onClick={flipFullScreenState}><Icon left={true}>fullscreen_exit</Icon> Exit Full Screen</NavItem>}
 				</Navbar>
 				{!isFullScreen && <NotepadBreadcrumbs />}
 			</header>

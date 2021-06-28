@@ -15,6 +15,8 @@ export function mapStateToProps({ notepads, currentNote, app }: IStoreState) {
 		note = notepads.notepad!.item!.notes[currentNote.ref];
 	}
 
+	const explorerWidth = parseInt(app.explorerWidth, 10);
+
 	return {
 		note,
 		x: currentNote.insertElement.x,
@@ -22,7 +24,8 @@ export function mapStateToProps({ notepads, currentNote, app }: IStoreState) {
 		enabled: currentNote.insertElement.enabled,
 		fontSize: app.defaultFontSize,
 		theme: ThemeValues[app.theme],
-		isFullScreen: app.isFullScreen
+		isFullScreen: app.isFullScreen,
+		explorerWidth: explorerWidth
 	};
 }
 

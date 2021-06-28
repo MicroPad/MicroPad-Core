@@ -1,3 +1,4 @@
+import './NotepadDropdownComponent.css';
 import * as React from 'react';
 import { Col, Dropdown, Icon, Modal, NavItem, ProgressBar, Row } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
@@ -11,11 +12,13 @@ import ImportMarkdownComponent from '../../containers/header/ImportMarkdownConta
 import { ISyncState } from '../../reducers/SyncReducer';
 import NpxIcon from '../../assets/npx.png';
 import MarkdownIcon from '../../assets/md.svg';
+import { ITheme } from '../../types/Themes';
 
 export interface INotepadDropdownProps {
 	isExporting: boolean;
 	notepadTitles?: string[];
 	syncState: ISyncState;
+	theme: ITheme;
 	openNotepadFromStorage?: (title: string) => void;
 	newNotepad?: (notepad: FlatNotepad) => void;
 	exportAll?: () => void;
@@ -25,10 +28,11 @@ export interface INotepadDropdownProps {
 
 export default class NotepadDropdownComponent extends React.Component<INotepadDropdownProps> {
 	render() {
-		const { notepadTitles, syncState, exportAll, exportToMarkdown, downloadNotepad } = this.props;
+		const { notepadTitles, syncState, exportAll, exportToMarkdown, downloadNotepad, theme } = this.props;
 
 		const notepadNavItems: JSX.Element[] = [];
-		(notepadTitles || []).forEach((title: string) => notepadNavItems.push(<NavItem key={generateGuid()} href="#!" onClick={this.openNotepad}>{title}</NavItem>));
+		notepadTitles?.forEach(title => notepadNavItems.push(<NavItem key={generateGuid()} href="#!" onClick={this.openNotepad}>{title}</NavItem>));
+
 
 		const iconStyles = {
 			width: '6rem',
@@ -37,55 +41,70 @@ export default class NotepadDropdownComponent extends React.Component<INotepadDr
 		};
 
 		return (
-			<li>
-				<Dropdown trigger={
-					<ul>
-						<NavItem id="notepad-dropdown">
-							<Icon left={true}>collections_bookmark</Icon> Notebooks <Icon right={true}>arrow_drop_down</Icon>
-						</NavItem>
-					</ul>
-				}>
-					<NavItem href="#!" onClick={this.createNotepad}><Icon left={true}>add</Icon> New</NavItem>
-					<UploadNotepadsComponent />
-					<ImportMarkdownComponent />
+			<Dropdown id="header__notepad-dropdown" trigger={
+				<ul id="notepad-dropdown">
+					<NavItem className="header__top-level-item">
+						<Icon left={true}>collections_bookmark</Icon> Notebooks <Icon right={true}>arrow_drop_down</Icon>
+					</NavItem>
+				</ul>
+			}>
+				<NavItem href="#!" onClick={this.createNotepad}><Icon left={true}>add</Icon> New</NavItem>
+				<UploadNotepadsComponent />
+				<ImportMarkdownComponent />
 
-					<Modal
-						header="Export All Notepads"
-						trigger={<NavItem id="export-all-notepads-trigger" href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}
-						modalOptions={DEFAULT_MODAL_OPTIONS}>
-						<Row>
-							<Col s={12} m={6} style={{ cursor: 'pointer' }} onClick={exportAll}>
+				<Modal
+					id="export-all-notepads-modal"
+					key="export-all-notepads-modal"
+					header="Export All Notepads"
+					trigger={<NavItem href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}
+					options={DEFAULT_MODAL_OPTIONS}>
+					<Row>
+						<Col s={12} m={6} style={{ cursor: 'pointer' }}>
+							<a href="#!" onClick={e => {
+								e.preventDefault();
+								exportAll?.();
+								return false;
+							}}>
 								<img src={NpxIcon} style={iconStyles} title="Export notepads as a zip archive of NPX files" alt="" />
 								<p style={{ textAlign: 'center' }}>Export notepads as a zip archive of NPX files</p>
-							</Col>
-							<Col s={12} m={6} style={{ cursor: 'pointer' }} onClick={exportToMarkdown}>
-								<img src={MarkdownIcon} style={iconStyles} title="Export notepads as a zip archive of markdown files" alt="" />
+							</a>
+						</Col>
+						<Col s={12} m={6} style={{ cursor: 'pointer' }}>
+							<a href="#!" onClick={e => {
+								e.preventDefault();
+								exportToMarkdown?.();
+								return false;
+							}}>
+								<img src={MarkdownIcon} className="export-all__md-icon" style={{
+									...iconStyles,
+									filter: theme.text !== '#000' ? 'invert(100%)' : undefined
+								}} title="Export notepads as a zip archive of markdown files" alt="" />
 								<p style={{ textAlign: 'center' }}>Export notepads as a zip archive of markdown files</p>
-							</Col>
-							{this.props.isExporting && <ProgressBar className="amber" />}
-						</Row>
-					</Modal>
+							</a>
+						</Col>
+						{this.props.isExporting && <ProgressBar className="amber" />}
+					</Row>
+				</Modal>
 
-					<LoginComponent
-						trigger={<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Connect to {SYNC_NAME}</NavItem>}
-						manageTrigger={<ManageSyncComponent />}
-					/>
+				<LoginComponent
+					trigger={<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Connect to {SYNC_NAME}</NavItem>}
+					manageTrigger={<ManageSyncComponent />}
+				/>
 
-					{/* User's notepads from here */}
-					<NavItem divider={true} />
-					{notepadNavItems}
+				{/* User's notepads from here */}
+				<li className="divider" />
+				{notepadNavItems}
 
-					<NavItem divider={true} />
-					{syncState.isLoading && <NavItem href="#!">Loading...</NavItem>}
-					{!!syncState.sharedNotepadList && Object.keys(syncState.sharedNotepadList).map(title =>
-						<NavItem key={generateGuid()} href="#!" onClick={() => {
-							downloadNotepad!(syncState.sharedNotepadList![title].notepad);
-						}}>
-							{title} ({SYNC_NAME} - {syncState.sharedNotepadList![title].owner})
-						</NavItem>
-					)}
-				</Dropdown>
-			</li>
+				<li className="divider" />
+				{!syncState.sharedNotepadList && syncState.isLoading && <NavItem href="#!">Loading...</NavItem>}
+				{!!syncState.sharedNotepadList && Object.keys(syncState.sharedNotepadList).map(title =>
+					<NavItem key={generateGuid()} href="#!" onClick={() => {
+						downloadNotepad!(syncState.sharedNotepadList![title].notepad);
+					}}>
+						{title} ({SYNC_NAME} - {syncState.sharedNotepadList![title].owner})
+					</NavItem>
+				)}
+			</Dropdown>
 		);
 	}
 

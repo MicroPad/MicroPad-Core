@@ -8,10 +8,9 @@ import DrawingElementComponent from './drawing/DrawingElementComponent';
 import { INoteViewerComponentProps } from '../NoteViewerComponent';
 import { Button, Icon, Row } from 'react-materialize';
 import Draggable, { DraggableData } from 'react-draggable';
-import SourcesComponent from '../../../containers/SourcesContainer';
+import SourcesComponent from '../sources/SourcesContainer';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { EditDueDateComponent } from './EditDueDateComponent';
-import * as Materialize from 'materialize-css/dist/js/materialize';
 import PdfElementComponent from './PdfElementComponent';
 import { TOAST_HANDLER } from '../../../root';
 import { ThemeValues } from '../../../ThemeValues';
@@ -218,7 +217,10 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 
 		// Undo dialog
 		const guid = TOAST_HANDLER.register(() => insert(element));
-		Materialize.toast(`Element Deleted <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`, 6000);
+		M.toast({
+			html: `Element Deleted <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`,
+			displayLength: 6000
+		});
 	}
 
 	private openEditor = event => {

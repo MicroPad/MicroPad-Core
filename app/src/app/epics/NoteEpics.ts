@@ -10,14 +10,13 @@ import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } 
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
-import * as Materialize from 'materialize-css/dist/js/materialize';
 import { ASSET_STORAGE } from '../root';
-import { EpicStore } from './index';
+import { EpicDeps, EpicStore } from './index';
 
-const loadNote$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+const loadNote$ = (action$: Observable<MicroPadAction>, store: EpicStore, { notificationService }: EpicDeps) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<string>>(actions.loadNote.started.type),
-		tap(() => Materialize.Toast.removeAll()),
+		tap(() => notificationService.dismissToasts()),
 		map((action: Action<string>): [string, FlatNotepad] => [action.payload, store.getState().notepads.notepad?.item!]),
 		filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
 		map(([ref, notepad]: [string, FlatNotepad]) => ({ ref: ref, note: notepad.notes[ref] })),

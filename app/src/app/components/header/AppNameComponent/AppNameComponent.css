@@ -3,6 +3,10 @@
 	font-size: 1rem;
 }
 
+.header__app-name {
+	cursor: pointer;
+}
+
 @media (min-width: 993px) {
 	.brand-logo {
 		padding-left: 15px !important;

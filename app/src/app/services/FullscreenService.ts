@@ -1,3 +1,5 @@
+const NAV_HEIGHT = 52;
+
 export function getOffset(isFullScreen: boolean): number {
-	return isFullScreen ? 64 : 128;
+	return isFullScreen ? NAV_HEIGHT : NAV_HEIGHT * 2;
 }

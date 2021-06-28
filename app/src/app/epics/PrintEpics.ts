@@ -44,7 +44,7 @@ export const generateMarkdownForPrint$ = (action$: Observable<MicroPadAction>, s
 				id: 'markdown1_print',
 				width: 'auto',
 				height: 'auto',
-				fontSize: (store.getState() as IStoreState).app.defaultFontSize,
+				fontSize: '12pt',
 				x: '0px',
 				y: '0px'
 			},

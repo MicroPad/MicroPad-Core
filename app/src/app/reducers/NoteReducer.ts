@@ -86,6 +86,11 @@ export class NoteReducer extends MicroPadReducer<ICurrentNoteState> {
 			};
 		} else if (isType(action, actions.closeNote) || isType(action, actions.closeNotepad)) {
 			return this.initialState;
+		} else if (isType(action, actions.flipFullScreenState)) {
+			return {
+				...state,
+				insertElement: { ...state.insertElement, enabled: false }
+			}
 		}
 
 		return state;

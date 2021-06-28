@@ -7,6 +7,7 @@ export interface ITheme {
 	text: string;
 	links: string;
 	explorerContent: string;
+	accentContent: string;
 	instructionImages: {
 		notepad: string;
 		note: string;

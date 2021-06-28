@@ -2,7 +2,6 @@ import * as React from 'react';
 import { CSSProperties } from 'react';
 import './NoteViewerComponent.css';
 import NoteElementComponent from './elements/NoteElementComponent';
-import * as Materialize from 'materialize-css/dist/js/materialize.js';
 import { ProgressBar } from 'react-materialize';
 import { filter, map } from 'rxjs/operators';
 import { fromEvent, Observable } from 'rxjs';
@@ -167,7 +166,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		}
 
 		if (!newProps.isLoading && (!note || note.elements.length > 0) && !!newProps.note && newProps.note.elements.length === 0) {
-			Materialize.toast('Welcome to your note! Press anywhere on the white area to insert an element.', 8000);
+			M.toast({ html: 'Welcome to your note! Click anywhere on the empty area to insert an element.', displayLength: 8000 });
 		}
 	}
 
@@ -178,7 +177,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		if (!note) {
 			if (isNotepadOpen) {
 				// Flash the Notepad Explorer amber
-				const explorer = document.getElementById('notepad-explorer')!;
+				const explorer: HTMLDivElement = document.querySelector('.notepad-explorer')!;
 				explorer.style.backgroundColor = theme.accent;
 				setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);
 
@@ -194,17 +193,25 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				if (!!makeQuickNotepad) makeQuickNotepad();
 
 				const guid = TOAST_HANDLER.register(() => deleteNotepad!());
-				Materialize.toast(`Created notebook <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`, 6000);
+				M.toast({ html: `Created notebook <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`, displayLength: 6000 });
 			}
 
 			return;
 		}
 
+		// Insert a new element
 		if (elementEditing.length === 0) {
-			// Insert a new element
+			const noteViewer = document.getElementById('note-viewer')!;
+			const notepadExplorerWidth = document.querySelector<HTMLDivElement>('.notepad-explorer')?.offsetWidth ?? 0;
+
+			const offsets = {
+				left: notepadExplorerWidth - noteViewer.scrollLeft,
+				top: FullScreenService.getOffset(isFullscreen) - noteViewer.scrollTop
+			};
+
 			toggleInsertMenu!({
-				x: event.clientX,
-				y: event.clientY - FullScreenService.getOffset(isFullscreen)
+				x: event.clientX - offsets.left,
+				y: event.clientY - offsets.top
 			});
 		} else {
 			edit!('');

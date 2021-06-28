@@ -1,19 +1,38 @@
+#breadcrumb-holder {
+	position: fixed;
+	width: 100%;
+	top: 52px;
+}
+
 #breadcrumb-holder > nav {
 	transition: background-color .3s;
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
-	height: 64px;
-	line-height: 64px;
+	height: 52px;
+	line-height: 52px;
 	margin-bottom: 0;
 }
 
-#breadcrumb-holder .MuiBreadcrumbs-ol {
-	flex-wrap: nowrap;
+/*.notepad-breadcrumbs__breadcrumb {*/
+/*	font-size: 18px;*/
+/*	color: white;*/
+/*	color: hsla(0,0%, 100%, .7);*/
+/*}*/
+
+#breadcrumb-holder .breadcrumb, #breadcrumb-holder .breadcrumb::before {
+	color: var(--mp-theme-explorerContent);
 }
 
-.notepad-breadcrumbs__breadcrumb {
-	font-size: 18px;
-	color: white;
-	color: hsla(0,0%, 100%, .7);
+#breadcrumb-holder .notepad-breadcrumbs__timestamp {
+	position: absolute;
+	padding-left: 20px;
+	opacity: 70%;
+	font-style: italic;
+}
+
+#breadcrumb-holder .notepad-breadcrumbs__timestamp-icon {
+	height: 52px;
+	line-height: 52px;
+	margin-right: 3px;
 }

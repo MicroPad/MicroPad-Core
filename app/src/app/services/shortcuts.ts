@@ -2,7 +2,7 @@ import { Store } from 'redux';
 import { IStoreState } from '../types';
 import * as mousetrap from 'mousetrap';
 import { actions, MicroPadAction } from '../actions';
-import { INotepadStoreState } from '../types/NotepadTypes';
+import { openModal } from '../util';
 
 export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction>) {
 	// Fullscreen
@@ -11,9 +11,7 @@ export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction
 	// Search
 	mousetrap.bind('mod+f', e => {
 		e.preventDefault();
-
-		const searchButton = document.querySelector(`#search-button > a`) as HTMLAnchorElement;
-		if (!!searchButton) searchButton.click();
+		openModal('search-modal');
 	});
 
 	// Quick Notepad Switch
@@ -29,13 +27,15 @@ export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction
 	mousetrap.bind('mod+s', e => {
 		e.preventDefault();
 
-		if (!!(store.getState().notepads.notepad || {} as INotepadStoreState).item) store.dispatch(actions.exportNotepad(undefined));
+		if (store.getState().notepads?.notepad?.item) {
+			store.dispatch(actions.exportNotepad(undefined));
+		}
 	});
 
 	// Export All Notepads
 	mousetrap.bind('mod+shift+s', e => {
 		e.preventDefault();
-		(document.querySelector('#export-all-notepads-trigger > a')! as HTMLAnchorElement).click();
+		openModal('export-all-notepads-modal');
 	});
 
 	// Import Notepad(s)

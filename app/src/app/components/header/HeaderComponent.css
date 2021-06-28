@@ -1,0 +1,19 @@
+ul.dropdown-content {
+	background-color: var(--mp-theme-chrome);
+}
+
+ul.dropdown-content > li > a, ul.dropdown-content > li > span {
+	color: var(--mp-theme-explorerContent) !important;
+}
+
+ul.dropdown-content li:hover {
+	background-color: var(--mp-theme-accent);
+}
+
+ul.dropdown-content li:hover > a:hover {
+	background-color: inherit;
+}
+
+ul.dropdown-content > li:hover > a, ul.dropdown-content > li:hover > span {
+	color: var(--mp-theme-accentContent) !important;
+}

@@ -17,18 +17,5 @@ export async function dismissWhatsNew() {
 }
 
 export async function getCurrentModal() {
-	const id = await page.evaluate(() => {
-		return new Promise<string | undefined>(res => {
-			const repeater = setInterval(() => {
-				const id = (window as any).MicroPadGlobals.currentModalId;
-				if (id) {
-					clearInterval(repeater);
-					res(id);
-				}
-			}, 1)
-		});
-	});
-	expect(id).toBeDefined();
-
-	return await page.waitForSelector(`#${id}`);
+	return await page.waitForSelector(`.modal.open`);
 }

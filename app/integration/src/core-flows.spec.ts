@@ -12,7 +12,7 @@ describe(`Core Flows`, () => {
 		await createNotebookUsingDropdown();
 
 		// Act
-		const explorer = (await page.$('#notepad-explorer'))!;
+		const explorer = (await page.$('.notepad-explorer'))!;
 		expect(explorer).toBeDefined();
 
 		const noteViewer = (await page.$('#note-viewer'))!;

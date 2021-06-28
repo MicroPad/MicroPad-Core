@@ -6,20 +6,20 @@ import { DEFAULT_MODAL_OPTIONS } from '../../util';
 export const SyncProErrorComponent = () => (
 	/* eslint-disable jsx-a11y/anchor-has-content */
 	<Modal
-		trigger={<a id="sync-pro-error-trigger" href="#!" />}
+		id="sync-pro-error-modal"
 		header="Good and bad news"
-		modalOptions={DEFAULT_MODAL_OPTIONS}>
+		options={DEFAULT_MODAL_OPTIONS}>
 		<div>
 			<p>
-				The good news is that you're using your notepad well with lots of images, recordings, files, and/or drawings!
+				The good news is that you're using your notebook well with lots of images, recordings, files, and/or drawings!
 			</p>
 
 			<p>
-				The bad news is that these notepads take up a lot more resources to keep in sync.<br />
+				The bad news is that these notepads take up a lot more resources to keep in-sync.<br />
 				To sync this notepad you'll need to upgrade to {SYNC_NAME} Pro for less than the price of a cup of coffee:
 			</p>
 
-			<Button className="blue" waves="light" onClick={() => window.open(`${MICROPAD_URL}/sync/manage`, '_blank')}>Upgrade here</Button>
+			<Button className="accent-btn" waves="light" onClick={() => window.open(`${MICROPAD_URL}/sync/manage`, '_blank')}>Upgrade here</Button>
 		</div>
 	</Modal>
 );

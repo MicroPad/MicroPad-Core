@@ -14,23 +14,21 @@ export default class ThemeDropdownComponent extends React.Component<IThemeDropdo
 		if (!select) return null;
 
 		return (
-			<li>
-				<Dropdown trigger={
-					<ul>
-						<NavItem href="#!">
-							<Icon left={true}>format_paint</Icon> Themes <Icon right={true}>arrow_drop_down</Icon>
+			<Dropdown trigger={
+				<ul>
+					<NavItem href="#!" className="header__top-level-item">
+						<Icon left={true}>format_paint</Icon> Themes <Icon right={true}>arrow_drop_down</Icon>
+					</NavItem>
+				</ul>
+			}>
+				{
+					Object.keys(ThemeValues).map(theme =>
+						<NavItem key={theme} href="#!" onClick={() => select(theme as ThemeName)}>
+							{theme} {selectedTheme === theme && <Icon left={true}>done</Icon>}
 						</NavItem>
-					</ul>
-				}>
-					{
-						Object.keys(ThemeValues).map(theme =>
-							<NavItem key={theme} href="#!" onClick={() => select(theme as ThemeName)}>
-								{theme} {selectedTheme === theme && <Icon left={true}>done</Icon>}
-							</NavItem>
-						)
-					}
-				</Dropdown>
-			</li>
+					)
+				}
+			</Dropdown>
 		);
 	}
 }

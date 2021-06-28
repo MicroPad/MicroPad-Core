@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FormEvent } from 'react';
-import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
+import { Button, Col, Icon, Modal, Row, TextInput } from 'react-materialize';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import PathChangeComponent from '../path-change/PathChangeContainer';
@@ -16,7 +16,12 @@ type Props = ConnectedProps<typeof explorerOptionsConnector> & {
 };
 
 export default class ExplorerOptionsComponent extends React.Component<Props> {
-	private titleInput: Input;
+	private title: string;
+
+	constructor(props: Props) {
+		super(props);
+		this.title = props.objToEdit.title;
+	}
 
 	render() {
 		const { objToEdit, type, colour, exportNotepad, loadNote, print } = this.props;
@@ -26,13 +31,13 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 		const notepadOptions: JSX.Element = (
 			<div>
 				<Row>
-					<Button className="blue" waves="light" onClick={exportNotepad}>
+					<Button className="accent-btn" waves="light" onClick={exportNotepad}>
 						<Icon left={true}>file_download</Icon> Export Notebook
 					</Button>
 				</Row>
 
 				<Row>
-					<Button className="blue" waves="light" onClick={this.encrypt}>
+					<Button className="accent-btn" waves="light" onClick={this.encrypt}>
 						<Icon left={true}>enhanced_encryption</Icon> Encrypt Notebook
 					</Button>
 
@@ -42,7 +47,7 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 
 					<p>
 						<em>
-							Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.<br />
+							Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.
 							Only titles, sources, markdown text, etc. are encrypted. Images and other binary items will not be encrypted. Exporting
 							to NPX files will export to plain-text.
 						</em>
@@ -53,7 +58,7 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 
 		const noteOptions: JSX.Element = (
 			<div>
-				<Row><Button className="blue" waves="light" onClick={() => {
+				<Row><Button className="accent-btn" waves="light" onClick={() => {
 					if (!!loadNote) loadNote((objToEdit as NPXObject).internalRef);
 					this.closeModal();
 					setTimeout(() => print!(), 500);
@@ -69,12 +74,12 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 				key={modalId}
 				header={`Options for ${objToEdit.title}`}
 				trigger={<a href="#!" className="exp-options-trigger" style={{ color: colour }}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}
-				modalOptions={DEFAULT_MODAL_OPTIONS}>
+				options={DEFAULT_MODAL_OPTIONS}>
 				<div className="explorer-options-modal">
 					<Row>
-						<form action="#" onSubmit={this.rename}>
-							<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>
-							<Col s={6}><Button className="blue" waves="light">Rename {displayType}</Button></Col>
+						<form action="#!" onSubmit={this.rename}>
+							<TextInput s={8} label="Title" defaultValue={this.title} onChange={e => this.title = e.target.value} />
+							<Col s={4}><Button className="accent-btn" waves="light">Rename {displayType}</Button></Col>
 						</form>
 					</Row>
 					<Row><Button className="red" waves="light" onClick={this.delete}><Icon
@@ -97,18 +102,17 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 	private rename = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const { objToEdit, type, renameNotepad, renameNotepadObject } = this.props;
-		const value = this.titleInput.state.value;
 
-		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
+		document.querySelector<HTMLDivElement>('.modal-overlay')?.click();
 
 		switch (type) {
 			case 'notepad':
-				renameNotepad!(value);
+				renameNotepad!(this.title);
 				break;
 
 			case 'section':
 			case 'note':
-				renameNotepadObject!({ internalRef: (objToEdit as NPXObject).internalRef, newName: value });
+				renameNotepadObject!({ internalRef: (objToEdit as NPXObject).internalRef, newName: this.title });
 				break;
 
 			default:

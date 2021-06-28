@@ -6,7 +6,16 @@ import { MicroPadAction } from './app/actions';
 import { Failure } from 'redux-typescript-actions';
 import { CaptureConsole } from '@sentry/integrations';
 
+enum SentryEnv {
+	LOCAL = 'local',
+	NEXT_DEV = 'next',
+	PROD = 'prod'
+}
+
 export function initSentry() {
+	const envTag = getDevEnv();
+	if (envTag === SentryEnv.LOCAL) return;
+
 	Sentry.init({
 		dsn: 'https://49d3ec40df254b7ebc17894456ad9d0e@o491589.ingest.sentry.io/5813252',
 		integrations: [
@@ -14,7 +23,7 @@ export function initSentry() {
 			new CaptureConsole({ levels: ['error'] })
 		],
 		tracesSampleRate: isDev() ? 1.0 : 0.2,
-		environment: isDev() ? 'dev' : 'prod',
+		environment: envTag,
 		release: version
 	});
 }
@@ -27,4 +36,12 @@ export function createSentryReduxEnhancer() {
 			error: (action?.payload as Failure<unknown, unknown>)?.error
 		})
 	});
+}
+
+function getDevEnv(): SentryEnv {
+	if (!isDev()) return SentryEnv.PROD;
+
+	/* eslint-disable no-restricted-globals */
+	return location.hostname === 'next.getmicropad.com' ? SentryEnv.NEXT_DEV : SentryEnv.LOCAL;
+	/* eslint-enable no-restricted-globals */
 }

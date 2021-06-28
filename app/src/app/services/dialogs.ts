@@ -6,42 +6,55 @@ import 'vex-js/dist/css/vex-theme-top.css';
 Vex.registerPlugin(VexDialog);
 Vex.defaultOptions!.className = 'vex-theme-top';
 
+type VexOpts = {
+	message?: string,
+	unsafeMessage?: string,
+	input?: string
+};
+
 export class Dialog {
-	public static alert = (message: string) => Vex.dialog.alert(message);
+	public static alert = (message: string) => Dialog.loadVex(Vex.dialog.alert, { message })
 
-	public static confirm = (message: string): Promise<boolean> => new Promise(resolve =>
-		Vex.dialog.confirm({
+	public static confirm = (message: string): Promise<boolean> => Dialog.loadVex<boolean>(
+		Vex.dialog.confirm,
+		{ message }
+	)
+
+	public static confirmUnsafe = (unsafeMessage: string): Promise<boolean> => Dialog.loadVex(
+		Vex.dialog.confirm,
+		{ unsafeMessage }
+	)
+
+	public static prompt = (message: string): Promise<string | undefined> => Dialog.loadVex(
+		Vex.dialog.prompt,
+		{
 			message,
-			callback: value => resolve(value)
-		})
+			input: '<input name="vex" type="text" class="vex-dialog-prompt-input" autocomplete="off">'
+		}
 	)
 
-	public static confirmUnsafe = (unsafeMessage: string): Promise<boolean> => new Promise(resolve =>
-		Vex.dialog.confirm({
-			unsafeMessage,
-			callback: value => resolve(value)
-		})
+	public static promptSecure = (message: string): Promise<string | undefined> => Dialog.loadVex(
+		Vex.dialog.prompt,
+		{
+			message,
+			input: '<input name="vex" type="password" class="vex-dialog-prompt-input" />',
+		}
 	)
 
-	public static prompt = (message: string, placeholder?: string): Promise<string | undefined> =>
-		new Promise(resolve => {
+	private static loadVex<T>(vexFn: (opts: any) => void, opts: VexOpts): Promise<T> {
+		return new Promise<T>(resolve => {
 			setTimeout(() => {
-				Vex.dialog.prompt({
-					message,
-					placeholder,
-					callback: value => resolve(value)
-				});
-			}, 0);
-		})
+				let modal = document.querySelector<HTMLDivElement>('.modal.open');
+				if (modal) modal.style.display = 'none';
 
-	public static promptSecure = (message: string): Promise<string | undefined> =>
-		new Promise(resolve => {
-			setTimeout(() => {
-				Vex.dialog.open({
-					message,
-					input: '<input name="vex" type="password" class="vex-dialog-prompt-input" />',
-					callback: value => resolve(value.vex)
+				vexFn.bind(Vex.dialog)({
+					...opts,
+					callback: (value: T) => {
+						if (modal) modal.style.display = 'initial';
+						resolve(value)
+					}
 				});
-			}, 0);
-		})
+			}, 10);
+		});
+	}
 }

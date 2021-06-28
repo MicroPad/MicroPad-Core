@@ -1,9 +1,14 @@
+/* Special Imports */
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import helpNpx from '!raw-loader!./assets/Help.npx';
 /* CSS Imports */
+import '@fontsource/abeezee';
 import 'material-icons-font/material-icons-font.css';
-import 'materialize-css/dist/css/materialize.min.css'; // TODO: Roboto will need to be imported here when this isn't
+import 'materialize-css/dist/css/materialize.min.css';
 import './root.css';
+import './ScrollbarPatch.css';
 /* Themes */
-import './theme-styles/Classic.css';
 import './theme-styles/Solarized.css';
 import './theme-styles/Midnight.css';
 import './theme-styles/Void.css';
@@ -11,10 +16,8 @@ import './theme-styles/Wellington.css';
 import './theme-styles/Peach.css';
 import './theme-styles/Pastel.css';
 import './theme-styles/Purple.css';
-import './theme-styles/IanPad.css';
 /* JS Imports */
 import * as React from 'react';
-import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed
 import 'materialize-css/dist/js/materialize.js';
 import * as serviceWorker from '../registerServiceWorker';
 import { APP_NAME, MICROPAD_URL } from './types';
@@ -32,7 +35,7 @@ import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './services/shortcuts';
 import * as PasteImage from 'paste-image';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
-import WhatsNewModalComponent from './components/WhatsNewModalComponent';
+import NoteElementModalComponent from './components/note-element-modal/NoteElementModalComponent';
 import { SyncUser } from './types/SyncTypes';
 import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 import InsertElementComponent from './containers/InsertElementContainer';
@@ -42,6 +45,7 @@ import ToastEventHandler from './services/ToastEventHandler';
 import { LastOpenedNotepad } from './epics/StorageEpics';
 import { noop } from './util';
 import { createSentryReduxEnhancer } from '../sentry';
+import { createDynamicCss } from './DynamicAppCss';
 
 window.MicroPadGlobals = {};
 
@@ -103,6 +107,7 @@ export function getStorage(): StorageMap {
 (async function init() {
 	if (!await compatibilityCheck()) return;
 	await hydrateStoreFromLocalforage();
+	createDynamicCss(store);
 
 	if (window.isElectron) store.dispatch(actions.checkVersion(undefined));
 	store.dispatch(actions.getNotepadList.started(undefined));
@@ -112,7 +117,7 @@ export function getStorage(): StorageMap {
 
 	// Render the main UI
 	ReactDOM.render(
-		<Provider store={store as any}>
+		<Provider store={store}>
 			{/*
 			// @ts-ignore TODO: Type has no properties in common with type 'IntrinsicAttributes & Pick ClassAttributes PrintViewOrAppContainerComponent & IPrintViewComponentProps & IAppProps, "ref" | "key">' */}
 			<PrintViewOrAppContainerComponent>
@@ -120,7 +125,7 @@ export function getStorage(): StorageMap {
 				<AppBodyComponent>
 					<NoteViewerComponent />
 					<NotepadExplorerComponent />
-					<WhatsNewModalComponent />
+					<NoteElementModalComponent id={"whats-new-modal"} npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
 					<SyncProErrorComponent />
 					<InsertElementComponent />
 				</ AppBodyComponent>
@@ -216,7 +221,15 @@ async function displayWhatsNew() {
 	if (minorVersion === oldMinorVersion) return;
 
 	// Open "What's New"
-	document.getElementById('whats-new-modal-trigger')!.click();
+	setTimeout(() => {
+		const whatsNewModal = document.getElementById('whats-new-modal');
+		if (whatsNewModal) {
+			M.Modal.getInstance(whatsNewModal).open();
+		} else {
+			console.error('Missing whats new modal');
+		}
+	}, 0);
+
 	await localforage.setItem('oldMinorVersion', minorVersion);
 }
 

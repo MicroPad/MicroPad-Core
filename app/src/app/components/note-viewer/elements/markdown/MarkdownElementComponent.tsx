@@ -1,3 +1,8 @@
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import helpNpx from '!raw-loader!../../../../assets/Help.npx';
+
+import './MarkdownElementComponent.css';
 import * as React from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
@@ -6,13 +11,13 @@ import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
 import { debounce } from '../../../../util';
-import Grid from '@material-ui/core/Grid';
-import { Input } from 'react-materialize';
-import MarkdownHelpComponent from './MarkdownHelpComponent';
+import { Button, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
 import { colourTransformer, fendTransformer } from './MarkdownTransformers';
+import NoteElementModalComponent from '../../../note-element-modal/NoteElementModalComponent';
+import { BehaviorSubject } from 'rxjs';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -36,6 +41,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private editBox: HTMLTextAreaElement | undefined;
 	private converter: Converter;
 	private readonly updateWithDebounce: (element: NoteElement) => void;
+	private html$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
 	constructor(props: IMarkdownElementComponentProps, state: object) {
 		super(props, state);
@@ -47,7 +53,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 			strikethrough: true,
 			tables: true,
 			tasklists: true,
-			prefixHeaderId: 'mdheader_',
+			noHeaderId: true,
 			emoji: true,
 			extensions: ['maths', 'fend', 'graphs', 'hashtags', 'colour']
 		} as IShowdownOpts);
@@ -96,7 +102,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				onResizeStop={(e, d, ref) => {
 					this.onSizeEdit('width', ref.style.width!);
 				}}>
-				<TodoListComponent html={this.generateHtml(element)} toggle={() => this.sendMessage({
+				<TodoListComponent html$={this.html$} toggle={() => this.sendMessage({
 					id: element.args.id,
 					type: 'toggle',
 					payload: {}
@@ -104,27 +110,32 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 				{
 					isEditing &&
-					<Grid style={{ paddingLeft: '5px', paddingRight: '5px', marginBottom: 0, color: theme.text }} container={true} spacing={3}>
-						<Grid item={true} xs={6}>
-							<Input
+					<Row style={{ marginBottom: 0, color: theme.text }}>
+						<Col s={6}>
+							<TextInput
+								inputClassName="markdown-element__options-input"
 								label="Font Size"
 								defaultValue={element.args.fontSize}
 								onChange={this.onFontSizeEdit}
 							/>
-						</Grid>
-
-						<Grid item={true} xs={6}>
-							<Input
-								style={{ width: '100%', color: theme.text }}
+						</Col>
+						<Col s={6}>
+							<TextInput
+								inputClassName="markdown-element__options-input"
 								label="Width"
 								defaultValue={element.args.width}
-								onChange={(e, v) => this.onSizeEdit('width', v)}
+								onChange={e => this.onSizeEdit('width', e.target.value)}
 							/>
-						</Grid>
-					</Grid>
+						</Col>
+					</Row>
 				}
 
-				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>Markdown Editor (<MarkdownHelpComponent />)</span>}
+				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>
+					Markdown Editor (<NoteElementModalComponent
+						trigger={<Button flat small waves="light" style={{ padding: '0' }}>Formatting Help</Button>}
+						npx={helpNpx}
+						findNote={np => np.sections[1].notes[0]} />)
+				</span>}
 
 				<div>
 					{
@@ -168,18 +179,16 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 		if (!!this.iframe) {
 			this.iframe.onload = () => {
-				this.generateHtml(element)
-					.then(html => {
-						this.sendMessage({
-							type: 'render',
-							id: element.args.id,
-							payload: {
-								...element,
-								content: html,
-								isPrinting
-							}
-						});
-					});
+				const html = this.generateHtml(element);
+				this.sendMessage({
+					type: 'render',
+					id: element.args.id,
+					payload: {
+						...element,
+						content: html,
+						isPrinting
+					}
+				});
 			};
 		} else if (!!this.editBox) {
 			this.editBox.onkeydown = enableTabs;
@@ -236,24 +245,20 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 		updateElement!(element.args.id, newElement);
 
-		this.generateHtml(newElement)
-			.then(html => {
-				this.sendMessage({
-					type: 'render',
-					id: element.args.id,
-					payload: {
-						...newElement,
-						content: html
-					}
-				});
-			});
+		this.sendMessage({
+			type: 'render',
+			id: element.args.id,
+			payload: {
+				...newElement,
+				content: this.generateHtml(newElement)
+			}
+		});
 	}
 
-	private generateHtml = (element: NoteElement): Promise<string> => {
-		return new Promise<string>(resolve => {
-			let html = this.converter.makeHtml(element.content);
-			resolve(html);
-		});
+	private generateHtml = (element: NoteElement): string => {
+		const html = this.converter.makeHtml(element.content);
+		this.html$.next(html);
+		return html;
 	}
 
 	private handleMessages = event => {

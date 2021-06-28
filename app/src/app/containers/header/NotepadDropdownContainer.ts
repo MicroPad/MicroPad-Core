@@ -3,6 +3,7 @@ import { IStoreState } from '../../types';
 import NotepadDropdownComponent, { INotepadDropdownProps } from '../../components/header/NotepadDropdownComponent';
 import { actions } from '../../actions';
 import { Action, Dispatch } from 'redux';
+import { ThemeValues } from '../../ThemeValues';
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepadDropdownProps> {
 	return {
@@ -14,11 +15,12 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INotepad
 	};
 }
 
-export function mapStateToProps({ notepads, sync, isExporting }: IStoreState) {
+export function mapStateToProps({ notepads, sync, isExporting, app }: IStoreState) {
 	return {
 		isExporting: isExporting.isLoading,
 		notepadTitles: notepads.savedNotepadTitles,
-		syncState: sync
+		syncState: sync,
+		theme: ThemeValues[app.theme]
 	};
 }
 

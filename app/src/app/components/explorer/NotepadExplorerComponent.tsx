@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { CSSProperties } from 'react';
 import './NotepadExplorerComponent.css';
-import { Icon } from 'react-materialize';
+import { Button, Icon } from 'react-materialize';
 import TreeView from 'react-treeview';
-import { generateGuid } from '../../util';
 import ExplorerOptionsComponent from './explorer-options/ExplorerOptionsContainer';
 import { NewNotepadObjectAction } from '../../types/ActionTypes';
 import HelpMessageComponent from '../../containers/HelpMessageContainer';
@@ -22,198 +21,216 @@ import OpenNoteVideo from '../../assets/instructions/open-note.mp4';
 import OpenNotepadVideo from '../../assets/instructions/open-notepad.mp4';
 import { notepadExplorerConnector } from './NotepadExplorerContainer';
 import { ConnectedProps } from 'react-redux';
+import { Resizable } from 're-resizable';
 
-export default class NotepadExplorerComponent extends React.Component<ConnectedProps<typeof notepadExplorerConnector>> {
-	render() {
-		const { notepad, theme } = this.props;
-		const openSections = new Set<string>(this.props.openSections);
+type Props = ConnectedProps<typeof notepadExplorerConnector>;
 
-		const notepadExplorerStyle: CSSProperties = {
-			display: 'initial',
-			transition: 'background-color .3s',
-			backgroundColor: theme.chrome,
-			borderLeft: `2px solid ${theme.accent}`,
-			color: theme.explorerContent
-		};
-		if (this.props.isFullScreen) notepadExplorerStyle.display = 'none';
+const NotepadExplorerComponent = (props: Props) => {
+	const { notepad, theme } = props;
+	const openSections = new Set<string>(props.openSections);
 
-		// Generate TreeViews
-		const treeViews: JSX.Element[] = [];
-		notepad?.sections?.forEach(section => treeViews.push(this.generateSectionTreeView(section, openSections)));
+	const notepadExplorerStyle: CSSProperties = {
+		display: 'initial',
+		transition: 'background-color .3s',
+		backgroundColor: theme.chrome,
+		borderRight: `2px solid ${theme.accent}`,
+		color: theme.explorerContent
+	};
+	if (props.isFullScreen) return null;
 
-		return (
-			<div id="notepad-explorer" style={notepadExplorerStyle}>
-				<div style={{ paddingRight: '5px' }}>
-					<a href="#!" onClick={this.props.flipFullScreenState}
-					   style={{ paddingRight: '5px', fontSize: '24px' }}>»</a>
-					<DueDateListComponent/>
-				</div>
+	// Generate TreeViews
+	const treeViews: JSX.Element[] = [];
+	notepad?.sections?.forEach(section => treeViews.push(generateSectionTreeView(props, section, openSections)));
 
-				{
-					!!notepad &&
-					<div>
-						<strong style={{ display: 'inline-flex' }}
-						        onContextMenu={NotepadExplorerComponent.handleRightClick}>
-							<span style={{ paddingRight: '5px' }}>
-								{notepad.title}
-								{this.props.isReadOnly && <em style={{ paddingLeft: '5px' }}>(Read-Only)</em>}
-							</span>
-							<ExplorerOptionsComponent objToEdit={notepad} type="notepad"/>
-						</strong>
-
-						<p style={{ marginTop: '0px' }}>
-							(<a href="#!" onClick={this.props.expandAll}>Expand All</a> | <a href="#!" onClick={() => {
-							if (!!this.props.openNote) {
-								this.props.collapseAll();
-								this.props.expandFromNote(this.props.openNote);
-							}
-						}}>Focus</a> | <a href="#!" onClick={this.props.collapseAll}>Collapse All</a>)
-						</p>
-
-						<div className="explorer-note add-button" key={generateGuid()} style={{ margin: 0 }}>
-							<a href="#!" style={{ color: theme.explorerContent }}
-							   onClick={() => this.newNotepadObject('section', notepad)}> <Icon>add</Icon> Section</a>
-						</div>
-
-						{treeViews}
-
-						<div style={{ paddingLeft: '10px', marginTop: '10px' }}>
-							<SyncOptionsComponent/>
-						</div>
-
-						{
-							/* Help messages */
-							!this.props.openNote &&
-							<React.Fragment>
-								{
-									(
-										notepad.sections.length === 0 ||
-										notepad.sections.some(s => s.notes.length === 0 && s.sections.length === 0)
-									) &&
-									<HelpMessageComponent
-										message={NEW_SECTION_HELP}
-										video={NewSectionVideo}/>
-								}
-								{
-									(
-										notepad.sections.length > 0 &&
-										notepad.sections.every(s => (s.notes.length > 0 || s.sections.length > 0))
-									) &&
-									<HelpMessageComponent
-										message={OPEN_NOTE_HELP}
-										video={OpenNoteVideo}/>
-								}
-							</React.Fragment>
-						}
-					</div>
+	return (
+		<Resizable
+			className="notepad-explorer"
+			style={notepadExplorerStyle}
+			size={{ width: props.explorerWidth, height: 'auto' }}
+			minWidth={240}
+			enable={{ right: true }}
+			handleWrapperClass="notepad-explorer__drag-handle"
+			handleStyles={{
+				right: {
+					position: 'fixed',
+					left: props.explorerWidth,
+					right: 0,
+					height: '100vh'
 				}
-
-				{
-					!notepad &&
-					<HelpMessageComponent
-						message={OPEN_NOTEPAD_HELP}
-						video={OpenNotepadVideo}/>
+			}}
+			onResizeStop={(_e, _d, ref) => {
+				if (ref.style.width === '240px') {
+					props.flipFullScreenState();
+				} else {
+					props.setExplorerWidth(ref.style.width)
 				}
-
-				{!!notepad && <hr/>}
-				<div style={{ paddingBottom: '200px' }}>
-					<AppSettingsComponent/>
-				</div>
+			}}>
+			<div>
+				<a href="#!" onClick={props.flipFullScreenState} style={{ fontSize: '24px', marginRight: '10px' }}>«</a>
+				<DueDateListComponent />
 			</div>
-		);
-	}
 
-	private async newNotepadObject(type: 'note' | 'section', parent: Parent) {
-		const { newNote, newSection } = this.props;
-		const title = await Dialog.prompt('Title:');
+			{
+				!!notepad &&
+				<div>
+					<strong style={{ display: 'inline-flex' }}
+					        onContextMenu={handleRightClick}>
+							<span>
+								{notepad.title}
+								{props.isReadOnly && <em style={{ paddingLeft: '5px' }}>(Read-Only)</em>}
+							</span>
+						<ExplorerOptionsComponent objToEdit={notepad} type="notepad"/>
+					</strong>
 
-		if (title) {
-			const action: NewNotepadObjectAction = {
-				title,
-				parent: (parent as Section).internalRef // will automatically be undefined for Notepad parents
-			};
+					<p style={{ marginTop: '0px' }}>
+						(<a href="#!" onClick={props.expandAll}>Expand All</a> | <a href="#!" onClick={() => {
+						if (!!props.openNote) {
+							props.collapseAll();
+							props.expandFromNote(props.openNote);
+						}
+					}}>Focus</a> | <a href="#!" onClick={props.collapseAll}>Collapse All</a>)
+					</p>
 
-			(type === 'note') ? newNote!(action) : newSection!(action);
-		}
-	}
+					<div className="explorer-note add-button" key={`${notepad.title}__new-section`} style={{ margin: 0 }}>
+						<Button flat onClick={() => newNotepadObject(props, 'section', notepad)}>
+							<Icon>add</Icon> Section
+						</Button>
+					</div>
 
-	private generateSectionTreeView(section: Section, openSections: Set<string>): JSX.Element {
-		const { theme, loadNote } = this.props;
+					{treeViews}
 
-		const nodeLabelStyle = {
-			display: 'inline-flex',
-			verticalAlign: 'middle',
-			paddingBottom: '10px',
-			paddingTop: '10px'
+					<div style={{ marginTop: '10px' }}>
+						<SyncOptionsComponent/>
+					</div>
+
+					{
+						/* Help messages */
+						!props.openNote &&
+						<React.Fragment>
+							{
+								(
+									notepad.sections.length === 0 ||
+									notepad.sections.some(s => s.notes.length === 0 && s.sections.length === 0)
+								) &&
+								<HelpMessageComponent
+									message={NEW_SECTION_HELP}
+									video={NewSectionVideo}/>
+							}
+							{
+								(
+									notepad.sections.length > 0 &&
+									notepad.sections.every(s => (s.notes.length > 0 || s.sections.length > 0))
+								) &&
+								<HelpMessageComponent
+									message={OPEN_NOTE_HELP}
+									video={OpenNoteVideo}/>
+							}
+						</React.Fragment>
+					}
+				</div>
+			}
+
+			{
+				!notepad &&
+				<HelpMessageComponent
+					message={OPEN_NOTEPAD_HELP}
+					video={OpenNotepadVideo}/>
+			}
+
+			{!!notepad && <hr/>}
+			<div style={{ paddingBottom: '200px' }}>
+				<AppSettingsComponent/>
+			</div>
+		</Resizable>
+	);
+}
+export default NotepadExplorerComponent;
+
+async function newNotepadObject({ newNote, newSection }: Props, type: 'note' | 'section', parent: Parent) {
+	const title = await Dialog.prompt(`${type.charAt(0).toUpperCase() + type.slice(1)} title:`);
+
+	if (title) {
+		const action: NewNotepadObjectAction = {
+			title,
+			parent: (parent as Section).internalRef // will automatically be undefined for Notepad parents
 		};
 
-		const childSections: JSX.Element[] = [];
-		((section || {} as Section).sections || [])
-			.forEach((child: Section) => childSections.push(this.generateSectionTreeView(child, openSections)));
+		(type === 'note') ? newNote(action) : newSection(action);
+	}
+}
 
-		const childNotes: JSX.Element[] = [];
-		((section || {} as Section).notes || [])
-			.forEach((child: Note) => childNotes.push(
-				<div className="explorer-note" key={generateGuid()}>
+function generateSectionTreeView(props: Props, section: Section, openSections: Set<string>): JSX.Element {
+	const { theme, loadNote } = props;
+
+	const nodeLabelStyle = {
+		display: 'inline-flex',
+		verticalAlign: 'middle',
+		paddingBottom: '10px',
+		paddingTop: '10px'
+	};
+
+	const childSections: JSX.Element[] = [];
+	section.sections.forEach((child: Section) => childSections.push(generateSectionTreeView(props, child, openSections)));
+
+	const childNotes: JSX.Element[] = [];
+	section.notes.forEach((child: Note) =>
+		childNotes.push(
+			<div className="explorer-note" key={`${child.internalRef}__entry`}>
 					<span>
 						<a
 							href="#!"
 							style={{ color: theme.explorerContent }} onClick={() => loadNote(child.internalRef)}
-							onContextMenu={NotepadExplorerComponent.handleRightClick}>
+							onContextMenu={handleRightClick}>
 							<Icon>note</Icon> {child.title}
 						</a>
 						<ExplorerOptionsComponent objToEdit={child} type="note"/>
 					</span>
-				</div>
-			));
+			</div>
+		)
+	);
 
-		return (
-			<TreeView
-				key={generateGuid()}
-				onClick={() => this.sectionArrowClick(section.internalRef, openSections)}
-				nodeLabel={
-					<span>
+	return (
+		<TreeView
+			key={`${section.internalRef}__entry`}
+			onClick={() => sectionArrowClick(props, section.internalRef, openSections)}
+			nodeLabel={
+				<span>
 						<span
 							style={nodeLabelStyle}
-							onClick={() => this.sectionArrowClick(section.internalRef, openSections)}
-							onContextMenu={NotepadExplorerComponent.handleRightClick}>
+							onClick={() => sectionArrowClick(props, section.internalRef, openSections)}
+							onContextMenu={handleRightClick}>
 							<Icon>book</Icon> {section.title}
 						</span>
 
 						<ExplorerOptionsComponent objToEdit={section} type="section"/>
 					</span>
-				}
-				collapsed={!openSections.has(section.internalRef)}>
-				<div className="explorer-note add-button" key={generateGuid()}>
-					<a href="#!" style={{ color: theme.explorerContent, paddingRight: '3px' }}
-					   onClick={() => this.newNotepadObject('note', section)}>
-						<Icon>add</Icon> Note
-					</a>
-					<a href="#!" style={{ color: theme.explorerContent, paddingLeft: '3px' }}
-					   onClick={() => this.newNotepadObject('section', section)}>
-						<Icon>add</Icon> Section
-					</a>
-				</div>
+			}
+			collapsed={!openSections.has(section.internalRef)}>
+			<div className="explorer-note add-button" key={`${section.internalRef}__new-obj`}>
+				<Button flat onClick={() => newNotepadObject(props, 'note', section)}>
+					<Icon>add</Icon> Note
+				</Button>
+				<Button flat onClick={() => newNotepadObject(props, 'section', section)}>
+					<Icon>add</Icon> Section
+				</Button>
+			</div>
 
-				{childSections}
-				{childNotes}
-			</TreeView>
-		);
+			{childSections}
+			{childNotes}
+		</TreeView>
+	);
+}
+
+function sectionArrowClick({ expandSection, collapseSection }: Props, guid: string, openSections: Set<string>) {
+	if (openSections.has(guid)) {
+		collapseSection(guid);
+	} else {
+		expandSection(guid);
 	}
+}
 
-	private sectionArrowClick(guid: string, openSections: Set<string>) {
-		const { expandSection, collapseSection } = this.props;
-
-		if (openSections.has(guid)) {
-			collapseSection(guid);
-		} else {
-			expandSection(guid);
-		}
-	}
-
-	private static handleRightClick(e: React.MouseEvent<HTMLElement, MouseEvent>): boolean {
-		e.preventDefault();
-		(e.target as Node).parentElement?.querySelector<HTMLAnchorElement>('.exp-options-trigger')?.click();
-		return false;
-	}
+function handleRightClick(e: React.MouseEvent<HTMLElement, MouseEvent>): boolean {
+	e.preventDefault();
+	(e.target as Node).parentElement?.querySelector<HTMLAnchorElement>('.exp-options-trigger')?.click();
+	return false;
 }
