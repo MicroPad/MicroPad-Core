@@ -4,9 +4,8 @@ module.exports = {
 		'jest-playwright': {
 			browsers: ['chromium', 'firefox'],
 			launchOptions: {
-				headless: false
+				headless: true
 			},
-
 		}
 	},
 	transform: {

@@ -79,10 +79,15 @@
 	padding-right: 5px;
 }
 
+.add-button {
+	padding: 0;
+}
+
 .add-button > button, .notepad-explorer button {
 	color: var(--mp-theme-explorerContent);
 	padding-left: 3px;
 	padding-right: 3px;
+	margin-right: 3px;
 }
 
 .add-button > button > .material-icons {
@@ -111,9 +116,16 @@
 	width: max-content;
 }
 
+.app-settings-component__action-list {
+	margin-top: 5px;
+}
+
 .app-settings-component__action-list > li {
 	padding-left: 1em;
-	text-decoration: underline;
+}
+
+.due-date-list > ol {
+	margin-top: 5px;
 }
 
 .sync-settings-component__action-list > li {

@@ -66,9 +66,8 @@ const NotepadExplorerComponent = (props: Props) => {
 				}
 			}}>
 			<div>
-				<a href="#!" onClick={props.flipFullScreenState}
-				   style={{ fontSize: '24px' }}>«</a>
-				<DueDateListComponent/>
+				<a href="#!" onClick={props.flipFullScreenState} style={{ fontSize: '24px', marginRight: '10px' }}>«</a>
+				<DueDateListComponent />
 			</div>
 
 			{

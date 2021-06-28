@@ -118,7 +118,8 @@ export const actions = {
 	addCryptoPasskey: actionCreator<AddCryptoPasskeyAction>('ADD_CRYPTO_PASSKEY'),
 	closeNotepad: actionCreator<void>('CLOSE_NOTEPAD'),
 	importMarkdown: actionCreator<Translators.Markdown.MarkdownImport[]>('IMPORT_FROM_MARKDOWN'),
-	setExplorerWidth: actionCreator<string>('SET_EXPLORER_WIDTH')
+	setExplorerWidth: actionCreator<string>('SET_EXPLORER_WIDTH'),
+	feelingLucky: actionCreator<void>('FEELING_LUCKY')
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([

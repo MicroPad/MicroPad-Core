@@ -20,6 +20,7 @@ import { Dispatch, MiddlewareAPI } from 'redux';
 import { IStoreState } from '../types';
 import ToastEventHandler from '../services/ToastEventHandler';
 import { NotificationService } from '../services/NotificationService';
+import { feelingLuckyEpics$ } from './FeelingLuckyEpics';
 
 const baseEpic$ = combineEpics(
 	notepadEpics$,
@@ -32,7 +33,8 @@ const baseEpic$ = combineEpics(
 	printEpics$,
 	syncEpics$,
 	cryptoEpics$,
-	dueDatesEpics$
+	dueDatesEpics$,
+	feelingLuckyEpics$
 );
 
 export type EpicDeps = {

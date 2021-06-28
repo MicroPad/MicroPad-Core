@@ -10,7 +10,8 @@ const AppSettingsComponent = (props: ConnectedProps<typeof appSettingsContainer>
 		<strong>{APP_NAME} Controls</strong>
 
 		<ul className="app-settings-component__action-list">
-			<li><Button flat onClick={() => Dialog.alert(`Nick hasn't done this thing yet`)}>Quick notebook switcher</Button></li>
+			<li><Button flat onClick={() => Dialog.alert(`Nick hasn't done this thing yet`)}>Quick notebook switcher</Button></li> {/* TODO */}
+			<li><Button flat onClick={() => props.feelingLucky()}>I'm feeling lucky</Button></li>
 			<li><Button flat onClick={() => props.clearOldData()}>Clear old data</Button></li>
 		</ul>
 	</div>

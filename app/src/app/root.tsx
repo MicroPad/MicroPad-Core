@@ -117,7 +117,7 @@ export function getStorage(): StorageMap {
 
 	// Render the main UI
 	ReactDOM.render(
-		<Provider store={store as any}>
+		<Provider store={store}>
 			{/*
 			// @ts-ignore TODO: Type has no properties in common with type 'IntrinsicAttributes & Pick ClassAttributes PrintViewOrAppContainerComponent & IPrintViewComponentProps & IAppProps, "ref" | "key">' */}
 			<PrintViewOrAppContainerComponent>
@@ -221,7 +221,15 @@ async function displayWhatsNew() {
 	if (minorVersion === oldMinorVersion) return;
 
 	// Open "What's New"
-	M.Modal.getInstance(document.getElementById('whats-new-modal')!).open();
+	setTimeout(() => {
+		const whatsNewModal = document.getElementById('whats-new-modal');
+		if (whatsNewModal) {
+			M.Modal.getInstance(whatsNewModal).open();
+		} else {
+			console.error('Missing whats new modal');
+		}
+	}, 0);
+
 	await localforage.setItem('oldMinorVersion', minorVersion);
 }
 

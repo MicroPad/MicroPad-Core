@@ -54,7 +54,7 @@ export class Dialog {
 						resolve(value)
 					}
 				});
-			}, 0);
+			}, 10);
 		});
 	}
 }
