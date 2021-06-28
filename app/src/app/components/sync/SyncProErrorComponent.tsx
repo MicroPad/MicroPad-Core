@@ -19,7 +19,7 @@ export const SyncProErrorComponent = () => (
 				To sync this notepad you'll need to upgrade to {SYNC_NAME} Pro for less than the price of a cup of coffee:
 			</p>
 
-			<Button className="blue" waves="light" onClick={() => window.open(`${MICROPAD_URL}/sync/manage`, '_blank')}>Upgrade here</Button>
+			<Button className="accent-btn" waves="light" onClick={() => window.open(`${MICROPAD_URL}/sync/manage`, '_blank')}>Upgrade here</Button>
 		</div>
 	</Modal>
 );

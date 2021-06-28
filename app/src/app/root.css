@@ -143,3 +143,8 @@ strong {
 	height: 52px !important;
 	line-height: 52px !important;
 }
+
+.accent-btn {
+	background-color: var(--mp-theme-accent);
+	color: var(--mp-theme-accentContent);
+}

@@ -36,7 +36,7 @@ export default class RecordingElementComponent extends React.Component<IFileElem
 				{
 					isEditing &&
 					<div ref={e => this.buttonContainer = e!} className="recording-inactive">
-						<Button className="blue" waves="light" onClick={() => this.recorder.start()}><Icon left={true}>record_voice_over</Icon> Start Recording</Button>
+						<Button className="accent-btn" waves="light" onClick={() => this.recorder.start()}><Icon left={true}>record_voice_over</Icon> Start Recording</Button>
 						<Button className="red" waves="light" onClick={() => this.recorder.stop()}><Icon left={true}>stop</Icon> Stop Recording</Button>
 					</div>
 				}

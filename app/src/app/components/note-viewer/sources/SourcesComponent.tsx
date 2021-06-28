@@ -30,7 +30,7 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 				</Button>
 			}
 			options={DEFAULT_MODAL_OPTIONS}>
-			<Button className="blue" waves="light" onClick={() => addSource(note, element)}>
+			<Button className="accent-btn" waves="light" onClick={() => addSource(note, element)}>
 				<Icon left={true}>add</Icon> Add Source
 			</Button>
 			<br /><br />

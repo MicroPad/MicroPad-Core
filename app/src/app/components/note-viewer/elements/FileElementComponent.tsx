@@ -27,7 +27,7 @@ export default class FileElementComponent extends React.Component<IFileElementCo
 					{
 						!isEditing &&
 						!!element.args.filename &&
-						<Button className="blue" waves="light" onClick={() => downloadAsset(element.args.filename!, element.args.ext!)}>
+						<Button className="accent-btn" waves="light" onClick={() => downloadAsset(element.args.filename!, element.args.ext!)}>
 							Download File
 						</Button>
 					}

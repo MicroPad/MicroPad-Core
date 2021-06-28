@@ -31,13 +31,13 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 		const notepadOptions: JSX.Element = (
 			<div>
 				<Row>
-					<Button className="blue" waves="light" onClick={exportNotepad}>
+					<Button className="accent-btn" waves="light" onClick={exportNotepad}>
 						<Icon left={true}>file_download</Icon> Export Notebook
 					</Button>
 				</Row>
 
 				<Row>
-					<Button className="blue" waves="light" onClick={this.encrypt}>
+					<Button className="accent-btn" waves="light" onClick={this.encrypt}>
 						<Icon left={true}>enhanced_encryption</Icon> Encrypt Notebook
 					</Button>
 
@@ -58,7 +58,7 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 
 		const noteOptions: JSX.Element = (
 			<div>
-				<Row><Button className="blue" waves="light" onClick={() => {
+				<Row><Button className="accent-btn" waves="light" onClick={() => {
 					if (!!loadNote) loadNote((objToEdit as NPXObject).internalRef);
 					this.closeModal();
 					setTimeout(() => print!(), 500);
@@ -78,8 +78,8 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 				<div className="explorer-options-modal">
 					<Row>
 						<form action="#!" onSubmit={this.rename}>
-							<TextInput s={6} label="Title" defaultValue={this.title} onChange={e => this.title = e.target.value} />
-							<Col s={6}><Button className="blue" waves="light">Rename {displayType}</Button></Col>
+							<TextInput s={8} label="Title" defaultValue={this.title} onChange={e => this.title = e.target.value} />
+							<Col s={4}><Button className="accent-btn" waves="light">Rename {displayType}</Button></Col>
 						</form>
 					</Row>
 					<Row><Button className="red" waves="light" onClick={this.delete}><Icon
