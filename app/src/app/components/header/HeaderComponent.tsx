@@ -1,3 +1,4 @@
+import './HeaderComponent.css';
 import * as React from 'react';
 import { CSSProperties } from 'react';
 import AppNameComponent from '../../containers/header/AppNameContainer';
