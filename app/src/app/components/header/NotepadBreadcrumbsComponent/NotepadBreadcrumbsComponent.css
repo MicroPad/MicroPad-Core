@@ -14,12 +14,6 @@
 	margin-bottom: 0;
 }
 
-/*.notepad-breadcrumbs__breadcrumb {*/
-/*	font-size: 18px;*/
-/*	color: white;*/
-/*	color: hsla(0,0%, 100%, .7);*/
-/*}*/
-
 #breadcrumb-holder .breadcrumb, #breadcrumb-holder .breadcrumb::before {
 	color: var(--mp-theme-explorerContent);
 }
