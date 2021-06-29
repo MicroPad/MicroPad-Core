@@ -18,9 +18,17 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 	};
 
 	public reducer(state: INotepadsStoreState, action: Action): INotepadsStoreState {
-		const newState = this.reducerImpl(state, action);
-		if (newState.notepad && newState.notepad.item) {
-			newState.notepad.isReadOnly = isReadOnlyNotebook(newState.notepad?.item?.title ?? '');
+		let newState = this.reducerImpl(state, action);
+
+		const isReadOnly = isReadOnlyNotebook(newState.notepad?.item?.title ?? '');
+		if (newState.notepad && newState.notepad?.isReadOnly !== isReadOnly) {
+			newState = {
+				...newState,
+				notepad: {
+					...newState.notepad,
+					isReadOnly: isReadOnlyNotebook(newState.notepad?.item?.title ?? '')
+				}
+			};
 		}
 
 		return newState;
@@ -32,10 +40,10 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 
 			return {
 				...state,
-				savedNotepadTitles: Array.from(new Set([
+				savedNotepadTitles: NotepadsReducer.getNotebookListWithMemo(Array.from(new Set([
 					...(state.savedNotepadTitles || []),
 					result.title
-				])),
+				])), state.savedNotepadTitles),
 				notepad: {
 					isLoading: false,
 					saving: false,
@@ -73,24 +81,24 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 			return {
 				...state,
 				isLoading: false,
-				savedNotepadTitles: Array.from(new Set([
+				savedNotepadTitles: NotepadsReducer.getNotebookListWithMemo(Array.from(new Set([
 					...(state.savedNotepadTitles || []),
 					...action.payload.result
-				]))
+				])), state.savedNotepadTitles)
 			};
 		} else if (isType(action, actions.newNotepad)) {
 			let notepad = action.payload;
 
-			if (state.savedNotepadTitles
-				&& state.savedNotepadTitles.some(title => title.toLowerCase() === notepad.title.toLowerCase())
-			) notepad = notepad.clone({}, notepad.title + ' (DUPLICATE)');
+			if (state.savedNotepadTitles?.some(title => title.toLowerCase() === notepad.title.toLowerCase())) {
+				notepad = notepad.clone({}, notepad.title + ' (DUPLICATE)');
+			}
 
 			return {
 				...state,
-				savedNotepadTitles: Array.from(new Set([
+				savedNotepadTitles: NotepadsReducer.getNotebookListWithMemo(Array.from(new Set([
 					...(state.savedNotepadTitles || []),
 					notepad.title
-				])).sort(),
+				])).sort(), state.savedNotepadTitles),
 				notepad: {
 					isLoading: false,
 					saving: false,
@@ -126,7 +134,14 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 			return {
 				...state,
 				notepad: undefined,
-				savedNotepadTitles: (state.savedNotepadTitles || []).filter(title => title !== action.payload)
+				savedNotepadTitles: NotepadsReducer.getNotebookListWithMemo(
+					state.savedNotepadTitles?.filter(title => title !== action.payload) ?? [],
+					state.savedNotepadTitles
+				),
+				dueDates: {
+					...state.dueDates,
+					dueItems: state.dueDates.dueItems.filter(item => item.notepadTitle !== action.payload)
+				}
 			};
 		} else if (isType(action, actions.renameNotepad.done)) {
 			return {
@@ -135,10 +150,10 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 					...state.notepad!,
 					item: state.notepad!.item!.clone({ lastModified: new Date() }, action.payload.params)
 				},
-				savedNotepadTitles: Array.from(new Set([
+				savedNotepadTitles: NotepadsReducer.getNotebookListWithMemo(Array.from(new Set([
 					...(state.savedNotepadTitles || []).filter(title => title !== action.payload.result),
 					action.payload.params
-				])).sort()
+				])).sort(), state.savedNotepadTitles)
 			};
 		} else if (isType(action, actions.deleteNotepadObject)) {
 			const isSubSectionOf = (section: FlatSection, parent: string): boolean => state.notepad!.item!
@@ -458,6 +473,7 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 			}
 		} else if (isType(action, actions.getDueDates.done) || isType(action, actions.getDueDates.failed)) {
 			let dueItems: DueItem[] = state.dueDates.dueItems;
+
 			if (!action.error) {
 				const payload = action.payload as unknown as Success<void, DueItem[]>;
 				dueItems = payload.result;
@@ -473,5 +489,9 @@ export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
 		}
 
 		return state;
+	}
+
+	private static getNotebookListWithMemo(newList: string[], currentList: string[] | undefined): string[] | undefined {
+		return JSON.stringify(newList) === JSON.stringify(currentList) ? currentList : newList;
 	}
 }
