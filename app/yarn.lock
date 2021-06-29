@@ -5540,10 +5540,10 @@ fd-slicer@~1.1.0:
   dependencies:
     pend "~1.2.0"
 
-fend-wasm@^0.1.17:
-  version "0.1.17"
-  resolved "https://registry.yarnpkg.com/fend-wasm/-/fend-wasm-0.1.17.tgz#8471836569cadb99c2ff74b9c4888fe593496e1e"
-  integrity sha512-Mvij14bDonySdBAg4dYpGtM66EzaI6mOgJNkfIDD2NSvIZTGAz2arfOrwLRoM8QBZYGzf1XZnFuCuUV3fKyNRg==
+fend-wasm@^0.1.19:
+  version "0.1.19"
+  resolved "https://registry.yarnpkg.com/fend-wasm/-/fend-wasm-0.1.19.tgz#4279d627dbe848b7dbc8b6336800e5855cb48381"
+  integrity sha512-tYk1mevSLwzDYoo5DRYEkT99hdZblFiqf6Vc7rqpjyglpq71GFw9sYsOMSgfNBwE3hzWtAOb4TEqyyfagtIi2A==
 
 figgy-pudding@^3.5.1:
   version "3.5.2"
