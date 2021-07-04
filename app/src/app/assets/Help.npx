@@ -15,7 +15,7 @@ of power and openness.
 - To see the future of MicroPad, take a look at our [GitHub Projects](https://github.com/orgs/MicroPad/projects).
 
 **Release notes for v3.31 (4th of July 2021)**
-- [fend](https://github.com/printfn/fend) now supports variables. For example, you can write `[[ x = 5; 4 * x ]]` to get [[ x = 5; 4 * x ]].
+- [fend](https://github.com/printfn/fend) now supports variables. For example, you can write `[[[ x = 5; 4 * x ]]]` to get [[ x = 5; 4 * x ]].
 
 **Release notes for v3.30.0 (18th of June 2021)**  
 ### c[IMPORTANT Information](red)
@@ -50,7 +50,7 @@ like getting 15°C in Fahrenheit ([[15C in F]])
 **Release notes for v3.26.0 (14th of October 2020)**
 - MicroPad's markdown just got a lot smarter with [fend](https://github.com/printfn/fend/wiki) 👩‍🏫
 	- It's an arbitrary precision calculator/unit conversion tool/lambda calculus machine/unicorn feeder
-	- You can do fancy things like `[[1 1/2 hours/2 to minutes]]` = [[1 1/2 hours/2 to minutes]]
+	- You can do fancy things like `[[[1 1/2 hours/2 to minutes]]]` = [[1 1/2 hours/2 to minutes]]
 	- For more information check out the *Formatting Help* on the markdown editors and in the *Help*
 	notebook
 
