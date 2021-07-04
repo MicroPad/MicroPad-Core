@@ -14,6 +14,9 @@ of power and openness.
 - This may be bundled with Electron. The licence for Electron can be found [here](https://github.com/electron/electron/blob/master/LICENSE).</markdown></note><note title="What's New" time="2018-05-23T19:13:17.864+12:00"><addons/><bibliography/><markdown id="markdown1" x="9px" y="9px" width="auto" height="auto" fontSize="16px"><![CDATA[***What's coming next?***
 - To see the future of MicroPad, take a look at our [GitHub Projects](https://github.com/orgs/MicroPad/projects).
 
+**Release notes for v3.31 (4th of July 2021)**
+- [fend](https://github.com/printfn/fend) now supports variables. For example, you can write `[[ x = 5; 4 * x ]]` to get [[ x = 5; 4 * x ]].
+
 **Release notes for v3.30.0 (18th of June 2021)**  
 ### c[IMPORTANT Information](red)
 - There have been a few recent occurrences of people storing all of their notes inside the *Help* notebook.
@@ -39,7 +42,7 @@ In the note/section options modal, there's a new option to move the item to anot
 
 **Release notes for v3.27.0 (13th of March 2021)**
 - A number of improvements to the drawing editor
-- The latest version of [fend](https://fend.printfn.nz) with fancy temperature conversions
+- The latest version of [fend](https://github.com/printfn/fend/wiki) with fancy temperature conversions
 like getting 15°C in Fahrenheit ([[15C in F]])
 - A number of under-the-hood upgrades to increase stability *and* recording now works in offline mode!
 - Search is a little less laggy (although there is still work to do in that area)
