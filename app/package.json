@@ -17,7 +17,6 @@
     "@sentry/react": "^6.6.0",
     "@sentry/tracing": "^6.6.0",
     "date-fns": "^2.21.3",
-    "deep-equal": "^2.0.5",
     "deep-freeze": "~0.0.1",
     "fend-wasm": "^0.1.19",
     "json-stringify-safe": "^5.0.1",
