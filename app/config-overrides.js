@@ -21,5 +21,6 @@ module.exports = function override(config, env) {
     use: [{ loader: require.resolve('wasm-loader'), options: {} }]
   });
 
-  return config;
+  console.log(config);
+  throw 'foo';
 };

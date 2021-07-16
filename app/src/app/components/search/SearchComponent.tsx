@@ -1,16 +1,16 @@
 import * as React from 'react';
-import { Collection, Icon, Modal, NavItem, Row, TextInput } from 'react-materialize';
+import { Autocomplete, Collection, Icon, Modal, NavItem, Row, TextInput } from 'react-materialize';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { FlatNotepad } from 'upad-parse/dist';
 import { Subject } from 'rxjs';
 import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../../types/ActionTypes';
-import { HashTagSearchResult, HashTagSearchResults } from '../../reducers/SearchReducer';
+import { SearchResult, SearchResults } from '../../reducers/SearchReducer';
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
 
 export interface ISearchComponentProps {
 	notepad?: FlatNotepad;
 	indices: SearchIndices;
-	hashTagResults: HashTagSearchResults;
+	hashTagResults: SearchResults;
 	query: string;
 	loadNote?: (ref: string) => void;
 	loadNoteFromHashTagResults?: (data: RestoreJsonNotepadAndLoadNoteAction) => void;
@@ -61,6 +61,17 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 			}
 		}
 
+		let existingHashtags = new Set<string>();
+		const allHashtags = this.props.indices
+			.map(index => index.trie.availableHashtags)
+			.flat()
+			.filter(hashtag => {
+				if (existingHashtags.has(hashtag)) return false;
+				existingHashtags.add(hashtag);
+				return true;
+			})
+			.map(hashtag => ({ label: hashtag, value: hashtag }));
+
 		return (
 			<Modal
 				id="search-modal"
@@ -74,6 +85,11 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 						setTimeout(() => this.searchInput.current?.focus(), 0);
 					}
 				}}>
+
+				<Autocomplete onChange={event => this.currentValue$.next(event.target.value)} options={{
+					data: { [query]: query }
+				}} />
+
 				<Row>
 					<TextInput
 						inputClassName="search-results"
@@ -114,10 +130,10 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 				{
 					// Display results for all the other notepads
 					Object.entries(hashTagResults)
-						.filter(([notepadTitle, results]: [string, HashTagSearchResult[]]) =>
+						.filter(([notepadTitle, results]: [string, SearchResult[]]) =>
 							!!results && results.length > 0 && (!notepad || notepadTitle !== notepad.title)
 						)
-						.map(([notepadTitle, results]: [string, HashTagSearchResult[]]) =>
+						.map(([notepadTitle, results]: [string, SearchResult[]]) =>
 							this.generateHashTagSearchResultList(notepadTitle, results)
 						)
 				}
@@ -170,7 +186,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 		loadNote(ref);
 	}
 
-	private generateHashTagSearchResultList = (notepadTitle: string, results: HashTagSearchResult[]): JSX.Element | null => {
+	private generateHashTagSearchResultList = (notepadTitle: string, results: SearchResult[]): JSX.Element | null => {
 		const { loadNoteFromHashTagResults } = this.props;
 		if (!loadNoteFromHashTagResults) return null;
 
