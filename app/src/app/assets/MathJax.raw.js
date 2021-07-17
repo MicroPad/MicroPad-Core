@@ -1,6 +1,6 @@
 /* eslint-disable */
 /*
- *  /MathJax.js
+ *  /MathJax.raw.js
  *
  *  Copyright (c) 2009-2018 The MathJax Consortium
  *

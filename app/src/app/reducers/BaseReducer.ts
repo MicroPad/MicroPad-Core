@@ -1,6 +1,5 @@
 import { MicroPadReducer } from '../types/ReducerType';
 import { IStoreState } from '../types';
-import * as deepFreeze from 'deep-freeze';
 import { isDev } from '../util';
 import { NotepadsReducer } from './NotepadsReducer';
 import { NoteReducer } from './NoteReducer';
@@ -14,6 +13,7 @@ import { NotepadPasskeysReducer } from './NotepadPasskeysReducer';
 import { MicroPadAction, READ_ONLY_ACTIONS } from '../actions';
 import { Action, Reducer } from 'redux';
 import { isReadOnlyNotebook } from '../ReadOnly';
+import deepFreeze from 'deep-freeze';
 
 export const REDUCERS: Array<MicroPadReducer<any>> = [
 	new AppReducer(),
@@ -56,7 +56,7 @@ export class BaseReducer implements ReduxReducer<IStoreState, MicroPadAction> {
 		};
 		REDUCERS.forEach(reducer => newState[reducer.key] = reducer.reducer(state![reducer.key], action));
 		
-		return isDev() ? deepFreeze(newState) : newState;
+		return isDev() ? deepFreeze(newState) as IStoreState : newState;
 	}
 
 	private static isReadonlyViolation(state: IStoreState, action: MicroPadAction): boolean {

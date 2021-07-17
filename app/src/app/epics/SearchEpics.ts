@@ -5,10 +5,9 @@ import { Action, Success } from 'redux-typescript-actions';
 import { actions, MicroPadAction } from '../actions';
 import { Dispatch } from 'redux';
 import { SearchIndices } from '../types/ActionTypes';
-import { indexNotepads } from '../workers/SearchWorker';
 import { EpicDeps, EpicStore } from './index';
 import { Notepad } from 'upad-parse/dist';
-import { search } from '../services/SearchService';
+import { search, indexNotepads } from '../services/SearchService';
 
 export const refreshIndices$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
