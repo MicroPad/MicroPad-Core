@@ -94,7 +94,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/repo/app
-      - run: sudo apt install rsync
+      - run: sudo apt-get update && sudo apt-get install -y rsync
       - run: rsync -aue "ssh -p 1276 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" app/build/* $NEXT_SSH_PATH
 
   publish-github-release:
