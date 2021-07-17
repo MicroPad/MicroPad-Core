@@ -10,7 +10,7 @@ import { DEFAULT_MODAL_OPTIONS } from '../../util';
 export interface ISearchComponentProps {
 	notepad?: FlatNotepad;
 	indices: SearchIndices;
-	hashTagResults: SearchResults;
+	results: SearchResults;
 	query: string;
 	loadNote?: (ref: string) => void;
 	loadNoteFromHashTagResults?: (data: RestoreJsonNotepadAndLoadNoteAction) => void;
@@ -25,7 +25,7 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 	private readonly destroy$: Subject<void> = new Subject<void>();
 
 	render() {
-		const { notepad, query, hashTagResults, indices } = this.props;
+		const { notepad, query, results, indices } = this.props;
 
 		this.results = [];
 
@@ -121,21 +121,21 @@ export default class SearchComponent extends React.Component<ISearchComponentPro
 
 				{
 					// Display results for the current notepad first
-					!!notepad
-					&& !!hashTagResults[notepad.title]
-					&& hashTagResults[notepad.title].length > 0
-					&& this.generateHashTagSearchResultList(notepad.title, hashTagResults[notepad.title])
+					// !!notepad
+					// && !!hashTagResults[notepad.title]
+					// && hashTagResults[notepad.title].length > 0
+					// && this.generateHashTagSearchResultList(notepad.title, hashTagResults[notepad.title])
 				}
 
 				{
 					// Display results for all the other notepads
-					Object.entries(hashTagResults)
-						.filter(([notepadTitle, results]: [string, SearchResult[]]) =>
-							!!results && results.length > 0 && (!notepad || notepadTitle !== notepad.title)
-						)
-						.map(([notepadTitle, results]: [string, SearchResult[]]) =>
-							this.generateHashTagSearchResultList(notepadTitle, results)
-						)
+					// Object.entries(hashTagResults)
+					// 	.filter(([notepadTitle, results]: [string, SearchResult[]]) =>
+					// 		!!results && results.length > 0 && (!notepad || notepadTitle !== notepad.title)
+					// 	)
+					// 	.map(([notepadTitle, results]: [string, SearchResult[]]) =>
+					// 		this.generateHashTagSearchResultList(notepadTitle, results)
+					// 	)
 				}
 			</Modal>
 		);

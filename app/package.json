@@ -10,6 +10,7 @@
     "build": "NODE_ENV=production node _build/build.js",
     "test": "TZ=NZ jest",
     "typecheck": "tsc --noEmit --p ./tsconfig.json",
+    "typecheck:watch": "tsc --noEmit --watch -p ./tsconfig.json",
     "lint": "eslint src/"
   },
   "dependencies": {
@@ -48,7 +49,7 @@
     "showdown": "^1.8.6",
     "timers-browserify": "^2.0.12",
     "typescript": "~4.3.2",
-    "upad-parse": "^7.2.0",
+    "upad-parse": "^7.3.0",
     "vex-dialog": "^1.1.0",
     "vex-js": "^4.1.0",
     "workbox-core": "^6.1.5",

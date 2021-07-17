@@ -9,7 +9,7 @@ export function mapStateToProps({ notepads, search }: IStoreState) {
 	return {
 		notepad: ((notepads || {} as INotepadsStoreState).notepad || {} as INotepadStoreState).item,
 		indices: search.indices,
-		hashTagResults: search.hashTagResults,
+		results: search.results,
 		query: search.query
 	};
 }
@@ -17,7 +17,7 @@ export function mapStateToProps({ notepads, search }: IStoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<ISearchComponentProps> {
 	return {
 		loadNote: (ref: string) => dispatch(actions.loadNote.started(ref)),
-		search: (query: string) => dispatch(actions.search(query)),
+		search: (query: string) => dispatch(actions.search.started(query)),
 		loadNoteFromHashTagResults: data => dispatch(actions.restoreJsonNotepadAndLoadNote(data))
 	};
 }

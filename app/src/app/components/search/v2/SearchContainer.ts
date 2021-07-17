@@ -6,7 +6,7 @@ export const searchConnector = connect(
 	({ search, notepads }: IStoreState) => ({
 		notepad: notepads.notepad?.item,
 		indices: search.indices,
-		results: search.hashTagResults,
+		results: search.results,
 		query: search.query
 	})
 );
