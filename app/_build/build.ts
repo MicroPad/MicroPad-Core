@@ -94,7 +94,9 @@ const PORT: number = (() => {
 
 	console.log('Built!');
 
-	runDevServer(PORT);
+	if (isDev) {
+		runDevServer(PORT);
+	}
 })().catch(err => {
 	console.error(err);
 	process.exit(1);
