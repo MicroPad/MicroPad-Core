@@ -14,13 +14,15 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta name="theme-color" content="#000000">
+	<link rel="stylesheet" href="%PUBLIC_URL%/assets/please-wait/please-wait.css">
+	<link rel="stylesheet" href="%PUBLIC_URL%/dist/index.css">
+
 	<!--
 	manifest.json provides metadata used when your web app is added to the
 	homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
 	-->
 	<link rel="manifest" href="%PUBLIC_URL%/manifest.json">
 	<link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-	<link rel="stylesheet" href="%PUBLIC_URL%/assets/please-wait/please-wait.css">
 	<link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-icon.png">
 	<!--
 	Notice the use of %PUBLIC_URL% in the tags above.
@@ -32,18 +34,20 @@
 	Learn how to configure a non-root public URL by running `npm run build`.
 	-->
 
+	<script type="module" src="%PUBLIC_URL%/dist/index.js"></script>
+	<script nomodule>document.write('A browser that supports ESM (modules) is required to run µPad.');</script>
+
 	<title>µPad</title>
 </head>
 <body>
 	<noscript>
-		You need to enable JavaScript to run this app.<br/>
-		Don't worry, it's all <a target="_blank" rel="noreferrer nofollow" href="https://github.com/MicroPad/Web">open source (MPLv2)</a>. Your freedoms are safe.
+		JavaScript is required to run µPad.
 	</noscript>
 	<div id="app"></div>
 	<script type="text/javascript" src="%PUBLIC_URL%/assets/please-wait/please-wait.min.js"></script>
 	<script type="text/javascript">
 		const loadingScreen = window.pleaseWait({
-			logo: "%PUBLIC_URL%/assets/loading.gif",
+			logo: "assets/loading.gif",
 			backgroundColor: "#607d8b",
 			loadingHtml: "<p style='font-size: 2rem; color: white; font-weight: 300;'>We're just loading everything now&hellip;" +
 			"<br /><br />While you're waiting, how about a little riddle?" +

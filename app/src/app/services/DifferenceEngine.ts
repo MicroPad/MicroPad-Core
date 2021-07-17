@@ -1,17 +1,15 @@
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import SyncWorker from '!workerize-loader!../workers/sync-worker/sync-worker.js';
-
-import { from, Observable, of } from 'rxjs';
+import { from, fromEvent, Observable, of } from 'rxjs';
 import { MICROPAD_URL } from '../types';
-import { concatMap, map, retry } from 'rxjs/operators';
-import { AssetList, INotepadSharingData, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from '../types/SyncTypes';
+import { concatMap, filter, map, retry, take } from 'rxjs/operators';
+import { AssetList, INotepadSharingData, ISyncedNotepad, SyncedNotepadList } from '../types/SyncTypes';
 import { parse } from 'date-fns';
 import { LAST_MODIFIED_FORMAT, Notepad } from 'upad-parse/dist';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { encrypt } from 'upad-parse/dist/crypto';
+import { generateGuid } from '../util';
+import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
 
-const SyncThread = new SyncWorker() as ISyncWorker;
+const SyncThread = new Worker('/dist/sync.worker.js', { type: 'module' });
 
 export const AccountService = (() => {
 	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);
@@ -80,7 +78,24 @@ export const SyncService = (() => {
 	});
 
 	async function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
-		const { assets } = await SyncThread.getAssetInfo(notepad.flatten());
+		const cid = generateGuid();
+		const res$ = fromEvent<MessageEvent>(SyncThread, 'message').pipe(
+			filter(event => event.data?.cid === cid),
+			map(event => {
+				if (event.data.error) throw event.data.error;
+				return event.data;
+			}),
+			take(1)
+		);
+
+		const getAssetInfo$: ReturnType<typeof getAssetInfoImpl> = res$.toPromise();
+		SyncThread.postMessage({
+			cid,
+			type: 'getAssetInfo',
+			flatNotepad: notepad.flatten()
+		});
+
+		const { assets } = await getAssetInfo$;
 		return Object.assign({}, notepad, { assetHashList: assets });
 	}
 

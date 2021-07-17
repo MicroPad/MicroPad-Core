@@ -6,9 +6,9 @@ import { actions, MicroPadAction } from '../actions';
 import { HashTagSearchResult, HashTagSearchResults } from '../reducers/SearchReducer';
 import { Dispatch } from 'redux';
 import { SearchIndices } from '../types/ActionTypes';
-import { indexNotepads } from '../workers/SearchWorker';
 import { EpicDeps, EpicStore } from './index';
 import { Notepad } from 'upad-parse/dist';
+import { indexNotepads } from '../services/SearchService';
 
 export const refreshIndices$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(

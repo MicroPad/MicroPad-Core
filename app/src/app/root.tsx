@@ -1,7 +1,7 @@
 /* Special Imports */
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import helpNpx from '!raw-loader!./assets/Help.npx';
+import helpNpx from './assets/Help.npx';
 /* CSS Imports */
 import '@fontsource/abeezee';
 import 'material-icons-font/material-icons-font.css';
@@ -19,13 +19,12 @@ import './theme-styles/Purple.css';
 /* JS Imports */
 import * as React from 'react';
 import 'materialize-css/dist/js/materialize.js';
-import * as serviceWorker from '../registerServiceWorker';
 import { APP_NAME, MICROPAD_URL } from './types';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import * as localforage from 'localforage';
+import localforage from 'localforage';
 import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
 import { Provider } from 'react-redux';
@@ -250,13 +249,4 @@ function pasteWatcher() {
 	PasteImage.on('paste-image', async (image: HTMLImageElement) => {
 		store.dispatch(actions.imagePasted.started(image.src));
 	});
-}
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-if (window.isElectron) {
-	serviceWorker.unregister();
-} else {
-	serviceWorker.register();
 }

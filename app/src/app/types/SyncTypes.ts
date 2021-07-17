@@ -1,9 +1,4 @@
 import { Notepad } from 'upad-parse/dist';
-import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
-
-export interface ISyncWorker {
-	getAssetInfo: typeof getAssetInfoImpl;
-}
 
 export type SyncLoginRequest = {
 	username: string;
