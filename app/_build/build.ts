@@ -100,9 +100,10 @@ const PORT: number = (() => {
 	process.exit(1);
 });
 
+const PUBLIC_URL_REGEX = /%PUBLIC_URL%/g;
 async function buildHtml(path: string): Promise<string> {
 	const html = await readFile(path).then(buffer => buffer.toString('utf-8'));
-	return html.replaceAll('%PUBLIC_URL%', process.env.PUBLIC_URL ?? '');
+	return html.replace(PUBLIC_URL_REGEX, process.env.PUBLIC_URL ?? '');
 }
 
 function runDevServer(port: number) {
