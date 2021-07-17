@@ -50,7 +50,6 @@ jobs:
             - yarn-packages-master
             - yarn-packages-
 
-      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: cd app && yarn
 
       - save_cache:
