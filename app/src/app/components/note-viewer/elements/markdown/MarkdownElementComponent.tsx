@@ -1,6 +1,6 @@
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import helpNpx from '!raw-loader!../../../../assets/Help.npx';
+import helpNpx from '../../../../assets/Help.npx';
 
 import './MarkdownElementComponent.css';
 import * as React from 'react';

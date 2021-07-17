@@ -1,7 +1,8 @@
-import * as Vex from 'vex-js';
-import * as VexDialog from 'vex-dialog';
 import 'vex-js/dist/css/vex.css';
 import 'vex-js/dist/css/vex-theme-top.css';
+
+const Vex = require('vex-js');
+const VexDialog = require('vex-dialog');
 
 Vex.registerPlugin(VexDialog);
 Vex.defaultOptions!.className = 'vex-theme-top';

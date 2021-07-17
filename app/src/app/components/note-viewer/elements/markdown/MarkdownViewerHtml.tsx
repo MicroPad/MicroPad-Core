@@ -1,15 +1,10 @@
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import MathJax from '!raw-loader!../../../../assets/MathJax.js';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import hljs from '!raw-loader!../../../../assets/highlight.js/highlight.min.js';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import hljsCss from '!raw-loader!../../../../assets/highlight.js/default.css';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import hljsCssDark from '!raw-loader!../../../../assets/highlight.js/monokai.css';
+// @ts-expect-error TS2306
+import MathJax from '../../../../assets/MathJax.raw.js';
+import hljs from '../../../../assets/highlight.js/highlight.min.raw.js';
+// @ts-expect-error TS2307
+import hljsCss from '../../../../assets/highlight.js/default.raw.css';
+// @ts-expect-error TS2307
+import hljsCssDark from '../../../../assets/highlight.js/monokai.raw.css';
 
 import { ITheme } from '../../../../types/Themes';
 import { isDev } from '../../../../util';

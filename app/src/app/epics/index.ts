@@ -1,6 +1,6 @@
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import helpNpx from '!raw-loader!../assets/Help.npx';
+import helpNpx from '../assets/Help.npx';
 
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 import { notepadEpics$ } from './NotepadEpics';
