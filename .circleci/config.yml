@@ -7,7 +7,7 @@ jobs:
   test:
     docker:
       # specify the version you desire here
-      - image: cimg/rust:1.52-node
+      - image: cimg/node:lts
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -21,7 +21,6 @@ jobs:
 
     steps:
       - checkout
-      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: cd app && yarn
       - run: cd app && yarn global add playwright && yarn playwright install-deps
 
@@ -38,7 +37,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/rust:latest-node
+      - image: cimg/node:lts
     working_directory: ~/repo
     steps:
       - checkout
@@ -77,7 +76,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/rust:latest-node
+      - image: cimg/node:lts
 
     working_directory: ~/repo
 
@@ -89,7 +88,7 @@ jobs:
 
   canary-deploy:
     docker:
-      - image: circleci/rust:latest-node
+      - image: cimg/node:lts
 
     working_directory: ~/repo
 
