@@ -17,11 +17,6 @@ export default class SearchComponent extends React.Component<Props, never> {
 	private readonly modalId = `search-modal--${this.componentCount}`;
 	private selectEl: any | null = null;
 
-	override shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<never>, nextContext: any): boolean {
-		// return this.props.query !== nextProps.query || this.props.notepad !== nextProps.notepad;
-		return true;
-	}
-
 	override render() {
 		const results = [
 			...(this.props.notepad && this.props.results[this.props.notepad?.title ?? ''] ? [this.getSearchResultGroup([this.props.notepad.title, this.props.results[this.props.notepad.title]])] : []),
@@ -53,9 +48,12 @@ export default class SearchComponent extends React.Component<Props, never> {
 					className="search__autocomplete"
 					isClearable={true}
 					isSearchable={true}
+					menuIsOpen={this.props.showResults}
 					options={results}
 					filterOption={() => true}
 					placeholder={`Search by note title or a hashtag`}
+					noOptionsMessage={() => `No search results found`}
+					inputValue={this.props.query}
 					onInputChange={value => {
 						this.props.search(value);
 					}}
@@ -63,6 +61,8 @@ export default class SearchComponent extends React.Component<Props, never> {
 						if (item) this.props.loadResult(this.props.notepad?.title, item.value);
 						this.closeModal();
 					}}
+					onFocus={() => this.props.setSearchResultVisibility(true)}
+					onBlur={() => this.props.setSearchResultVisibility(false)}
 					styles={{
 						control: (styles, props) => ({
 							...styles,

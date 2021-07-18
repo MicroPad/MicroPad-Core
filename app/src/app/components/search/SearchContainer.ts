@@ -11,6 +11,7 @@ export const searchConnector = connect(
 			notepad: notepads.notepad?.item,
 			query: search.query,
 			results: search.results,
+			showResults: search.shouldShowResults
 		};
 	},
 	(dispatch: Dispatch<MicroPadAction>) => ({
@@ -21,7 +22,8 @@ export const searchConnector = connect(
 			} else {
 				dispatch(actions.restoreJsonNotepadAndLoadNote(result));
 			}
-		}
+		},
+		setSearchResultVisibility: (visibility: boolean) => dispatch(actions.setSearchResultVisibility(visibility))
 	})
 );
 
