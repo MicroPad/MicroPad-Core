@@ -1,12 +1,11 @@
 import './HeaderComponent.css';
-import * as React from 'react';
-import { CSSProperties } from 'react';
+import React, { CSSProperties } from 'react';
 import AppNameComponent from '../../containers/header/AppNameContainer';
 import { Icon, Navbar, NavItem } from 'react-materialize';
 import NotepadDropdownComponent from '../../containers/header/NotepadDropdownContainer';
 import { INotepadStoreState } from '../../types/NotepadTypes';
 import NotepadBreadcrumbs from '../../containers/header/NotepadBreadcrumbsContainer';
-import SearchComponent from '../../containers/SearchContainer';
+import SearchComponent from '../search/SearchContainer';
 import ThemeDropdownComponent from '../../containers/header/ThemeDropdownContainer';
 import { ITheme } from '../../types/Themes';
 

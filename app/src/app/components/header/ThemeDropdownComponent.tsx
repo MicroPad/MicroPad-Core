@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Dropdown, Icon, NavItem } from 'react-materialize';
 import { ThemeName } from '../../types/Themes';
 import { ThemeValues } from '../../ThemeValues';

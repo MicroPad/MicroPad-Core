@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { APP_NAME } from '../../../types';
 import { ConnectedProps } from 'react-redux';
 import { appSettingsContainer } from './AppSettingsContainer';

@@ -1,5 +1,5 @@
 import { INoteElementComponentProps } from '../NoteElementComponent';
-import * as React from 'react';
+import React from 'react';
 import { dataURItoBlob } from '../../../../util';
 import { trim } from './trim-canvas';
 import { Resizable } from 're-resizable';

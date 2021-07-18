@@ -1,6 +1,5 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import './NoteElementModalComponent.css';
-import { useState } from 'react';
 import { Converter, extension } from 'showdown';
 import { IShowdownOpts } from '../note-viewer/elements/markdown/MarkdownElementComponent';
 import { Modal } from 'react-materialize';

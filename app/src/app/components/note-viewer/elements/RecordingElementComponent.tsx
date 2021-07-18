@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Button, Icon } from 'react-materialize';
 import './RecordingElementComponent.css';
 import { IFileElementComponent } from './FileElementComponent';

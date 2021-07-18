@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { SyntheticEvent } from 'react';
+import React, { SyntheticEvent } from 'react';
 import { Icon, NavItem } from 'react-materialize';
 import { Translators } from 'upad-parse/dist';
 

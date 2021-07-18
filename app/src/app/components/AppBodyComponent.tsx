@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import * as FullScreenService from '../services/FullscreenService';
 
 export interface IAppBodyComponentProps {

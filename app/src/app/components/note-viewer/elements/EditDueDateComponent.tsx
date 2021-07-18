@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../types/Themes';
 import { format, formatDistanceStrict } from 'date-fns';

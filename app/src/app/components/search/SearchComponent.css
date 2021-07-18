@@ -1,0 +1,7 @@
+#search-modal--0, #search-modal--1 {
+	overflow: visible;
+}
+
+.search__autocomplete {
+	z-index: 10;
+}

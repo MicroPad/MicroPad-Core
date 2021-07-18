@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { ElementArgs, NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';
 import { InsertElementAction } from '../../types/ActionTypes';

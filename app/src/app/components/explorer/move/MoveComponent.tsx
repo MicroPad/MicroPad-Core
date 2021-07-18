@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { ConnectedProps } from 'react-redux';
 import { moveConnector } from './MoveContainer';
 import { SYNC_NAME } from '../../../types';

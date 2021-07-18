@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import './NoteElementComponent.css';
 import MarkdownElementComponent from './markdown/MarkdownElementComponent';
 import ImageElementComponent from './ImageElementComponent';

@@ -11,7 +11,7 @@ export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction
 	// Search
 	mousetrap.bind('mod+f', e => {
 		e.preventDefault();
-		openModal('search-modal');
+		openModal('search-modal--0');
 	});
 
 	// Quick Notepad Switch

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { ConnectedProps } from 'react-redux';

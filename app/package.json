@@ -10,6 +10,7 @@
     "build": "NODE_ENV=production node _build/build.js",
     "test": "TZ=NZ jest",
     "typecheck": "tsc --noEmit --p ./tsconfig.json",
+    "typecheck:watch": "tsc --noEmit --watch -p ./tsconfig.json",
     "lint": "eslint src/"
   },
   "dependencies": {
@@ -18,6 +19,7 @@
     "@sentry/react": "^6.6.0",
     "@sentry/tracing": "^6.6.0",
     "@types/deep-freeze": "^0.1.2",
+    "@types/react-select": "^4.0.17",
     "date-fns": "^2.21.3",
     "deep-freeze": "~0.0.1",
     "fend-wasm": "^0.1.19",
@@ -36,6 +38,7 @@
     "react-draggable": "^4.3.1",
     "react-materialize": "git+https://github.com/MicroPad/react-materialize.git#temp-fix",
     "react-redux": "^7.1.0",
+    "react-select": "^4.3.1",
     "react-treeview": "^0.4.7",
     "redux": "^4.1.0",
     "redux-devtools-extension": "^2.13.2",
@@ -48,7 +51,7 @@
     "showdown": "^1.8.6",
     "timers-browserify": "^2.0.12",
     "typescript": "~4.3.2",
-    "upad-parse": "^7.2.0",
+    "upad-parse": "^7.3.0",
     "vex-dialog": "^1.1.0",
     "vex-js": "^4.1.0",
     "workbox-core": "^6.1.5",

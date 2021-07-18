@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { FormEvent } from 'react';
+import React, { FormEvent } from 'react';
 import { Button, Col, Icon, Modal, Row, TextInput } from 'react-materialize';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';

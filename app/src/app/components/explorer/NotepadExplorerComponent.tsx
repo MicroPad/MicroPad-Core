@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { CSSProperties } from 'react';
+import React, { CSSProperties } from 'react';
 import './NotepadExplorerComponent.css';
 import { Button, Icon } from 'react-materialize';
 import TreeView from 'react-treeview';

@@ -1,8 +1,39 @@
-import * as localforage from 'localforage';
-import { FlatNotepad, Translators, Trie } from 'upad-parse/dist';
 import { SearchIndices } from '../types/ActionTypes';
+import { SearchResults } from '../reducers/SearchReducer';
+import localforage from 'localforage';
 import { NotepadPasskeysState } from '../reducers/NotepadPasskeysReducer';
+import { FlatNotepad } from 'upad-parse';
+import { Translators, Trie } from 'upad-parse/dist';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
+
+export function search(query: string, searchIndices: SearchIndices): SearchResults {
+	// Create a data structure with each notepad being the key to all the results for that hashtag's search
+	const results: SearchResults = {};
+
+	if (!query.length) return results;
+
+	searchIndices.forEach(index =>
+		index.notepad.search(index.trie, query)
+			.map(note => ({
+				title: note.title,
+				parentTitle: index.notepad.sections[note.parent as string].title,
+				noteRef: note.internalRef
+			}))
+			.forEach(result => {
+				results[index.notepad.title] ??= [];
+				results[index.notepad.title].push(result);
+			})
+	);
+
+	Object.keys(results).forEach(notepad => {
+		const resultList = results[notepad];
+		results[notepad] = resultList.sort((a, b) =>
+			Math.abs(query.length - a.title.length) - Math.abs(query.length - b.title.length)
+		)
+	});
+
+	return results;
+}
 
 export async function indexNotepads(indices: SearchIndices, passkeys: NotepadPasskeysState) {
 	const NOTEPAD_STORAGE = localforage.createInstance({
