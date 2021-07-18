@@ -6,6 +6,7 @@ export interface ISearchState {
 	query: string;
 	results: SearchResults;
 	indices: SearchIndices;
+	shouldShowResults: boolean;
 }
 
 export type SearchResult = {
@@ -21,7 +22,8 @@ export class SearchReducer extends MicroPadReducer<ISearchState> {
 	public readonly initialState: ISearchState = {
 		results: {},
 		query: '',
-		indices: []
+		indices: [],
+		shouldShowResults: false
 	};
 
 	constructor() {
@@ -39,6 +41,12 @@ export class SearchReducer extends MicroPadReducer<ISearchState> {
 			...state,
 			results: action.payload.result
 		}), actions.search.done);
+
+		this.handle((state, action) => ({
+			...state,
+			shouldShowResults: action.payload
+		}), actions.setSearchResultVisibility);
+
 
 		this.handleMemo((state, action) => ({
 			...state,

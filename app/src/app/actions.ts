@@ -118,7 +118,8 @@ export const actions = {
 	closeNotepad: actionCreator<void>('CLOSE_NOTEPAD'),
 	importMarkdown: actionCreator<Translators.Markdown.MarkdownImport[]>('IMPORT_FROM_MARKDOWN'),
 	setExplorerWidth: actionCreator<string>('SET_EXPLORER_WIDTH'),
-	feelingLucky: actionCreator<void>('FEELING_LUCKY')
+	feelingLucky: actionCreator<void>('FEELING_LUCKY'),
+	setSearchResultVisibility: actionCreator<boolean>('SET_SEARCH_RESULT_VISIBILITY')
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([

@@ -10,7 +10,7 @@ import * as MarkDownViewer from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
-import { debounce } from '../../../../util';
+import { debounce, openModal } from '../../../../util';
 import { Button, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
@@ -275,7 +275,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 			case 'hashtag':
 				search(message.payload);
-				(document.querySelector(`#search-button > a`)! as HTMLAnchorElement).click();
+				openModal('search-modal--0');
 				break;
 
 			case 'link':

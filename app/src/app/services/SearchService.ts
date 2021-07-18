@@ -7,7 +7,6 @@ import { Translators, Trie } from 'upad-parse/dist';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 
 export function search(query: string, searchIndices: SearchIndices): SearchResults {
-	// Create a data structure with each notepad being the key to all the results for that hashtag's search
 	const results: SearchResults = {};
 
 	if (!query.length) return results;
