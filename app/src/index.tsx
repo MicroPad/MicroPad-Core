@@ -1,6 +1,9 @@
 import { initSentry } from './sentry';
 import { isDev } from './app/util';
 import * as serviceWorker from './registerServiceWorker';
+import { domReady$ } from './app/services/ReadyService';
+
+domReady$.subscribe();
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

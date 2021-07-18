@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 

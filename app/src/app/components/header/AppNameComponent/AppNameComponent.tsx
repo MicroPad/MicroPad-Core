@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { APP_NAME } from '../../../types';
 import './AppNameComponent.css';
 import { IVersion } from '../../../reducers/AppReducer';

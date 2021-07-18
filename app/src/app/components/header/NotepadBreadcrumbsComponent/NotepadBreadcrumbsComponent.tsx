@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import './NotepadBreadcrumbsComponent.css';
 import { Breadcrumb as MaterialBreadcrumb, Icon } from 'react-materialize';
 

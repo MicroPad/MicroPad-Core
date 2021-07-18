@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { CSSProperties } from 'react';
+import React, { CSSProperties } from 'react';
 import './NoteViewerComponent.css';
 import NoteElementComponent from './elements/NoteElementComponent';
 import { ProgressBar } from 'react-materialize';

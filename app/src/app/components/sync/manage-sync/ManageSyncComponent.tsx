@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Button, Modal, NavItem } from 'react-materialize';
 import { MICROPAD_URL, SYNC_NAME } from '../../../types';
 import { ISyncState } from '../../../reducers/SyncReducer';

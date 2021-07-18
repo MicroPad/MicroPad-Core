@@ -5,31 +5,43 @@ import { NotepadPasskeysState } from '../reducers/NotepadPasskeysReducer';
 import { FlatNotepad } from 'upad-parse';
 import { Translators, Trie } from 'upad-parse/dist';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
+import { BehaviorSubject } from 'rxjs';
+
+export const RE_INIT_AUTOCOMPLETE$ = new BehaviorSubject<void>(void 0);
 
 export function search(query: string, searchIndices: SearchIndices): SearchResults {
 	// Create a data structure with each notepad being the key to all the results for that hashtag's search
 	const results: SearchResults = {};
 
-	// Hashtag search
-	if (query.length > 1 || query.substring(0, 1) === '#') {
-		searchIndices.forEach(index =>
-			index.notepad.search(index.trie, query)
-				.map(note => ({
-					title: note.title,
-					parentTitle: index.notepad.sections[note.parent as string].title,
-					noteRef: note.internalRef
-				}))
-				.forEach(result => {
-					results[index.notepad.title] ??= [];
-					results[index.notepad.title].push(result);
-				})
-		);
+	searchIndices.forEach(index =>
+		index.notepad.search(index.trie, query)
+			.map(note => ({
+				title: note.title,
+				parentTitle: index.notepad.sections[note.parent as string].title,
+				noteRef: note.internalRef
+			}))
+			.forEach(result => {
+				results[index.notepad.title] ??= [];
+				results[index.notepad.title].push(result);
+			})
+	);
 
-		return results;
-	}
+	Object.keys(results).forEach(notepad => {
+		const resultList = results[notepad];
+		results[notepad] = resultList.sort((a, b) =>
+			Math.abs(query.length - a.title.length) - Math.abs(query.length - b.title.length)
+		)
+	});
 
-	// TODO: General search
 	return results;
+}
+
+export function flattenSearchResults(allResults: SearchResults): Record<string, string> {
+	const flatResults: Record<string, string> = {};
+	Object.values(allResults)
+		.forEach(results => results.map(result => flatResults[result.title] = result.noteRef));
+
+	return flatResults;
 }
 
 export async function indexNotepads(indices: SearchIndices, passkeys: NotepadPasskeysState) {

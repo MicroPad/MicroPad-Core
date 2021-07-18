@@ -1,5 +1,5 @@
 import './NotepadDropdownComponent.css';
-import * as React from 'react';
+import React from 'react';
 import { Col, Dropdown, Icon, Modal, NavItem, ProgressBar, Row } from 'react-materialize';
 import UploadNotepadsComponent from '../../containers/header/UploadNotepadsContainer';
 import { DEFAULT_MODAL_OPTIONS, generateGuid } from '../../util';

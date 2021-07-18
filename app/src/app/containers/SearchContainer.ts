@@ -1,16 +1,15 @@
 import { IStoreState } from '../types';
 import { connect } from 'react-redux';
-import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { Action, Dispatch } from 'redux';
 import { default as SearchComponent, ISearchComponentProps } from '../components/search/SearchComponent';
 import { actions } from '../actions';
 
 export function mapStateToProps({ notepads, search }: IStoreState) {
 	return {
-		notepad: ((notepads || {} as INotepadsStoreState).notepad || {} as INotepadStoreState).item,
+		notepad: notepads?.notepad?.item,
 		indices: search.indices,
-		results: search.results,
-		query: search.query
+		query: search.query,
+		results: search.results
 	};
 }
 

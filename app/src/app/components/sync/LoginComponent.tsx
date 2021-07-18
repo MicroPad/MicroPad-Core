@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { FormEvent } from 'react';
+import React, { FormEvent } from 'react';
 import { Button, Modal, TextInput } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL, SYNC_NAME } from '../../types';
 import { SyncUser } from '../../types/SyncTypes';

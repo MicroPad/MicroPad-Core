@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { INotepadsStoreState } from './NotepadTypes';
 import { IExplorerState } from '../reducers/ExplorerReducer';
 import { ISearchState } from '../reducers/SearchReducer';

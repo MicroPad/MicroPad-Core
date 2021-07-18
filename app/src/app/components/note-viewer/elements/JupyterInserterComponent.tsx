@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { SyntheticEvent } from 'react';
+import React, { SyntheticEvent } from 'react';
 import { Icon } from 'react-materialize';
 import { readFileInputEventAsText } from '../../../util';
 import { Dialog } from '../../../services/dialogs';

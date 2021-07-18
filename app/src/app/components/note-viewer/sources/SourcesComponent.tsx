@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Button, Icon, Modal, TextInput } from 'react-materialize';
 import { Dialog } from '../../../services/dialogs';
 import { DEFAULT_MODAL_OPTIONS } from '../../../util';

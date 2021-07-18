@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { SyntheticEvent } from 'react';
+import React, { SyntheticEvent } from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
 import { Button, Row } from 'react-materialize';
 import { dataURItoBlob } from '../../../util';

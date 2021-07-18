@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { MICROPAD_URL, SYNC_NAME } from '../../types';
 import { ISyncedNotepad, SyncUser } from '../../types/SyncTypes';
 import * as DifferenceEngine from '../../services/DifferenceEngine';

@@ -3,7 +3,7 @@
 import helpNpx from '../../../../assets/Help.npx';
 
 import './MarkdownElementComponent.css';
-import * as React from 'react';
+import React from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
 import * as MarkDownViewer from './MarkdownViewerHtml';

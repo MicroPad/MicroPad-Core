@@ -17,7 +17,7 @@ import './theme-styles/Peach.css';
 import './theme-styles/Pastel.css';
 import './theme-styles/Purple.css';
 /* JS Imports */
-import * as React from 'react';
+import React from 'react';
 import 'materialize-css/dist/js/materialize.js';
 import { APP_NAME, MICROPAD_URL } from './types';
 import { applyMiddleware, compose, createStore } from 'redux';

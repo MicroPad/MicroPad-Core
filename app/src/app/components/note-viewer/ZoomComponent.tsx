@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { isMobile } from '../../util';
 import { Button, Icon } from 'react-materialize';
 import { ITheme } from '../../types/Themes';

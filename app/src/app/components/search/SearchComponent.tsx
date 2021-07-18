@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Autocomplete, Collection, Icon, Modal, NavItem, Row, TextInput } from 'react-materialize';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { FlatNotepad } from 'upad-parse/dist';

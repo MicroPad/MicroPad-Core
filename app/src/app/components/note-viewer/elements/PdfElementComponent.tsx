@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { SyntheticEvent } from 'react';
+import React, { SyntheticEvent } from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
 import { Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';

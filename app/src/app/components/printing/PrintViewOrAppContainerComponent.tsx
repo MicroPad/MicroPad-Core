@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import './PrintViewComponent.css';
 import MarkdownElementComponent from '../note-viewer/elements/markdown/MarkdownElementComponent';
 import { Note } from 'upad-parse/dist';
