@@ -5,13 +5,12 @@ import { NotepadPasskeysState } from '../reducers/NotepadPasskeysReducer';
 import { FlatNotepad } from 'upad-parse';
 import { Translators, Trie } from 'upad-parse/dist';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
-import { BehaviorSubject } from 'rxjs';
-
-export const RE_INIT_AUTOCOMPLETE$ = new BehaviorSubject<void>(void 0);
 
 export function search(query: string, searchIndices: SearchIndices): SearchResults {
 	// Create a data structure with each notepad being the key to all the results for that hashtag's search
 	const results: SearchResults = {};
+
+	if (!query.length) return results;
 
 	searchIndices.forEach(index =>
 		index.notepad.search(index.trie, query)
@@ -34,14 +33,6 @@ export function search(query: string, searchIndices: SearchIndices): SearchResul
 	});
 
 	return results;
-}
-
-export function flattenSearchResults(allResults: SearchResults): Record<string, string> {
-	const flatResults: Record<string, string> = {};
-	Object.values(allResults)
-		.forEach(results => results.map(result => flatResults[result.title] = result.noteRef));
-
-	return flatResults;
 }
 
 export async function indexNotepads(indices: SearchIndices, passkeys: NotepadPasskeysState) {

@@ -1,24 +1,21 @@
 import './SearchComponent.css';
 import React from 'react';
-import { Dropdown, Icon, Modal, NavItem } from 'react-materialize';
+import { Icon, Modal, NavItem } from 'react-materialize';
 import { ConnectedProps } from 'react-redux';
 import { searchConnector } from './SearchContainer';
 import { DEFAULT_MODAL_OPTIONS } from '../../../util';
-import { Subject } from 'rxjs';
+import Select from 'react-select';
+import { GroupTypeBase, OptionTypeBase } from 'react-select/src/types';
+import { SearchResult } from '../../../reducers/SearchReducer';
 
 type Props = ConnectedProps<typeof searchConnector>;
 
-// This is a bit complex because we need to use the old-school imperative materialize approach for an async autocomplete
-// see: https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/
 export default class SearchComponent extends React.Component<Props, never> {
 	private static componentCount: number = 0;
 
 	private readonly componentCount = SearchComponent.componentCount++;
 	private readonly modalId = `search-modal--${this.componentCount}`;
-	private readonly inputId = `search__autocomplete--${this.componentCount}`;
-	private readonly dropdownId = `search__results--${this.componentCount}`;
-	private readonly destroyed$ = new Subject<void>();
-	private inputElRef: React.RefObject<HTMLInputElement> = { current: null };
+	private selectEl: any | null = null;
 
 	override shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<never>, nextContext: any): boolean {
 		// return this.props.query !== nextProps.query || this.props.notepad !== nextProps.notepad;
@@ -26,6 +23,13 @@ export default class SearchComponent extends React.Component<Props, never> {
 	}
 
 	override render() {
+		const results = [
+			...(this.props.notepad && this.props.results[this.props.notepad?.title ?? ''] ? [this.getSearchResultGroup([this.props.notepad.title, this.props.results[this.props.notepad.title]])] : []),
+			...Object.entries(this.props.results)
+				.filter(([notepadTitle]) => notepadTitle !== this.props.notepad?.title)
+				.map(this.getSearchResultGroup)
+		];
+
 		return (
 			<Modal
 				id={this.modalId}
@@ -40,51 +44,93 @@ export default class SearchComponent extends React.Component<Props, never> {
 					...DEFAULT_MODAL_OPTIONS,
 					onOpenEnd: modal => {
 						DEFAULT_MODAL_OPTIONS.onOpenEnd?.(modal);
-						// setTimeout(() => searchInput.current?.focus(), 0); TODO
+						setTimeout(() => this.selectEl?.focus(), 0);
 					}
 				}}>
 
-				<input
-					id={this.inputId}
-					type="text"
-					// label={`Search by ${(!!this.props.notepad && `note title or a`) || ''} hashtag`}
-					value={this.props.query}
-					onChange={event => this.props.search(event.target.value)}
-					onKeyDown={}
+				<Select
+					ref={el => this.selectEl = el}
+					className="search__autocomplete"
+					isClearable={true}
+					isSearchable={true}
+					options={results}
+					filterOption={() => true}
+					placeholder={`Search by note title or a hashtag`}
+					onInputChange={value => {
+						this.props.search(value);
+					}}
+					onChange={item => {
+						if (item) this.props.loadResult(this.props.notepad?.title, item.value);
+						this.closeModal();
+					}}
+					styles={{
+						control: (styles, props) => ({
+							...styles,
+							backgroundColor: 'var(--mp-theme-chrome)'
+						}),
+						option: (styles, props) => ({
+							...styles,
+							backgroundColor: props.isFocused ? 'var(--mp-theme-accent)' : 'var(--mp-theme-chrome)',
+							color: props.isFocused ? 'var(--mp-theme-accentContent)' : 'var(--mp-theme-explorerContent)'
+						}),
+						group: (styles, props) => ({
+							...styles,
+							backgroundColor: 'var(--mp-theme-chrome)',
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						menuList: (styles, props) => ({
+							...styles,
+							backgroundColor: 'var(--mp-theme-chrome)',
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						noOptionsMessage: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						singleValue: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						placeholder: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						dropdownIndicator: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						clearIndicator: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						input: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+					}}
 				/>
 
-				<Dropdown trigger={<div id={this.dropdownId} />}>
-					{
-						this.props.results[this.props.notepad?.title || '']?.map(result => <a key={result.noteRef} href="#!">{result.title}</a>)
-					}
-				</Dropdown>
 			</Modal>
 		);
 	}
 
-	// override componentDidMount() {
-	// 	// combineLatest([domReady$.pipe(take(1)), RE_INIT_AUTOCOMPLETE$]).pipe(
-	// 	// 	takeUntil(this.destroyed$)
-	// 	// ).subscribe(() => {
-	// 	// 	if (this.inputElRef.current) {
-	// 	// 		const instance = M.Autocomplete.init(this.inputElRef.current, {
-	// 	// 			data: this.props.results
-	// 	// 		});
-	// 	//
-	// 	// 		if (Object.keys(this.props.results).length) {
-	// 	// 			instance.open();
-	// 	// 		}
-	// 	// 	}
-	// 	// });
-	// }
-	//
-	// override componentWillUnmount() {
-	// 	this.destroyed$.next();
-	//
-	// 	domReady$.pipe(take(1)).subscribe(() => {
-	// 		if (this.inputElRef.current) {
-	// 			M.Autocomplete.getInstance(this.inputElRef.current).destroy();
-	// 		}
-	// 	});
-	// }
+	private getSearchResultGroup = ([notepadTitle, results]: [string, SearchResult[]]): GroupTypeBase<OptionTypeBase> => {
+		return {
+			label: notepadTitle,
+			options: results
+				.map(result => ({
+					label: `${result.parentTitle} > ${result.title}`,
+					value: {
+						...result,
+						notepadTitle
+					}
+				}))
+				.sort((a, b) => Math.abs(this.props.query.length - a.value.title.length) - Math.abs(this.props.query.length - b.value.title.length))
+		};
+	}
+
+	private closeModal = () => {
+		const overlay: HTMLElement | null = document.querySelector('.modal-overlay');
+		if (!!overlay) overlay.click();
+	}
 }
