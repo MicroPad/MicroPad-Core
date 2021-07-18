@@ -5,7 +5,7 @@ import { Icon, Navbar, NavItem } from 'react-materialize';
 import NotepadDropdownComponent from '../../containers/header/NotepadDropdownContainer';
 import { INotepadStoreState } from '../../types/NotepadTypes';
 import NotepadBreadcrumbs from '../../containers/header/NotepadBreadcrumbsContainer';
-import SearchComponent from '../search/v2/SearchContainer';
+import SearchComponent from '../search/SearchContainer';
 import ThemeDropdownComponent from '../../containers/header/ThemeDropdownContainer';
 import { ITheme } from '../../types/Themes';
 
