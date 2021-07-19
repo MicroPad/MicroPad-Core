@@ -52,6 +52,12 @@ export class SearchReducer extends MicroPadReducer<ISearchState> {
 			...state,
 			indices: action.payload.result
 		}), actions.indexNotepads.done);
+
+		this.handle<any>(state => ({
+			...state,
+			query: this.initialState.query,
+			results: this.initialState.results
+		}), actions.loadNote.started, actions.restoreJsonNotepadAndLoadNote)
 	}
 
 

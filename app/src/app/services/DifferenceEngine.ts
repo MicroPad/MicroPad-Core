@@ -9,7 +9,7 @@ import { encrypt } from 'upad-parse/dist/crypto';
 import { generateGuid } from '../util';
 import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
 
-const SyncThread = new Worker('/dist/sync.worker.js', { type: 'module' });
+const SyncThread = new Worker(build.defs.SYNC_WORKER_PATH, { type: 'module' });
 
 export const AccountService = (() => {
 	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);

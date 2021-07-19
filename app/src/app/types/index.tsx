@@ -33,6 +33,12 @@ declare global {
 		/** This is just missing from TS typings */
 		crossOriginIsolated?: boolean
 	}
+
+	const build: {
+		defs: {
+			SYNC_WORKER_PATH: string;
+		}
+	}
 }
 
 export const APP_NAME = 'µPad';

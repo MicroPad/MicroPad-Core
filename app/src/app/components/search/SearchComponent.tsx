@@ -46,7 +46,6 @@ export default class SearchComponent extends React.Component<Props, never> {
 				<Select
 					ref={el => this.selectEl = el}
 					className="search__autocomplete"
-					isClearable={true}
 					isSearchable={true}
 					menuIsOpen={this.props.showResults}
 					options={results}
@@ -61,6 +60,7 @@ export default class SearchComponent extends React.Component<Props, never> {
 						if (item) this.props.loadResult(this.props.notepad?.title, item.value);
 						this.closeModal();
 					}}
+					value={null}
 					onFocus={() => this.props.setSearchResultVisibility(true)}
 					onBlur={() => this.props.setSearchResultVisibility(false)}
 					styles={{

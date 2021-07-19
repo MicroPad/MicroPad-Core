@@ -11,24 +11,26 @@ export function search(query: string, searchIndices: SearchIndices): SearchResul
 
 	if (!query.length) return results;
 
-	searchIndices.forEach(index =>
-		index.notepad.search(index.trie, query)
-			.map(note => ({
-				title: note.title,
-				parentTitle: index.notepad.sections[note.parent as string].title,
-				noteRef: note.internalRef
-			}))
-			.forEach(result => {
-				results[index.notepad.title] ??= [];
-				results[index.notepad.title].push(result);
-			})
+	query.split(' ').forEach(term =>
+		searchIndices.forEach(index =>
+			index.notepad.search(index.trie, term)
+				.map(note => ({
+					title: note.title,
+					parentTitle: index.notepad.sections[note.parent as string].title,
+					noteRef: note.internalRef
+				}))
+				.forEach(result => {
+					results[index.notepad.title] ??= [];
+					results[index.notepad.title].push(result);
+				})
+		)
 	);
 
 	Object.keys(results).forEach(notepad => {
 		const resultList = results[notepad];
 		results[notepad] = resultList.sort((a, b) =>
 			Math.abs(query.length - a.title.length) - Math.abs(query.length - b.title.length)
-		)
+		);
 	});
 
 	return results;

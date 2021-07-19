@@ -3,6 +3,7 @@ import wasmLoader from 'esbuild-plugin-wasm';
 import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { injectManifest } from 'workbox-build';
+import { minify as minifyHtml } from 'html-minifier';
 import servor from 'servor';
 
 const OUT_DIR = 'build';
@@ -20,15 +21,9 @@ const PORT: number = (() => {
 	await rm(OUT_DIR, { recursive: true, force: true });
 	await copyDir('public', OUT_DIR);
 
-	const htmlPath = join(OUT_DIR, 'index.html');
-	await writeFile(htmlPath, await buildHtml(htmlPath));
-
-	await build({
-		entryPoints: [
-			'src/index.tsx',
-			'src/app/workers/sync-worker/sync.worker.ts',
-		],
-		entryNames: '[name]',
+	const { metafile: syncWorkerMetafile } = await build({
+		entryPoints: ['src/app/workers/sync-worker/sync.worker.ts'],
+		entryNames: '[name]-[hash]',
 		bundle: true,
 		outdir: `${OUT_DIR}/dist`,
 		platform: 'browser',
@@ -48,6 +43,7 @@ const PORT: number = (() => {
 		sourcemap: true,
 		splitting: true,
 		publicPath: '/dist',
+		metafile: true,
 		watch: isDev,
 		define: {
 			'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
@@ -58,6 +54,66 @@ const PORT: number = (() => {
 			wasmLoader({ mode: 'deferred' })
 		],
 	}).catch(() => process.exit(1));
+
+	if (!syncWorkerMetafile) throw new Error('Missing metafile');
+	const syncWorkerJsPath: string | undefined = Object.entries(syncWorkerMetafile.outputs)
+		.find(([, metadata]) => metadata.entryPoint === 'src/app/workers/sync-worker/sync.worker.ts')?.[0]
+		.replace(`${OUT_DIR}/`, '');
+	if (!syncWorkerJsPath) throw new Error('Missing sync.worker.js');
+
+	const { metafile } = await build({
+		entryPoints: ['src/index.tsx',],
+		entryNames: '[name]-[hash]',
+		bundle: true,
+		outdir: `${OUT_DIR}/dist`,
+		platform: 'browser',
+		format: 'esm',
+		loader: {
+			'.npx': 'text',
+			'.raw.js': 'text',
+			'.raw.css': 'text',
+			'.woff': 'file',
+			'.woff2': 'file',
+			'.png': 'file',
+			'.mp4': 'file',
+			'.svg': 'file',
+			'.ttf': 'file'
+		},
+		minify: !isDev,
+		sourcemap: true,
+		splitting: true,
+		publicPath: '/dist',
+		metafile: true,
+		watch: isDev,
+		define: {
+			'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+			'process.env.PUBLIC_URL': `'${process.env.PUBLIC_URL}'`,
+			'build.defs.SYNC_WORKER_PATH': `'${syncWorkerJsPath}'`,
+		},
+		plugins: [
+			// esbuildPluginBrowserslist(browserslist()), TODO: top-level await detection bug
+			wasmLoader({ mode: 'deferred' })
+		],
+	}).catch(() => process.exit(1));
+
+	if (!metafile) throw new Error('Missing metafile');
+	const indexJsPath: string | undefined = Object.entries(metafile.outputs)
+		.find(([, metadata]) => metadata.entryPoint === 'src/index.tsx')?.[0]
+		.replace(`${OUT_DIR}/`, '');
+	if (!indexJsPath) throw new Error('Missing index.js');
+
+	const indexCssPath: string | undefined = Object.keys(metafile.outputs)
+		.find(output => /\/index-.+\.css$/.test(output))
+		?.replace(`${OUT_DIR}/`, '');
+	if (!indexCssPath) throw new Error('Missing index.css');
+
+	// Build index.html
+	const htmlPath = join(OUT_DIR, 'index.html');
+	const html = await buildHtml(htmlPath, indexJsPath, indexCssPath);
+	await writeFile(htmlPath, isDev ? html : minifyHtml(html, {
+		removeComments: true,
+		collapseWhitespace: true,
+	}));
 
 	// Build service worker
 	await build({
@@ -103,9 +159,14 @@ const PORT: number = (() => {
 });
 
 const PUBLIC_URL_REGEX = /%PUBLIC_URL%/g;
-async function buildHtml(path: string): Promise<string> {
+const INDEX_JS_REGEX = /%INDEX_JS_PATH%/g;
+const INDEX_CSS_REGEX = /%INDEX_CSS_PATH%/g;
+async function buildHtml(path: string, indexJsPath: string, indexCssPath: string): Promise<string> {
 	const html = await readFile(path).then(buffer => buffer.toString('utf-8'));
-	return html.replace(PUBLIC_URL_REGEX, process.env.PUBLIC_URL ?? '');
+	return html
+		.replace(PUBLIC_URL_REGEX, process.env.PUBLIC_URL ?? '')
+		.replace(INDEX_JS_REGEX, indexJsPath)
+		.replace(INDEX_CSS_REGEX, indexCssPath);
 }
 
 function runDevServer(port: number) {
