@@ -16,12 +16,12 @@ export const filterTruthy = <T>() => filter((a: T | undefined | null | false): a
 
 export const noEmit = () => filter((_a): _a is never => false);
 
-export function isDev(): boolean {
+export function isDev(includeNextDev: boolean = true): boolean {
 	/* eslint-disable no-restricted-globals */
 	const params = new URLSearchParams(location.search);
 	return (
 		!params.get('prod')
-		&& (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'next.getmicropad.com')
+		&& (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || (includeNextDev && location.hostname === 'next.getmicropad.com'))
 	);
 	/* eslint-enable no-restricted-globals */
 }
