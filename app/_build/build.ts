@@ -23,7 +23,7 @@ const PORT: number = (() => {
 
 	const { metafile: syncWorkerMetafile } = await build({
 		entryPoints: ['src/app/workers/sync-worker/sync.worker.ts'],
-		entryNames: '[name]-[hash]',
+		entryNames: isDev? '[name]' : '[name]-[hash]',
 		bundle: true,
 		outdir: `${OUT_DIR}/dist`,
 		platform: 'browser',
@@ -39,7 +39,7 @@ const PORT: number = (() => {
 			'.svg': 'file',
 			'.ttf': 'file'
 		},
-		minify: !isDev,
+		minify: true,
 		sourcemap: true,
 		splitting: true,
 		publicPath: '/dist',
@@ -63,7 +63,7 @@ const PORT: number = (() => {
 
 	const { metafile } = await build({
 		entryPoints: ['src/index.tsx',],
-		entryNames: '[name]-[hash]',
+		entryNames: isDev? '[name]-a' : '[name]-[hash]',
 		bundle: true,
 		outdir: `${OUT_DIR}/dist`,
 		platform: 'browser',
@@ -79,7 +79,7 @@ const PORT: number = (() => {
 			'.svg': 'file',
 			'.ttf': 'file'
 		},
-		minify: !isDev,
+		minify: true,
 		sourcemap: true,
 		splitting: true,
 		publicPath: '/dist',

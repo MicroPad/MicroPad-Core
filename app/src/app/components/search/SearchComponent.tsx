@@ -87,6 +87,10 @@ export default class SearchComponent extends React.Component<Props, never> {
 							...styles,
 							color: 'var(--mp-theme-explorerContent)'
 						}),
+						groupHeading: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
 						singleValue: (styles, props) => ({
 							...styles,
 							color: 'var(--mp-theme-explorerContent)'
