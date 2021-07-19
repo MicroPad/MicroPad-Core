@@ -115,9 +115,16 @@ export default class SearchComponent extends React.Component<Props, never> {
 	}
 
 	private getSearchResultGroup = ([notepadTitle, results]: [string, SearchResult[]]): GroupTypeBase<OptionTypeBase> => {
+		const seen = new Set<string>();
+
 		return {
 			label: notepadTitle,
 			options: results
+				.filter(result => {
+					if (seen.has(result.noteRef)) return false;
+					seen.add(result.noteRef);
+					return true;
+				})
 				.map(result => ({
 					label: `${result.parentTitle} > ${result.title}`,
 					value: {
