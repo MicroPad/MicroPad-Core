@@ -4,7 +4,7 @@ import NoteElementComponent from './elements/NoteElementComponent';
 import { ProgressBar } from 'react-materialize';
 import { filter, map } from 'rxjs/operators';
 import { fromEvent, Observable } from 'rxjs';
-import ZoomComponent from '../../containers/ZoomContainer';
+import ZoomComponent from './zoom/ZoomContainer';
 import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';

@@ -1,3 +1,7 @@
+:root {
+	--mp-mobile-width: 600px;
+}
+
 body {
 	margin: 0;
 	padding: 0;

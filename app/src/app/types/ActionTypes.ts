@@ -80,7 +80,7 @@ export type SearchIndex = { notepad: FlatNotepad, trie: Trie };
 
 export type SearchIndices = SearchIndex[];
 
-export enum ZoomChange {
+export const enum ZoomChange {
 	INCREASE,
 	DECREASE
 }
