@@ -3,7 +3,7 @@ import { SUPPORT_REGEX } from './regex';
 
 initSentry();
 
-const shouldSkip = document.cookie.split('; ').some(cookie => cookie == `ignoreSupport=1`);
+const shouldSkip = document.cookie.split('; ').some(cookie => cookie === `ignoreSupport=1`);
 
 // This sucks but is needed because feature detection can't handle syntax errors like top-level await.
 // There's a feature detection based page in `root.tsx` that should be used in most cases instead.
