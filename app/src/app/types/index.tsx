@@ -28,6 +28,7 @@ declare global {
 	interface Window {
 		MicroPadGlobals: MicroPadGlobals
 		isElectron?: boolean,
+		isSupported: boolean,
 		toastEvent: (guid: string) => void,
 
 		/** This is just missing from TS typings */

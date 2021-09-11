@@ -21,9 +21,34 @@ const PORT: number = (() => {
 	await rm(OUT_DIR, { recursive: true, force: true });
 	await copyDir('public', OUT_DIR);
 
+	const { metafile: browserCheckMetafile } = await build({
+		entryPoints: ['src/unsupported-page/index.tsx'],
+		entryNames: isDev ? 'browser-support-[name]-a' : 'browser-support-[name]-[hash]',
+		bundle: true,
+		outdir: `${OUT_DIR}/dist`,
+		platform: 'browser',
+		target: 'es6',
+		format: 'iife',
+		minify: true,
+		sourcemap: true,
+		publicPath: '/dist',
+		metafile: true,
+		watch: isDev,
+		define: {
+			'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
+			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
+		}
+	}).catch(() => process.exit(1));
+
+	if (!browserCheckMetafile) throw new Error('Missing metafile');
+	const browserCheckJsPath: string | undefined = Object.entries(browserCheckMetafile.outputs)
+		.find(([, metadata]) => metadata.entryPoint === 'src/unsupported-page/index.tsx')?.[0]
+		.replace(`${OUT_DIR}/`, '');
+	if (!browserCheckJsPath) throw new Error('Missing unsupported-page bundle');
+
 	const { metafile: syncWorkerMetafile } = await build({
 		entryPoints: ['src/app/workers/sync-worker/sync.worker.ts'],
-		entryNames: isDev? '[name]' : '[name]-[hash]',
+		entryNames: isDev ? '[name]' : '[name]-[hash]',
 		bundle: true,
 		outdir: `${OUT_DIR}/dist`,
 		platform: 'browser',
@@ -50,7 +75,7 @@ const PORT: number = (() => {
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
 		plugins: [
-			// esbuildPluginBrowserslist(browserslist()), TODO: top-level await detection bug
+			// esbuildPluginBrowserslist(browserslist()), // TODO: top-level await detection bug
 			wasmLoader({ mode: 'deferred' })
 		],
 	}).catch(() => process.exit(1));
@@ -63,7 +88,7 @@ const PORT: number = (() => {
 
 	const { metafile } = await build({
 		entryPoints: ['src/index.tsx',],
-		entryNames: isDev? '[name]-a' : '[name]-[hash]',
+		entryNames: isDev ? '[name]-a' : '[name]-[hash]',
 		bundle: true,
 		outdir: `${OUT_DIR}/dist`,
 		platform: 'browser',
@@ -91,7 +116,7 @@ const PORT: number = (() => {
 			'build.defs.SYNC_WORKER_PATH': `'${syncWorkerJsPath}'`,
 		},
 		plugins: [
-			// esbuildPluginBrowserslist(browserslist()), TODO: top-level await detection bug
+			// esbuildPluginBrowserslist(browserslist()), // TODO: top-level await detection bug
 			wasmLoader({ mode: 'deferred' })
 		],
 	}).catch(() => process.exit(1));
@@ -109,7 +134,7 @@ const PORT: number = (() => {
 
 	// Build index.html
 	const htmlPath = join(OUT_DIR, 'index.html');
-	const html = await buildHtml(htmlPath, indexJsPath, indexCssPath);
+	const html = await buildHtml(htmlPath, browserCheckJsPath, indexJsPath, indexCssPath);
 	await writeFile(htmlPath, isDev ? html : minifyHtml(html, {
 		removeComments: true,
 		collapseWhitespace: true,
@@ -158,15 +183,13 @@ const PORT: number = (() => {
 	process.exit(1);
 });
 
-const PUBLIC_URL_REGEX = /%PUBLIC_URL%/g;
-const INDEX_JS_REGEX = /%INDEX_JS_PATH%/g;
-const INDEX_CSS_REGEX = /%INDEX_CSS_PATH%/g;
-async function buildHtml(path: string, indexJsPath: string, indexCssPath: string): Promise<string> {
+async function buildHtml(path: string, browserCheckPath: string, indexJsPath: string, indexCssPath: string): Promise<string> {
 	const html = await readFile(path).then(buffer => buffer.toString('utf-8'));
 	return html
-		.replace(PUBLIC_URL_REGEX, process.env.PUBLIC_URL ?? '')
-		.replace(INDEX_JS_REGEX, indexJsPath)
-		.replace(INDEX_CSS_REGEX, indexCssPath);
+		.replace(/%PUBLIC_URL%/g, process.env.PUBLIC_URL ?? '')
+		.replace(/%BROWSER_CHECK_JS_PATH%/g, browserCheckPath)
+		.replace(/%INDEX_JS_PATH%/g, indexJsPath)
+		.replace(/%INDEX_CSS_PATH%/g, indexCssPath);
 }
 
 function runDevServer(port: number) {

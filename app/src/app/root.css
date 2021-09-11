@@ -152,3 +152,7 @@ strong {
 	background-color: var(--mp-theme-accent);
 	color: var(--mp-theme-accentContent);
 }
+
+button:focus {
+	background-color: unset !important;
+}
