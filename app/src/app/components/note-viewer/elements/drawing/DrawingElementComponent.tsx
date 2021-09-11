@@ -1,6 +1,5 @@
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import React from 'react';
-import { dataURItoBlob } from '../../../../util';
 import { trim } from './trim-canvas';
 import { Resizable } from 're-resizable';
 import { Checkbox, Col, Row } from 'react-materialize';
@@ -149,7 +148,8 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 			tmpContext.drawImage(this.imageElement, 0, 0);
 
 			this.hasTrimmed = true;
-			this.imageElement.src = URL.createObjectURL(dataURItoBlob(trim(tmpCanvas).toDataURL()));
+			const drawingBlob$ = new Promise<Blob | null>(resolve => trim(tmpCanvas).toBlob(blob => resolve(blob)));
+			drawingBlob$.then(drawingBlob => this.imageElement.src = URL.createObjectURL(drawingBlob));
 		};
 	}
 
@@ -162,7 +162,8 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 		if (!this.canvasElement) return null;
 
 		// Update element with canvas contents replacing the old asset
-		updateElement!(element.args.id, element, dataURItoBlob(this.canvasElement.toDataURL()));
+		const drawingBlob$ = new Promise<Blob | null>(resolve => this.canvasElement.toBlob(blob => resolve(blob)));
+		drawingBlob$.then(drawingBlob => updateElement!(element.args.id, element, drawingBlob));
 
 		return null;
 	}

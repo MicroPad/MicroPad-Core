@@ -1,9 +1,9 @@
-import React, { SyntheticEvent } from 'react';
+import React from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
 import { Button, Row } from 'react-materialize';
-import { dataURItoBlob } from '../../../util';
 import { Dialog } from '../../../services/dialogs';
 import { ITheme } from '../../../types/Themes';
+import { readFile } from '../../../services/files';
 
 export interface IFileElementComponent extends INoteElementComponentProps {
 	downloadAsset: (filename: string, uuid: string) => void;
@@ -40,36 +40,23 @@ export default class FileElementComponent extends React.Component<IFileElementCo
 		);
 	}
 
-	private fileSelected = event => {
+	private fileSelected = async event => {
 		const { updateElement, element, edit } = this.props;
 
-		this.readFileInputEventAsDataUrl(event)
-			.then(([dataUri, filename]: [string, string]) => {
-				updateElement!(element.args.id, {
-					...element,
-					args: {
-						...element.args,
-						filename: filename,
-					}
-				}, dataURItoBlob(dataUri));
-				edit('');
-			})
-			.catch((err) => {
-				Dialog.alert('Error uploading file');
-				console.error(err);
-			});
-	}
-
-	private readFileInputEventAsDataUrl(event: SyntheticEvent<HTMLInputElement>): Promise<[string, string]> {
-		return new Promise((resolve, reject) => {
-			const file = event.currentTarget.files![0];
-			if (!file) reject();
-			const reader = new FileReader();
-
-			reader.onload = () => resolve([reader.result as string, file.name as string]);
-
-			reader.readAsDataURL(file);
-		});
+		try {
+			const file = await readFile(event);
+			updateElement!(element.args.id, {
+				...element,
+				args: {
+					...element.args,
+					filename: file.name,
+				}
+			}, file);
+			edit('');
+		} catch (err) {
+			console.error(err);
+			await Dialog.alert('There was an error storing your file');
+		}
 	}
 
 	private openEditor = event => {

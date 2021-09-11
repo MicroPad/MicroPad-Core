@@ -1,10 +1,10 @@
-import React, { SyntheticEvent } from 'react';
+import React from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
-import { dataURItoBlob } from '../../../util';
 import { Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { Dialog } from '../../../services/dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
+import { readFile } from '../../../services/files';
 
 export default class ImageElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {
@@ -61,30 +61,17 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 		);
 	}
 
-	private fileSelected = event => {
+	private fileSelected = async event => {
 		const { updateElement, element, edit } = this.props;
 
-		this.readFileInputEventAsDataUrl(event)
-			.then(dataUri => {
-				updateElement!(element.args.id, element, dataURItoBlob(dataUri));
-				edit('');
-			})
-			.catch((err) => {
-				Dialog.alert('Error uploading file');
-				console.error(err);
-			});
-	}
-
-	private readFileInputEventAsDataUrl(event: SyntheticEvent<HTMLInputElement>): Promise<string> {
-		return new Promise((resolve, reject) => {
-			const file = event.currentTarget.files![0];
-			if (!file) reject();
-			const reader = new FileReader();
-
-			reader.onload = () => resolve(reader.result as string);
-
-			reader.readAsDataURL(file);
-		});
+		try {
+			const file = await readFile(event);
+			updateElement!(element.args.id, element, file);
+			edit('');
+		} catch (err) {
+			console.error(err);
+			await Dialog.alert('There was an error storing your image');
+		}
 	}
 
 	private openEditor = event => {

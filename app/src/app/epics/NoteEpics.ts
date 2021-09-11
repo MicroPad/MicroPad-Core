@@ -4,7 +4,7 @@ import { from, Observable, of } from 'rxjs';
 import { Action } from 'redux-typescript-actions';
 import { actions, MicroPadAction } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
-import { dataURItoBlob, filterTruthy, generateGuid } from '../util';
+import { filterTruthy, generateGuid } from '../util';
 import saveAs from 'save-as';
 import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
@@ -287,4 +287,24 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 				});
 			})
 	);
+}
+
+// Thanks to http://stackoverflow.com/a/12300351/998467
+function dataURItoBlob(dataURI: string) {
+	// convert base64 to raw binary data held in a string
+	// doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+	let byteString = atob(dataURI.split(',')[1]);
+
+	// separate out the mime component
+	let mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+	// write the bytes of the string to an ArrayBuffer
+	let ab = new ArrayBuffer(byteString.length);
+	let ia = new Uint8Array(ab);
+	for (let i = 0; i < byteString.length; i++) {
+		ia[i] = byteString.charCodeAt(i);
+	}
+
+	// write the ArrayBuffer to a blob, and you're done
+	return new Blob([ab], { type: mimeString });
 }

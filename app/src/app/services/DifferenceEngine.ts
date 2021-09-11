@@ -8,8 +8,10 @@ import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { encrypt } from 'upad-parse/dist/crypto';
 import { generateGuid } from '../util';
 import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
+import { NotificationService } from './NotificationService';
 
 const SyncThread = new Worker(build.defs.SYNC_WORKER_PATH, { type: 'module' });
+const notificationService = new NotificationService();
 
 export const AccountService = (() => {
 	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);
@@ -95,7 +97,14 @@ export const SyncService = (() => {
 			flatNotepad: notepad.flatten()
 		});
 
-		const { assets } = await getAssetInfo$;
+		const { assets, hasOversizedAssets } = await getAssetInfo$;
+		if (hasOversizedAssets) {
+			notificationService.toast({
+				html: `Warning: Some assets (images, recordings, files, etc.) in your notebook are too large to be uploaded to MicroSync.`,
+				displayLength: 3000
+			});
+		}
+
 		return Object.assign({}, notepad, { assetHashList: assets });
 	}
 

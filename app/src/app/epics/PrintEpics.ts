@@ -1,5 +1,5 @@
 import { combineEpics, ofType } from 'redux-observable';
-import { dataURItoBlob, filterTruthy } from '../util';
+import { filterTruthy } from '../util';
 import { actions, MicroPadAction } from '../actions';
 import { filter, map, switchMap } from 'rxjs/operators';
 import { IStoreState } from '../types';
@@ -25,11 +25,19 @@ export const generateMarkdownForPrint$ = (action$: Observable<MicroPadAction>, s
 					.filter(e => !!e.args.ext)
 					.map(async e => {
 						const blob: Blob = await ASSET_STORAGE.getItem(e.args.ext!) as Blob;
-						const data = (e.type === 'drawing') ? dataURItoBlob(await getTrimmedDrawing(blob)) : blob;
+						const data = (e.type === 'drawing') ? await getTrimmedDrawing(blob) : blob;
 						return { uuid: e.args.ext!, data };
 					}));
 
-				const assets: Asset[] = resolvedAssets.map(res => new Asset(res.data, res.uuid));
+				const assets: Asset[] = resolvedAssets
+					.filter(res => {
+						if (!res.data) {
+							console.log(`Missing data for ${res.uuid}`);
+						}
+
+						return !!res.data;
+					})
+					.map(res => new Asset(res.data!, res.uuid));
 
 				return [
 					note,
@@ -57,8 +65,8 @@ export const printEpics$ = combineEpics(
 	generateMarkdownForPrint$
 );
 
-function getTrimmedDrawing(blob: Blob): Promise<string> {
-	return new Promise<string>(resolve => {
+function getTrimmedDrawing(blob: Blob): Promise<Blob | null> {
+	return new Promise(resolve => {
 		const img = new Image();
 
 		img.onload = () => {
@@ -70,8 +78,10 @@ function getTrimmedDrawing(blob: Blob): Promise<string> {
 			tmpContext.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
 			tmpContext.drawImage(img, 0, 0);
 
-			URL.revokeObjectURL(img.src);
-			resolve((trim(tmpCanvas).toDataURL()));
+			trim(tmpCanvas).toBlob(blob => {
+				URL.revokeObjectURL(img.src);
+				resolve(blob);
+			});
 		};
 
 		img.src = URL.createObjectURL(blob);
