@@ -3,7 +3,7 @@ import { openMicroPad } from './utils/general-ui';
 describe(`App Start`, () => {
 	beforeAll(async () => {
 		await openMicroPad(); // Load MicroPad
-	})
+	});
 
 	it(`should start MicroPad`, async () => {
 		// Arrange / Act
