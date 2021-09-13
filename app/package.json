@@ -5,7 +5,7 @@
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py && ./get_precache_files.py > src/extraPrecacheFiles.ts",
     "prestart": "yarn supportedBrowsers && tsc -p _build/tsconfig.json",
-    "start": "NODE_ENV=development node _build/build.js",
+    "start": "NODE_ENV='' node _build/build.js",
     "prebuild": "yarn supportedBrowsers && tsc -p _build/tsconfig.json",
     "build": "NODE_ENV=production node _build/build.js",
     "test": "TZ=NZ jest",
@@ -94,11 +94,12 @@
   },
   "browserslist": {
     "production": [
-      "last 2 chrome version",
-      "last 2 firefox version",
-      "last 2 safari version",
-      "not Safari < 15",
+      "chrome >= 89",
       "electron >= 12",
+      "edge >= 89",
+      "firefox >= 89",
+      "safari >= 15",
+      "ios_saf >= 15",
       "unreleased versions"
     ],
     "development": [
@@ -129,11 +130,10 @@
     "@typescript-eslint/parser": "^4.0.0",
     "babel-eslint": "^10.0.0",
     "browserslist": "^4.16.6",
-    "esbuild": "^0.12.15",
+    "esbuild": "^0.12.27",
     "esbuild-plugin-browserslist": "^0.2.1",
     "esbuild-plugin-manifest": "^0.4.6",
     "esbuild-plugin-wasm": "^1.0.0",
-    "esbuild-plugin-webworker": "git+https://github.com/endreymarcell/esbuild-plugin-webworker.git#8646b2758da7a84c0045988a2a3a13e44bca7945",
     "eslint": "^7.5.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-flowtype": "^5.2.0",

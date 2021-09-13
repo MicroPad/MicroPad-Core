@@ -4,6 +4,8 @@ import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/prom
 import { join } from 'path';
 import { injectManifest } from 'workbox-build';
 import { minify as minifyHtml } from 'html-minifier';
+import { esbuildPluginBrowserslist } from 'esbuild-plugin-browserslist';
+import browserslist, { clearCaches as clearBrowserslistCache } from 'browserslist';
 import servor from 'servor';
 
 const OUT_DIR = 'build';
@@ -12,6 +14,8 @@ const PORT: number = (() => {
 	const port = process.env.MICROPAD_PORT;
 	return !!port ? parseInt(port, 10) : 3000;
 })();
+
+clearBrowserslistCache();
 
 (async () => {
 	process.env.PUBLIC_URL ??= '';
@@ -75,7 +79,7 @@ const PORT: number = (() => {
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
 		plugins: [
-			// esbuildPluginBrowserslist(browserslist()), // TODO: top-level await detection bug
+			esbuildPluginBrowserslist(browserslist()),
 			wasmLoader({ mode: 'deferred' })
 		],
 	}).catch(() => process.exit(1));
@@ -116,7 +120,7 @@ const PORT: number = (() => {
 			'build.defs.SYNC_WORKER_PATH': `'${syncWorkerJsPath}'`,
 		},
 		plugins: [
-			// esbuildPluginBrowserslist(browserslist()), // TODO: top-level await detection bug
+			esbuildPluginBrowserslist(browserslist()),
 			wasmLoader({ mode: 'deferred' })
 		],
 	}).catch(() => process.exit(1));
