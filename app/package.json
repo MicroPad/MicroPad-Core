@@ -4,15 +4,14 @@
   "private": true,
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py && ./get_precache_files.py > src/extraPrecacheFiles.ts",
-    "prestart": "yarn supportedBrowsers && tsc -p _build/tsconfig.json",
+    "prestart": "tsc -p _build/tsconfig.json",
     "start": "NODE_ENV='' node _build/build.js",
-    "prebuild": "yarn supportedBrowsers && tsc -p _build/tsconfig.json",
+    "prebuild": "tsc -p _build/tsconfig.json",
     "build": "NODE_ENV=production node _build/build.js",
     "test": "TZ=NZ jest",
     "typecheck": "tsc --noEmit --p ./tsconfig.json",
     "typecheck:watch": "tsc --noEmit --watch -p ./tsconfig.json",
-    "lint": "eslint src/",
-    "supportedBrowsers": "echo \"export const SUPPORT_REGEX = $(yarn exec browserslist-useragent-regexp --allowHigherVersions ‑‑ignoreMinor);\" > src/unsupported-page/regex.ts"
+    "lint": "eslint src/"
   },
   "dependencies": {
     "@fontsource/abeezee": "^4.4.5",

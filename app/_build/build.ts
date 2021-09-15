@@ -7,6 +7,7 @@ import { minify as minifyHtml } from 'html-minifier';
 import { esbuildPluginBrowserslist } from 'esbuild-plugin-browserslist';
 import browserslist, { clearCaches as clearBrowserslistCache } from 'browserslist';
 import servor from 'servor';
+import { getUserAgentRegExp } from 'browserslist-useragent-regexp';
 
 const OUT_DIR = 'build';
 const isDev = process.env.NODE_ENV !== 'production';
@@ -26,7 +27,7 @@ clearBrowserslistCache();
 	await copyDir('public', OUT_DIR);
 
 	const { metafile: browserCheckMetafile } = await build({
-		entryPoints: ['src/unsupported-page/index.tsx'],
+		entryPoints: ['src/unsupported-page/index.ts'],
 		entryNames: isDev ? 'browser-support-[name]-a' : 'browser-support-[name]-[hash]',
 		bundle: true,
 		outdir: `${OUT_DIR}/dist`,
@@ -39,6 +40,7 @@ clearBrowserslistCache();
 		metafile: true,
 		watch: isDev,
 		define: {
+			'build.defs.SUPPORTED_BROWSERS_REGEX': `"${getUserAgentRegExp({ allowHigherVersions: true }).source.replaceAll('\\', '\\\\')}"`,
 			'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		}
@@ -46,7 +48,7 @@ clearBrowserslistCache();
 
 	if (!browserCheckMetafile) throw new Error('Missing metafile');
 	const browserCheckJsPath: string | undefined = Object.entries(browserCheckMetafile.outputs)
-		.find(([, metadata]) => metadata.entryPoint === 'src/unsupported-page/index.tsx')?.[0]
+		.find(([, metadata]) => metadata.entryPoint === 'src/unsupported-page/index.ts')?.[0]
 		.replace(`${OUT_DIR}/`, '');
 	if (!browserCheckJsPath) throw new Error('Missing unsupported-page bundle');
 

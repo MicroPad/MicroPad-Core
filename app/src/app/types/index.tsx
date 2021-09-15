@@ -35,9 +35,13 @@ declare global {
 		crossOriginIsolated?: boolean
 	}
 
+	/**
+	 * Fake globals from the build process
+	 */
 	const build: {
 		defs: {
-			SYNC_WORKER_PATH: string;
+			SYNC_WORKER_PATH: string,
+			SUPPORTED_BROWSERS_REGEX: string
 		}
 	}
 }
