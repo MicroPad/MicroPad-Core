@@ -3083,10 +3083,6 @@ esbuild-plugin-wasm@^1.0.0:
   resolved "https://registry.yarnpkg.com/esbuild-plugin-wasm/-/esbuild-plugin-wasm-1.0.0.tgz#4ca95ac4ae553331d2b0099223f8713a49b6cff2"
   integrity sha512-iXIf3hwfqorExG66/eNr3U8JakIZuge70nMNQtinvxbzdljQ/RjvwaBiGPqF/DvuIumUApbe3zj2kqHLVyc7uQ==
 
-"esbuild-plugin-webworker@git+https://github.com/endreymarcell/esbuild-plugin-webworker.git#8646b2758da7a84c0045988a2a3a13e44bca7945":
-  version "1.0.0"
-  resolved "git+https://github.com/endreymarcell/esbuild-plugin-webworker.git#8646b2758da7a84c0045988a2a3a13e44bca7945"
-
 esbuild@^0.12.27:
   version "0.12.27"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.12.27.tgz#9bcfb837111c5e89b189188dde339515b213a724"
