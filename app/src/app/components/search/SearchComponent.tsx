@@ -71,7 +71,11 @@ export default class SearchComponent extends React.Component<Props, never> {
 						option: (styles, props) => ({
 							...styles,
 							backgroundColor: props.isFocused ? 'var(--mp-theme-accent)' : 'var(--mp-theme-chrome)',
-							color: props.isFocused ? 'var(--mp-theme-accentContent)' : 'var(--mp-theme-explorerContent)'
+							color: props.isFocused ? 'var(--mp-theme-accentContent)' : 'var(--mp-theme-explorerContent)',
+							':active': {
+								backgroundColor: props.isFocused ? 'var(--mp-theme-accent)' : 'var(--mp-theme-chrome)',
+								color: props.isFocused ? 'var(--mp-theme-accentContent)' : 'var(--mp-theme-explorerContent)'
+							}
 						}),
 						group: (styles, props) => ({
 							...styles,
@@ -111,6 +115,7 @@ export default class SearchComponent extends React.Component<Props, never> {
 							...styles,
 							color: 'var(--mp-theme-explorerContent)'
 						}),
+
 					}}
 				/>
 
