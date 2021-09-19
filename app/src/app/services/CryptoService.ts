@@ -24,7 +24,8 @@ export async function fromShell(shell: NotepadShell, key?: string): Promise<Encr
 	try {
 		notepad = await decrypt(shell, passkey);
 	} catch (e) {
-		throw new DecryptionError(e);
+		const error = e instanceof Error ? e : new Error('' + e);
+		throw new DecryptionError(error);
 	}
 
 	return {
