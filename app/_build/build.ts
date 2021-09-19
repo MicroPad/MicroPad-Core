@@ -231,9 +231,10 @@ async function exists(path: string): Promise<boolean> {
 		await stat(path);
 		return true;
 	} catch (e) {
-		if (e?.code === 'ENOENT') {
+		if ((e as unknown & { code?: string })?.code === 'ENOENT') {
 			return false;
 		}
+
 		throw e;
 	}
 }

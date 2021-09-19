@@ -19,7 +19,7 @@ import './theme-styles/Purple.css';
 /* JS Imports */
 import React from 'react';
 import 'materialize-css/dist/js/materialize.js';
-import { APP_NAME, MICROPAD_URL } from './types';
+import { MICROPAD_URL } from './types';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
@@ -45,6 +45,8 @@ import { LastOpenedNotepad } from './epics/StorageEpics';
 import { noop } from './util';
 import { createSentryReduxEnhancer } from '../sentry';
 import { createDynamicCss } from './DynamicAppCss';
+import { hasRequiredFeatures } from '../unsupported-page/feature-detect';
+import { showUnsupportedPage } from '../unsupported-page/show-page';
 
 window.MicroPadGlobals = {};
 
@@ -104,7 +106,12 @@ export function getStorage(): StorageMap {
 }
 
 (async function init() {
-	if (!await compatibilityCheck()) return;
+	const shouldInit = await hasRequiredFeatures();
+	if (!shouldInit) {
+		showUnsupportedPage();
+		return;
+	}
+
 	await hydrateStoreFromLocalforage();
 	createDynamicCss(store);
 
@@ -179,39 +186,6 @@ async function hydrateStoreFromLocalforage() {
 			store.dispatch(actions.openNotepadFromStorage.started(notepadTitle));
 		}
 	}
-}
-
-async function compatibilityCheck(): Promise<boolean> {
-	function doesSupportSrcDoc(): boolean {
-		const testIframe = document.createElement('iframe');
-		testIframe.srcdoc = 'test';
-		return testIframe.getAttribute('srcdoc') === 'test';
-	}
-	function hasUrlHelperClasses(): boolean {
-		try {
-			const url = new URL('https://example.com');
-			return !!new URLSearchParams(url.search);
-		} catch (_) { return false; }
-	}
-
-	if (!(doesSupportSrcDoc() && hasUrlHelperClasses())) {
-		ReactDOM.render(
-			<div style={{ margin: '10px' }}>
-				<h1>Bad news <span role="img" aria-label="sad face">😢</span></h1>
-				<p>
-					Your web-browser doesn't support important features required for {APP_NAME} to function.<br />
-					You can try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer nofollow">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="noopener noreferrer nofollow">Mozilla Firefox</a>.
-				</p>
-				<p>
-					You could also download {APP_NAME} <a href="https://getmicropad.com/#download">here</a>.
-				</p>
-			</div>,
-			document.getElementById('app') as HTMLElement
-		);
-		return false;
-	}
-
-	return true;
 }
 
 async function displayWhatsNew() {
