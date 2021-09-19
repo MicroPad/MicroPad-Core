@@ -1,3 +1,6 @@
+// TODO: Clear out core-js dep when this isn't needed anymore (node >= 15)
+import 'core-js/features/string/replace-all';
+
 import { build } from 'esbuild';
 import wasmLoader from 'esbuild-plugin-wasm';
 import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises';
