@@ -11,7 +11,7 @@ import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
 import { debounce, openModal } from '../../../../util';
-import { Button, Col, Row, TextInput } from 'react-materialize';
+import { Button, Checkbox, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
@@ -111,7 +111,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				{
 					isEditing &&
 					<Row style={{ marginBottom: 0, color: theme.text }}>
-						<Col s={6}>
+						<Col s={4}>
 							<TextInput
 								inputClassName="markdown-element__options-input"
 								label="Font Size"
@@ -119,13 +119,33 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 								onChange={this.onFontSizeEdit}
 							/>
 						</Col>
-						<Col s={6}>
+						<Col s={4}>
 							<TextInput
 								inputClassName="markdown-element__options-input"
 								label="Width"
 								defaultValue={element.args.width}
 								onChange={e => this.onSizeEdit('width', e.target.value)}
 							/>
+						</Col>
+						<Col s={3}>
+							<Row style={{ marginBottom: 0, color: theme.text }}>
+								<Col s={12}>
+									<Checkbox
+										label="Word Wrap"
+										value="1"
+										checked={false}
+										filledIn
+									/>
+								</Col>
+								<Col s={12}>
+									<Checkbox
+										label="Spellcheck"
+										value="1"
+										checked={false}
+										filledIn
+									/>
+								</Col>
+							</Row>
 						</Col>
 					</Row>
 				}
