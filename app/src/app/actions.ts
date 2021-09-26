@@ -119,7 +119,9 @@ export const actions = {
 	importMarkdown: actionCreator<Translators.Markdown.MarkdownImport[]>('IMPORT_FROM_MARKDOWN'),
 	setExplorerWidth: actionCreator<string>('SET_EXPLORER_WIDTH'),
 	feelingLucky: actionCreator<void>('FEELING_LUCKY'),
-	setSearchResultVisibility: actionCreator<boolean>('SET_SEARCH_RESULT_VISIBILITY')
+	setSearchResultVisibility: actionCreator<boolean>('SET_SEARCH_RESULT_VISIBILITY'),
+	toggleSpellCheck: actionCreator<boolean | void>('TOGGLE_SPELL_CHECK'),
+	toggleWordWrap: actionCreator<boolean | void>('TOGGLE_WORD_WRAP')
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([

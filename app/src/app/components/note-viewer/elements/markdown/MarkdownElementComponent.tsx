@@ -18,6 +18,8 @@ import { ITheme } from '../../../../types/Themes';
 import { colourTransformer, fendTransformer } from './MarkdownTransformers';
 import NoteElementModalComponent from '../../../note-element-modal/NoteElementModalComponent';
 import { BehaviorSubject } from 'rxjs';
+import { ConnectedProps } from 'react-redux';
+import { markdownElementContainer } from './MarkdownElementContainer';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -36,14 +38,16 @@ export interface IShowdownOpts extends ConverterOptions {
 	emoji: boolean;
 }
 
-export default class MarkdownElementComponent extends React.Component<IMarkdownElementComponentProps> {
+type Props = ConnectedProps<typeof markdownElementContainer> & IMarkdownElementComponentProps;
+
+export default class MarkdownElementComponent extends React.Component<Props> {
 	private iframe: HTMLIFrameElement | undefined;
 	private editBox: HTMLTextAreaElement | undefined;
 	private converter: Converter;
 	private readonly updateWithDebounce: (element: NoteElement) => void;
 	private html$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
-	constructor(props: IMarkdownElementComponentProps, state: object) {
+	constructor(props: Props, state: object) {
 		super(props, state);
 
 		this.configureExtensions();
@@ -130,18 +134,20 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 						<Col s={3}>
 							<Row style={{ marginBottom: 0, color: theme.text }}>
 								<Col s={12}>
+									<Col s={12}>
+										<Checkbox
+											label="Spellcheck"
+											value="1"
+											checked={this.props.shouldSpellCheck}
+											onChange={() => this.props.toggleSpellCheck()}
+											filledIn
+										/>
+									</Col>
 									<Checkbox
 										label="Word Wrap"
 										value="1"
-										checked={false}
-										filledIn
-									/>
-								</Col>
-								<Col s={12}>
-									<Checkbox
-										label="Spellcheck"
-										value="1"
-										checked={false}
+										checked={this.props.shouldWordWrap}
+										onChange={() => this.props.toggleWordWrap()}
 										filledIn
 									/>
 								</Col>
@@ -178,7 +184,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 									height: '400px',
 									backgroundColor: theme.background,
 									color: theme.text,
-									whiteSpace: 'pre',
+									whiteSpace: this.props.shouldWordWrap ? 'normal' : 'pre',
 									overflowWrap: 'normal',
 									overflowX: 'auto'
 								}
@@ -187,6 +193,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 							placeholder="Text (in Markdown)"
 							defaultValue={element.content}
 							onChange={this.onElementEdit}
+							spellCheck={this.props.shouldSpellCheck}
 							autoFocus={true} />
 					}
 				</div>

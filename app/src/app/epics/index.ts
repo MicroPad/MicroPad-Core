@@ -21,6 +21,7 @@ import { IStoreState } from '../types';
 import ToastEventHandler from '../services/ToastEventHandler';
 import { NotificationService } from '../services/NotificationService';
 import { feelingLuckyEpics$ } from './FeelingLuckyEpics';
+import { editorEpics$ } from './EditorEpics';
 
 const baseEpic$ = combineEpics(
 	notepadEpics$,
@@ -34,7 +35,8 @@ const baseEpic$ = combineEpics(
 	syncEpics$,
 	cryptoEpics$,
 	dueDatesEpics$,
-	feelingLuckyEpics$
+	feelingLuckyEpics$,
+	editorEpics$
 );
 
 export type EpicDeps = {

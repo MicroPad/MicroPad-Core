@@ -98,7 +98,7 @@
       "edge >= 89",
       "firefox >= 89",
       "safari >= 15",
-      "ios_saf >= 15",
+      "ios_saf >= 9999",
       "unreleased versions"
     ],
     "development": [
