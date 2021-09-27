@@ -135,10 +135,6 @@ strong {
 	font-weight: bolder;
 }
 
-#nav-mobile li {
-	color: black !important;
-}
-
 .modal-content > h4:first-of-type {
 	word-break: break-word;
 }

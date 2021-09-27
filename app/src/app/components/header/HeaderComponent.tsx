@@ -43,7 +43,7 @@ export default class HeaderComponent extends React.Component<IHeaderComponentPro
 		return (
 			<header style={{ position: 'fixed', color: theme.explorerContent, zIndex: 1000 }}>
 				<Navbar className="menu-items" brand={<AppNameComponent />} style={navStyle} alignLinks="right" menuIcon={<Icon>menu</Icon>}>
-					<span style={{ marginRight: '10px', color: theme.explorerContent }}>{saveText}</span>
+					<span className="Header__save-status">{saveText}</span>
 					<ThemeDropdownComponent />
 					<NotepadDropdownComponent />
 					<SearchComponent />

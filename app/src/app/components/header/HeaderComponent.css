@@ -17,3 +17,16 @@ ul.dropdown-content li:hover > a:hover {
 ul.dropdown-content > li:hover > a, ul.dropdown-content > li:hover > span {
 	color: var(--mp-theme-accentContent) !important;
 }
+
+.Header__save-status {
+	margin-right: 10px;
+	color: var(--mp-theme-explorerContent);
+}
+
+#mobile-nav {
+	background-color: var(--mp-theme-chrome);
+}
+
+#mobile-nav .header__top-level-item, #mobile-nav .header__top-level-item > .material-icons {
+	color: var(--mp-theme-explorerContent) !important;
+}
