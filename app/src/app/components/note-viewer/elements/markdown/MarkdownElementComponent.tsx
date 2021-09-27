@@ -134,15 +134,15 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 						<Col s={3}>
 							<Row style={{ marginBottom: 0, color: theme.text }}>
 								<Col s={12}>
-									<Col s={12}>
-										<Checkbox
-											label="Spellcheck"
-											value="1"
-											checked={this.props.shouldSpellCheck}
-											onChange={() => this.props.toggleSpellCheck()}
-											filledIn
-										/>
-									</Col>
+									<Checkbox
+										label="Spellcheck"
+										value="1"
+										checked={this.props.shouldSpellCheck}
+										onChange={() => this.props.toggleSpellCheck()}
+										filledIn
+									/>
+								</Col>
+								<Col s={12}>
 									<Checkbox
 										label="Word Wrap"
 										value="1"

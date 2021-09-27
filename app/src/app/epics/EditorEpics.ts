@@ -38,7 +38,7 @@ export const notifySpellCheckWeirdness$ = (action$: Observable<MicroPadAction>, 
 	action$.pipe(
 		ofType<MicroPadAction>(actions.toggleSpellCheck.type),
 		tap(() => notificationService.toast({
-			html: `Updated spell check preferences. You may need to close and re-open the editor to see any effect.`,
+			html: `Updated spell check preferences.<br/>You may need to close and re-open the editor to see any effect.`,
 			displayLength: 3000
 		})),
 		noEmit()
