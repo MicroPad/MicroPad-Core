@@ -2,7 +2,6 @@
 import 'core-js/features/string/replace-all';
 
 import { build } from 'esbuild';
-import wasmLoader from 'esbuild-plugin-wasm';
 import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { injectManifest } from 'workbox-build';
@@ -71,7 +70,8 @@ clearBrowserslistCache();
 			'.png': 'file',
 			'.mp4': 'file',
 			'.svg': 'file',
-			'.ttf': 'file'
+			'.ttf': 'file',
+			'.wasm': 'file'
 		},
 		minify: true,
 		sourcemap: true,
@@ -84,8 +84,7 @@ clearBrowserslistCache();
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
 		plugins: [
-			esbuildPluginBrowserslist(browserslist()),
-			wasmLoader({ mode: 'deferred' })
+			esbuildPluginBrowserslist(browserslist())
 		],
 	}).catch(() => process.exit(1));
 
@@ -96,7 +95,7 @@ clearBrowserslistCache();
 	if (!syncWorkerJsPath) throw new Error('Missing sync.worker.js');
 
 	const { metafile } = await build({
-		entryPoints: ['src/index.tsx',],
+		entryPoints: ['src/index.tsx'],
 		entryNames: isDev ? '[name]-a' : '[name]-[hash]',
 		bundle: true,
 		outdir: `${OUT_DIR}/dist`,
@@ -111,7 +110,8 @@ clearBrowserslistCache();
 			'.png': 'file',
 			'.mp4': 'file',
 			'.svg': 'file',
-			'.ttf': 'file'
+			'.ttf': 'file',
+			'.wasm': 'file'
 		},
 		minify: true,
 		sourcemap: true,
@@ -125,8 +125,7 @@ clearBrowserslistCache();
 			'build.defs.SYNC_WORKER_PATH': `'${syncWorkerJsPath}'`,
 		},
 		plugins: [
-			esbuildPluginBrowserslist(browserslist()),
-			wasmLoader({ mode: 'deferred' })
+			esbuildPluginBrowserslist(browserslist())
 		],
 	}).catch(() => process.exit(1));
 
@@ -181,6 +180,9 @@ clearBrowserslistCache();
 		swDest: join(OUT_DIR, 'service-worker.js'),
 		globDirectory: OUT_DIR
 	});
+
+	// Copy in WASM
+	await copyFile(join('node_modules', 'fend-wasm-web', 'fend_wasm_bg.wasm'), join(OUT_DIR, 'dist', 'fend_wasm_bg.wasm'));
 
 	console.log('Built!');
 

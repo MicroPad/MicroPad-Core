@@ -1,5 +1,6 @@
 import { isDev } from './app/util';
 import * as serviceWorker from './registerServiceWorker';
+import { initWasm } from './app/init-wasm';
 
 // `window.isSupported` is set by the Unsupported Browser logic.
 if (window.isSupported) {
@@ -12,7 +13,7 @@ if (window.isSupported) {
 		serviceWorker.register();
 	}
 
-	import('./app/root');
+	initWasm().then(() => import('./app/root'));
 }
 
 export {};
