@@ -1,5 +1,5 @@
 import { ShowdownExtension } from 'showdown';
-import { evaluateFendWithTimeoutMultiple } from 'fend-wasm';
+import { evaluateFendWithTimeoutMultiple } from 'fend-wasm-web';
 
 export type MarkdownTransformer = ShowdownExtension;
 
