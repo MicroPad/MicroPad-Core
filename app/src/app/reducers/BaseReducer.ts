@@ -14,6 +14,7 @@ import { MicroPadAction, READ_ONLY_ACTIONS } from '../actions';
 import { Action, Reducer } from 'redux';
 import { isReadOnlyNotebook } from '../ReadOnly';
 import deepFreeze from 'deep-freeze';
+import { EditorReducer } from './EditorReducer';
 
 export const REDUCERS: Array<MicroPadReducer<any>> = [
 	new AppReducer(),
@@ -24,7 +25,8 @@ export const REDUCERS: Array<MicroPadReducer<any>> = [
 	new SearchReducer(),
 	new PrintReducer(),
 	new SyncReducer(),
-	new IsExportingReducer()
+	new IsExportingReducer(),
+	new EditorReducer()
 ];
 
 interface ReduxReducer<S, A extends Action> {

@@ -8,6 +8,7 @@ import { ISyncState } from '../reducers/SyncReducer';
 import { IAppStoreState } from '../reducers/AppReducer';
 import { IsExportingState } from '../reducers/IsExportingReducer';
 import { NotepadPasskeysState } from '../reducers/NotepadPasskeysReducer';
+import { EditorState } from '../reducers/EditorReducer';
 
 export interface IStoreState {
 	readonly app: IAppStoreState;
@@ -19,6 +20,7 @@ export interface IStoreState {
 	readonly print: IPrintStoreState;
 	readonly sync: ISyncState;
 	readonly isExporting: IsExportingState;
+	readonly editor: EditorState
 }
 
 export type MicroPadGlobals = {

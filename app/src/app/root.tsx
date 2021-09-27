@@ -168,6 +168,12 @@ async function hydrateStoreFromLocalforage() {
 	const helpPref: boolean | null = await localforage.getItem<boolean>('show help');
 	if (helpPref !== null) store.dispatch(actions.setHelpPref(helpPref));
 
+	const shouldSpellCheck = await SETTINGS_STORAGE.getItem<boolean>('shouldSpellCheck');
+	if (shouldSpellCheck !== null) store.dispatch(actions.toggleSpellCheck(shouldSpellCheck));
+
+	const shouldWordWrap = await SETTINGS_STORAGE.getItem<boolean>('shouldWordWrap');
+	if (shouldWordWrap !== null) store.dispatch(actions.toggleWordWrap(shouldWordWrap));
+
 	const syncUser: SyncUser | null = await SYNC_STORAGE.getItem<SyncUser>('sync user');
 	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
 
