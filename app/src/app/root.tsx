@@ -124,8 +124,6 @@ export function getStorage(): StorageMap {
 	// Render the main UI
 	ReactDOM.render(
 		<Provider store={store}>
-			{/*
-			// @ts-ignore TODO: Type has no properties in common with type 'IntrinsicAttributes & Pick ClassAttributes PrintViewOrAppContainerComponent & IPrintViewComponentProps & IAppProps, "ref" | "key">' */}
 			<PrintViewOrAppContainerComponent>
 				<HeaderComponent />
 				<AppBodyComponent>
