@@ -17,5 +17,6 @@ module.exports = {
 		}
 	},
 	'roots': ['<rootDir>/src/', '<rootDir>/integration/src/'],
-	setupFilesAfterEnv: ['<rootDir>/integration/src/utils/jest-image.ts']
+	setupFilesAfterEnv: ['<rootDir>/integration/src/utils/jest-image.ts'],
+	testTimeout: '30000'
 };
