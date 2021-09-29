@@ -43,9 +43,9 @@ export const HeaderComponent = (props: ConnectedProps<typeof headerConnector>) =
 
 	if (isSyncing) saveText = 'Syncing...';
 
-	function generateNavInteractables(position: NavPos): React.ReactNode[] {
+	function generateNavInteractables(position: NavPos) {
 		return [
-			<span className="Header__save-status" key="status message">{saveText}</span>,
+			saveText.length ? <span className="Header__save-status" key="status message">{saveText}</span> : null,
 			<ThemeDropdownComponent key="theme" />,
 			<NotepadDropdownComponent key="notepads" position={position} />,
 			<SearchComponent key="search" />,
@@ -56,7 +56,12 @@ export const HeaderComponent = (props: ConnectedProps<typeof headerConnector>) =
 
 	const sideNav = (
 		<React.Fragment>
-			{!isWideScreenView && generateNavInteractables(NavPos.SideNav).map((el, i) => <li key={i}>{el}</li>)}
+			{
+				!isWideScreenView
+				&& generateNavInteractables(NavPos.SideNav)
+					.filter((el) => !!el)
+					.map((el, i) => <li key={i}>{el}</li>)
+			}
 		</React.Fragment>
 	);
 

@@ -1,4 +1,4 @@
-import { SearchIndices } from '../types/ActionTypes';
+import { SearchIndex, SearchIndices, SearchResultInfo } from '../types/ActionTypes';
 import { SearchResults } from '../reducers/SearchReducer';
 import localforage from 'localforage';
 import { NotepadPasskeysState } from '../reducers/NotepadPasskeysReducer';
@@ -13,15 +13,11 @@ export function search(query: string, searchIndices: SearchIndices): SearchResul
 
 	query.split(' ').forEach(term =>
 		searchIndices.forEach(index =>
-			index.notepad.search(index.trie, term)
-				.map(note => ({
-					title: note.title,
-					parentTitle: index.notepad.sections[note.parent as string].title,
-					noteRef: note.internalRef
-				}))
+			Trie.search(index.trie, term)
+				.map(noteRef => index.searchResultInfo[noteRef])
 				.forEach(result => {
-					results[index.notepad.title] ??= [];
-					results[index.notepad.title].push(result);
+					results[index.notepadTitle] ??= [];
+					results[index.notepadTitle].push(result);
 				})
 		)
 	);
@@ -63,12 +59,35 @@ export async function indexNotepads(indices: SearchIndices, passkeys: NotepadPas
 		.then(resolvedNotepads =>
 			resolvedNotepads
 				.filter((notepad): notepad is FlatNotepad => !!notepad)
-				.map((notepad: FlatNotepad) => {
+				.map((notepad: FlatNotepad): SearchIndex => {
 					if (!!indices[notepad.title] && !indices[notepad.title].shouldReindex(new Date(), Object.keys(notepad.notes).length)) {
-						return { notepad: notepad, trie: indices[notepad.title] };
+						return {
+							notepadTitle: notepad.title,
+							trie: indices[notepad.title],
+							searchResultInfo: getSearchResultInfo(notepad)
+						};
 					}
 
-					return { notepad: notepad, trie: Trie.buildTrie(notepad.notes) };
+					return {
+						notepadTitle: notepad.title,
+						trie: Trie.buildTrie(notepad.notes),
+						searchResultInfo: getSearchResultInfo(notepad)
+					};
 				})
 		);
+}
+
+function getSearchResultInfo(notepad: FlatNotepad): SearchResultInfo {
+	const info: SearchResultInfo = {};
+
+	for (const noteRef of Object.keys(notepad.notes)) {
+		const note = notepad.notes[noteRef];
+		info[noteRef] = {
+			noteRef,
+			title: note.title,
+			parentTitle: notepad.sections[note.parent as string].title
+		};
+	}
+
+	return info;
 }

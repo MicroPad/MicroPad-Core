@@ -22,7 +22,10 @@ export const indexNotepads$ = (action$: Observable<MicroPadAction>, store: EpicS
 		switchMap((indices: SearchIndices) =>
 			from(indexNotepads(indices, store.getState().notepadPasskeys)).pipe(
 				map(newIndices => actions.indexNotepads.done({ params: undefined, result: newIndices })),
-				catchError(err => of(actions.indexNotepads.failed({ params: undefined, error: err })))
+				catchError(err => {
+					console.error(err);
+					return of(actions.indexNotepads.failed({ params: undefined, error: err }));
+				})
 			)
 		)
 	);

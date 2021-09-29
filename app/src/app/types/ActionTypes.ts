@@ -2,6 +2,7 @@ import { ISyncedNotepad, SyncUser } from './SyncTypes';
 import { NoteElement, Source } from 'upad-parse/dist/Note';
 import { FlatNotepad, Note, Notepad, Trie } from 'upad-parse/dist';
 import { MicroPadAction } from '../actions';
+import { SearchResult } from '../reducers/SearchReducer';
 
 export type UpdateElementAction = {
 	noteRef: string;
@@ -76,7 +77,13 @@ export type AddCryptoPasskeyAction = {
 	passkey: string;
 };
 
-export type SearchIndex = { notepad: FlatNotepad, trie: Trie };
+export type SearchIndex = {
+	notepadTitle: string,
+	trie: Trie,
+	searchResultInfo: SearchResultInfo
+};
+
+export type SearchResultInfo = { [noteRef: string]: SearchResult };
 
 export type SearchIndices = SearchIndex[];
 
