@@ -46,7 +46,7 @@ const NotepadExplorerComponent = (props: Props) => {
 			className="notepad-explorer"
 			style={notepadExplorerStyle}
 			size={{ width: props.explorerWidth, height: 'auto' }}
-			minWidth={240}
+			minWidth={0}
 			enable={{ right: true }}
 			handleWrapperClass="notepad-explorer__drag-handle"
 			handleStyles={{
@@ -58,8 +58,8 @@ const NotepadExplorerComponent = (props: Props) => {
 				}
 			}}
 			onResizeStop={(_e, _d, ref) => {
-				if (ref.style.width === '240px') {
-					props.flipFullScreenState();
+				if (parseInt(ref.style.width, 10) <= 50) {
+					setTimeout(() => props.flipFullScreenState(), 0);
 				} else {
 					props.setExplorerWidth(ref.style.width)
 				}
