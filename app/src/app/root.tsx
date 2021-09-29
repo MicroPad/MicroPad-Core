@@ -28,7 +28,7 @@ import localforage from 'localforage';
 import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
 import { Provider } from 'react-redux';
-import HeaderComponent from './containers/header/HeaderContainer';
+import HeaderComponent from './components/header/HeaderContainer';
 import NotepadExplorerComponent from './components/explorer/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './services/shortcuts';

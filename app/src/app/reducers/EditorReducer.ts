@@ -10,7 +10,7 @@ export class EditorReducer extends MicroPadReducer<EditorState> {
 	public readonly key = 'editor';
 	public readonly initialState: EditorState = {
 		shouldSpellCheck: true,
-		shouldWordWrap: true
+		shouldWordWrap: false
 	};
 
 	constructor() {

@@ -1,19 +1,19 @@
 import './NotepadDropdownComponent.css';
 import React from 'react';
 import { Col, Dropdown, Icon, Modal, NavItem, ProgressBar, Row } from 'react-materialize';
-import UploadNotepadsComponent from '../../../containers/header/UploadNotepadsContainer';
+import UploadNotepadsComponent from '../upload-notepads/UploadNotepadsContainer';
 import { DEFAULT_MODAL_OPTIONS, generateGuid } from '../../../util';
 import { Dialog } from '../../../services/dialogs';
 import { SYNC_NAME } from '../../../types';
 import LoginComponent from '../../../containers/LoginContainer';
 import ManageSyncComponent from '../../../containers/ManageSyncContainer';
 import { FlatNotepad, Note } from 'upad-parse/dist';
-import ImportMarkdownComponent from '../../../containers/header/ImportMarkdownContainer';
+import ImportMarkdownComponent from '../import-markdown/ImportMarkdownContainer';
 import NpxIcon from '../../../assets/npx.png';
 import MarkdownIcon from '../../../assets/md.svg';
 import { ConnectedProps } from 'react-redux';
 import { notepadDropdownConnector } from './NotepadDropdownContainer';
-import { NavPos } from '../../../containers/header/HeaderContainer';
+import { NavPos } from '../HeaderContainer';
 
 export type NotepadDropdownProps = {
 	position: NavPos

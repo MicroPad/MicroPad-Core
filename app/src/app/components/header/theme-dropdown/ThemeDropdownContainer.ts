@@ -1,11 +1,11 @@
-import { IStoreState } from '../../types';
+import { IStoreState } from '../../../types';
 import {
 	default as ThemeDropdownComponent,
 	IThemeDropdownComponentProps
-} from '../../components/header/ThemeDropdownComponent';
+} from './ThemeDropdownComponent';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
-import { actions } from '../../actions';
+import { actions } from '../../../actions';
 
 export function mapStateToProps({ app }: IStoreState) {
 	return {

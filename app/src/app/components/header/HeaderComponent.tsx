@@ -1,26 +1,15 @@
 import './HeaderComponent.css';
 import React, { CSSProperties, useEffect, useState } from 'react';
-import AppNameComponent from '../../containers/header/AppNameContainer';
+import AppNameComponent from './app-name/AppNameContainer';
 import { Icon, Navbar, NavItem } from 'react-materialize';
 import NotepadDropdownComponent from './notepad-dropdown/NotepadDropdownContainer';
-import { INotepadStoreState } from '../../types/NotepadTypes';
-import NotepadBreadcrumbs from '../../containers/header/NotepadBreadcrumbsContainer';
+import NotepadBreadcrumbs from './notepad-breadcrumbs/NotepadBreadcrumbsContainer';
 import SearchComponent from '../search/SearchContainer';
-import ThemeDropdownComponent from '../../containers/header/ThemeDropdownContainer';
-import { ITheme } from '../../types/Themes';
-import { NavPos } from '../../containers/header/HeaderContainer';
+import ThemeDropdownComponent from './theme-dropdown/ThemeDropdownContainer';
+import { headerConnector, NavPos } from './HeaderContainer';
+import { ConnectedProps } from 'react-redux';
 
-export interface IHeaderComponentProps {
-	isFullScreen: boolean;
-	isSyncing: boolean;
-	theme: ITheme;
-	getHelp?: () => void;
-	notepad?: INotepadStoreState;
-	flipFullScreenState?: () => void;
-	closeNotepad?: () => void;
-}
-
-export const HeaderComponent = (props: IHeaderComponentProps) => {
+export const HeaderComponent = (props: ConnectedProps<typeof headerConnector>) => {
 	/*
 	 * This is some fun code to detect if we're in the "mobile" view or not and re-render the component if we are.
 	 * Doing it this way instead of with CSS lets us reduce our DOM weight, React rerender trees, and makes sure IDs are
@@ -28,10 +17,9 @@ export const HeaderComponent = (props: IHeaderComponentProps) => {
 	 */
 	const [isWideScreenView, setIsWideScreenView] = useState<boolean>(true);
 	useEffect(() => {
-		const observer = new IntersectionObserver(entries => {
-			console.log(entries);
-			setIsWideScreenView(!entries.some(entry => entry.isIntersecting));
-		});
+		const observer = new IntersectionObserver(entries =>
+			setIsWideScreenView(entries.every(entry => !entry.isIntersecting))
+		);
 		observer.observe(document.querySelector<HTMLDivElement>('.sidenav-trigger')!);
 		return () => observer.disconnect();
 	});

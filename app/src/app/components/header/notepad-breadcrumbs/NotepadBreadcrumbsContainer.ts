@@ -1,13 +1,13 @@
 import { connect } from 'react-redux';
-import { IStoreState } from '../../types';
+import { IStoreState } from '../../../types';
 import NotepadBreadcrumbsComponent, {
 	Breadcrumb,
 	INotepadBreadcrumbsProps
-} from '../../components/header/notepad-breadcrumbs/NotepadBreadcrumbsComponent';
+} from './NotepadBreadcrumbsComponent';
 import { format } from 'date-fns';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { Action, Dispatch } from 'redux';
-import { actions } from '../../actions';
+import { actions } from '../../../actions';
 import { FlatNotepad } from 'upad-parse';
 
 let oldNotepad: FlatNotepad | undefined = undefined;

@@ -43,7 +43,7 @@ export class AppReducer extends MicroPadReducer<IAppStoreState> {
 		defaultFontSize: '16px',
 		zoom: 1,
 		showHelp: true,
-		theme: 'Classic',
+		theme: 'Pastel',
 		explorerWidth: '280px'
 	};
 

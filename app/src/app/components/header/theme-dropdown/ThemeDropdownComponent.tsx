@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dropdown, Icon, NavItem } from 'react-materialize';
-import { ThemeName } from '../../types/Themes';
-import { ThemeValues } from '../../ThemeValues';
+import { ThemeName } from '../../../types/Themes';
+import { ThemeValues } from '../../../ThemeValues';
 
 export interface IThemeDropdownComponentProps {
 	selectedTheme: ThemeName;

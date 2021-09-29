@@ -1,16 +1,10 @@
 import React from 'react';
 import { APP_NAME } from '../../../types';
 import './AppNameComponent.css';
-import { IVersion } from '../../../reducers/AppReducer';
-import { ITheme } from '../../../types/Themes';
+import { ConnectedProps } from 'react-redux';
+import { appNameConnector } from './AppNameContainer';
 
-export interface IAppNameComponentProps {
-	version: IVersion;
-	theme: ITheme;
-	closeNotepad?: () => void;
-}
-
-export default class AppNameComponent extends React.Component<IAppNameComponentProps> {
+export default class AppNameComponent extends React.Component<ConnectedProps<typeof appNameConnector>> {
 	private readonly statusToSymbol = {
 		dev: 'ρ',
 		alpha: 'α',

@@ -1,12 +1,9 @@
 import React, { SyntheticEvent } from 'react';
 import { Icon, NavItem } from 'react-materialize';
-import { Translators } from 'upad-parse/dist';
+import { ConnectedProps } from 'react-redux';
+import { importMarkdownConnector } from './ImportMarkdownContainer';
 
-export interface IImportMarkdownComponentProps {
-	importMd?: (md: Translators.Markdown.MarkdownImport[]) => void;
-}
-
-export default class ImportMarkdownComponent extends React.Component<IImportMarkdownComponentProps> {
+export default class ImportMarkdownComponent extends React.Component<ConnectedProps<typeof importMarkdownConnector>> {
 	private uploadInput!: HTMLInputElement;
 
 	render() {

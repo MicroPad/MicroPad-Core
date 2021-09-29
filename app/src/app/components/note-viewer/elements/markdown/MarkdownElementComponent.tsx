@@ -191,7 +191,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 									height: '400px',
 									backgroundColor: theme.background,
 									color: theme.text,
-									whiteSpace: this.props.shouldWordWrap ? 'normal' : 'pre',
+									whiteSpace: this.props.shouldWordWrap ? 'break-spaces' : 'pre',
 									overflowWrap: 'normal',
 									overflowX: 'auto'
 								}
