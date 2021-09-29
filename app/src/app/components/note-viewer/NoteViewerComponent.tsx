@@ -175,18 +175,22 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 
 		if (!note) {
 			if (isNotepadOpen) {
-				// Flash the Notepad Explorer amber
-				const explorer: HTMLDivElement = document.querySelector('.notepad-explorer')!;
-				explorer.style.backgroundColor = theme.accent;
-				setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);
+				// Flash the Notepad Explorer amber if we're not in full screen
+				const explorer: HTMLDivElement | null = document.querySelector('.notepad-explorer');
+				if (explorer) {
+					explorer.style.backgroundColor = theme.accent;
+					setTimeout(() => explorer.style.backgroundColor = theme.chrome, 150);
+				}
 
 				// Create a quick note
 				if (!!makeQuickNote) makeQuickNote();
 			} else {
 				// Flash notepads drop-down
-				const explorer = document.getElementById('notepad-dropdown')!;
-				explorer.style.backgroundColor = theme.accent;
-				setTimeout(() => explorer.style.backgroundColor = '', 150);
+				const explorer = document.getElementById('notepad-dropdown');
+				if (explorer) {
+					explorer.style.backgroundColor = theme.accent;
+					setTimeout(() => explorer.style.backgroundColor = '', 150);
+				}
 
 				// Create quick notepad
 				if (!!makeQuickNotepad) makeQuickNotepad();
