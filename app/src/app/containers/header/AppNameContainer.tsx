@@ -1,6 +1,6 @@
 import { IStoreState } from '../../types';
 import { connect } from 'react-redux';
-import AppNameComponent, { IAppNameComponentProps } from '../../components/header/AppNameComponent/AppNameComponent';
+import AppNameComponent, { IAppNameComponentProps } from '../../components/header/app-name/AppNameComponent';
 import { Action, Dispatch } from 'redux';
 import { actions } from '../../actions';
 import { ThemeValues } from '../../ThemeValues';

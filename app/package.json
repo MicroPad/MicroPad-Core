@@ -93,12 +93,12 @@
   },
   "browserslist": {
     "production": [
-      "chrome >= 89",
+      "chrome >= 80",
       "electron >= 12",
-      "edge >= 89",
-      "firefox >= 89",
-      "safari >= 14",
-      "ios_saf >= 14",
+      "edge >= 80",
+      "firefox >= 80",
+      "safari >= 13",
+      "ios_saf >= 13",
       "unreleased versions"
     ],
     "development": [

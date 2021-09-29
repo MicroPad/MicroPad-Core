@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import UploadNotepadsComponent, { IUploadNotepadsComponentProps } from '../../components/header/UploadNotepadsComponent/UploadNotepadsComponent';
+import UploadNotepadsComponent, { IUploadNotepadsComponentProps } from '../../components/header/upload-notepads/UploadNotepadsComponent';
 import { Action, Dispatch } from 'redux';
 import { actions } from '../../actions';
 

@@ -5,6 +5,11 @@ import HeaderComponent from '../../components/header/HeaderComponent';
 import { IStoreState } from '../../types';
 import { ThemeValues } from '../../ThemeValues';
 
+export const enum NavPos {
+	MainNav,
+	SideNav
+}
+
 export function mapStateToProps({ notepads, app, sync }: IStoreState) {
 	return {
 		notepad: notepads.notepad,

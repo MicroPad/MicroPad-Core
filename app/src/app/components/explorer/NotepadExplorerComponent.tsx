@@ -4,7 +4,7 @@ import { Button, Icon } from 'react-materialize';
 import TreeView from 'react-treeview';
 import ExplorerOptionsComponent from './explorer-options/ExplorerOptionsContainer';
 import { NewNotepadObjectAction } from '../../types/ActionTypes';
-import HelpMessageComponent from '../../containers/HelpMessageContainer';
+import HelpMessageComponent from '../help-message/HelpMessageContainer';
 import { Dialog } from '../../services/dialogs';
 import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
 import { Note, Parent, Section } from 'upad-parse/dist';

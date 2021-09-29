@@ -3,7 +3,7 @@ import { IStoreState } from '../../types';
 import NotepadBreadcrumbsComponent, {
 	Breadcrumb,
 	INotepadBreadcrumbsProps
-} from '../../components/header/NotepadBreadcrumbsComponent/NotepadBreadcrumbsComponent';
+} from '../../components/header/notepad-breadcrumbs/NotepadBreadcrumbsComponent';
 import { format } from 'date-fns';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { Action, Dispatch } from 'redux';

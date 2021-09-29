@@ -27,6 +27,15 @@ ul.dropdown-content > li:hover > a, ul.dropdown-content > li:hover > span {
 	background-color: var(--mp-theme-chrome);
 }
 
-#mobile-nav .header__top-level-item, #mobile-nav .header__top-level-item > .material-icons {
+#mobile-nav .header__top-level-item, #mobile-nav .header__top-level-item > .material-icons, .dropdown-content i.material-icons {
 	color: var(--mp-theme-explorerContent) !important;
+}
+
+#mobile-nav.sidenav li > a {
+	padding: 0;
+}
+
+#mobile-nav.sidenav li {
+	line-height: 52px;
+	margin-bottom: 10px;
 }
