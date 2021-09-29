@@ -2,7 +2,6 @@ import { ISyncedNotepad, SyncUser } from './SyncTypes';
 import { NoteElement, Source } from 'upad-parse/dist/Note';
 import { FlatNotepad, Note, Notepad, Trie } from 'upad-parse/dist';
 import { MicroPadAction } from '../actions';
-import { SearchResult } from '../reducers/SearchReducer';
 
 export type UpdateElementAction = {
 	noteRef: string;
