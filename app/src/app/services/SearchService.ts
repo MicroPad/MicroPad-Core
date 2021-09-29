@@ -1,5 +1,5 @@
 import { SearchIndex, SearchIndices, SearchResultInfo } from '../types/ActionTypes';
-import { SearchResults } from '../reducers/SearchReducer';
+import { SearchResult, SearchResults } from '../reducers/SearchReducer';
 import localforage from 'localforage';
 import { NotepadPasskeysState } from '../reducers/NotepadPasskeysReducer';
 import { FlatNotepad } from 'upad-parse';
@@ -14,7 +14,14 @@ export function search(query: string, searchIndices: SearchIndices): SearchResul
 	query.split(' ').forEach(term =>
 		searchIndices.forEach(index =>
 			Trie.search(index.trie, term)
-				.map(noteRef => index.searchResultInfo[noteRef])
+				.map((noteRef): SearchResult => {
+					const noteInfo = index.searchResultInfo.results[noteRef];
+					return {
+						noteRef,
+						title: noteInfo.title,
+						parentTitle: index.searchResultInfo.parentTitles[noteInfo.parentRef]
+					};
+				})
 				.forEach(result => {
 					results[index.notepadTitle] ??= [];
 					results[index.notepadTitle].push(result);
@@ -78,15 +85,19 @@ export async function indexNotepads(indices: SearchIndices, passkeys: NotepadPas
 }
 
 function getSearchResultInfo(notepad: FlatNotepad): SearchResultInfo {
-	const info: SearchResultInfo = {};
+	const info: SearchResultInfo = {
+		results: {},
+		parentTitles: {}
+	};
 
 	for (const noteRef of Object.keys(notepad.notes)) {
 		const note = notepad.notes[noteRef];
-		info[noteRef] = {
+		info.results[noteRef] = {
 			noteRef,
 			title: note.title,
-			parentTitle: notepad.sections[note.parent as string].title
+			parentRef: note.parent as string
 		};
+		info.parentTitles[note.parent as string] ??= notepad.sections[note.parent as string].title;
 	}
 
 	return info;

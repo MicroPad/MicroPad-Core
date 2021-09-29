@@ -83,7 +83,16 @@ export type SearchIndex = {
 	searchResultInfo: SearchResultInfo
 };
 
-export type SearchResultInfo = { [noteRef: string]: SearchResult };
+export type SearchResultInfo = {
+	results: {
+		[noteRef: string]: {
+			title: string;
+			parentRef: string;
+			noteRef: string;
+		}
+	},
+	parentTitles: { [parentRef: string]: string }
+};
 
 export type SearchIndices = SearchIndex[];
 
