@@ -2,7 +2,7 @@ describe(`Unsupported Page`, () => {
 	it(`should show the unsupported page on unsupported devices`, async () => {
 		// Arrange
 		const context = await browser.newContext({
-			userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11.1; rv:90.0) Gecko/20100101 Firefox/88.0'
+			userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11.1; rv:90.0) Gecko/20100101 Firefox/79.0'
 		});
 		const page = await context.newPage();
 		await page.goto(process.env['MICROPAD_URL'] ?? 'http://localhost:3000?prod=1');
@@ -18,7 +18,7 @@ describe(`Unsupported Page`, () => {
 	it(`should be able to continue anyway`, async () => {
 		// Arrange
 		const context = await browser.newContext({
-			userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11.1; rv:90.0) Gecko/20100101 Firefox/88.0'
+			userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11.1; rv:90.0) Gecko/20100101 Firefox/79.0'
 		});
 		const page = await context.newPage();
 		await page.goto(process.env['MICROPAD_URL'] ?? 'http://localhost:3000?prod=1');
