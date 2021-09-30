@@ -73,7 +73,7 @@ clearBrowserslistCache();
 			'.ttf': 'file',
 			'.wasm': 'file'
 		},
-		minify: true,
+		minify: !isDev,
 		sourcemap: true,
 		splitting: true,
 		publicPath: '/dist',
@@ -113,7 +113,7 @@ clearBrowserslistCache();
 			'.ttf': 'file',
 			'.wasm': 'file'
 		},
-		minify: true,
+		minify: !isDev,
 		sourcemap: true,
 		splitting: true,
 		publicPath: '/dist',
@@ -166,7 +166,7 @@ clearBrowserslistCache();
 			'.svg': 'file',
 			'.ttf': 'file'
 		},
-		minify: true,
+		minify: !isDev,
 		sourcemap: true,
 		define: {
 			'process.env.NODE_ENV': '"production"',
