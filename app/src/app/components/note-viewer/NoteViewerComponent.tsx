@@ -124,6 +124,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				style={styles}
 				ref={div => this.viewerDiv = div!}
 				onClick={this.handleEmptyClick}
+				onContextMenu={this.handleEmptyClick}
 				onScroll={async () => this.scrolling = true}
 				onDrop={event => this.handleFileDrop(event as any)}
 				onDragOver={e => {
@@ -173,6 +174,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		const { note, edit, elementEditing, theme, toggleInsertMenu, isNotepadOpen, isFullscreen, makeQuickNotepad, makeQuickNote, deleteNotepad } = this.props;
 		if ((event.target !== this.viewerDiv && event.target !== this.containerDiv)) return;
 
+		event.preventDefault();
+
 		if (!note) {
 			if (isNotepadOpen) {
 				// Flash the Notepad Explorer amber if we're not in full screen
@@ -199,7 +202,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				M.toast({ html: `Created notebook <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`, displayLength: 6000 });
 			}
 
-			return;
+			return false;
 		}
 
 		// Insert a new element
@@ -219,6 +222,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		} else {
 			edit!('');
 		}
+
+		return false;
 	}
 
 	private handleFileDrop = (event: DragEvent) => {
