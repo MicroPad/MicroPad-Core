@@ -309,7 +309,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 
 			case 'hashtag':
 				search(message.payload);
-				openModal('search-modal--0');
+				openModal('search-modal');
 				break;
 
 			case 'link':

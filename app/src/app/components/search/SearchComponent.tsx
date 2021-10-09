@@ -11,10 +11,6 @@ import { SearchResult } from '../../reducers/SearchReducer';
 type Props = ConnectedProps<typeof searchConnector>;
 
 export default class SearchComponent extends React.Component<Props, never> {
-	private static componentCount: number = 0;
-
-	private readonly componentCount = SearchComponent.componentCount++;
-	private readonly modalId = `search-modal--${this.componentCount}`;
 	private selectEl: any | null = null;
 
 	override render() {
@@ -27,7 +23,7 @@ export default class SearchComponent extends React.Component<Props, never> {
 
 		return (
 			<Modal
-				id={this.modalId}
+				id="search-modal"
 				key={`search-${this.props.notepad?.title ?? 'all'}`}
 				header="Search"
 				trigger={
