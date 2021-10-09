@@ -1,9 +1,9 @@
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { actions } from '../actions';
 
 export type NotepadPasskeysState = Record<string, string>;
 
-export class NotepadPasskeysReducer extends MicroPadReducer<NotepadPasskeysState> {
+export class NotepadPasskeysReducer extends AbstractReducer<NotepadPasskeysState> {
 	public readonly key = 'notepadPasskeys';
 	public readonly initialState: NotepadPasskeysState = {};
 

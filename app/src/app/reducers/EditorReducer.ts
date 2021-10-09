@@ -1,4 +1,4 @@
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { actions } from '../actions';
 
 export type EditorState = {
@@ -6,7 +6,7 @@ export type EditorState = {
 	shouldWordWrap: boolean
 };
 
-export class EditorReducer extends MicroPadReducer<EditorState> {
+export class EditorReducer extends AbstractReducer<EditorState> {
 	public readonly key = 'editor';
 	public readonly initialState: EditorState = {
 		shouldSpellCheck: true,

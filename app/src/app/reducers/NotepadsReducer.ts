@@ -1,4 +1,4 @@
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { Action } from 'redux';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { actions } from '../actions';
@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 import { DueItem } from '../services/DueDates';
 import { isReadOnlyNotebook } from '../ReadOnly';
 
-export class NotepadsReducer extends MicroPadReducer<INotepadsStoreState> {
+export class NotepadsReducer extends AbstractReducer<INotepadsStoreState> {
 	public readonly key = 'notepads';
 	public readonly initialState: INotepadsStoreState = {
 		isLoading: false,

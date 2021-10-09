@@ -1,5 +1,5 @@
 import { INotepadSharingData, SyncUser } from '../types/SyncTypes';
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
@@ -10,7 +10,7 @@ export interface ISyncState {
 	isLoading: boolean;
 }
 
-export class SyncReducer extends MicroPadReducer<ISyncState> {
+export class SyncReducer extends AbstractReducer<ISyncState> {
 	public readonly key = 'sync';
 	public readonly initialState: ISyncState = {
 		isLoading: false

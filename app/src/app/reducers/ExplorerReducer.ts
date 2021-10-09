@@ -1,4 +1,4 @@
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { Action } from 'redux';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
@@ -9,7 +9,7 @@ export interface IExplorerState {
 	openSections: string[];
 }
 
-export class ExplorerReducer extends MicroPadReducer<IExplorerState> {
+export class ExplorerReducer extends AbstractReducer<IExplorerState> {
 	public readonly key = 'explorer';
 	public readonly initialState: IExplorerState = {
 		openSections: []

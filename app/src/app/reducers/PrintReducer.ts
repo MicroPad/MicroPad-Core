@@ -1,4 +1,4 @@
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { actions } from '../actions';
 import { NoteElement } from 'upad-parse/dist/Note';
 
@@ -6,7 +6,7 @@ export interface IPrintStoreState {
 	elementToPrint?: NoteElement;
 }
 
-export class PrintReducer extends MicroPadReducer<IPrintStoreState> {
+export class PrintReducer extends AbstractReducer<IPrintStoreState> {
 	readonly key = 'print';
 	readonly initialState: IPrintStoreState = {};
 

@@ -1,10 +1,10 @@
 import { Action, ActionCreator } from 'redux-typescript-actions';
-import { IStoreState } from './index';
+import { IStoreState } from '../types';
 import { MicroPadAction } from '../actions';
 
 export type ReducerHandler<S, ActionPayload> = (state: S, action: Action<ActionPayload>) => S;
 
-export abstract class MicroPadReducer<S> {
+export abstract class AbstractReducer<S> {
 	public abstract readonly key: keyof IStoreState;
 	public abstract readonly initialState: S;
 	private handlers: { [actionType: string]: ReducerHandler<S, any> } = {};

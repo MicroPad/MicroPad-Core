@@ -1,4 +1,4 @@
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { actions } from '../actions';
 import { SearchIndices } from '../types/ActionTypes';
 
@@ -17,7 +17,7 @@ export type SearchResult = {
 
 export type SearchResults = { [notepadTitle: string]: SearchResult[] };
 
-export class SearchReducer extends MicroPadReducer<ISearchState> {
+export class SearchReducer extends AbstractReducer<ISearchState> {
 	public readonly key = 'search';
 	public readonly initialState: ISearchState = {
 		results: {},

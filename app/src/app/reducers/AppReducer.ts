@@ -2,7 +2,7 @@
 import { version } from '../../../package.json';
 
 import { Action } from 'redux';
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { isType } from 'redux-typescript-actions';
 import { actions } from '../actions';
 import { ThemeName } from '../types/Themes';
@@ -30,7 +30,7 @@ export interface IVersion {
 
 const { major, minor, patch } = parse(version) || { major: 0, minor: 0, patch: 0 };
 
-export class AppReducer extends MicroPadReducer<IAppStoreState> {
+export class AppReducer extends AbstractReducer<IAppStoreState> {
 	public readonly key = 'app';
 	public readonly initialState: IAppStoreState = {
 		version: {

@@ -1,4 +1,4 @@
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { IStoreState } from '../types';
 import { isDev } from '../util';
 import { NotepadsReducer } from './NotepadsReducer';
@@ -16,7 +16,7 @@ import { isReadOnlyNotebook } from '../ReadOnly';
 import deepFreeze from 'deep-freeze';
 import { EditorReducer } from './EditorReducer';
 
-export const REDUCERS: Array<MicroPadReducer<any>> = [
+export const REDUCERS: Array<AbstractReducer<any>> = [
 	new AppReducer(),
 	new NotepadPasskeysReducer(),
 	new NotepadsReducer(),
