@@ -185,10 +185,8 @@ async function hydrateStoreFromLocalforage() {
 	} else if (!!lastOpenedNotepad) {
 		const { notepadTitle, noteRef } = lastOpenedNotepad;
 		if (noteRef) {
-			console.log('h1');
 			store.dispatch(actions.restoreJsonNotepadAndLoadNote({ notepadTitle, noteRef }));
 		} else {
-			console.log('h2');
 			store.dispatch(actions.openNotepadFromStorage.started(notepadTitle));
 		}
 	}

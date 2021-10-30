@@ -14,7 +14,11 @@ export class DecryptionError extends Error {
 
 export async function fromShell(shell: NotepadShell, key?: string): Promise<EncryptNotepadAction> {
 	// Notepad is unencrypted, just return it
-	if (typeof shell.sections === 'object') return { notepad: await Translators.Json.toNotepadFromNotepad(shell), passkey: '' };
+	if (typeof shell.sections === 'object') return {
+		notepad: await Translators.Json.toNotepadFromNotepad(shell),
+		passkey: '',
+		rememberKey: false
+	};
 
 	// Prompt for decryption
 	const passkey: RememberMePromptRes | undefined = key != null

@@ -132,7 +132,7 @@ const openNotepadFromStorage$ = (action$: Observable<MicroPadAction>, store: Epi
 					return from(fromShell(JSON.parse(json!), store.getState().notepadPasskeys[notepadTitle]));
 				}),
 				mergeMap((res: EncryptNotepadAction) => [
-					actions.addCryptoPasskey({ notepadTitle: res.notepad.title, passkey: res.passkey }),
+					actions.addCryptoPasskey({ notepadTitle: res.notepad.title, passkey: res.passkey, remember: res.rememberKey }),
 					actions.openNotepadFromStorage.done({ params: '', result: undefined }),
 					actions.parseNpx.done({ params: '', result: res.notepad.flatten() }),
 				]),
@@ -317,7 +317,7 @@ async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: Loc
 	const areNotepadsStillEncrypted = !!resolvedNotepadsOrErrors.find(res => res instanceof Error);
 
 	const resolvedNotepads = resolvedNotepadsOrErrors.filter((res): res is EncryptNotepadAction => !(res instanceof Error)).map((cryptoInfo: EncryptNotepadAction) => {
-		cryptoPasskeys.push(actions.addCryptoPasskey({ notepadTitle: cryptoInfo.notepad.title, passkey: cryptoInfo.passkey }));
+		cryptoPasskeys.push(actions.addCryptoPasskey({ notepadTitle: cryptoInfo.notepad.title, passkey: cryptoInfo.passkey, remember: false }));
 		return cryptoInfo.notepad;
 	});
 
