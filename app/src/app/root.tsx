@@ -85,11 +85,17 @@ export const SETTINGS_STORAGE = localforage.createInstance({
 	storeName: 'settings'
 });
 
+export const CRYPTO_PASSKEYS_STORAGE = localforage.createInstance({
+	name: 'MicroPad',
+	storeName: 'cryptoPasskeys'
+});
+
 export type StorageMap = {
 	notepadStorage: LocalForage,
 	assetStorage: LocalForage,
 	syncStorage: LocalForage,
 	settingsStorage: LocalForage,
+	cryptoPasskeysStorage: LocalForage,
 
 	/** @deprecated Use settingsStorage instead */
 	generalStorage: LocalForage
@@ -101,6 +107,7 @@ export function getStorage(): StorageMap {
 		assetStorage: ASSET_STORAGE,
 		syncStorage: SYNC_STORAGE,
 		settingsStorage: SETTINGS_STORAGE,
+		cryptoPasskeysStorage: CRYPTO_PASSKEYS_STORAGE,
 		generalStorage: localforage
 	};
 }
