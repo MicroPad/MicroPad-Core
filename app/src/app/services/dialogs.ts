@@ -13,6 +13,11 @@ type VexOpts = {
 	input?: string
 };
 
+export type RememberMePromptRes = {
+	secret: string,
+	remember: boolean
+};
+
 export class Dialog {
 	public static alert = (message: string) => Dialog.loadVex(Vex.dialog.alert, { message })
 
@@ -41,6 +46,34 @@ export class Dialog {
 			input: '<input name="vex" type="password" class="vex-dialog-prompt-input" />',
 		}
 	)
+
+	public static promptSecureRememberMe = (message: string): Promise<RememberMePromptRes | undefined> => {
+		const checkboxId = `vex__checkbox--${Dialog.ID_COUNT++}`;
+
+		return Dialog.loadVex<{ secret?: string, remember?: '1' } | undefined>(
+			Vex.dialog.open,
+			{
+				message,
+				input: `
+				<input name="secret" type="password" class="vex-dialog-prompt-input" />
+				<div class="vex-custom-input-wrapper" style="padding-top: 1em;">
+					<label for="${checkboxId}" style="color: var(--mp-theme-explorerContent);">
+						<input id="${checkboxId}" name="remember" class="filled-in" type="checkbox" class="vex-dialog-prompt-input" value="1" />
+						<span>Remember</span>
+					</label>
+				</div>
+			`,
+			}
+		).then(res => {
+			if (!res?.secret) return undefined;
+			return {
+				secret: res.secret,
+				remember: res.remember === '1'
+			};
+		});
+	};
+
+	private static ID_COUNT: number = 0;
 
 	private static loadVex<T>(vexFn: (opts: any) => void, opts: VexOpts): Promise<T> {
 		return new Promise<T>(resolve => {

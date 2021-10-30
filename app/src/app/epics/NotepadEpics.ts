@@ -177,6 +177,7 @@ const restoreJsonNotepadAndLoadNote$ = (action$: Observable<MicroPadAction>, sto
 				map(({ notepad, passkey }) => ({ notepad: notepad.flatten(), passkey })),
 				map(({ notepad, passkey }): [string, FlatNotepad, string] => [result.noteRef, notepad, passkey]),
 				catchError(err => {
+					console.log('why');
 					console.error(err);
 
 					if (err instanceof DecryptionError) {

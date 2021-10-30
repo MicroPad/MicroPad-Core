@@ -67,8 +67,9 @@ export type MoveNotepadObjectAction = {
 };
 
 export type EncryptNotepadAction = {
-	notepad: Notepad;
-	passkey: string;
+	notepad: Notepad,
+	passkey: string,
+	rememberKey?: boolean
 };
 
 export type AddCryptoPasskeyAction = {
