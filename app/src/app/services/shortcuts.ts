@@ -2,7 +2,6 @@ import { Store } from 'redux';
 import { IStoreState } from '../types';
 import * as mousetrap from 'mousetrap';
 import { actions, MicroPadAction } from '../actions';
-import { openModal } from '../util';
 
 export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction>) {
 	// Fullscreen
@@ -11,13 +10,13 @@ export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction
 	// Search
 	mousetrap.bind('mod+f', e => {
 		e.preventDefault();
-		openModal('search-modal');
+		store.dispatch(actions.openModal('search-modal'));
 	});
 
 	// Quick Notepad Switch (modal)
 	mousetrap.bind('mod+k', e => {
 		e.preventDefault();
-		openModal('quick-switch-modal');
+		store.dispatch(actions.openModal('quick-switch-modal'));
 	});
 
 	// Quick Notepad Switch (old)
@@ -41,7 +40,7 @@ export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction
 	// Export All Notepads
 	mousetrap.bind('mod+shift+s', e => {
 		e.preventDefault();
-		openModal('export-all-notepads-modal');
+		store.dispatch(actions.openModal('export-all-notepads-modal'));
 	});
 
 	// Import Notepad(s)

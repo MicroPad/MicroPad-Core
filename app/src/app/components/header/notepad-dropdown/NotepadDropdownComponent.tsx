@@ -1,6 +1,6 @@
 import './NotepadDropdownComponent.css';
 import React from 'react';
-import { Col, Dropdown, Icon, Modal, NavItem, ProgressBar, Row } from 'react-materialize';
+import { Col, Dropdown, Icon, NavItem, ProgressBar, Row } from 'react-materialize';
 import UploadNotepadsComponent from '../upload-notepads/UploadNotepadsContainer';
 import { DEFAULT_MODAL_OPTIONS, generateGuid } from '../../../util';
 import { Dialog } from '../../../services/dialogs';
@@ -14,6 +14,7 @@ import MarkdownIcon from '../../../assets/md.svg';
 import { ConnectedProps } from 'react-redux';
 import { notepadDropdownConnector } from './NotepadDropdownContainer';
 import { NavPos } from '../HeaderContainer';
+import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
 
 export type NotepadDropdownProps = {
 	position: NavPos
@@ -63,7 +64,7 @@ const NotepadDropdownComponent = React.memo((props: Props) => {
 			<UploadNotepadsComponent />
 			<ImportMarkdownComponent />
 
-			<Modal
+			<SingletonModalComponent
 				id="export-all-notepads-modal"
 				key="export-all-notepads-modal"
 				header="Export All Notepads"
@@ -95,7 +96,7 @@ const NotepadDropdownComponent = React.memo((props: Props) => {
 					</Col>
 					{props.isExporting && <ProgressBar className="amber" />}
 				</Row>
-			</Modal>
+			</SingletonModalComponent>
 
 			<LoginComponent
 				trigger={<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Connect to {SYNC_NAME}</NavItem>}

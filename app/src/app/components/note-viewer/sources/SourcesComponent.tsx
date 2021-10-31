@@ -1,11 +1,12 @@
 import React from 'react';
-import { Button, Icon, Modal, TextInput } from 'react-materialize';
+import { Button, Icon, TextInput } from 'react-materialize';
 import { Dialog } from '../../../services/dialogs';
 import { DEFAULT_MODAL_OPTIONS } from '../../../util';
 import { sourcesConnector } from './SourcesContainer';
 import { ConnectedProps } from 'react-redux';
 import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
+import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
 
 const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 	const { note, element } = props;
@@ -22,7 +23,7 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 	));
 
 	return (
-		<Modal
+		<SingletonModalComponent
 			header="Bibliography"
 			trigger={
 				<Button flat small waves="light" style={{ padding: '0' }}>
@@ -36,7 +37,7 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 			<br /><br />
 
 			{sources}
-		</Modal>
+		</SingletonModalComponent>
 	);
 
 	function onSourceEdit(id: number, value: string, note: Note) {

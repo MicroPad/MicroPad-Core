@@ -1,6 +1,6 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { noEmit } from '../util';
-import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, delay, filter, map, switchMap, tap } from 'rxjs/operators';
 import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
 import * as localforage from 'localforage';
 import { Action, Success } from 'redux-typescript-actions';
@@ -76,10 +76,37 @@ export const persistTheme$ = (action$: Observable<MicroPadAction>) =>
 		noEmit()
 	);
 
+export const openModal$ = (action$: Observable<MicroPadAction>) =>
+	action$.pipe(
+		ofType<MicroPadAction, Action<string>>(actions.openModal.type),
+		delay(0), // put us on the next frame of the event loop so the modal can get into the DOM
+		tap(action => openModal(action.payload)),
+		noEmit()
+	);
+
 export const appEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
 	closeDrawingEditorOnZoom$,
 	saveHelpPreference$,
 	revertHelpPrefOnHelpLoad$,
 	checkVersion$,
-	persistTheme$
+	persistTheme$,
+	openModal$
 );
+
+function openModal(id: string) {
+	const modalEl = document.getElementById(id);
+	if (!modalEl) {
+		throw new Error(`${id} is not a modal because it doesn't exist in th DOM.`);
+	}
+
+	open();
+	function open() {
+		setTimeout(() => {
+			try {
+				M.Modal.getInstance(document.getElementById(id)!).open();
+			} catch (e) {
+				open();
+			}
+		}, 0);
+	}
+}

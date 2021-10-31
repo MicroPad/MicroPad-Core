@@ -1,12 +1,13 @@
 import './SearchComponent.css';
 import React from 'react';
-import { Icon, Modal, NavItem } from 'react-materialize';
+import { Icon, NavItem } from 'react-materialize';
 import { ConnectedProps } from 'react-redux';
 import { searchConnector } from './SearchContainer';
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
 import Select from 'react-select';
 import { GroupTypeBase, OptionTypeBase } from 'react-select/src/types';
 import { SearchResult } from '../../reducers/SearchReducer';
+import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
 
 type Props = ConnectedProps<typeof searchConnector>;
 
@@ -22,7 +23,7 @@ export default class SearchComponent extends React.Component<Props, never> {
 		];
 
 		return (
-			<Modal
+			<SingletonModalComponent
 				id="search-modal"
 				key={`search-${this.props.notepad?.title ?? 'all'}`}
 				header="Search"
@@ -110,12 +111,10 @@ export default class SearchComponent extends React.Component<Props, never> {
 						input: (styles, props) => ({
 							...styles,
 							color: 'var(--mp-theme-explorerContent)'
-						}),
-
+						})
 					}}
 				/>
-
-			</Modal>
+			</SingletonModalComponent>
 		);
 	}
 
