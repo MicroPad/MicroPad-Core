@@ -133,7 +133,7 @@ const openNotepadFromStorage$ = (action$: Observable<MicroPadAction>, store: Epi
 				}),
 				mergeMap((res: EncryptNotepadAction) => [
 					actions.addCryptoPasskey({ notepadTitle: res.notepad.title, passkey: res.passkey, remember: res.rememberKey }),
-					actions.openNotepadFromStorage.done({ params: '', result: undefined }),
+					actions.openNotepadFromStorage.done({ params: notepadTitle, result: undefined }),
 					actions.parseNpx.done({ params: '', result: res.notepad.flatten() }),
 				]),
 				catchError(err => {
@@ -141,11 +141,14 @@ const openNotepadFromStorage$ = (action$: Observable<MicroPadAction>, store: Epi
 
 					if (err instanceof DecryptionError) {
 						Dialog.alert(err.message);
+						return of(
+							actions.openNotepadFromStorage.failed({ params: notepadTitle, error: err })
+						);
 					} else {
 						Dialog.alert(`There was an error opening your notebook`);
 					}
 
-					return of(actions.openNotepadFromStorage.failed(err));
+					return of(actions.openNotepadFromStorage.failed({ params: notepadTitle, error: err }));
 				})
 			)
 		)
