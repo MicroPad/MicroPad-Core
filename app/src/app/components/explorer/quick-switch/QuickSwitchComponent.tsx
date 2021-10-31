@@ -14,10 +14,9 @@ const QuickSwitchComponent = (props: Props) => {
 	const selectEl = useRef<HTMLElement | null>(null);
 	const [menuIsOpen, setResultVisibility] = useState(false);
 
-	const results: ReadonlyArray<{ label: string; value: string }> = props.notepadTitles.map(title => ({
-		label: title,
-		value: title
-	}));
+	const results: ReadonlyArray<{ label: string; value: string }> = props.notepadTitles
+		.filter(title => title !== props.currentTitle)
+		.map(title => ({ label: title, value: title }));
 
 	return (
 		<Modal
@@ -31,6 +30,14 @@ const QuickSwitchComponent = (props: Props) => {
 					setTimeout(() => selectEl.current?.focus(), 0);
 				}
 			}}>
+
+			<p>
+				<em>
+					Fun fact: You can quickly open this switcher by pressing <strong>Ctrl + K</strong> or <strong>⌘ + K</strong>!{' '}
+					See the <strong>Shortcuts</strong> note in the <strong>Help</strong> notebook for more ways{' '}
+					to avoid using a mouse.
+				</em>
+			</p>
 
 			<Select
 				ref={el => selectEl.current = (el as unknown as HTMLElement)}
