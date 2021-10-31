@@ -37,6 +37,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 
 	private isErasing = false;
 	private isRainbow = false;
+	private drawColour = '#000000';
 	private rainbowIndex = 0;
 
 	render() {
@@ -271,7 +272,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 				: this.rainbowIndex * -1
 			: this.rainbowIndex;
 
-		return (this.isRainbow) ? rainbow[this.rainbowIndex += newIndex] : '#000000';
+		return (this.isRainbow) ? rainbow[this.rainbowIndex += newIndex] : this.drawColour;
 	}
 
 	// Draws the outline of a line from pos1 to pos2 with the given width
