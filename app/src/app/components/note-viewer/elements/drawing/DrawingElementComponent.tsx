@@ -51,20 +51,20 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 	private drawColour = colours.BLACK;
 	private rainbowIndex = 0;
 
-        private setDrawColour = (e, colour) => {
-                this.drawColour = colour;
-                this.isErasing = false;
-                this.isRainbow = false;
+	private setDrawColour = (e, colour) => {
+		this.drawColour = colour;
+		this.isErasing = false;
+		this.isRainbow = false;
 
-                // Complete hack, but I don't know how to actually implement radio buttons
-                // Also doesn't really work when clicking on colours multiple times
-                // but it's enough to demo the idea
-                var buttons = Array.from((e.target as HTMLInputElement).parentNode.parentNode.parentNode.children);
-                buttons.forEach(b => b.firstChild.firstChild.checked = false);
-                (e.target as HTMLInputElement).checked = true;
-                console.log((e.target as HTMLInputElement).checked);
+		// Complete hack, but I don't know how to actually implement radio buttons
+		// Also doesn't really work when clicking on colours multiple times
+		// but it's enough to demo the idea
+		var buttons = Array.from((e.target as HTMLInputElement).parentNode.parentNode.parentNode.children);
+		buttons.forEach(b => b.firstChild.firstChild.checked = false);
+		(e.target as HTMLInputElement).checked = true;
+		console.log((e.target as HTMLInputElement).checked);
 
-        }
+	}
 
 	render() {
 		const { element, noteAssets, elementEditing, theme } = this.props;
@@ -322,7 +322,9 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 				: this.rainbowIndex * -1
 			: this.rainbowIndex;
 
-		return (this.isRainbow) ? rainbow[this.rainbowIndex += newIndex] : this.drawColour;
+
+		return (this.isRainbow) ? rainbow[this.rainbowIndex += newIndex]
+					: this.drawColour;
 	}
 
 	// Draws the outline of a line from pos1 to pos2 with the given width
