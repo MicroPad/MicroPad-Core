@@ -119,8 +119,7 @@ export const download$ = (action$: Observable<MicroPadAction>, store: EpicStore)
 		concatMap((syncId: string) =>
 			DifferenceEngine.SyncService.downloadNotepad(syncId).pipe(
 				switchMap((remoteNotepad: ISyncedNotepad) => {
-					let localNotepad = (((store.getState() as IStoreState).notepads ||{} as INotepadStoreState).notepad ||{} as INotepadStoreState).item;
-					if (!localNotepad) localNotepad = new FlatNotepad('');
+					const localNotepad: FlatNotepad = store.getState().notepads?.notepad?.item ?? new FlatNotepad('');
 
 					return from(DifferenceEngine.SyncService.notepadToSyncedNotepad(localNotepad.toNotepad())).pipe(
 						switchMap((local: ISyncedNotepad) => {

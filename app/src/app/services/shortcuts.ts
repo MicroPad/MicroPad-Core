@@ -14,7 +14,13 @@ export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction
 		openModal('search-modal');
 	});
 
-	// Quick Notepad Switch
+	// Quick Notepad Switch (modal)
+	mousetrap.bind('mod+k', e => {
+		e.preventDefault();
+		openModal('quick-switch-modal');
+	});
+
+	// Quick Notepad Switch (old)
 	Array.from(Array(9).keys()).map(n => n + 1).forEach(n => {
 		mousetrap.bind(`mod+${n}`, e => {
 			e.preventDefault();

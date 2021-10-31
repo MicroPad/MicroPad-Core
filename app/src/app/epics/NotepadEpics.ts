@@ -129,14 +129,22 @@ const parseMarkdownImport$ = (action$: Observable<MicroPadAction>) =>
 		map((np: Notepad) => actions.parseNpx.done({ params: '', result: np.flatten() }))
 	);
 
-const restoreJsonNotepad$ = (action$: Observable<MicroPadAction>) =>
+// This is what's used in sync. It is more active to prompt for passkeys than other variants
+const restoreJsonNotepad$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<string>>(actions.restoreJsonNotepad.type),
 		map((action: Action<string>) => action.payload),
 		switchMap((json: string) => from((async () => {
 			try {
 				const shell: NotepadShell = JSON.parse(json);
-				const res = await fromShell(shell);
+				let res: EncryptNotepadAction;
+
+				const passkey: string | undefined = store.getState().notepadPasskeys[shell.title];
+				if (passkey) {
+					res = await fromShell(shell, passkey).catch(() => fromShell(shell));
+				} else {
+					res = await fromShell(shell)
+				}
 
 				return [
 					actions.addCryptoPasskey({

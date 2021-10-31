@@ -1,0 +1,7 @@
+#quick-switch-modal {
+	overflow: visible;
+}
+
+.quick-switch__autocomplete {
+	z-index: 10;
+}
