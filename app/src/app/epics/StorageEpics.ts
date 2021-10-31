@@ -132,8 +132,8 @@ const openNotepadFromStorage$ = (action$: Observable<MicroPadAction>, store: Epi
 					return from(fromShell(JSON.parse(json!), store.getState().notepadPasskeys[notepadTitle]));
 				}),
 				mergeMap((res: EncryptNotepadAction) => [
-					actions.addCryptoPasskey({ notepadTitle: res.notepad.title, passkey: res.passkey }),
-					actions.openNotepadFromStorage.done({ params: '', result: undefined }),
+					actions.addCryptoPasskey({ notepadTitle: res.notepad.title, passkey: res.passkey, remember: res.rememberKey }),
+					actions.openNotepadFromStorage.done({ params: notepadTitle, result: undefined }),
 					actions.parseNpx.done({ params: '', result: res.notepad.flatten() }),
 				]),
 				catchError(err => {
@@ -141,11 +141,14 @@ const openNotepadFromStorage$ = (action$: Observable<MicroPadAction>, store: Epi
 
 					if (err instanceof DecryptionError) {
 						Dialog.alert(err.message);
+						return of(
+							actions.openNotepadFromStorage.failed({ params: notepadTitle, error: err })
+						);
 					} else {
 						Dialog.alert(`There was an error opening your notebook`);
 					}
 
-					return of(actions.openNotepadFromStorage.failed(err));
+					return of(actions.openNotepadFromStorage.failed({ params: notepadTitle, error: err }));
 				})
 			)
 		)
@@ -247,9 +250,15 @@ const clearLastOpenedNotepad$ = (action$: Observable<MicroPadAction>) =>
 		noEmit()
 	);
 
-const clearOldData$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+const clearOldData$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<{ silent: boolean }>>(actions.clearOldData.started.type),
+		tap(action => {
+			// Clear saved crypto passwords if the user clicked the manual button
+			if (!action.payload.silent) {
+				getStorage().cryptoPasskeysStorage.clear().catch(err => console.error(err));
+			}
+		}),
 		concatMap(action =>
 			from(cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store.getState(), action.payload.silent)).pipe(
 				mergeMap((addPasskeyActions: Action<AddCryptoPasskeyAction>[]) => [
@@ -317,7 +326,7 @@ async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: Loc
 	const areNotepadsStillEncrypted = !!resolvedNotepadsOrErrors.find(res => res instanceof Error);
 
 	const resolvedNotepads = resolvedNotepadsOrErrors.filter((res): res is EncryptNotepadAction => !(res instanceof Error)).map((cryptoInfo: EncryptNotepadAction) => {
-		cryptoPasskeys.push(actions.addCryptoPasskey({ notepadTitle: cryptoInfo.notepad.title, passkey: cryptoInfo.passkey }));
+		cryptoPasskeys.push(actions.addCryptoPasskey({ notepadTitle: cryptoInfo.notepad.title, passkey: cryptoInfo.passkey, remember: false }));
 		return cryptoInfo.notepad;
 	});
 

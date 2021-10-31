@@ -141,7 +141,8 @@ const restoreJsonNotepad$ = (action$: Observable<MicroPadAction>) =>
 				return [
 					actions.addCryptoPasskey({
 						notepadTitle: res.notepad.title,
-						passkey: res.passkey
+						passkey: res.passkey,
+						remember: res.rememberKey
 					}),
 					actions.parseNpx.done({
 						params: '',
@@ -165,6 +166,7 @@ const restoreJsonNotepad$ = (action$: Observable<MicroPadAction>) =>
 		mergeMap((restoreActions: Action<any>[]) => [...restoreActions])
 	);
 
+type DecryptedShellContainer = Omit<EncryptNotepadAction, 'notepad'> & { notepad: FlatNotepad, noteRef: string };
 const restoreJsonNotepadAndLoadNote$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<RestoreJsonNotepadAndLoadNoteAction>>(actions.restoreJsonNotepadAndLoadNote.type),
@@ -174,8 +176,7 @@ const restoreJsonNotepadAndLoadNote$ = (action$: Observable<MicroPadAction>, sto
 				switchMap(notepadJson =>
 					from(fromShell(JSON.parse(notepadJson!), store.getState().notepadPasskeys[result.notepadTitle]))
 				),
-				map(({ notepad, passkey }) => ({ notepad: notepad.flatten(), passkey })),
-				map(({ notepad, passkey }): [string, FlatNotepad, string] => [result.noteRef, notepad, passkey]),
+				map((res): DecryptedShellContainer => ({ ...res, notepad: res.notepad.flatten(), noteRef: result.noteRef })),
 				catchError(err => {
 					console.error(err);
 
@@ -189,10 +190,10 @@ const restoreJsonNotepadAndLoadNote$ = (action$: Observable<MicroPadAction>, sto
 			)
 		),
 		filterTruthy(),
-		concatMap(([noteRef, notepad, passkey]: [string, FlatNotepad, string]) => [
-			actions.addCryptoPasskey({ notepadTitle: notepad.title, passkey }),
-			actions.parseNpx.done({ params: '', result: notepad }),
-			actions.loadNote.started(noteRef)
+		concatMap(res => [
+			actions.addCryptoPasskey({ notepadTitle: res.notepad.title, passkey: res.passkey, remember: res.rememberKey }),
+			actions.parseNpx.done({ params: '', result: res.notepad }),
+			actions.loadNote.started(res.noteRef)
 		])
 	);
 
@@ -501,7 +502,8 @@ const moveObjAcrossNotepads$ = (actions$: Observable<MicroPadAction>, store: Epi
 				return [
 					actions.addCryptoPasskey({
 						notepadTitle: decryptedShell.notepad.title,
-						passkey: decryptedShell.passkey
+						passkey: decryptedShell.passkey,
+						remember: decryptedShell.rememberKey
 					}),
 					actions.parseNpx.done({
 						params: '',

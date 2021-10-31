@@ -155,13 +155,13 @@ strong {
 }
 
 /* The background of the checked box */
-#app [type=checkbox].filled-in:checked+span:not(.lever):after {
+#app [type=checkbox].filled-in:checked+span:not(.lever):after, .vex [type=checkbox].filled-in:checked+span:not(.lever):after {
 	background-color: var(--mp-theme-accent);
 	border: 2px solid #5a5a5a;
 }
 
 /* The tick */
-#app [type=checkbox].filled-in:checked+span:not(.lever):before {
+#app [type=checkbox].filled-in:checked+span:not(.lever):before, .vex [type=checkbox].filled-in:checked+span:not(.lever):before {
 	border-right: 2px solid var(--mp-theme-accentContent);
 	border-bottom: 2px solid var(--mp-theme-accentContent);
 }

@@ -67,13 +67,15 @@ export type MoveNotepadObjectAction = {
 };
 
 export type EncryptNotepadAction = {
-	notepad: Notepad;
-	passkey: string;
+	notepad: Notepad,
+	passkey: string,
+	rememberKey: boolean
 };
 
 export type AddCryptoPasskeyAction = {
-	notepadTitle?: string;
-	passkey: string;
+	notepadTitle?: string,
+	passkey: string,
+	remember: boolean
 };
 
 export type SearchIndex = {

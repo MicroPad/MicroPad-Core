@@ -47,6 +47,7 @@ import { createSentryReduxEnhancer } from '../sentry';
 import { createDynamicCss } from './DynamicAppCss';
 import { hasRequiredFeatures } from '../unsupported-page/feature-detect';
 import { showUnsupportedPage } from '../unsupported-page/show-page';
+import { restoreSavedPasswords } from './services/CryptoService';
 
 window.MicroPadGlobals = {};
 
@@ -62,6 +63,8 @@ export const store = createStore(
 	baseReducer.initialState,
 	composeWithDevTools(compose(applyMiddleware(epicMiddleware), createSentryReduxEnhancer()))
 );
+
+export type MicroPadStore = typeof store;
 
 export const TOAST_HANDLER = new ToastEventHandler();
 
@@ -85,11 +88,17 @@ export const SETTINGS_STORAGE = localforage.createInstance({
 	storeName: 'settings'
 });
 
+export const CRYPTO_PASSKEYS_STORAGE = localforage.createInstance({
+	name: 'MicroPad',
+	storeName: 'cryptoPasskeys'
+});
+
 export type StorageMap = {
 	notepadStorage: LocalForage,
 	assetStorage: LocalForage,
 	syncStorage: LocalForage,
 	settingsStorage: LocalForage,
+	cryptoPasskeysStorage: LocalForage,
 
 	/** @deprecated Use settingsStorage instead */
 	generalStorage: LocalForage
@@ -101,6 +110,7 @@ export function getStorage(): StorageMap {
 		assetStorage: ASSET_STORAGE,
 		syncStorage: SYNC_STORAGE,
 		settingsStorage: SETTINGS_STORAGE,
+		cryptoPasskeysStorage: CRYPTO_PASSKEYS_STORAGE,
 		generalStorage: localforage
 	};
 }
@@ -160,6 +170,8 @@ export function getStorage(): StorageMap {
 async function hydrateStoreFromLocalforage() {
 	await Promise.all(Object.values(getStorage()).map(storage => storage.ready()));
 
+	const restoreSavedPasswords$ = restoreSavedPasswords(store, CRYPTO_PASSKEYS_STORAGE);
+
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
 
@@ -177,6 +189,8 @@ async function hydrateStoreFromLocalforage() {
 
 	const theme = await localforage.getItem<ThemeName>('theme');
 	if (!!theme) store.dispatch(actions.selectTheme(theme));
+
+	await restoreSavedPasswords$;
 
 	// Reopen the last notebook + note
 	const lastOpenedNotepad = await localforage.getItem<string | LastOpenedNotepad>('last opened notepad');
