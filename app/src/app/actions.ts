@@ -121,7 +121,8 @@ export const actions = {
 	feelingLucky: actionCreator<void>('FEELING_LUCKY'),
 	setSearchResultVisibility: actionCreator<boolean>('SET_SEARCH_RESULT_VISIBILITY'),
 	toggleSpellCheck: actionCreator<boolean | void>('TOGGLE_SPELL_CHECK'),
-	toggleWordWrap: actionCreator<boolean | void>('TOGGLE_WORD_WRAP')
+	toggleWordWrap: actionCreator<boolean | void>('TOGGLE_WORD_WRAP'),
+	openModal: actionCreator<string>('OPEN_MODAL')
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([

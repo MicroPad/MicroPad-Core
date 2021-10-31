@@ -1,11 +1,12 @@
 import React from 'react';
-import { Button, Modal } from 'react-materialize';
+import { Button } from 'react-materialize';
 import { MICROPAD_URL, SYNC_NAME } from '../../types';
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
+import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
 
 export const SyncProErrorComponent = () => (
 	/* eslint-disable jsx-a11y/anchor-has-content */
-	<Modal
+	<SingletonModalComponent
 		id="sync-pro-error-modal"
 		header="Good and bad news"
 		options={DEFAULT_MODAL_OPTIONS}>
@@ -21,5 +22,5 @@ export const SyncProErrorComponent = () => (
 
 			<Button className="accent-btn" waves="light" onClick={() => window.open(`${MICROPAD_URL}/sync/manage`, '_blank')}>Upgrade here</Button>
 		</div>
-	</Modal>
+	</SingletonModalComponent>
 );

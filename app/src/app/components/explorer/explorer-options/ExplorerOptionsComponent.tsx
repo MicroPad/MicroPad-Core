@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { Button, Col, Icon, Modal, Row, TextInput } from 'react-materialize';
+import { Button, Col, Icon, Row, TextInput } from 'react-materialize';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import PathChangeComponent from '../path-change/PathChangeContainer';
@@ -8,6 +8,7 @@ import { ConnectedProps } from 'react-redux';
 import { explorerOptionsConnector } from './ExplorerOptionsContainer';
 import MoveComponent from '../move/MoveContainer';
 import { DEFAULT_MODAL_OPTIONS, generateGuid } from '../../../util';
+import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
 
 type Props = ConnectedProps<typeof explorerOptionsConnector> & {
 	objToEdit: NPXObject | Notepad;
@@ -68,7 +69,7 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 		const modalId = `notepad-edit-object-modal-${(objToEdit as NPXObject).internalRef ?? generateGuid()}`
 
 		return (
-			<Modal
+			<SingletonModalComponent
 				id={modalId}
 				key={modalId}
 				header={`Options for ${objToEdit.title}`}
@@ -94,7 +95,7 @@ export default class ExplorerOptionsComponent extends React.Component<Props> {
 							</React.Fragment>
 					}
 				</div>
-			</Modal>
+			</SingletonModalComponent>
 		);
 	}
 
