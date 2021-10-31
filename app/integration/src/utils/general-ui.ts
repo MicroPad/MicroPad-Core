@@ -1,14 +1,20 @@
 /**
  * Get MicroPad loaded and happy just sitting in the initial state we want for most tests.
  */
+import { Page } from 'playwright';
+
 export async function stabiliseMicroPad() {
 	await openMicroPad()
 		.then(dismissWhatsNew);
 }
 
 export async function openMicroPad() {
-	await page.goto(process.env['MICROPAD_URL'] ?? 'http://localhost:3000?prod=1');
+	await openMicroPadRaw();
 	await page.waitForSelector('.brand-logo');
+}
+
+export async function openMicroPadRaw(myPage: Page = page) {
+	await myPage.goto(process.env['MICROPAD_URL'] ?? 'http://localhost:3000?prod=1&integration=1');
 }
 
 export async function dismissWhatsNew() {

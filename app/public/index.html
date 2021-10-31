@@ -34,13 +34,6 @@
 	Learn how to configure a non-root public URL by running `npm run build`.
 	-->
 
-<!--	<script type="module">-->
-<!--		addEventListener('error', function (event) {-->
-<!--			console.error(event);-->
-<!--			document.write(`<p>There was an error running MicroPad. Please report it to <a href="https://github.com/MicroPad/MicroPad-Core/issues">https://github.com/MicroPad/MicroPad-Core/issues</a>.</p>`);-->
-<!--			document.write(`More information: <pre>${event}</pre>`);-->
-<!--		});-->
-<!--	</script>-->
 	<script src="%PUBLIC_URL%/%BROWSER_CHECK_JS_PATH%"></script>
 	<script type="module" src="%PUBLIC_URL%/%INDEX_JS_PATH%"></script>
 	<script nomodule>document.write('A browser that supports ESM (modules) is required to run µPad.');</script>
@@ -78,10 +71,6 @@
 		window.addEventListener('load', function () {
 			loadingScreen.finish();
 		}, false);
-
-		if (navigator.storage && navigator.storage.persist) {
-			navigator.storage.persist();
-		}
 	</script>
 </body>
 </html>

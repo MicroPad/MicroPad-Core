@@ -1,3 +1,5 @@
+import { openMicroPadRaw } from './utils/general-ui';
+
 describe(`Unsupported Page`, () => {
 	it(`should show the unsupported page on unsupported devices`, async () => {
 		// Arrange
@@ -5,7 +7,7 @@ describe(`Unsupported Page`, () => {
 			userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11.1; rv:90.0) Gecko/20100101 Firefox/79.0'
 		});
 		const page = await context.newPage();
-		await page.goto(process.env['MICROPAD_URL'] ?? 'http://localhost:3000?prod=1');
+		await openMicroPadRaw(page);
 
 		// Act
 		const unsupportedDiv = await page.$('#unsupported-page');
@@ -21,7 +23,7 @@ describe(`Unsupported Page`, () => {
 			userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11.1; rv:90.0) Gecko/20100101 Firefox/79.0'
 		});
 		const page = await context.newPage();
-		await page.goto(process.env['MICROPAD_URL'] ?? 'http://localhost:3000?prod=1');
+		await openMicroPadRaw(page);
 
 		// Act + Assert
 		await page.$('#unsupported-page button').then(continueBtn => continueBtn!.click());
@@ -48,7 +50,7 @@ describe(`Unsupported Page`, () => {
 			userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11.1; rv:90.0) Gecko/20100101 Firefox/100.0'
 		});
 		const page = await context.newPage();
-		await page.goto(process.env['MICROPAD_URL'] ?? 'http://localhost:3000?prod=1');
+		await openMicroPadRaw(page);
 
 		// Act
 		const unsupportedDiv = await page.$('#unsupported-page');
