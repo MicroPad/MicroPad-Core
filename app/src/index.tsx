@@ -4,6 +4,7 @@ import { initWasm } from './app/init-wasm';
 
 // `window.isSupported` is set by the Unsupported Browser logic.
 if (window.isSupported) {
+	// eslint-disable-next-line no-restricted-globals
 	const params = new URLSearchParams(location.search);
 	const isInTest = params.has('integration');
 
