@@ -10,7 +10,8 @@ export const markdownElementContainer = connect(
 	}),
 	dispatch => ({
 		toggleSpellCheck: () => dispatch(actions.toggleSpellCheck()),
-		toggleWordWrap: () => dispatch(actions.toggleWordWrap())
+		toggleWordWrap: () => dispatch(actions.toggleWordWrap()),
+		openModal: (modal: string) => dispatch(actions.openModal(modal))
 	})
 );
 

@@ -19,6 +19,7 @@ export interface IAppStoreState {
 	showHelp: boolean;
 	theme: ThemeName;
 	explorerWidth: string;
+	currentModalId?: string;
 }
 
 export interface IVersion {
@@ -48,7 +49,12 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 	};
 
 	public reducer(state: IAppStoreState, action: Action): IAppStoreState {
-		if (isType(action, actions.flipFullScreenState)) {
+		if (isType(action, actions.openModal)) {
+			return {
+				...state,
+				currentModalId: action.payload
+			}
+		} else if (isType(action, actions.flipFullScreenState)) {
 			const zoom = state.isFullScreen ? this.initialState.zoom : state.zoom;
 
 			return {

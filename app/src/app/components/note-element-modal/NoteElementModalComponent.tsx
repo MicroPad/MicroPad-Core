@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import './NoteElementModalComponent.css';
 import { Converter, extension } from 'showdown';
 import { IShowdownOpts } from '../note-viewer/elements/markdown/MarkdownElementComponent';
-import { Modal } from 'react-materialize';
 import { Translators } from 'upad-parse';
 import { colourTransformer, fendTransformer } from '../note-viewer/elements/markdown/MarkdownTransformers';
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
 import { Note, Notepad } from 'upad-parse/dist';
+import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
 
 export type Props = {
 	npx: string,
@@ -28,7 +28,7 @@ const NoteElementModalComponent = (props: Props) => {
 	}
 
 	return (
-		<Modal
+		<SingletonModalComponent
 			id={props.id}
 			trigger={props.trigger}
 			fixedFooter={true}
@@ -37,7 +37,7 @@ const NoteElementModalComponent = (props: Props) => {
 			<div id="markdown-help" dangerouslySetInnerHTML={{
 				__html: renderedNote.html
 			}} />
-		</Modal>
+		</SingletonModalComponent>
 	);
 }
 export default NoteElementModalComponent;

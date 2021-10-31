@@ -213,12 +213,7 @@ async function displayWhatsNew() {
 
 	// Open "What's New"
 	setTimeout(() => {
-		const whatsNewModal = document.getElementById('whats-new-modal');
-		if (whatsNewModal) {
-			M.Modal.getInstance(whatsNewModal).open();
-		} else {
-			console.error('Missing whats new modal');
-		}
+		store.dispatch(actions.openModal('whats-new-modal'));
 	}, 0);
 
 	await localforage.setItem('oldMinorVersion', minorVersion);

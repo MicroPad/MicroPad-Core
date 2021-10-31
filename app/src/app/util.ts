@@ -128,12 +128,3 @@ export function unreachable() {
 }
 
 export function noop() {}
-
-export function openModal(id: string) {
-	const modalEl = document.getElementById(id);
-	if (!modalEl) {
-		throw new Error(`${id} is not a modal because it doesn't exist in th DOM.`);
-	}
-
-	M.Modal.getInstance(modalEl).open();
-}

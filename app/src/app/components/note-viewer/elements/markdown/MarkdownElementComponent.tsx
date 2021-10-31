@@ -10,7 +10,7 @@ import * as MarkDownViewer from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
-import { debounce, openModal } from '../../../../util';
+import { debounce } from '../../../../util';
 import { Button, Checkbox, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
@@ -309,7 +309,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 
 			case 'hashtag':
 				search(message.payload);
-				openModal('search-modal');
+				this.props.openModal('search-modal');
 				break;
 
 			case 'link':
