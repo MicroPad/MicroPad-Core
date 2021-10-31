@@ -247,9 +247,15 @@ const clearLastOpenedNotepad$ = (action$: Observable<MicroPadAction>) =>
 		noEmit()
 	);
 
-const clearOldData$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+const clearOldData$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<{ silent: boolean }>>(actions.clearOldData.started.type),
+		tap(action => {
+			// Clear saved crypto passwords if the user clicked the manual button
+			if (!action.payload.silent) {
+				getStorage().cryptoPasskeysStorage.clear().catch(err => console.error(err));
+			}
+		}),
 		concatMap(action =>
 			from(cleanHangingAssets(NOTEPAD_STORAGE, ASSET_STORAGE, store.getState(), action.payload.silent)).pipe(
 				mergeMap((addPasskeyActions: Action<AddCryptoPasskeyAction>[]) => [

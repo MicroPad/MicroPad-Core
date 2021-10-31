@@ -2,7 +2,10 @@ import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { Notepad, Translators } from 'upad-parse/dist';
 import { Dialog, RememberMePromptRes } from './dialogs';
 import { decrypt } from 'upad-parse/dist/crypto';
-import { EncryptNotepadAction } from '../types/ActionTypes';
+import { AddCryptoPasskeyAction, EncryptNotepadAction } from '../types/ActionTypes';
+import { Action } from 'redux-typescript-actions';
+import { actions } from '../actions';
+import { MicroPadStore } from '../root';
 
 export class DecryptionError extends Error {
 	constructor (error: Error) {
@@ -40,4 +43,21 @@ export async function fromShell(shell: NotepadShell, key?: string): Promise<Encr
 		passkey: passkey.secret,
 		rememberKey: passkey.remember
 	};
+}
+
+export async function restoreSavedPasswords(store: MicroPadStore, storage: LocalForage): Promise<void> {
+	const keys = await storage.keys();
+
+	const forks: Promise<Action<AddCryptoPasskeyAction>>[] = keys.map(async notepadTitle =>
+		store.dispatch(
+			actions.addCryptoPasskey({
+				notepadTitle,
+				passkey: await storage.getItem<string>(notepadTitle) ?? '',
+				remember: false // It's already remembered!
+			})
+		)
+	);
+
+	// Join
+	await Promise.all(forks);
 }
