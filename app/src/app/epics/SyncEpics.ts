@@ -359,10 +359,7 @@ export const clearStorageOnLogout$ = (action$: Observable<MicroPadAction>) =>
 export const openSyncProErrorModal$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		ofType<MicroPadAction>(actions.syncProError.type),
-		map(() => document.getElementById('sync-pro-error-modal')),
-		filterTruthy(),
-		tap(modalEl => M.Modal.getInstance(modalEl).open()),
-		noEmit()
+		map(() => actions.openModal('sync-pro-error-modal'))
 	);
 
 export const syncEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
