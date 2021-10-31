@@ -4,10 +4,13 @@ import { initWasm } from './app/init-wasm';
 
 // `window.isSupported` is set by the Unsupported Browser logic.
 if (window.isSupported) {
-	if (navigator.storage && navigator.storage.persist) {
+	const params = new URLSearchParams(location.search);
+	const isInTest = params.has('integration');
+
+	if (!isInTest && navigator.storage && navigator.storage.persist) {
 		navigator.storage.persist().then(storageAllowed => {
 			if (!storageAllowed) {
-				alert(`Failed to get permission for long-term storage. Notebooks may be removed from your devices storage under storage pressure.`);
+				console.warn(`Failed to get permission for long-term storage. Notebooks may be removed from your devices storage under storage pressure.`);
 			}
 			initMicroPad();
 		});
