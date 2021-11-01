@@ -52,6 +52,9 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 	private rainbowIndex = 0;
 
 	private setDrawColour = (e, colour) => {
+		console.log(e.target);
+		console.log(e.target.value);
+		console.log(colour);
 		this.drawColour = colour;
 		this.isErasing = false;
 		this.isRainbow = false;
@@ -59,11 +62,11 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 		// Complete hack, but I don't know how to actually implement radio buttons
 		// Also doesn't really work when clicking on colours multiple times
 		// but it's enough to demo the idea
-		var buttons = Array.from((e.target as HTMLInputElement).parentNode.parentNode.parentNode.children);
+		/*var buttons = Array.from((e.target as HTMLInputElement).parentNode.parentNode.parentNode.children);
 		buttons.forEach(b => b.firstChild.firstChild.checked = false);
 		(e.target as HTMLInputElement).checked = true;
 		console.log((e.target as HTMLInputElement).checked);
-
+		//*/
 	}
 
 	render() {
@@ -141,6 +144,9 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 						</Col>
 						<Col>
 							<Checkbox label="Purple" value="1" checked={this.drawColour === colours.PURPLE} filledIn onChange={e => this.setDrawColour(e, colours.PURPLE)} />
+						</Col>
+						<Col>
+							<input type="color" value={this.drawColour} onChange={e => this.setDrawColour(e, e.target.value)} />
 						</Col>
 					</Row>
 
