@@ -37,6 +37,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 
 	private isErasing = false;
 	private isRainbow = false;
+        private drawColour = "#000000";
 	private rainbowIndex = 0;
 
 	private setDrawColour = (e, colour) => {
