@@ -20,17 +20,6 @@ const rainbow = [
 	'#760089'
 ];
 
-const colours = {
-        BLACK  : '#000000',
-        WHITE  : '#FFFFFF',
-        RED    : '#E70000',
-        YELLOW : '#FFEF00',
-        GREEN  : '#00811F',
-        BLUE   : '#0044FF',
-        ORANGE : '#FF8C00',
-        PURPLE : '#760089'
-};
-
 export interface IDrawingElementComponentProps extends INoteElementComponentProps {
 	isFullScreen: boolean;
 }
