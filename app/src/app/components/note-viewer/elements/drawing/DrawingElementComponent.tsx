@@ -122,34 +122,9 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 							<Checkbox label="Rainbow Mode 🏳️‍🌈" value="1" checked={this.isRainbow} filledIn onChange={e => this.isRainbow = (e.target as HTMLInputElement).checked} />
 						</Col>
 						<Col>
-							<Checkbox label="Black" value="1" checked={this.drawColour === colours.BLACK} filledIn onChange={e => this.setDrawColour(e, colours.BLACK)} />
-						</Col>
-						<Col>
-							<Checkbox label="White" value="1" checked={this.drawColour === colours.WHITE} filledIn onChange={e => this.setDrawColour(e, colours.WHITE)} />
-						</Col>
-						<Col>
-							<Checkbox label="Red" value="1" checked={this.drawColour === colours.RED} filledIn onChange={e => this.setDrawColour(e, colours.RED)} />
-						</Col>
-						<Col>
-							<Checkbox label="Yellow" value="1" checked={this.drawColour === colours.YELLOW} filledIn onChange={e => this.setDrawColour(e, colours.YELLOW)} />
-						</Col>
-						<Col>
-							<Checkbox label="Green" value="1" checked={this.drawColour === colours.GREEN} filledIn onChange={e => this.setDrawColour(e, colours.GREEN)} />
-						</Col>
-						<Col>
-							<Checkbox label="Blue" value="1" checked={this.drawColour === colours.BLUE} filledIn onChange={e => this.setDrawColour(e, colours.BLUE)} />
-						</Col>
-						<Col>
-							<Checkbox label="Orange" value="1" checked={this.drawColour === colours.ORANGE} filledIn onChange={e => this.setDrawColour(e, colours.ORANGE)} />
-						</Col>
-						<Col>
-							<Checkbox label="Purple" value="1" checked={this.drawColour === colours.PURPLE} filledIn onChange={e => this.setDrawColour(e, colours.PURPLE)} />
-						</Col>
-						<Col>
-							<input type="color" value={this.drawColour} onChange={e => this.setDrawColour(e, e.target.value)} />
+							<input type="color" defaultValue={this.drawColour} onChange={e => this.setDrawColour(e, e.target.value)} />
 						</Col>
 					</Row>
-
 					{!this.supportsPointerEvents && <p><em>Your browser seems to not support pointer events. Drawing may not work.</em></p>}
 				</div>
 			);
