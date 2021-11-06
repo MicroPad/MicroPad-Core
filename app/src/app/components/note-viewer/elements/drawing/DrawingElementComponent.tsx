@@ -21,9 +21,9 @@ const rainbow = [
 ];
 
 const modes = {
-	COLOUR:  'Colour',
+	COLOUR: 'Colour',
 	RAINBOW: 'Rainbow',
-	ERASER:  'Eraser',
+	ERASER: 'Eraser',
 };
 
 
