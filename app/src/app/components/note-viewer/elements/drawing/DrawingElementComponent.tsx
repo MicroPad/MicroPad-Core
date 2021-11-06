@@ -20,6 +20,13 @@ const rainbow = [
 	'#760089'
 ];
 
+const modes = {
+	COLOUR:'Colour',
+	RAINBOW:'Rainbow',
+	ERASER:'Eraser',
+};
+
+
 export interface IDrawingElementComponentProps extends INoteElementComponentProps {
 	isFullScreen: boolean;
 }
@@ -35,15 +42,22 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 	private ongoingTouches = new OngoingTouches();
 	private canvasImage?: Blob | null;
 
-	private isErasing = false;
-	private isRainbow = false;
-        private drawColour = "#000000";
+	private drawingMode = modes.COLOUR;
+	private drawColour = "#000000";
 	private rainbowIndex = 0;
 
 	private setDrawColour = (e, colour) => {
 		this.drawColour = colour;
-		this.isErasing = false;
-		this.isRainbow = false;
+		this.drawingMode = "Colour";
+	}
+
+	private setMode = (e, mode) => {
+		this.drawingMode = mode;
+	}
+
+	private clearModeSelection = e => {
+		e.target.value = "";
+		e.target.placeholder = this.drawingMode;
 	}
 
 	render() {
@@ -93,13 +107,25 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 
 					<Row style={{ padding: '5px' }}>
 						<Col>
-							<Checkbox label="Erase Mode" value="1" checked={this.isErasing} filledIn onChange={e => this.isErasing = (e.target as HTMLInputElement).checked} />
+							<input type="text" list="drawing-modes" autoComplete="off" placeholder={this.drawingMode} onClick={this.clearModeSelection} onChange={e => this.setMode(e, e.target.value)}/>
+							<datalist key="drawing-modes" id="drawing-modes">
+								<option value={modes.COLOUR}/>
+								<option value={modes.RAINBOW}/>
+								<option value={modes.ERASER}/>
+							</datalist>
 						</Col>
 						<Col>
-							<Checkbox label="Rainbow Mode 🏳️‍🌈" value="1" checked={this.isRainbow} filledIn onChange={e => this.isRainbow = (e.target as HTMLInputElement).checked} />
-						</Col>
-						<Col>
-							<input type="color" defaultValue={this.drawColour} onChange={e => this.setDrawColour(e, e.target.value)} />
+							<input type="color" list="mp-drawing-colours" defaultValue={this.drawColour} onChange={e => this.setDrawColour(e, e.target.value)}/>
+							<datalist key="mp-drawing-colours" id="mp-drawing-colours">
+								<option value="#000000">Black</option>
+								<option value="#FFFFFF">White</option>
+								<option value="#E70000">Red</option>
+								<option value="#FFEF00">Yellow</option>
+								<option value="#00811F">Green</option>
+								<option value="#0044FF">Blue</option>
+								<option value="#FF8C00">Orange</option>
+								<option value="#760089">Purple</option>
+							</datalist>
 						</Col>
 					</Row>
 					{!this.supportsPointerEvents && <p><em>Your browser seems to not support pointer events. Drawing may not work.</em></p>}
@@ -128,8 +154,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 		const { element, noteAssets } = this.props;
 
 		this.ongoingTouches = new OngoingTouches();
-		this.isErasing = false;
-		this.isRainbow = false;
+		this.drawingMode = modes.COLOUR;
 		if (!!this.canvasElement) {
 			this.initCanvas();
 
@@ -269,20 +294,20 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 	}
 
 	private shouldErase = (event: PointerEvent): boolean => {
-		return this.isErasing || event.buttons === 32;
+		return (this.drawingMode == modes.ERASER) || event.buttons === 32;
 	}
 
 	private getLineStyle = (): string => {
 		// Increment through the colours of the rainbow and reset to the beginning when reaching the last colour
-		const newIndex = (this.isRainbow)
+		const newIndex = (this.drawingMode == modes.RAINBOW)
 			? (this.rainbowIndex < rainbow.length - 1)
 				? 1
 				: this.rainbowIndex * -1
 			: this.rainbowIndex;
 
 
-		return (this.isRainbow) ? rainbow[this.rainbowIndex += newIndex]
-					: this.drawColour;
+		return (this.drawingMode == modes.RAINBOW) 	? rainbow[this.rainbowIndex += newIndex]
+								: this.drawColour;
 	}
 
 	// Draws the outline of a line from pos1 to pos2 with the given width
