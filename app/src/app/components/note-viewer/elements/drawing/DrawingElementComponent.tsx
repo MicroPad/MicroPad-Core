@@ -2,7 +2,7 @@ import { INoteElementComponentProps } from '../NoteElementComponent';
 import React from 'react';
 import { trim } from './trim-canvas';
 import { Resizable } from 're-resizable';
-import { Checkbox, Col, Row } from 'react-materialize';
+import { Col, Row } from 'react-materialize';
 import stringify from 'json-stringify-safe';
 import * as FullScreenService from '../../../../services/FullscreenService';
 
@@ -21,9 +21,9 @@ const rainbow = [
 ];
 
 const modes = {
-	COLOUR:'Colour',
-	RAINBOW:'Rainbow',
-	ERASER:'Eraser',
+	COLOUR:  'Colour',
+	RAINBOW: 'Rainbow',
+	ERASER:  'Eraser',
 };
 
 
@@ -294,19 +294,19 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 	}
 
 	private shouldErase = (event: PointerEvent): boolean => {
-		return (this.drawingMode == modes.ERASER) || event.buttons === 32;
+		return (this.drawingMode === modes.ERASER) || event.buttons === 32;
 	}
 
 	private getLineStyle = (): string => {
 		// Increment through the colours of the rainbow and reset to the beginning when reaching the last colour
-		const newIndex = (this.drawingMode == modes.RAINBOW)
+		const newIndex = (this.drawingMode === modes.RAINBOW)
 			? (this.rainbowIndex < rainbow.length - 1)
 				? 1
 				: this.rainbowIndex * -1
 			: this.rainbowIndex;
 
 
-		return (this.drawingMode == modes.RAINBOW) 	? rainbow[this.rainbowIndex += newIndex]
+		return (this.drawingMode === modes.RAINBOW) 	? rainbow[this.rainbowIndex += newIndex]
 								: this.drawColour;
 	}
 
