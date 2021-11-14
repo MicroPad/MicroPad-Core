@@ -1,10 +1,10 @@
 import React from 'react';
 import './NoteElementComponent.css';
-import MarkdownElementComponent from './markdown/MarkdownElementContainer';
+import MarkdownElementComponent from './markdown/MarkdownElementConnector';
 import ImageElementComponent from './ImageElementComponent';
 import FileElementComponent from './FileElementComponent';
 import RecordingElement from './RecordingElementComponent';
-import DrawingElementComponent from './drawing/DrawingElementComponent';
+import DrawingElementComponent from './drawing/DrawingElementContainer';
 import { INoteViewerComponentProps } from '../NoteViewerComponent';
 import { Button, Icon, Row } from 'react-materialize';
 import Draggable, { DraggableData } from 'react-draggable';
@@ -33,7 +33,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 	private isDragging = false;
 
 	render() {
-		const { element, noteAssets, theme, search, downloadAsset, elementEditing, edit, updateElement, isFullscreen } = this.props;
+		const { element, noteAssets, theme, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
 		if (!theme) return null;
 
 		const isEditing = element.args.id === elementEditing;
@@ -122,8 +122,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					elementEditing={elementEditing}
 					updateElement={updateElement}
 					noteAssets={noteAssets}
-					edit={edit}
-					isFullScreen={isFullscreen!} />
+					edit={edit} />
 				);
 				break;
 

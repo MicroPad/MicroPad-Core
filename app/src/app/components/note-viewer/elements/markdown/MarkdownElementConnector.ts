@@ -3,10 +3,10 @@ import MarkdownElementComponent from './MarkdownElementComponent';
 import { IStoreState } from '../../../../types';
 import { actions } from '../../../../actions';
 
-export const markdownElementContainer = connect(
-	(store: IStoreState) => ({
-		shouldSpellCheck: store.editor.shouldSpellCheck,
-		shouldWordWrap: store.editor.shouldWordWrap
+export const markdownElementConnector = connect(
+	(state: IStoreState) => ({
+		shouldSpellCheck: state.editor.shouldSpellCheck,
+		shouldWordWrap: state.editor.shouldWordWrap
 	}),
 	dispatch => ({
 		toggleSpellCheck: () => dispatch(actions.toggleSpellCheck()),
@@ -15,4 +15,4 @@ export const markdownElementContainer = connect(
 	})
 );
 
-export default markdownElementContainer(MarkdownElementComponent);
+export default markdownElementConnector(MarkdownElementComponent);

@@ -19,7 +19,7 @@ import { colourTransformer, fendTransformer } from './MarkdownTransformers';
 import NoteElementModalComponent from '../../../note-element-modal/NoteElementModalComponent';
 import { BehaviorSubject } from 'rxjs';
 import { ConnectedProps } from 'react-redux';
-import { markdownElementContainer } from './MarkdownElementContainer';
+import { markdownElementConnector } from './MarkdownElementConnector';
 import { NotificationService } from '../../../../services/NotificationService';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
@@ -39,7 +39,7 @@ export interface IShowdownOpts extends ConverterOptions {
 	emoji: boolean;
 }
 
-type Props = ConnectedProps<typeof markdownElementContainer> & IMarkdownElementComponentProps;
+type Props = ConnectedProps<typeof markdownElementConnector> & IMarkdownElementComponentProps;
 
 export default class MarkdownElementComponent extends React.Component<Props> {
 	private iframe: HTMLIFrameElement | undefined;
