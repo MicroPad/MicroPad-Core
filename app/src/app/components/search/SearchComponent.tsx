@@ -4,12 +4,16 @@ import { Icon, NavItem } from 'react-materialize';
 import { ConnectedProps } from 'react-redux';
 import { searchConnector } from './SearchContainer';
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
-import Select from 'react-select';
-import { GroupTypeBase, OptionTypeBase } from 'react-select/src/types';
+import Select, { GroupBase } from 'react-select';
 import { SearchResult } from '../../reducers/SearchReducer';
 import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
 
 type Props = ConnectedProps<typeof searchConnector>;
+
+type SearchResultOption = {
+	label: string,
+	value: SearchResult & { notepadTitle: string }
+};
 
 export default class SearchComponent extends React.Component<Props, never> {
 	private selectEl: any | null = null;
@@ -53,8 +57,11 @@ export default class SearchComponent extends React.Component<Props, never> {
 					onInputChange={value => {
 						this.props.search(value);
 					}}
-					onChange={item => {
-						if (item) this.props.loadResult(this.props.notepad?.title, item.value);
+					// @ts-expect-error TS-2322, the type definitions from the library are wrong, they say we get a
+					// group as `item` but we really get the option.
+					onChange={(item: SearchResultOption) => {
+						console.log(item);
+						// if (item) this.props.loadResult(this.props.notepad?.title, item.value);
 						this.closeModal();
 					}}
 					value={null}
@@ -118,7 +125,12 @@ export default class SearchComponent extends React.Component<Props, never> {
 		);
 	}
 
-	private getSearchResultGroup = ([notepadTitle, results]: [string, SearchResult[]]): GroupTypeBase<OptionTypeBase> => {
+	private closeModal = () => {
+		const overlay: HTMLElement | null = document.querySelector('.modal-overlay');
+		if (!!overlay) overlay.click();
+	}
+
+	private getSearchResultGroup = ([notepadTitle, results]: [string, SearchResult[]]): GroupBase<SearchResultOption> => {
 		const seen = new Set<string>();
 
 		return {
@@ -138,10 +150,5 @@ export default class SearchComponent extends React.Component<Props, never> {
 				}))
 				.sort((a, b) => Math.abs(this.props.query.length - a.value.title.length) - Math.abs(this.props.query.length - b.value.title.length))
 		};
-	}
-
-	private closeModal = () => {
-		const overlay: HTMLElement | null = document.querySelector('.modal-overlay');
-		if (!!overlay) overlay.click();
 	}
 }

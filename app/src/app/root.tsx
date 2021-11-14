@@ -1,5 +1,5 @@
 /* Special Imports */
-// @ts-ignore
+// @ts-expect-error
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import helpNpx from './assets/Help.npx';
 /* CSS Imports */

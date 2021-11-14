@@ -12,11 +12,11 @@ import { NEW_SECTION_HELP, OPEN_NOTE_HELP, OPEN_NOTEPAD_HELP } from '../../types
 import DueDateListComponent from './due-date-list/DueDateListContainer';
 import AppSettingsComponent from './app-settings/AppSettingsContainer';
 
-// @ts-ignore
+// @ts-expect-error TS2307
 import NewSectionVideo from '../../assets/instructions/new-section.mp4';
-// @ts-ignore
+// @ts-expect-error
 import OpenNoteVideo from '../../assets/instructions/open-note.mp4';
-// @ts-ignore
+// @ts-expect-error
 import OpenNotepadVideo from '../../assets/instructions/open-notepad.mp4';
 import { notepadExplorerConnector } from './NotepadExplorerContainer';
 import { ConnectedProps } from 'react-redux';

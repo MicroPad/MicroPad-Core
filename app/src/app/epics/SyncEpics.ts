@@ -155,7 +155,7 @@ export const download$ = (action$: Observable<MicroPadAction>, store: EpicStore)
 						})
 					);
 				}),
-				// @ts-ignore TODO
+				// @ts-expect-error TODO
 				distinctUntilKeyChanged('lastModified'),
 				map((remoteNotepad: ISyncedNotepad) => actions.restoreJsonNotepad(stringify(remoteNotepad))),
 				catchError((error): Observable<Action<any>> => {
