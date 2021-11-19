@@ -1,5 +1,4 @@
 import React, { SyntheticEvent } from 'react';
-// @ts-ignore
 import { Icon, NavItem } from 'react-materialize';
 import JSZip from 'jszip';
 import { readFileInputEventAsText } from '../../../util';

@@ -1,8 +1,8 @@
 // MIT http://rem.mit-license.org
 
 export function trim(c) {
-	var ctx = c.getContext('2d'),
-		copy = document.createElement('canvas').getContext('2d'),
+	let ctx = c.getContext('2d'),
+		copy = document.createElement('canvas').getContext('2d')!,
 		pixels = ctx.getImageData(0, 0, c.width, c.height),
 		l = pixels.data.length,
 		i,
@@ -15,7 +15,7 @@ export function trim(c) {
 		x, y;
 
 	for (i = 0; i < l; i += 4) {
-		if (pixels.data[i+3] !== 0) {
+		if (pixels.data[i + 3] !== 0) {
 			x = (i / 4) % c.width;
 			y = ~~((i / 4) / c.width);
 
@@ -42,12 +42,12 @@ export function trim(c) {
 			}
 		}
 	}
-	bound.bottom++;
-	bound.right++;
+	bound.bottom!++;
+	bound.right!++;
 
-	var trimHeight = bound.bottom - bound.top,
-		trimWidth = bound.right - bound.left,
-		trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+	const trimHeight = bound.bottom! - bound.top!,
+		trimWidth = bound.right! - bound.left!,
+		trimmed = ctx.getImageData(bound.left!, bound.top!, trimWidth, trimHeight);
 
 	copy.canvas.width = trimWidth;
 	copy.canvas.height = trimHeight;

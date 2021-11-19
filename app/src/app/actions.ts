@@ -24,6 +24,7 @@ import { NoteElement } from 'upad-parse/dist/Note';
 import { SearchResults } from './reducers/SearchReducer';
 import { ThemeName } from './types/Themes';
 import { DueItem } from './services/DueDates';
+import { DrawMode } from './reducers/EditorReducer';
 
 export type MicroPadAction = ActionTypes[keyof ActionTypes];
 export type ActionNames = keyof ActionFactories;
@@ -122,7 +123,8 @@ export const actions = {
 	setSearchResultVisibility: actionCreator<boolean>('SET_SEARCH_RESULT_VISIBILITY'),
 	toggleSpellCheck: actionCreator<boolean | void>('TOGGLE_SPELL_CHECK'),
 	toggleWordWrap: actionCreator<boolean | void>('TOGGLE_WORD_WRAP'),
-	openModal: actionCreator<string>('OPEN_MODAL')
+	openModal: actionCreator<string>('OPEN_MODAL'),
+	setDrawMode: actionCreator<DrawMode>('SET_DRAW_MODE')
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([

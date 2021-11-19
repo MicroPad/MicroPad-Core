@@ -1,6 +1,6 @@
 import React from 'react';
 import './PrintViewComponent.css';
-import MarkdownElementComponent from '../note-viewer/elements/markdown/MarkdownElementContainer';
+import MarkdownElementComponent from '../note-viewer/elements/markdown/MarkdownElementConnector';
 import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';

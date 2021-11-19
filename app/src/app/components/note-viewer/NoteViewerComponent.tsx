@@ -114,7 +114,6 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				updateElement={updateElement}
 				downloadAsset={downloadAsset}
 				elementEditing={elementEditing}
-				isFullscreen={isFullscreen}
 				insert={insert} />
 		));
 
