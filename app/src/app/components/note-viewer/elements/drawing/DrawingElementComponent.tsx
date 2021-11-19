@@ -180,6 +180,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 		this.drawingMode = modes.COLOUR;
 
 		const canvasElement = this.canvasElement;
+		console.log(!!canvasElement);
 		if (!!canvasElement) {
 
 			this.initCanvas();
