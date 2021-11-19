@@ -43,5 +43,7 @@ export class EditorReducer extends AbstractReducer<EditorState> {
 		);
 
 		this.handle((state, { payload }) => ({ ...state, drawMode: payload }), actions.setDrawMode);
+
+		this.handle((state, { payload }) => ({ ...state, drawingLineColour: payload }), actions.setDrawingLineColour);
 	}
 }

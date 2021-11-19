@@ -57,6 +57,9 @@ export default class DrawingElementComponent extends React.Component<Props> {
 	private setDrawColour = (e, colour) => {
 		this.drawColour = colour;
 		this.drawingMode = "Colour";
+		console.log(colour);
+		//this.props.setDrawingLineColour(colour);
+		this.props.setDrawMode(DrawMode.Line);
 	}
 
 	private setMode = (e, mode) => {
@@ -338,7 +341,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 		//return (this.drawingMode === modes.RAINBOW) 	? rainbow[this.rainbowIndex += newIndex]
 		//						: this.drawColour;
 		// implement colour change
-		return (this.props.drawMode === DrawMode.RAINBOW) ? rainbow[this.rainbowIndex += newIndex] : '#000000';
+		return (this.props.drawMode === DrawMode.RAINBOW) ? rainbow[this.rainbowIndex += newIndex] : this.props.drawingLineColour;
 
 	}
 
