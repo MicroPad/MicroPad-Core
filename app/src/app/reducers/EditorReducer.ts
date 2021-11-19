@@ -20,7 +20,7 @@ export class EditorReducer extends AbstractReducer<EditorState> {
 		shouldSpellCheck: true,
 		shouldWordWrap: true,
 		drawMode: DrawMode.Line,
-		drawingLineColour: '#000'
+		drawingLineColour: '#000000'
 	};
 
 	constructor() {

@@ -3,8 +3,6 @@ import React from 'react';
 import { trim } from './trim-canvas';
 import { Resizable } from 're-resizable';
 // Remove unused imports later
-import { Col, Row } from 'react-materialize';
-import stringify from 'json-stringify-safe';
 import { Row, Select } from 'react-materialize';
 
 import * as FullScreenService from '../../../../services/FullscreenService';
@@ -57,18 +55,8 @@ export default class DrawingElementComponent extends React.Component<Props> {
 	private setDrawColour = (e, colour) => {
 		this.drawColour = colour;
 		this.drawingMode = "Colour";
-		console.log(colour);
-		//this.props.setDrawingLineColour(colour);
+		this.props.setDrawingLineColour(colour);
 		this.props.setDrawMode(DrawMode.Line);
-	}
-
-	private setMode = (e, mode) => {
-		this.drawingMode = mode;
-	}
-
-	private clearModeSelection = e => {
-		e.target.value = "";
-		e.target.placeholder = this.drawingMode;
 	}
 
 	render() {
@@ -76,7 +64,6 @@ export default class DrawingElementComponent extends React.Component<Props> {
 		if (!theme) return null;
 
 		const isEditing = element.args.id === elementEditing;
-
 		this.hasTrimmed = false;
 
 		if (isEditing) {
@@ -121,29 +108,18 @@ export default class DrawingElementComponent extends React.Component<Props> {
 					</Resizable>
 
 					<Row style={{ padding: '5px' }}>
-						<label hidden l="How does this work?" />
-						<Col>
-							<input type="text" list="drawing-modes" autoComplete="off" placeholder={this.drawingMode} onClick={this.clearModeSelection} onChange={e => this.setMode(e, e.target.value)}/>
-							<datalist key="drawing-modes" id="drawing-modes">
-								<option value={modes.COLOUR}/>
-								<option value={modes.RAINBOW}/>
-								<option value={modes.ERASER}/>
-							</datalist>
-						</Col>
-						<Col>
-							<input type="color" list="mp-drawing-colours" defaultValue={this.drawColour} onChange={e => this.setDrawColour(e, e.target.value)}/>
-							<datalist key="mp-drawing-colours" id="mp-drawing-colours">
-								<option value="#000000">Black</option>
-								<option value="#FFFFFF">White</option>
-								<option value="#E70000">Red</option>
-								<option value="#FFEF00">Yellow</option>
-								<option value="#00811F">Green</option>
-								<option value="#0044FF">Blue</option>
-								<option value="#FF8C00">Orange</option>
-								<option value="#760089">Purple</option>
-							</datalist>
-						</Col>
-						<label hidden l="New code" />
+						<input type="text" value={this.props.drawMode} onChange={e => {}} />
+						<input type="color" list="mp-drawing-colours" value={this.props.drawingLineColour} onChange={e => this.setDrawColour(e, e.target.value)}/>
+						<datalist key="mp-drawing-colours" id="mp-drawing-colours">
+							<option value="#000000">Black</option>
+							<option value="#FFFFFF">White</option>
+							<option value="#E70000">Red</option>
+							<option value="#FFEF00">Yellow</option>
+							<option value="#00811F">Green</option>
+							<option value="#0044FF">Blue</option>
+							<option value="#FF8C00">Orange</option>
+							<option value="#760089">Purple</option>
+						</datalist>
 						<Select label="Drawing mode" multiple={false} value={this.props.drawMode} onChange={e => this.props.setDrawMode(e.target.value as DrawMode)}>
 							<option value={DrawMode.Line}>Line</option>
 							<option value={DrawMode.ERASE}>Erase</option>
@@ -176,11 +152,8 @@ export default class DrawingElementComponent extends React.Component<Props> {
 		const { element, noteAssets } = this.props;
 
 		this.ongoingTouches = new OngoingTouches();
-		// Is drawing mode still needed?
-		this.drawingMode = modes.COLOUR;
 
 		const canvasElement = this.canvasElement;
-		console.log(!!canvasElement);
 		if (!!canvasElement) {
 
 			this.initCanvas();
@@ -324,9 +297,6 @@ export default class DrawingElementComponent extends React.Component<Props> {
 	}
 
 	private shouldErase = (event: PointerEvent): boolean => {
-
-		//return (this.drawingMode === modes.ERASER) || event.buttons === 32;
-
 		return this.props.drawMode === DrawMode.ERASE || event.buttons === 32;
 	}
 
@@ -339,11 +309,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 				: this.rainbowIndex * -1
 			: this.rainbowIndex;
 
-		//return (this.drawingMode === modes.RAINBOW) 	? rainbow[this.rainbowIndex += newIndex]
-		//						: this.drawColour;
-		// implement colour change
 		return (this.props.drawMode === DrawMode.RAINBOW) ? rainbow[this.rainbowIndex += newIndex] : this.props.drawingLineColour;
-
 	}
 
 	// Draws the outline of a line from pos1 to pos2 with the given width
