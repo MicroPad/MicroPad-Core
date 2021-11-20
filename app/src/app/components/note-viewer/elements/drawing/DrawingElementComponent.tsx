@@ -16,7 +16,7 @@ type Position = {
 	y: number
 };
 
-const rainbow = [
+const rainbow: ReadonlyArray<string> = [
 	'#E70000',
 	'#FF8C00',
 	'#FFEF00',
@@ -148,7 +148,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 		this.componentDidUpdate();
 	}
 
-	componentDidUpdate() {
+	componentDidUpdate(prevProps?: Readonly<Props>) {
 		const { element, noteAssets } = this.props;
 
 		this.ongoingTouches = new OngoingTouches();
@@ -158,16 +158,19 @@ export default class DrawingElementComponent extends React.Component<Props> {
 
 			this.initCanvas();
 
-			// Restore saved image to canvas
-			const img = new Image();
-			img.onload = () => {
-				const canvasElement = this.canvasElement;
-				if (!canvasElement) return;
-				canvasElement.width = img.naturalWidth;
-				canvasElement.height = img.naturalHeight;
-				this.ctx.drawImage(img, 0, 0);
-			};
-			img.src = noteAssets[element.args.ext!];
+			const isNewEditor = this.props.elementEditing !== prevProps?.elementEditing;
+			if (isNewEditor) {
+				// Restore saved image to canvas
+				const img = new Image();
+				img.onload = () => {
+					const canvasElement = this.canvasElement;
+					if (!canvasElement) return;
+					canvasElement.width = img.naturalWidth;
+					canvasElement.height = img.naturalHeight;
+					this.ctx.drawImage(img, 0, 0);
+				};
+				img.src = noteAssets[element.args.ext!];
+			}
 			return;
 		}
 
