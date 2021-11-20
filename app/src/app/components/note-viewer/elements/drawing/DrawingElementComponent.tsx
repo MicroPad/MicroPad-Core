@@ -42,12 +42,35 @@ export default class DrawingElementComponent extends React.Component<Props> {
 
 	private rainbowIndex = 0;
 
+	/*
+		When selecting a colour, the drawing mode changes to 'Line' in order to immediately start drawing lines
+		The select box, where the user can choose a drawing mode, doesn't immediately update its value, still
+		displaying the old value (e.g. 'Eraser' instead of 'Line').
+		Subsequently selecting a different colour (without mode change), however, updates the select box. The
+		precise reason for this	behaviour is unknown.
+		Therefore, the solution (or rather, hack) is to cause a re-render by state change. Experimentally, this
+		only works within the 'render' method, not outside of it.
+
+		See also: https://github.com/MicroPad/MicroPad-Core/pull/384
+	*/
+	private causeStateChangeToReRenderOnColourSelect = false;
+
 	render() {
 		const { element, noteAssets, elementEditing, theme } = this.props;
 		if (!theme) return null;
 
 		const isEditing = element.args.id === elementEditing;
 		this.hasTrimmed = false;
+
+		// See above for the reason of this hack
+		// Mimicking the above mentioned manual solution, a different colour is selected and then reset.
+		// This will cause a re-render, but the condition won't be met again
+		if (this.causeStateChangeToReRenderOnColourSelect) {
+			var colour = this.props.drawingLineColour;
+			this.props.setDrawingLineColour("#000000");
+			this.props.setDrawingLineColour(colour);
+		}
+		this.causeStateChangeToReRenderOnColourSelect = false;
 
 		if (isEditing) {
 			return (
@@ -106,7 +129,10 @@ export default class DrawingElementComponent extends React.Component<Props> {
 									type="color"
 									list="mp-drawing-colours"
 									value={this.props.drawingLineColour}
-									onChange={e => this.props.setDrawingLineColour(e.target.value)} />
+									onChange={e => {
+											// Trigger re-render to update select box; See above for the reason
+											this.causeStateChangeToReRenderOnColourSelect = true;
+											this.props.setDrawingLineColour(e.target.value)}} />
 								<datalist key="mp-drawing-colours" id="mp-drawing-colours">
 									<option value="#000000">Black</option>
 									<option value="#FFFFFF">White</option>
