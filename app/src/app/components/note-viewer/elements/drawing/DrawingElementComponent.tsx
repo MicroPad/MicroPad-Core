@@ -1,9 +1,10 @@
-import { INoteElementComponentProps } from '../NoteElementComponent';
+import './DrawingElementComponent.css';
 import React from 'react';
+import { INoteElementComponentProps } from '../NoteElementComponent';
 import { trim } from './trim-canvas';
 import { Resizable } from 're-resizable';
 // Remove unused imports later
-import { Row, Select } from 'react-materialize';
+import { Col, Row, Select } from 'react-materialize';
 
 import * as FullScreenService from '../../../../services/FullscreenService';
 import { ConnectedProps } from 'react-redux';
@@ -25,13 +26,6 @@ const rainbow: ReadonlyArray<string> = [
 	'#760089'
 ];
 
-// Are modes here still necessary?
-const modes = {
-	COLOUR: 'Colour',
-	RAINBOW: 'Rainbow',
-	ERASER: 'Eraser',
-};
-
 type Props = ConnectedProps<typeof drawingElementConnector> & INoteElementComponentProps;
 
 
@@ -46,18 +40,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 	private ongoingTouches = new OngoingTouches();
 	private canvasImage?: Blob | null;
 
-	// Are modes still necessary?
-	private drawingMode = modes.COLOUR;
-	private drawColour = "#000000";
-
 	private rainbowIndex = 0;
-
-	private setDrawColour = (e, colour) => {
-		this.drawColour = colour;
-		this.drawingMode = "Colour";
-		this.props.setDrawingLineColour(colour);
-		this.props.setDrawMode(DrawMode.Line);
-	}
 
 	render() {
 		const { element, noteAssets, elementEditing, theme } = this.props;
@@ -102,29 +85,41 @@ export default class DrawingElementComponent extends React.Component<Props> {
 							// @ts-expect-error
 							ref={(e: DrawingCanvas | undefined) => this.canvasElement = e?.inner ?? null}
 							key={`drawing-canvas-${this.props.element.args.id}`}
+							className="drawing-element__view"
 							width="500"
 							height="450"
 							style={{ border: 'solid black 1px', touchAction: 'none' }} />
 					</Resizable>
 
 					<Row style={{ padding: '5px' }}>
-						<input type="text" value={this.props.drawMode} onChange={e => {}} />
-						<input type="color" list="mp-drawing-colours" value={this.props.drawingLineColour} onChange={e => this.setDrawColour(e, e.target.value)}/>
-						<datalist key="mp-drawing-colours" id="mp-drawing-colours">
-							<option value="#000000">Black</option>
-							<option value="#FFFFFF">White</option>
-							<option value="#E70000">Red</option>
-							<option value="#FFEF00">Yellow</option>
-							<option value="#00811F">Green</option>
-							<option value="#0044FF">Blue</option>
-							<option value="#FF8C00">Orange</option>
-							<option value="#760089">Purple</option>
-						</datalist>
-						<Select label="Drawing mode" multiple={false} value={this.props.drawMode} onChange={e => this.props.setDrawMode(e.target.value as DrawMode)}>
-							<option value={DrawMode.Line}>Line</option>
-							<option value={DrawMode.ERASE}>Erase</option>
-							<option value={DrawMode.RAINBOW}>Rainbow Mode 🏳️‍🌈</option>
-						</Select>
+						<Col s={6}>
+							<Select label="Drawing mode" multiple={false} value={this.props.drawMode} onChange={e => this.props.setDrawMode(e.target.value as DrawMode)}>
+								<option value={DrawMode.Line}>Line</option>
+								<option value={DrawMode.ERASE}>Erase</option>
+								<option value={DrawMode.RAINBOW}>Rainbow Mode 🏳️‍🌈</option>
+							</Select>
+						</Col>
+						<div className="input-field col s6"> {/* Manual <Col> so I can make this an <Input> too */}
+							<div className="select-wrapper"> {/* The colour picker should have the same style rules as a Select */}
+								<input
+									id="drawing-element-editor__color-picker"
+									type="color"
+									list="mp-drawing-colours"
+									value={this.props.drawingLineColour}
+									onChange={e => this.props.setDrawingLineColour(e.target.value)} />
+								<datalist key="mp-drawing-colours" id="mp-drawing-colours">
+									<option value="#000000">Black</option>
+									<option value="#FFFFFF">White</option>
+									<option value="#E70000">Red</option>
+									<option value="#FFEF00">Yellow</option>
+									<option value="#00811F">Green</option>
+									<option value="#0044FF">Blue</option>
+									<option value="#FF6900">Orange</option>
+									<option value="#760089">Purple</option>
+								</datalist>
+							</div>
+							<label id="drawing-element-editor__color-picker-label" htmlFor="drawing-element-editor__color-picker">Line colour</label>
+						</div>
 					</Row>
 					{!this.supportsPointerEvents && <p><em>Your browser seems to not support pointer events. Drawing may not work.</em></p>}
 				</div>
@@ -132,12 +127,12 @@ export default class DrawingElementComponent extends React.Component<Props> {
 		}
 
 		return (
-			<div style={{
+			<div className="drawing-element__view" style={{
 				overflow: 'hidden',
 				height: 'auto',
 				minWidth: '170px',
 				minHeight: '130px',
-				backgroundColor: !isEditing ? theme.drawingBackground : undefined
+				backgroundColor: theme.drawingBackground
 			}} onClick={this.openEditor}>
 				<img ref={elm => this.imageElement = elm!} style={{ height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px' }} src={noteAssets[element.args.ext!]} alt="" />
 			</div>
