@@ -145,7 +145,7 @@ export function getStorage(): StorageMap {
 				</ AppBodyComponent>
 			</PrintViewOrAppContainerComponent>
 		</Provider>,
-		document.getElementById('app') as HTMLElement
+		document.getElementById('app')!
 	);
 
 	// Some clean up of an old storage item, this line can be deleted at some point in the future

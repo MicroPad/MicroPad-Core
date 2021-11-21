@@ -64,7 +64,9 @@
       "react-app",
       "plugin:jest-playwright/recommended"
     ],
-    "ignorePatterns": ["*.js"],
+    "ignorePatterns": [
+      "*.js"
+    ],
     "overrides": [
       {
         "files": [
@@ -109,19 +111,21 @@
     ]
   },
   "devDependencies": {
+    "@types/deep-freeze": "^0.1.2",
     "@types/html-minifier": "^4.0.1",
     "@types/jest": "^27.0.1",
     "@types/jest-image-snapshot": "^4.3.0",
     "@types/json-stringify-safe": "^5.0.0",
     "@types/mousetrap": "^1.6.7",
     "@types/node": "^16.9.2",
+    "@types/react-dom": "^17.0.11",
     "@types/react-redux": "^7.1.2",
     "@types/semver": "^7.3.4",
     "@types/showdown": "^1.7.3",
     "@types/workbox-build": "^5.0.1",
-    "@types/deep-freeze": "^0.1.2",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
+    "babel-eslint": "^10.1.0",
     "browserslist": "^4.16.6",
     "core-js": "^3.17.3",
     "esbuild": "^0.13.2",
@@ -129,7 +133,6 @@
     "esbuild-plugin-manifest": "^0.4.6",
     "eslint": "^8.2.0",
     "eslint-config-react-app": "^6.0.0",
-    "babel-eslint": "^10.1.0",
     "eslint-plugin-flowtype": "^8.0.3",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jest": "^25.2.4",
