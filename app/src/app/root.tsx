@@ -132,7 +132,9 @@ export function getStorage(): StorageMap {
 	enableKeyboardShortcuts(store);
 
 	// Render the main UI
-	ReactDOM.render(
+	const appContainer = document.getElementById('app')!;
+	const root = ReactDOM.createRoot(appContainer);
+	root.render(
 		<Provider store={store}>
 			<PrintViewOrAppContainerComponent>
 				<HeaderComponent />
@@ -144,8 +146,7 @@ export function getStorage(): StorageMap {
 					<InfoModalsComponent />
 				</ AppBodyComponent>
 			</PrintViewOrAppContainerComponent>
-		</Provider>,
-		document.getElementById('app') as HTMLElement
+		</Provider>
 	);
 
 	// Some clean up of an old storage item, this line can be deleted at some point in the future
