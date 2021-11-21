@@ -60,8 +60,7 @@ export default class SearchComponent extends React.Component<Props, never> {
 					// @ts-expect-error TS-2322, the type definitions from the library are wrong, they say we get a
 					// group as `item` but we really get the option.
 					onChange={(item: SearchResultOption) => {
-						console.log(item);
-						// if (item) this.props.loadResult(this.props.notepad?.title, item.value);
+						if (item) this.props.loadResult(this.props.notepad?.title, item.value);
 						this.closeModal();
 					}}
 					value={null}
