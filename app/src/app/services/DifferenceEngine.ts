@@ -8,10 +8,10 @@ import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { encrypt } from 'upad-parse/dist/crypto';
 import { generateGuid } from '../util';
 import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
-import { NotificationService } from './NotificationService';
+import { actions } from '../actions';
+import { store } from '../root';
 
 const SyncThread = new Worker(build.defs.SYNC_WORKER_PATH, { type: 'module' });
-const notificationService = new NotificationService();
 
 export const AccountService = (() => {
 	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);
@@ -79,6 +79,7 @@ export const SyncService = (() => {
 		token
 	});
 
+	let oversizedAssetCount = 0;
 	async function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
 		const cid = generateGuid();
 		const res$ = fromEvent<MessageEvent>(SyncThread, 'message').pipe(
@@ -98,11 +99,9 @@ export const SyncService = (() => {
 		});
 
 		const { assets, hasOversizedAssets } = await getAssetInfo$;
-		if (hasOversizedAssets) {
-			notificationService.toast({
-				html: `Warning: Some assets (images, recordings, files, etc.) in your notebook are too large to be uploaded to MicroSync.`,
-				displayLength: 3000
-			});
+		if (hasOversizedAssets && hasOversizedAssets !== oversizedAssetCount) {
+			oversizedAssetCount = hasOversizedAssets;
+			store.dispatch(actions.openModal('sync-oversized-assets-modal'));
 		}
 
 		return Object.assign({}, notepad, { assetHashList: assets });

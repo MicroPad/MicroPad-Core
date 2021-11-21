@@ -69,17 +69,25 @@ const checkNoteAssets$ = (action$: Observable<MicroPadAction>, store: EpicStore)
 		})
 	);
 
-const downloadAsset$ = (action$: Observable<MicroPadAction>) =>
+const downloadAsset$ = (action$: Observable<MicroPadAction>, _store: EpicStore, { notificationService }: EpicDeps) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<{ filename: string, uuid: string }>>(actions.downloadAsset.started.type),
 		map((action: Action<{ filename: string, uuid: string }>) => action.payload),
 		switchMap(({ filename, uuid }: { filename: string, uuid: string }) =>
-			from(ASSET_STORAGE.getItem(uuid))
+			from(ASSET_STORAGE.getItem<Blob>(uuid))
 				.pipe(
+					filter((blob: Blob | null): blob is Blob => {
+						if (!blob) {
+							notificationService.toast({
+								html: `This file cannot be downloaded because the file isn't stored in this notebook.`
+							});
+							return false;
+						}
+						return true;
+					}),
 					map((blob): [Blob, string] => [blob as Blob, filename])
 				)
 		),
-		filterTruthy(),
 		tap(([blob, filename]: [Blob, string]) => saveAs(blob, filename)),
 		map(([_blob, filename]: [Blob, string]) => actions.downloadAsset.done({ params: { filename, uuid: '' }, result: undefined }))
 	);

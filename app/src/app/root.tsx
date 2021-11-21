@@ -36,7 +36,6 @@ import * as PasteImage from 'paste-image';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import NoteElementModalComponent from './components/note-element-modal/NoteElementModalComponent';
 import { SyncUser } from './types/SyncTypes';
-import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from './types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
@@ -48,6 +47,7 @@ import { createDynamicCss } from './DynamicAppCss';
 import { hasRequiredFeatures } from '../unsupported-page/feature-detect';
 import { showUnsupportedPage } from '../unsupported-page/show-page';
 import { restoreSavedPasswords } from './services/CryptoService';
+import InfoModalsComponent from './components/InfoModalsComponent';
 
 window.MicroPadGlobals = {};
 
@@ -140,8 +140,8 @@ export function getStorage(): StorageMap {
 					<NoteViewerComponent />
 					<NotepadExplorerComponent />
 					<NoteElementModalComponent id={"whats-new-modal"} npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
-					<SyncProErrorComponent />
 					<InsertElementComponent />
+					<InfoModalsComponent />
 				</ AppBodyComponent>
 			</PrintViewOrAppContainerComponent>
 		</Provider>,

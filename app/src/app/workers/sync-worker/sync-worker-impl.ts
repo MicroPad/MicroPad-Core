@@ -10,7 +10,7 @@ const ASSET_STORAGE = localforage.createInstance({
 
 const MAX_ASSET_SIZE = 50 * 1024 * 1024; // 50MiB
 
-export async function getAssetInfoImpl(notepad: FlatNotepad): Promise<{ assets: { [assetRef: string]: number }, hasOversizedAssets: boolean }> {
+export async function getAssetInfoImpl(notepad: FlatNotepad): Promise<{ assets: { [assetRef: string]: number }, hasOversizedAssets: number }> {
 	// Setup access to our binary assets
 	await ASSET_STORAGE.ready();
 
@@ -20,13 +20,15 @@ export async function getAssetInfoImpl(notepad: FlatNotepad): Promise<{ assets: 
 	const assetBlobs: Array<Blob | null> = await Promise.all(notepadAssets.map(uuid => ASSET_STORAGE.getItem<Blob>(uuid)))
 
 	const assets: Record<string, number> = {};
-	let hasOversizedAssets: boolean = false;
+	let hasOversizedAssets: number = 0;
 	for (let i = 0; i < notepadAssets.length; ++i) {
 		const blob = assetBlobs[i];
 		if (!blob || !blob.size) continue;
 
+		// Skip oversized assets
 		if (blob.size > MAX_ASSET_SIZE) {
-			hasOversizedAssets = true;
+			hasOversizedAssets++;
+			continue;
 		}
 
 		assets[notepadAssets[i]] = crc32(new Uint8Array(await blob.arrayBuffer()));
