@@ -96,7 +96,7 @@
       "chrome >= 80",
       "electron >= 12",
       "edge >= 80",
-      "firefox >= 80",
+      "firefox >= 78",
       "safari >= 13",
       "ios_saf >= 13",
       "unreleased versions"
