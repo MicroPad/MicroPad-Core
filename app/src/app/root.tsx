@@ -133,6 +133,7 @@ export function getStorage(): StorageMap {
 
 	// Render the main UI
 	const appContainer = document.getElementById('app')!;
+	// @ts-expect-error @types/react-dom hasn't been updated for React 18 yet
 	const root = ReactDOM.createRoot(appContainer);
 	root.render(
 		<Provider store={store}>
