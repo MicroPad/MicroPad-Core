@@ -1,0 +1,7 @@
+#drawing-element-editor__color-picker {
+	margin-top: 8px;
+}
+
+.drawing-element__view {
+	background-color: var(--mp-theme-drawingBackground);
+}

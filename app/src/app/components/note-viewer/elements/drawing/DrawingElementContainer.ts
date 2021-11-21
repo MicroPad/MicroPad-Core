@@ -7,10 +7,12 @@ import { actions } from '../../../../actions';
 export const drawingElementConnector = connect(
 	(state: IStoreState) => ({
 		isFullScreen: state.app.isFullScreen,
-		drawMode: state.editor.drawMode
+		drawMode: state.editor.drawMode,
+		drawingLineColour: state.editor.drawingLineColour
 	}),
 	dispatch => ({
-		setDrawMode: (mode: DrawMode) => dispatch(actions.setDrawMode(mode))
+		setDrawMode: (mode: DrawMode) => dispatch(actions.setDrawMode(mode)),
+		setDrawingLineColour: (colour: string) => dispatch(actions.setDrawingLineColour(colour))
 	})
 );
 
