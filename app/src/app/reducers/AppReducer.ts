@@ -52,7 +52,12 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 			return {
 				...state,
 				currentModalId: action.payload
-			}
+			};
+		} else if (isType(action, actions.closeModal)) {
+			return {
+				...state,
+				currentModalId: undefined
+			};
 		} else if (isType(action, actions.flipFullScreenState)) {
 			const zoom = state.isFullScreen ? this.initialState.zoom : state.zoom;
 

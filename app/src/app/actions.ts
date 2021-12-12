@@ -124,6 +124,7 @@ export const actions = {
 	toggleSpellCheck: actionCreator<boolean | void>('TOGGLE_SPELL_CHECK'),
 	toggleWordWrap: actionCreator<boolean | void>('TOGGLE_WORD_WRAP'),
 	openModal: actionCreator<string>('OPEN_MODAL'),
+	closeModal: actionCreator<void>('CLOSE_MODAL'),
 	setDrawMode: actionCreator<DrawMode>('SET_DRAW_MODE'),
 	setDrawingLineColour: actionCreator<string>('SET_DRAWING_LINE_COLOUR')
 };

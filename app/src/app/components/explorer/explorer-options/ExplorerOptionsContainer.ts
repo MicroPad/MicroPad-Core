@@ -13,6 +13,7 @@ export const explorerOptionsConnector = connect(
 	}),
 	(dispatch, directProps: ExplorerOptionsProps) => ({
 		rename: (newName: string) => {
+			dispatch(actions.closeModal());
 			switch (directProps.type) {
 				case 'notepad':
 					dispatch(actions.renameNotepad.started(newName));
@@ -26,7 +27,7 @@ export const explorerOptionsConnector = connect(
 		},
 		deleteObj: async () => {
 			if (!await Dialog.confirm(`Are you sure you want to delete '${directProps.objToEdit.title}'?`)) return;
-			document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
+			dispatch(actions.closeModal());
 
 			switch (directProps.type) {
 				case 'notepad':
