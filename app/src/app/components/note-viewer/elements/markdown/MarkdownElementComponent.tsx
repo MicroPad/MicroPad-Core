@@ -107,11 +107,11 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 				onResizeStop={(e, d, ref) => {
 					this.onSizeEdit('width', ref.style.width!);
 				}}>
-				<TodoListComponent html$={this.html$} toggle={() => this.sendMessage({
+				{isEditing || <TodoListComponent html$={this.html$} toggle={() => this.sendMessage({
 					id: element.args.id,
 					type: 'toggle',
 					payload: {}
-				})} />
+				})} />}
 
 				{
 					isEditing &&
