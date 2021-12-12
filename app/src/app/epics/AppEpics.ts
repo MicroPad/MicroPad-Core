@@ -1,5 +1,5 @@
 import { combineEpics, ofType } from 'redux-observable';
-import { filterTruthy, noEmit } from '../util';
+import { noEmit } from '../util';
 import { catchError, delay, filter, map, switchMap, tap } from 'rxjs/operators';
 import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
 import * as localforage from 'localforage';
@@ -14,7 +14,6 @@ import { IVersion } from '../reducers/AppReducer';
 import { actions, MicroPadAction } from '../actions';
 import { Dispatch } from 'redux';
 import { Dialog } from '../services/dialogs';
-import { MicroPadStore } from '../root';
 
 export const closeDrawingEditorOnZoom$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
@@ -85,7 +84,7 @@ export const openModal$ = (action$: Observable<MicroPadAction>) =>
 		noEmit()
 	);
 
-export const closeModal$ = (action$: Observable<MicroPadAction>, store: MicroPadStore) =>
+export const closeModal$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<string>>(actions.closeModal.type),
 		tap(() => {
