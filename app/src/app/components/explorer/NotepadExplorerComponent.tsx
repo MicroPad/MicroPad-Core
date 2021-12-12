@@ -78,7 +78,7 @@ const NotepadExplorerComponent = (props: Props) => {
 								{notepad.title}
 								{props.isReadOnly && <em style={{ paddingLeft: '5px' }}>(Read-Only)</em>}
 							</span>
-						<ExplorerOptionsComponent objToEdit={notepad} type="notepad"/>
+						<ExplorerOptionsComponent objToEdit={notepad} type="notepad" key={notepad.title} />
 					</strong>
 
 					<p style={{ marginTop: '0px' }}>

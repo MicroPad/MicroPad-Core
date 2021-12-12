@@ -7,11 +7,10 @@ import { getParentList, pathChangeConnector } from './PathChangeContainer';
 type Props = ConnectedProps<typeof pathChangeConnector> & {
 	objToEdit: NPXObject;
 	type: 'section' | 'note';
-	changed: () => void;
 };
 
 const PathChangeComponent = (props: Props) => {
-	const { notepad, objToEdit, type, moveObj, changed } = props;
+	const { notepad, objToEdit, type, moveObj } = props;
 	if (!notepad) return null;
 
 	return (
@@ -22,7 +21,6 @@ const PathChangeComponent = (props: Props) => {
 				style={{ display: 'block', width: 'max-content' }}
 				onChange={event => {
 					moveObj(objToEdit.internalRef, event.currentTarget.value, type);
-					if (!!changed) changed();
 				}}>
 				{
 					getParentList(notepad, objToEdit.internalRef)
