@@ -18,6 +18,7 @@
     "@sentry/integrations": "^6.6.0",
     "@sentry/react": "^6.6.0",
     "@sentry/tracing": "^6.6.0",
+    "@silvia-odwyer/photon": "^0.3.11",
     "browserslist-useragent-regexp": "^3.0.0",
     "date-fns": "^2.21.3",
     "deep-freeze": "~0.0.1",
