@@ -24,6 +24,9 @@ clearBrowserslistCache();
 	process.env.PUBLIC_URL ??= '';
 
 	await copyDir('node_modules/timers-browserify', 'node_modules/timers');
+	await copyDir('node_modules/path-browserify', 'node_modules/path');
+	await copyDir('node_modules/stream-browserify', 'node_modules/stream');
+
 
 	await rm(OUT_DIR, { recursive: true, force: true });
 	await copyDir('public', OUT_DIR);
