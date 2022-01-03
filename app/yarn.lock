@@ -1562,6 +1562,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.17.tgz#ae146499772e33fc6382e1880bc567e41a528586"
   integrity sha512-C1vTZME8cFo8uxY2ui41xcynEotVkczIVI5AjLmy5pkpBv/FtG+jhtOlfcPysI8VRVwoOMv6NJm44LGnoMSWkw==
 
+"@types/offscreencanvas@^2019.6.4":
+  version "2019.6.4"
+  resolved "https://registry.yarnpkg.com/@types/offscreencanvas/-/offscreencanvas-2019.6.4.tgz#64f6d120b53925028299c744fcdd32d2cd525963"
+  integrity sha512-u8SAgdZ8ROtkTF+mfZGOscl0or6BSj9A4g37e6nvxDc+YB/oDut0wHkK2PBBiC2bNR8TS0CPV+1gAk4fNisr1Q==
+
 "@types/pixelmatch@*":
   version "5.2.4"
   resolved "https://registry.yarnpkg.com/@types/pixelmatch/-/pixelmatch-5.2.4.tgz#ca145cc5ede1388c71c68edf2d1f5190e5ddd0f6"

@@ -10,8 +10,9 @@ import { generateGuid } from '../util';
 import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
 import { actions } from '../actions';
 import { store } from '../root';
+import { WorkerMsgData } from '../workers';
 
-const SyncThread = new Worker(build.defs.SYNC_WORKER_PATH, { type: 'module' });
+const AssetHashWorker = new Worker(build.defs.SYNC_WORKER_PATH, { type: 'module' });
 
 export const AccountService = (() => {
 	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);
@@ -82,7 +83,7 @@ export const SyncService = (() => {
 	let oversizedAssetCount = 0;
 	async function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
 		const cid = generateGuid();
-		const res$ = fromEvent<MessageEvent>(SyncThread, 'message').pipe(
+		const res$ = fromEvent<MessageEvent<WorkerMsgData<ReturnType<typeof getAssetInfoImpl>>>>(AssetHashWorker, 'message').pipe(
 			filter(event => event.data?.cid === cid),
 			map(event => {
 				if (event.data.error) throw event.data.error;
@@ -91,8 +92,8 @@ export const SyncService = (() => {
 			take(1)
 		);
 
-		const getAssetInfo$: ReturnType<typeof getAssetInfoImpl> = res$.toPromise();
-		SyncThread.postMessage({
+		const getAssetInfo$ = res$.toPromise();
+		AssetHashWorker.postMessage({
 			cid,
 			type: 'getAssetInfo',
 			flatNotepad: notepad.flatten()
