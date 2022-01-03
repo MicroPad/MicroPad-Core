@@ -183,6 +183,7 @@ clearBrowserslistCache();
 
 	// Copy in WASM
 	await copyFile(join('node_modules', 'fend-wasm-web', 'fend_wasm_bg.wasm'), join(OUT_DIR, 'dist', 'fend_wasm_bg.wasm'));
+	await copyFile(join('node_modules', '@nick_webster', 'photon', 'photon_rs_bg.wasm'), join(OUT_DIR, 'dist', 'photon_rs_bg.wasm'));
 
 	console.log('Built!');
 

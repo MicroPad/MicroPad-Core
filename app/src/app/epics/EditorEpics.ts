@@ -41,12 +41,12 @@ export const resizeImage$ = (action$: Observable<MicroPadAction>, store: EpicSto
 	action$.pipe(
 		ofType<MicroPadAction, Action<UpdateElementAction>>(actions.updateElement.type),
 		// Don't mess with a new upload, there will be a follow-on plain update in a sec
-		filter(({ payload: p }) => p.element.type === 'image' && !!p.element.args.ext && !!p.newAsset),
+		filter(({ payload: p }) => p.element.type === 'image' && !!p.element.args.ext && !p.newAsset),
 		debounceTime(1000),
 		switchMap(action => from(getStorage().assetStorage.getItem<Blob>(action.payload.element.args.ext!)).pipe(
 			filterTruthy(),
 			switchMap(imageBlob => shrinkImage(imageBlob, action.payload.element)),
-			map()
+			noEmit() // TODO: map to an update action
 		))
 	);
 
