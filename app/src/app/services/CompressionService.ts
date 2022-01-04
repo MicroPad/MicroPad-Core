@@ -1,5 +1,5 @@
 import { FlatNotepad } from 'upad-parse';
-import { default as initPhoton, open_image, putImageData, resize, resize_img_browser } from '@nick_webster/photon';
+import { default as initPhoton, open_image, resize_img_browser } from '@nick_webster/photon';
 import { NoteElement } from 'upad-parse/dist/Note';
 
 let started = false;
