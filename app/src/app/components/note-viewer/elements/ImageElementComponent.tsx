@@ -6,8 +6,8 @@ import { Dialog } from '../../../services/dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { readFile } from '../../../services/files';
 
-const AUTO_MAX_WIDTH = '50vw';
-const AUTO_MAX_HEIGHT = '50vh';
+const IMAGE_AUTO_MAX_WIDTH = '50vw';
+const IMAGE_AUTO_MAX_HEIGHT = '50vh';
 
 export default class ImageElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {
@@ -33,8 +33,8 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 						<img style={{
 							height: (element.args.height !== 'auto') ? '100%' : undefined,
 							width: (element.args.width !== 'auto') ? '100%' : undefined,
-							maxHeight: (element.args.height === 'auto') ? AUTO_MAX_HEIGHT : undefined,
-							maxWidth: (element.args.width === 'auto') ? AUTO_MAX_WIDTH : undefined,
+							maxHeight: (element.args.height === 'auto') ? IMAGE_AUTO_MAX_HEIGHT : undefined,
+							maxWidth: (element.args.width === 'auto') ? IMAGE_AUTO_MAX_WIDTH : undefined,
 						}} src={noteAssets[element.args.ext!]} alt="" />
 					</Resizable>
 				}

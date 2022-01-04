@@ -27,6 +27,7 @@ import { FlatNotepad, LAST_MODIFIED_FORMAT } from 'upad-parse/dist';
 import stringify from 'json-stringify-safe';
 import { EpicDeps, EpicStore } from './index';
 import { Dispatch } from 'redux';
+import { optimiseAssets } from '../services/CompressionService';
 
 export const uploadCount$ = new BehaviorSubject<number>(0);
 
@@ -174,7 +175,7 @@ export const download$ = (action$: Observable<MicroPadAction>, store: EpicStore)
 		)
 	);
 
-export const upload$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+export const upload$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
 	action$.pipe(
 		ofType<MicroPadAction, Action<SyncAction>>(actions.syncUpload.started.type),
 		tap(() => uploadCount$.next(uploadCount$.getValue() + 1)),
@@ -198,8 +199,14 @@ export const upload$ = (action$: Observable<MicroPadAction>, store: EpicStore) =
 							concatMap((assetList: AssetList) => from((async () => {
 								const requests: UploadAssetAction[] = [];
 
-								const blobs: Array<Blob | null> = await Promise.all(Object.keys(assetList).map(uuid => ASSET_STORAGE.getItem<Blob>(uuid)));
-								Object.values(assetList)
+								const orderedAssetList = Object.entries(assetList);
+								const blobs: Array<Blob | null> = await optimiseAssets(
+									getStorage().assetStorage,
+									orderedAssetList.map(([uuid]) => uuid),
+									store.getState().notepads.notepad?.item!
+								);
+								orderedAssetList
+									.map(([, url]) => url)
 									.filter((url, i) => {
 										if (!blobs[i]) {
 											console.error('Asset was null, skipping ', url);
@@ -211,9 +218,9 @@ export const upload$ = (action$: Observable<MicroPadAction>, store: EpicStore) =
 
 								return requests;
 							})())),
-							concatMap((requests: UploadAssetAction[]) => from((async () =>
-									await Promise.all(requests.map(req => DifferenceEngine.uploadAsset(req.url, req.asset).toPromise()))
-							)()))
+							concatMap((requests: UploadAssetAction[]) => from(
+								Promise.all(requests.map(req => DifferenceEngine.uploadAsset(req.url, req.asset).toPromise()))
+							))
 						)
 				),
 				switchMap(() =>

@@ -26,5 +26,5 @@ export interface INotepadSharingData {
 export type CombinedNotepadSyncList = Record<string, INotepadSharingData>;
 
 export interface ISyncedNotepad extends Notepad {
-	assetHashList: { [uuid: string]: number };
+	assetHashList: { [uuid: string]: string | number };
 }

@@ -152,7 +152,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 				}}
 				defaultPosition={{ x: parseInt(element.args.x, 10), y: parseInt(element.args.y, 10) }}
 				handle=".handle">
-				<div className="noteElement" style={containerStyles} ref={e => this.container = e!}>
+				<div className="noteElement" style={containerStyles} ref={e => this.container = e!} data-el-id={element.args.id}>
 					<div className="z-depth-2 hoverable" style={elementStyles} ref={e => this.element = e!} onClick={this.openEditor}>
 						{!(isEditing && element.type === 'drawing') && <p className="handle" style={{ color: theme.text }}>::::</p>}
 						{!!elementComponent && elementComponent}
