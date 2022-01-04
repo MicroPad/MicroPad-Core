@@ -1,6 +1,3 @@
-// TODO: Clear out core-js dep when this isn't needed anymore (node >= 15)
-import 'core-js/features/string/replace-all';
-
 import { build } from 'esbuild';
 import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises';
 import { join } from 'path';
@@ -19,14 +16,12 @@ const PORT: number = (() => {
 })();
 
 clearBrowserslistCache();
+const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'));
 
 (async () => {
 	process.env.PUBLIC_URL ??= '';
 
 	await copyDir('node_modules/timers-browserify', 'node_modules/timers');
-	await copyDir('node_modules/path-browserify', 'node_modules/path');
-	await copyDir('node_modules/stream-browserify', 'node_modules/stream');
-
 
 	await rm(OUT_DIR, { recursive: true, force: true });
 	await copyDir('public', OUT_DIR);
@@ -37,7 +32,7 @@ clearBrowserslistCache();
 		bundle: true,
 		outdir: `${OUT_DIR}/dist`,
 		platform: 'browser',
-		target: 'es6',
+		target: 'es2015',
 		format: 'iife',
 		minify: true,
 		sourcemap: true,
@@ -87,7 +82,7 @@ clearBrowserslistCache();
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
 		plugins: [
-			esbuildPluginBrowserslist(browserslist())
+			esbuildPluginBrowserslist(esBuildTargets)
 		],
 	}).catch(() => process.exit(1));
 
@@ -128,7 +123,7 @@ clearBrowserslistCache();
 			'build.defs.SYNC_WORKER_PATH': `'${syncWorkerJsPath}'`,
 		},
 		plugins: [
-			esbuildPluginBrowserslist(browserslist())
+			esbuildPluginBrowserslist(esBuildTargets)
 		],
 	}).catch(() => process.exit(1));
 
@@ -175,6 +170,9 @@ clearBrowserslistCache();
 			'process.env.NODE_ENV': '"production"',
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
+		plugins: [
+			esbuildPluginBrowserslist(esBuildTargets)
+		],
 	}).catch(() => process.exit(1));
 
 	// Build manifest
