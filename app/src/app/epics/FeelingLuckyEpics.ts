@@ -1,29 +1,29 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { actions, MicroPadAction } from '../actions';
-import { Dispatch } from 'redux';
-import { EpicDeps, EpicStore } from './index';
-import { Observable } from 'rxjs';
-import { Action } from 'typescript-fsa';
-import { map } from 'rxjs/operators';
+import { EpicStore } from './index';
+import { Observable, switchMap } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 import { ThemeValues } from '../ThemeValues';
 import { ThemeName } from '../types/Themes';
 
-export const feelingLucky$ = (actions$: Observable<MicroPadAction>, store: EpicStore) =>
+export const feelingLucky$ = (actions$: Observable<MicroPadAction>, state$: EpicStore) =>
 	actions$.pipe(
-		ofType<MicroPadAction, Action<void>>(actions.feelingLucky.type),
-		map(() => store.getState()),
-		map(state => {
-			// Select a random theme
-			const themeNames = Object.keys(ThemeValues);
-			let theme: ThemeName;
-			do {
-				theme = themeNames[themeNames.length * Math.random() | 0] as ThemeName
-			} while (!theme || theme === state.app.theme);
+		ofType(actions.feelingLucky.type),
+		switchMap(() => state$.pipe(
+			map(state => {
+				// Select a random theme
+				const themeNames = Object.keys(ThemeValues);
+				let theme: ThemeName;
+				do {
+					theme = themeNames[themeNames.length * Math.random() | 0] as ThemeName
+				} while (!theme || theme === state.app.theme);
 
-			return actions.selectTheme(theme);
-		})
+				return actions.selectTheme(theme);
+			}),
+			take(1)
+		))
 	);
 
-export const feelingLuckyEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
+export const feelingLuckyEpics$ = combineEpics(
 	feelingLucky$
 );

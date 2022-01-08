@@ -2,42 +2,14 @@
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import helpNpx from '../assets/Help.npx';
 
-import { combineEpics, createEpicMiddleware } from 'redux-observable';
-import { notepadEpics$ } from './NotepadEpics';
-import { storageEpics$ } from './StorageEpics';
-import { noteEpics$ } from './NoteEpics';
-import { appEpics$ } from './AppEpics';
+import { createEpicMiddleware } from 'redux-observable';
 import { Action } from 'typescript-fsa';
-import { cryptoEpics$ } from './CryptoEpics';
 import { getStorage, StorageMap, TOAST_HANDLER } from '../root';
-import { printEpics$ } from './PrintEpics';
-import { helpEpics$ } from './HelpEpics';
-import { searchEpics$ } from './SearchEpics';
-import { syncEpics$ } from './SyncEpics';
-import { explorerEpics$ } from './ExplorerEpics';
-import { dueDatesEpics$ } from './DueDatesEpics';
-import { Dispatch, MiddlewareAPI } from 'redux';
 import { IStoreState } from '../types';
 import ToastEventHandler from '../services/ToastEventHandler';
 import { NotificationService } from '../services/NotificationService';
-import { feelingLuckyEpics$ } from './FeelingLuckyEpics';
-import { editorEpics$ } from './EditorEpics';
-
-const baseEpic$ = combineEpics(
-	notepadEpics$,
-	storageEpics$,
-	helpEpics$,
-	searchEpics$,
-	noteEpics$,
-	explorerEpics$,
-	appEpics$,
-	printEpics$,
-	syncEpics$,
-	cryptoEpics$,
-	dueDatesEpics$,
-	feelingLuckyEpics$,
-	editorEpics$
-);
+import { Observable } from 'rxjs';
+import { MicroPadAction } from '../actions';
 
 export type EpicDeps = {
 	helpNpx: string,
@@ -47,7 +19,7 @@ export type EpicDeps = {
 	notificationService: NotificationService
 };
 
-export const epicMiddleware = createEpicMiddleware<Action<any>, any, EpicDeps>(baseEpic$, {
+export const epicMiddleware = createEpicMiddleware<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>({
 	dependencies: {
 		helpNpx,
 		getStorage: getStorage,
@@ -57,4 +29,4 @@ export const epicMiddleware = createEpicMiddleware<Action<any>, any, EpicDeps>(b
 	}
 });
 
-export type EpicStore = MiddlewareAPI<Dispatch, IStoreState>
+export type EpicStore = Observable<IStoreState>
