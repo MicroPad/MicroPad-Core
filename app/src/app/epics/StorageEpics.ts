@@ -22,7 +22,7 @@ import { Dialog } from '../services/dialogs';
 import { ISyncedNotepad } from '../types/SyncTypes';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { elvis, filterTruthy, getUsedAssets, noEmit, resolveElvis } from '../util';
+import { filterTruthy, getUsedAssets, noEmit } from '../util';
 import { DecryptionError, fromShell } from '../services/CryptoService';
 import { AddCryptoPasskeyAction, DeleteElementAction, EncryptNotepadAction } from '../types/ActionTypes';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
@@ -345,11 +345,7 @@ async function cleanHangingAssets(notepadStorage: LocalForage, assetStorage: Loc
 		await notepadStorage.setItem(
 			notepad.title,
 			await notepad.toJson(
-				resolveElvis(
-					elvis(cryptoPasskeys.find(action => action.payload.notepadTitle === notepad.title))
-					.payload
-					.passkey
-				)
+				cryptoPasskeys.find(action => action.payload.notepadTitle === notepad.title)?.payload?.passkey
 			)
 		);
 	}

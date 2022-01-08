@@ -90,39 +90,6 @@ export function getUsedAssets(notepad: FlatNotepad): Set<string> {
 	);
 }
 
-/**
- * Safely travel through data that could be undefined
- */
-export function elvis(obj: any): any {
-	if (obj === undefined || obj === null) obj = { isUndefined: true };
-
-	return new Proxy(typeof obj === 'object' ? { ...obj } : obj, {
-		get: (target: object, key: PropertyKey): any => {
-			// Thanks to https://www.beyondjava.net/elvis-operator-aka-safe-navigation-javascript-typescript
-			const res = target[key];
-			if (!!res) return res instanceof Object ? elvis(res) : res;
-
-			return elvis(undefined);
-		}
-	});
-}
-
-export function resolveElvis(obj: any): any {
-	return !!obj.isUndefined ? undefined : obj;
-}
-
-// Thanks to https://gist.github.com/nmsdvid/8807205
-export function debounce(callback: (...args: any[]) => void, time: number) {
-	let interval;
-	return (...args) => {
-		clearTimeout(interval);
-		interval = setTimeout(() => {
-			interval = null;
-			callback(...args);
-		}, time);
-	};
-}
-
 export function unreachable() {
 	return new Error('Unreachable Error!');
 }
