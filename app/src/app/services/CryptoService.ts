@@ -3,7 +3,7 @@ import { Notepad, Translators } from 'upad-parse/dist';
 import { Dialog, RememberMePromptRes } from './dialogs';
 import { decrypt } from 'upad-parse/dist/crypto';
 import { AddCryptoPasskeyAction, EncryptNotepadAction } from '../types/ActionTypes';
-import { Action } from 'redux-typescript-actions';
+import { Action } from 'typescript-fsa';
 import { actions } from '../actions';
 import { MicroPadStore } from '../root';
 

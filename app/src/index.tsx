@@ -12,6 +12,7 @@ if (window.isSupported) {
 		navigator.storage.persist().then(storageAllowed => {
 			if (!storageAllowed) {
 				console.warn(`Failed to get permission for long-term storage. Notebooks may be removed from your devices storage under storage pressure.`);
+				alert(`Failed to get permission for long-term storage. Notebooks may be removed from your devices storage under storage pressure.`);
 			}
 			initMicroPad();
 		});

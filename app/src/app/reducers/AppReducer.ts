@@ -2,7 +2,7 @@ import { version } from '../../../package.json';
 
 import { Action } from 'redux';
 import { AbstractReducer } from './AbstractReducer';
-import { isType } from 'redux-typescript-actions';
+import { isType } from 'typescript-fsa';
 import { actions } from '../actions';
 import { ThemeName } from '../types/Themes';
 import { parse } from 'semver';
@@ -52,7 +52,12 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 			return {
 				...state,
 				currentModalId: action.payload
-			}
+			};
+		} else if (isType(action, actions.closeModal)) {
+			return {
+				...state,
+				currentModalId: undefined
+			};
 		} else if (isType(action, actions.flipFullScreenState)) {
 			const zoom = state.isFullScreen ? this.initialState.zoom : state.zoom;
 

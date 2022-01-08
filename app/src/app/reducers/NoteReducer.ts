@@ -1,6 +1,6 @@
 import { AbstractReducer } from './AbstractReducer';
 import { Action } from 'redux';
-import { isType } from 'redux-typescript-actions';
+import { isType } from 'typescript-fsa';
 import { actions } from '../actions';
 
 export interface IInsertElementState {
@@ -40,7 +40,7 @@ export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
 			|| isType(action, actions.deleteNotepad)
 			|| isType(action, actions.renameNotepad.done)
 		) {
-			this.cleanUpObjectUrls(state.assetUrls);
+			NoteReducer.cleanUpObjectUrls(state.assetUrls);
 			return this.initialState;
 		} else if (isType(action, actions.loadNote.started)) {
 			return {
@@ -53,7 +53,7 @@ export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
 				isLoading: false
 			};
 		} else if (isType(action, actions.loadNote.done)) {
-			this.cleanUpObjectUrls(state.assetUrls);
+			NoteReducer.cleanUpObjectUrls(state.assetUrls);
 			return {
 				...state,
 				isLoading: false,
@@ -63,7 +63,7 @@ export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
 			};
 		} else if (isType(action, actions.deleteNotepadObject)) {
 			if (action.payload === state.ref) {
-				this.cleanUpObjectUrls(state.assetUrls);
+				NoteReducer.cleanUpObjectUrls(state.assetUrls);
 				return this.initialState;
 			}
 		} else if (isType(action, actions.openEditor)) {
@@ -96,11 +96,9 @@ export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
 		return state;
 	}
 
-	private cleanUpObjectUrls(assetUrls: object) {
-		for (let ref in assetUrls) {
-			if (!assetUrls.hasOwnProperty(ref)) continue;
-
-			URL.revokeObjectURL(assetUrls[ref]);
+	private static cleanUpObjectUrls(assetUrls: object) {
+		for (const url of Object.values(assetUrls)) {
+			URL.revokeObjectURL(assetUrls[url]);
 		}
 	}
 }

@@ -30,8 +30,7 @@ export const moveConnector = connect(
 				internalRef: props.internalRef,
 				oldNotepad,
 				type
-			}))
-			props.changed();
+			}));
 		}
 	})
 );

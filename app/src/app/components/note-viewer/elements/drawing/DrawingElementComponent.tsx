@@ -1,8 +1,11 @@
-import { INoteElementComponentProps } from '../NoteElementComponent';
+import './DrawingElementComponent.css';
 import React from 'react';
+import { INoteElementComponentProps } from '../NoteElementComponent';
 import { trim } from './trim-canvas';
 import { Resizable } from 're-resizable';
-import { Row, Select } from 'react-materialize';
+// Remove unused imports later
+import { Col, Row, Select } from 'react-materialize';
+
 import * as FullScreenService from '../../../../services/FullscreenService';
 import { ConnectedProps } from 'react-redux';
 import { drawingElementConnector } from './DrawingElementContainer';
@@ -25,6 +28,7 @@ const rainbow: ReadonlyArray<string> = [
 
 type Props = ConnectedProps<typeof drawingElementConnector> & INoteElementComponentProps;
 
+
 export default class DrawingElementComponent extends React.Component<Props> {
 	private readonly supportsPointerEvents = typeof window.onpointerdown === 'object';
 
@@ -43,7 +47,6 @@ export default class DrawingElementComponent extends React.Component<Props> {
 		if (!theme) return null;
 
 		const isEditing = element.args.id === elementEditing;
-
 		this.hasTrimmed = false;
 
 		if (isEditing) {
@@ -82,31 +85,59 @@ export default class DrawingElementComponent extends React.Component<Props> {
 							// @ts-expect-error
 							ref={(e: DrawingCanvas | undefined) => this.canvasElement = e?.inner ?? null}
 							key={`drawing-canvas-${this.props.element.args.id}`}
+							className="drawing-element__view"
 							width="500"
 							height="450"
 							style={{ border: 'solid black 1px', touchAction: 'none' }} />
 					</Resizable>
 
 					<Row style={{ padding: '5px' }}>
-						<Select label="Drawing mode" multiple={false} value={this.props.drawMode} onChange={e => this.props.setDrawMode(e.target.value as DrawMode)}>
-							<option value={DrawMode.Line}>Line</option>
-							<option value={DrawMode.ERASE}>Erase</option>
-							<option value={DrawMode.RAINBOW}>Rainbow Mode 🏳️‍🌈</option>
-						</Select>
+						<Col s={6}>
+							<Select
+								key={this.props.drawMode}
+								label="Drawing mode"
+								multiple={false}
+								value={this.props.drawMode}
+								onChange={e => this.props.setDrawMode(e.target.value as DrawMode)}>
+								<option value={DrawMode.Line}>Line</option>
+								<option value={DrawMode.ERASE}>Erase</option>
+								<option value={DrawMode.RAINBOW}>Rainbow Mode 🏳️‍🌈</option>
+							</Select>
+						</Col>
+						<div className="input-field col s6"> {/* Manual <Col> so I can make this an <Input> too */}
+							<div className="select-wrapper"> {/* The colour picker should have the same style rules as a Select */}
+								<input
+									id="drawing-element-editor__color-picker"
+									type="color"
+									list="mp-drawing-colours"
+									value={this.props.drawingLineColour}
+									onChange={e => this.props.setDrawingLineColour(e.target.value)} />
+								<datalist key="mp-drawing-colours" id="mp-drawing-colours">
+									<option value="#000000">Black</option>
+									<option value="#FFFFFF">White</option>
+									<option value="#E70000">Red</option>
+									<option value="#FFEF00">Yellow</option>
+									<option value="#00811F">Green</option>
+									<option value="#0044FF">Blue</option>
+									<option value="#FF6900">Orange</option>
+									<option value="#760089">Purple</option>
+								</datalist>
+							</div>
+							<label id="drawing-element-editor__color-picker-label" htmlFor="drawing-element-editor__color-picker">Line colour</label>
+						</div>
 					</Row>
-
 					{!this.supportsPointerEvents && <p><em>Your browser seems to not support pointer events. Drawing may not work.</em></p>}
 				</div>
 			);
 		}
 
 		return (
-			<div style={{
+			<div className="drawing-element__view" style={{
 				overflow: 'hidden',
 				height: 'auto',
 				minWidth: '170px',
 				minHeight: '130px',
-				backgroundColor: !isEditing ? theme.drawingBackground : undefined
+				backgroundColor: theme.drawingBackground
 			}} onClick={this.openEditor}>
 				<img ref={elm => this.imageElement = elm!} style={{ height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px' }} src={noteAssets[element.args.ext!]} alt="" />
 			</div>
@@ -121,8 +152,10 @@ export default class DrawingElementComponent extends React.Component<Props> {
 		const { element, noteAssets } = this.props;
 
 		this.ongoingTouches = new OngoingTouches();
+
 		const canvasElement = this.canvasElement;
 		if (!!canvasElement) {
+
 			this.initCanvas();
 
 			const isNewEditor = this.props.elementEditing !== prevProps?.elementEditing;
@@ -154,7 +187,9 @@ export default class DrawingElementComponent extends React.Component<Props> {
 
 			this.hasTrimmed = true;
 			const drawingBlob$ = new Promise<Blob | null>(resolve => trim(tmpCanvas).toBlob(blob => resolve(blob)));
-			drawingBlob$.then(drawingBlob => this.imageElement.src = URL.createObjectURL(drawingBlob));
+			drawingBlob$.then(drawingBlob => {
+				if (this.imageElement && drawingBlob) this.imageElement.src = URL.createObjectURL(drawingBlob)
+			});
 		};
 	}
 
@@ -272,13 +307,14 @@ export default class DrawingElementComponent extends React.Component<Props> {
 
 	private getLineStyle = (): string => {
 		// Increment through the colours of the rainbow and reset to the beginning when reaching the last colour
+		//const newIndex = (this.drawingMode === modes.RAINBOW)
 		const newIndex = (this.props.drawMode === DrawMode.RAINBOW)
 			? (this.rainbowIndex < rainbow.length - 1)
 				? 1
 				: this.rainbowIndex * -1
 			: this.rainbowIndex;
 
-		return (this.props.drawMode === DrawMode.RAINBOW) ? rainbow[this.rainbowIndex += newIndex] : '#000000';
+		return (this.props.drawMode === DrawMode.RAINBOW) ? rainbow[this.rainbowIndex += newIndex] : this.props.drawingLineColour;
 	}
 
 	// Draws the outline of a line from pos1 to pos2 with the given width

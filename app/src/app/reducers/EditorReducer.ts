@@ -20,7 +20,7 @@ export class EditorReducer extends AbstractReducer<EditorState> {
 		shouldSpellCheck: true,
 		shouldWordWrap: true,
 		drawMode: DrawMode.Line,
-		drawingLineColour: '#000'
+		drawingLineColour: '#000000'
 	};
 
 	constructor() {
@@ -43,5 +43,7 @@ export class EditorReducer extends AbstractReducer<EditorState> {
 		);
 
 		this.handle((state, { payload }) => ({ ...state, drawMode: payload }), actions.setDrawMode);
+
+		this.handle((state, { payload }) => ({ ...state, drawingLineColour: payload, drawMode: DrawMode.Line }), actions.setDrawingLineColour);
 	}
 }

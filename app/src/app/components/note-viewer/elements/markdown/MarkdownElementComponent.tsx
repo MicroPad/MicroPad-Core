@@ -10,7 +10,6 @@ import * as MarkDownViewer from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
-import { debounce } from '../../../../util';
 import { Button, Checkbox, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
@@ -41,30 +40,11 @@ export interface IShowdownOpts extends ConverterOptions {
 
 type Props = ConnectedProps<typeof markdownElementConnector> & IMarkdownElementComponentProps;
 
+const converter = configureShowdown();
+
 export default class MarkdownElementComponent extends React.Component<Props> {
 	private iframe: HTMLIFrameElement | undefined;
-	private editBox: HTMLTextAreaElement | undefined;
-	private converter: Converter;
-	private readonly updateWithDebounce: (element: NoteElement) => void;
-	private html$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-
-	constructor(props: Props, state: object) {
-		super(props, state);
-
-		this.configureExtensions();
-		this.converter = new Converter({
-			parseImgDimensions: true,
-			simplifiedAutoLink: true,
-			strikethrough: true,
-			tables: true,
-			tasklists: true,
-			noHeaderId: true,
-			emoji: true,
-			extensions: ['maths', 'fend', 'graphs', 'hashtags', 'colour']
-		} as IShowdownOpts);
-
-		this.updateWithDebounce = this.createUpdateWithDebounce();
-	}
+	private readonly html$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
 	render() {
 		const { element, elementEditing, theme } = this.props;
@@ -107,11 +87,11 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 				onResizeStop={(e, d, ref) => {
 					this.onSizeEdit('width', ref.style.width!);
 				}}>
-				<TodoListComponent html$={this.html$} toggle={() => this.sendMessage({
+				{isEditing || <TodoListComponent html$={this.html$} toggle={() => this.sendMessage({
 					id: element.args.id,
 					type: 'toggle',
 					payload: {}
-				})} />
+				})} />}
 
 				{
 					isEditing &&
@@ -196,10 +176,10 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 									overflowX: 'auto'
 								}
 							}
-							ref={input => this.editBox = input!}
 							placeholder="Text (in Markdown)"
-							defaultValue={element.content}
+							value={element.content}
 							onChange={this.onElementEdit}
+							onKeyDown={e => enableTabs(e.target as HTMLTextAreaElement, e)}
 							spellCheck={this.props.shouldSpellCheck}
 							autoFocus={true} />
 					}
@@ -224,8 +204,6 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 					}
 				});
 			};
-		} else if (!!this.editBox) {
-			this.editBox.onkeydown = enableTabs;
 		}
 	}
 
@@ -244,26 +222,22 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 	private onElementEdit = (event) => {
 		const { element } = this.props;
 
-		const newElement: NoteElement = {
+		this.props.updateElement!(element.args.id, {
 			...element,
 			content: event.target.value
-		};
-
-		this.updateWithDebounce(newElement);
+		});
 	}
 
 	private onFontSizeEdit = (event) => {
 		const { element } = this.props;
 
-		const newElement: NoteElement = {
+		this.props.updateElement!(element.args.id, {
 			...element,
 			args: {
 				...element.args,
 				fontSize: event.target.value
 			}
-		};
-
-		this.updateWithDebounce(newElement);
+		});
 	}
 
 	private onSizeEdit = (type: 'width' | 'height', value: string) => {
@@ -290,7 +264,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 	}
 
 	private generateHtml = (element: NoteElement): string => {
-		const html = this.converter.makeHtml(element.content);
+		const html = converter.makeHtml(element.content);
 		this.html$.next(html);
 		return html;
 	}
@@ -348,99 +322,102 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 		if (!this.iframe) return;
 		this.iframe.contentWindow!.postMessage(message, '*');
 	}
+}
 
-	private createUpdateWithDebounce = () => {
-		const { updateElement } = this.props;
-
-		return debounce((element: NoteElement) => {
-			updateElement!(element.args.id, element);
-		}, 100);
-	}
-
-	private configureExtensions = () => {
-		extension('maths', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /(===[^]+?===|''[^]+?''|;;[^]+?;;)/gi,
-					replace: function(s: string, match: string) {
-						matches.push(match);
-						let n = matches.length - 1;
-						return '%MATHPLACEHOLDER' + n + 'ENDMATHPLACEHOLDER%';
-					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							let pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
-					}
+function configureShowdown(): Converter {
+	extension('maths', () => {
+		let matches: string[] = [];
+		return [
+			{
+				type: 'lang',
+				regex: /(===[^]+?===|''[^]+?''|;;[^]+?;;)/gi,
+				replace: function(s: string, match: string) {
+					matches.push(match);
+					let n = matches.length - 1;
+					return '%MATHPLACEHOLDER' + n + 'ENDMATHPLACEHOLDER%';
 				}
-			];
-		});
-
-		extension('fend', fendTransformer);
-
-		extension('graphs', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi,
-					replace: function(s: string) {
-						matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
-						let n = matches.length - 1;
-						return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
+			},
+			{
+				type: 'output',
+				filter: function(text: string) {
+					for (let i = 0; i < matches.length; ++i) {
+						let pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
+						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							const pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
-					}
+					// reset array
+					matches = [];
+					return text;
 				}
-			];
-		});
+			}
+		];
+	});
 
-		extension('hashtags', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /(^|\s)(#[a-z\d-]+)/gi,
-					replace: function(s: string) {
-						matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${s.split('#')[1]}');">${s}</a>`);
-						const n = matches.length - 1;
-						return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
-					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							const pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
-					}
+	extension('fend', fendTransformer);
+
+	extension('graphs', () => {
+		let matches: string[] = [];
+		return [
+			{
+				type: 'lang',
+				regex: /(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi,
+				replace: function(s: string) {
+					matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
+					let n = matches.length - 1;
+					return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
 				}
-			];
-		});
+			},
+			{
+				type: 'output',
+				filter: function(text: string) {
+					for (let i = 0; i < matches.length; ++i) {
+						const pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
+						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+					}
+					// reset array
+					matches = [];
+					return text;
+				}
+			}
+		];
+	});
 
-		extension('colour', colourTransformer);
-	}
+	extension('hashtags', () => {
+		let matches: string[] = [];
+		return [
+			{
+				type: 'lang',
+				regex: /(^|\s)(#[a-z\d-]+)/gi,
+				replace: function(s: string) {
+					matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${s.split('#')[1]}');">${s}</a>`);
+					const n = matches.length - 1;
+					return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
+				}
+			},
+			{
+				type: 'output',
+				filter: function(text: string) {
+					for (let i = 0; i < matches.length; ++i) {
+						const pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
+						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+					}
+					// reset array
+					matches = [];
+					return text;
+				}
+			}
+		];
+	});
+
+	extension('colour', colourTransformer);
+
+	return new Converter({
+		parseImgDimensions: true,
+		simplifiedAutoLink: true,
+		strikethrough: true,
+		tables: true,
+		tasklists: true,
+		noHeaderId: true,
+		emoji: true,
+		extensions: ['maths', 'fend', 'graphs', 'hashtags', 'colour']
+	} as IShowdownOpts);
 }

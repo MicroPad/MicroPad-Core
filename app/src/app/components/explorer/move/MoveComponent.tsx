@@ -7,7 +7,6 @@ export type Props = ConnectedProps<typeof moveConnector> & MoveComponentExplicit
 export type MoveComponentExplicitProps = {
 	internalRef: string,
 	type: 'section' | 'note',
-	changed: () => void
 };
 
 const MoveComponent = (props: Props) => {

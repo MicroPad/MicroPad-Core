@@ -1,6 +1,3 @@
-// TODO: Clear out core-js dep when this isn't needed anymore (node >= 15)
-import 'core-js/features/string/replace-all';
-
 import { build } from 'esbuild';
 import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises';
 import { join } from 'path';
@@ -19,6 +16,7 @@ const PORT: number = (() => {
 })();
 
 clearBrowserslistCache();
+const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'));
 
 (async () => {
 	process.env.PUBLIC_URL ??= '';
@@ -34,7 +32,7 @@ clearBrowserslistCache();
 		bundle: true,
 		outdir: `${OUT_DIR}/dist`,
 		platform: 'browser',
-		target: 'es6',
+		target: 'es2015',
 		format: 'iife',
 		minify: true,
 		sourcemap: true,
@@ -84,7 +82,7 @@ clearBrowserslistCache();
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
 		plugins: [
-			esbuildPluginBrowserslist(browserslist())
+			esbuildPluginBrowserslist(esBuildTargets)
 		],
 	}).catch(() => process.exit(1));
 
@@ -125,7 +123,7 @@ clearBrowserslistCache();
 			'build.defs.SYNC_WORKER_PATH': `'${syncWorkerJsPath}'`,
 		},
 		plugins: [
-			esbuildPluginBrowserslist(browserslist())
+			esbuildPluginBrowserslist(esBuildTargets)
 		],
 	}).catch(() => process.exit(1));
 
@@ -172,6 +170,9 @@ clearBrowserslistCache();
 			'process.env.NODE_ENV': '"production"',
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
+		plugins: [
+			esbuildPluginBrowserslist(esBuildTargets)
+		],
 	}).catch(() => process.exit(1));
 
 	// Build manifest
@@ -183,6 +184,7 @@ clearBrowserslistCache();
 
 	// Copy in WASM
 	await copyFile(join('node_modules', 'fend-wasm-web', 'fend_wasm_bg.wasm'), join(OUT_DIR, 'dist', 'fend_wasm_bg.wasm'));
+	await copyFile(join('node_modules', '@nick_webster', 'photon', 'photon_rs_bg.wasm'), join(OUT_DIR, 'dist', 'photon_rs_bg.wasm'));
 
 	console.log('Built!');
 

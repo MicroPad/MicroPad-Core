@@ -1,4 +1,4 @@
-import { Action, ActionCreator } from 'redux-typescript-actions';
+import { Action, ActionCreator } from 'typescript-fsa';
 import { IStoreState } from '../types';
 import { MicroPadAction } from '../actions';
 

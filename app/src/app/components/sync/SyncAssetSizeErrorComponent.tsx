@@ -1,6 +1,4 @@
 import React from 'react';
-import { Button } from 'react-materialize';
-import { MICROPAD_URL, SYNC_NAME } from '../../types';
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
 import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
 import { SYNC_ASSET_OVERSIZED_MESSAGE, SYNC_ASSET_OVERSIZED_MODAL_TITLE } from '../../strings.enNZ';

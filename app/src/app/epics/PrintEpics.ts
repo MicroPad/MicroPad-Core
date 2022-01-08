@@ -1,20 +1,20 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { filterTruthy } from '../util';
 import { actions, MicroPadAction } from '../actions';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { filter, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { IStoreState } from '../types';
 import { trim } from '../components/note-viewer/elements/drawing/trim-canvas';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist';
 import { MarkdownNote, NoteElement } from 'upad-parse/dist/Note';
 import { from, Observable } from 'rxjs';
 import { ASSET_STORAGE } from '../root';
-import { EpicStore } from './index';
+import { EpicDeps, EpicStore } from './index';
 
-export const generateMarkdownForPrint$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+export const generateMarkdownForPrint$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType<MicroPadAction>(actions.print.started.type),
-		map(() => store.getState()),
-		map((state: IStoreState): [FlatNotepad, string] => [state.notepads.notepad?.item!, state.currentNote.ref]),
+		ofType(actions.print.started.type),
+		withLatestFrom(state$),
+		map(([,state]): [FlatNotepad, string] => [state.notepads.notepad?.item!, state.currentNote.ref]),
 		filter(([notepad, noteRef]: [FlatNotepad, string]) => !!notepad && !!noteRef),
 		map(([notepad, noteRef]: [FlatNotepad, string]) => notepad.notes[noteRef]),
 		filterTruthy(),
@@ -45,23 +45,24 @@ export const generateMarkdownForPrint$ = (action$: Observable<MicroPadAction>, s
 				] as [Note, Asset[]];
 			})())
 		),
-		switchMap(([note, assets]: [Note, Asset[]]) => from((note as Note).toMarkdown(assets))),
-		map((mdNote: MarkdownNote) => ({
-			content: mdNote.md,
-			args: {
-				id: 'markdown1_print',
-				width: 'auto',
-				height: 'auto',
-				fontSize: '12pt',
-				x: '0px',
-				y: '0px'
-			},
-			type: 'markdown'
-		} as NoteElement)),
-		map((element: NoteElement) => actions.print.done({ params: undefined, result: element }))
+		switchMap(([note, assets]: [Note, Asset[]]) => from(note.toMarkdown(assets)).pipe(
+			map((mdNote: MarkdownNote) => ({
+				content: mdNote.md,
+				args: {
+					id: 'markdown1_print',
+					width: 'auto',
+					height: 'auto',
+					fontSize: '12pt',
+					x: '0px',
+					y: '0px'
+				},
+				type: 'markdown'
+			} as NoteElement)),
+			map((element: NoteElement) => actions.print.done({ result: element }))
+		))
 	);
 
-export const printEpics$ = combineEpics(
+export const printEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	generateMarkdownForPrint$
 );
 

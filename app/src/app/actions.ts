@@ -1,4 +1,4 @@
-import actionCreatorFactory, { ActionCreator, AsyncActionCreators } from 'redux-typescript-actions';
+import actionCreatorFactory, { ActionCreator, AsyncActionCreators } from 'typescript-fsa';
 import { IRenameNotepadObjectAction } from './types/NotepadTypes';
 import {
 	AddCryptoPasskeyAction,
@@ -28,6 +28,14 @@ import { DrawMode } from './reducers/EditorReducer';
 
 export type MicroPadAction = ActionTypes[keyof ActionTypes];
 export type ActionNames = keyof ActionFactories;
+
+export type MicroPadActions = {
+	[ActionName in ActionNames]: ActionFactories[ActionName] extends ActionCreator<any>
+		? ReturnType<ActionFactories[ActionName]>
+		: ActionFactories[ActionName] extends AsyncActionCreators<any, any, any>
+			? { started: ReturnType<ActionFactories[ActionName]['started']>, done: ReturnType<ActionFactories[ActionName]['done']>, failed: ReturnType<ActionFactories[ActionName]['failed']> }
+			: never;
+};
 
 type ActionFactories = typeof actions;
 type ActionTypes = {
@@ -124,7 +132,9 @@ export const actions = {
 	toggleSpellCheck: actionCreator<boolean | void>('TOGGLE_SPELL_CHECK'),
 	toggleWordWrap: actionCreator<boolean | void>('TOGGLE_WORD_WRAP'),
 	openModal: actionCreator<string>('OPEN_MODAL'),
-	setDrawMode: actionCreator<DrawMode>('SET_DRAW_MODE')
+	closeModal: actionCreator<void>('CLOSE_MODAL'),
+	setDrawMode: actionCreator<DrawMode>('SET_DRAW_MODE'),
+	setDrawingLineColour: actionCreator<string>('SET_DRAWING_LINE_COLOUR')
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
