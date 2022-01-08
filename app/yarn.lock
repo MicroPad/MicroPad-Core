@@ -5683,14 +5683,14 @@ re-resizable@^6.9.0:
   dependencies:
     fast-memoize "^2.5.1"
 
-react-dom@^18.0.0-beta-149b420f6-20211119:
-  version "18.0.0-beta-fdc1d617a-20211118"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.0.0-beta-fdc1d617a-20211118.tgz#0d2ddaa962fae1bbcf17c0eac5e3879d30793753"
-  integrity sha512-BlA0NdAKE+Ibe5orAfHphf76ltL9+PiWsexrjVjtRcumrra3WH3rDYT+evXfLFBzxpbZDjhkL1oQ1/zCjKyWBA==
+react-dom@^18.0.0-rc.0-next-fe419346d-20220105:
+  version "18.0.0-rc.0-next-fe419346d-20220105"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.0.0-rc.0-next-fe419346d-20220105.tgz#088f9ba3eda4baf34f5a6723f99450e91dfe7b16"
+  integrity sha512-zvZmV2HneSUV5bFABIDbxPyY/EbrNksXmU6pL18upPAUy+pgR2pFngzsbFi8n6R1B/yWZKvwh7Fyor13j9NNXw==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-    scheduler "0.21.0-beta-fdc1d617a-20211118"
+    scheduler "0.21.0-rc.0-next-fe419346d-20220105"
 
 react-draggable@^4.3.1:
   version "4.4.4"
@@ -5759,10 +5759,10 @@ react-treeview@^0.4.7:
   dependencies:
     prop-types "^15.5.8"
 
-react@^18.0.0-beta-149b420f6-20211119:
-  version "18.0.0-beta-fdc1d617a-20211118"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.0.0-beta-fdc1d617a-20211118.tgz#ed8dd1674ddcab02bfff88ba368ad4d44db79fa7"
-  integrity sha512-+02tXs7Wc5az4Aw+dWp7Vwmd68POpiJF0pD20dVCwS+W8xxQ9GFEJrd5VE4Nal+HWDkGzSb6dApxoahULK/8ZA==
+react@^18.0.0-rc.0-next-fe419346d-20220105:
+  version "18.0.0-rc.0-next-fe419346d-20220105"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.0.0-rc.0-next-fe419346d-20220105.tgz#ce42410d2cfa17c1775819fb90dc58faea87fc9a"
+  integrity sha512-+Z40aKfTF4fRlaeHVFiZ0NnRSV+r/WtrQM17nzs59bGaUtIRaui5oZ9oYvLX3XpfME/L1L0mU9+5PqSHA8FS3Q==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -6031,10 +6031,10 @@ saxes@^5.0.1:
   dependencies:
     xmlchars "^2.2.0"
 
-scheduler@0.21.0-beta-fdc1d617a-20211118:
-  version "0.21.0-beta-fdc1d617a-20211118"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.21.0-beta-fdc1d617a-20211118.tgz#1f5e075e81b48af4a50d8f602a7a636731f0b8d4"
-  integrity sha512-fagjljhO7tVIGdT3rtYjjbHve/XfMubdY3Yna799WMK/rfYZtsGvX3GPu3IsjwOIs3IrcGjlxVRm6u3PFO+lwA==
+scheduler@0.21.0-rc.0-next-fe419346d-20220105:
+  version "0.21.0-rc.0-next-fe419346d-20220105"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.21.0-rc.0-next-fe419346d-20220105.tgz#0f57a98e0c5702e1ad098d9228ee651abd954ea7"
+  integrity sha512-DerOJ2siEsHU3nJGB/0O3c3FW9JtVcf3Kwsxna2rGgwOzhQBVCnxemVhbEmJTq1AfEOB/NBA07Y/uqIJYBLGAw==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
