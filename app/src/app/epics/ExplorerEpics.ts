@@ -1,6 +1,5 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { concatMap, filter, map, tap, withLatestFrom } from 'rxjs/operators';
-import { Action } from 'typescript-fsa';
 import { actions, MicroPadAction, MicroPadActions } from '../actions';
 import { filterTruthy, noEmit } from '../util';
 import { NewNotepadObjectAction } from '../types/ActionTypes';

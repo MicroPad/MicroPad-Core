@@ -1,12 +1,8 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { catchError, debounceTime, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
-import { Action, Success } from 'typescript-fsa';
 import { actions, MicroPadAction, MicroPadActions } from '../actions';
-import { Dispatch } from 'redux';
-import { SearchIndices } from '../types/ActionTypes';
 import { EpicDeps, EpicStore } from './index';
-import { Notepad } from 'upad-parse/dist';
 import { indexNotepads, search } from '../services/SearchService';
 import { IStoreState } from '../types';
 
