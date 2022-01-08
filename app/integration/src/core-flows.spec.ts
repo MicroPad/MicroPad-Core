@@ -3,6 +3,8 @@ import { createNotebookUsingDropdown } from './utils/notebooks';
 import { IMG_SNAPSHOT_OPTS } from './utils/jest-image';
 
 describe(`Core Flows`, () => {
+	jest.retryTimes(2);
+
 	beforeAll(async () => {
 		await stabiliseMicroPad(); // Load MicroPad
 	})
