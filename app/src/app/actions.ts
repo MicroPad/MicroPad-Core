@@ -1,4 +1,4 @@
-import actionCreatorFactory, { ActionCreator, AsyncActionCreators } from 'redux-typescript-actions';
+import actionCreatorFactory, { ActionCreator, AsyncActionCreators } from 'typescript-fsa';
 import { IRenameNotepadObjectAction } from './types/NotepadTypes';
 import {
 	AddCryptoPasskeyAction,

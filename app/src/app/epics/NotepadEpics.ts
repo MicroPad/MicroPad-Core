@@ -11,7 +11,7 @@ import {
 	tap,
 	throttleTime
 } from 'rxjs/operators';
-import { Action, Failure, Success } from 'redux-typescript-actions';
+import { Action, Failure, Success } from 'typescript-fsa';
 import { combineEpics, ofType } from 'redux-observable';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';

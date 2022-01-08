@@ -1,7 +1,7 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { catchError, debounceTime, map, switchMap } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
-import { Action, Success } from 'redux-typescript-actions';
+import { Action, Success } from 'typescript-fsa';
 import { actions, MicroPadAction } from '../actions';
 import { Dispatch } from 'redux';
 import { SearchIndices } from '../types/ActionTypes';

@@ -12,7 +12,7 @@ import {
 	take,
 	tap
 } from 'rxjs/operators';
-import { Action, Success } from 'redux-typescript-actions';
+import { Action, Success } from 'typescript-fsa';
 import { combineEpics, ofType } from 'redux-observable';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { IStoreState } from '../types';

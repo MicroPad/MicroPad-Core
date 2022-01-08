@@ -1,7 +1,7 @@
 import { INotepadSharingData, SyncUser } from '../types/SyncTypes';
 import { AbstractReducer } from './AbstractReducer';
 import { Action } from 'redux';
-import { isType } from 'redux-typescript-actions';
+import { isType } from 'typescript-fsa';
 import { actions } from '../actions';
 
 export interface ISyncState {

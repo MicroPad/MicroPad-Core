@@ -3,7 +3,7 @@ import { actions, MicroPadAction } from '../actions';
 import { Dispatch } from 'redux';
 import { EpicDeps, EpicStore } from './index';
 import { Observable } from 'rxjs';
-import { Action } from 'redux-typescript-actions';
+import { Action } from 'typescript-fsa';
 import { map } from 'rxjs/operators';
 import { ThemeValues } from '../ThemeValues';
 import { ThemeName } from '../types/Themes';

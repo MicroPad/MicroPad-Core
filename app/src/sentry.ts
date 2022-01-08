@@ -3,7 +3,7 @@ import { Integrations } from '@sentry/tracing';
 import { isDev } from './app/util';
 import { version } from '../package.json';
 import { MicroPadAction } from './app/actions';
-import { Failure } from 'redux-typescript-actions';
+import { Failure } from 'typescript-fsa';
 import { CaptureConsole } from '@sentry/integrations';
 
 enum SentryEnv {

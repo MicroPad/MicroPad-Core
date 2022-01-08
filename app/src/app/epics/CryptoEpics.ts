@@ -2,7 +2,7 @@ import { combineEpics, ofType } from 'redux-observable';
 import { EMPTY, from, Observable } from 'rxjs';
 import { catchError, concatMap, filter, map } from 'rxjs/operators';
 import { actions, MicroPadAction } from '../actions';
-import { Action } from 'redux-typescript-actions';
+import { Action } from 'typescript-fsa';
 import { EpicDeps, EpicStore } from './index';
 import { AddCryptoPasskeyAction } from '../types/ActionTypes';
 import { Dispatch } from 'redux';

@@ -2,7 +2,7 @@ import { version } from '../../../package.json';
 
 import { Action } from 'redux';
 import { AbstractReducer } from './AbstractReducer';
-import { isType } from 'redux-typescript-actions';
+import { isType } from 'typescript-fsa';
 import { actions } from '../actions';
 import { ThemeName } from '../types/Themes';
 import { parse } from 'semver';

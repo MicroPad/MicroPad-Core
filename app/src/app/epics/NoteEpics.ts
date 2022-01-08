@@ -1,7 +1,7 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { catchError, concatMap, filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
-import { Action } from 'redux-typescript-actions';
+import { Action } from 'typescript-fsa';
 import { actions, MicroPadAction } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { filterTruthy, generateGuid } from '../util';

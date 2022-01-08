@@ -3,7 +3,7 @@ import { noEmit } from '../util';
 import { catchError, delay, filter, map, switchMap, tap } from 'rxjs/operators';
 import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
 import * as localforage from 'localforage';
-import { Action, Success } from 'redux-typescript-actions';
+import { Action, Success } from 'typescript-fsa';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
 import { FlatNotepad } from 'upad-parse/dist';
 import { EMPTY, Observable } from 'rxjs';

@@ -13,7 +13,7 @@ import {
 	switchMap,
 	tap
 } from 'rxjs/operators';
-import { Action, Success } from 'redux-typescript-actions';
+import { Action, Success } from 'typescript-fsa';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
 import { ASSET_STORAGE, store as STORE, SYNC_STORAGE } from '../root';
 import * as DifferenceEngine from '../services/DifferenceEngine';

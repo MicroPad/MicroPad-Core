@@ -1,6 +1,6 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { forkJoin, from, Observable, of } from 'rxjs';
-import { Action, Success } from 'redux-typescript-actions';
+import { Action, Success } from 'typescript-fsa';
 import { actions, MicroPadAction } from '../actions';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { EpicDeps, EpicStore } from './index';

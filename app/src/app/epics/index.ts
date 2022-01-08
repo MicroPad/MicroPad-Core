@@ -7,7 +7,7 @@ import { notepadEpics$ } from './NotepadEpics';
 import { storageEpics$ } from './StorageEpics';
 import { noteEpics$ } from './NoteEpics';
 import { appEpics$ } from './AppEpics';
-import { Action } from 'redux-typescript-actions';
+import { Action } from 'typescript-fsa';
 import { cryptoEpics$ } from './CryptoEpics';
 import { getStorage, StorageMap, TOAST_HANDLER } from '../root';
 import { printEpics$ } from './PrintEpics';
