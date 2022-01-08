@@ -1,26 +1,27 @@
 import { combineEpics, ofType } from 'redux-observable';
-import { catchError, debounceTime, map, switchMap } from 'rxjs/operators';
+import { catchError, debounceTime, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
 import { Action, Success } from 'typescript-fsa';
-import { actions, MicroPadAction } from '../actions';
+import { actions, MicroPadAction, MicroPadActions } from '../actions';
 import { Dispatch } from 'redux';
 import { SearchIndices } from '../types/ActionTypes';
 import { EpicDeps, EpicStore } from './index';
 import { Notepad } from 'upad-parse/dist';
 import { indexNotepads, search } from '../services/SearchService';
+import { IStoreState } from '../types';
 
 export const refreshIndices$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		ofType<MicroPadAction, Action<Success<Notepad, void> | string>>(actions.saveNotepad.done.type, actions.deleteNotepad.type),
+		ofType(actions.saveNotepad.done.type, actions.deleteNotepad.type),
 		map(() => actions.indexNotepads.started(undefined))
 	);
 
-export const indexNotepads$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+export const indexNotepads$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType<MicroPadAction>(actions.indexNotepads.started.type),
-		map(() => store.getState().search.indices),
-		switchMap((indices: SearchIndices) =>
-			from(indexNotepads(indices, store.getState().notepadPasskeys)).pipe(
+		ofType(actions.indexNotepads.started.type),
+		withLatestFrom(state$),
+		switchMap(([,state]) =>
+			from(indexNotepads(state.search.indices, state.notepadPasskeys)).pipe(
 				map(newIndices => actions.indexNotepads.done({ params: undefined, result: newIndices })),
 				catchError(err => {
 					console.error(err);
@@ -30,17 +31,19 @@ export const indexNotepads$ = (action$: Observable<MicroPadAction>, store: EpicS
 		)
 	);
 
-export const search$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+export const search$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType<MicroPadAction, Action<string>>(actions.search.started.type),
+		ofType(actions.search.started.type),
 		debounceTime(100),
-		map((action: Action<string>) => actions.search.done({
+		map(action => (action as MicroPadActions['search']['started'])),
+		withLatestFrom(state$),
+		map(([action, state]) => actions.search.done({
 			params: action.payload,
-			result: search(action.payload, store.getState().search.indices)
+			result: search(action.payload, state.search.indices)
 		}))
 	);
 
-export const searchEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
+export const searchEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	refreshIndices$,
 	indexNotepads$,
 	search$

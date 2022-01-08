@@ -16,19 +16,19 @@ import { catchError } from 'rxjs/operators';
 
 export const rootEpic$ = (action$, store$, deps) =>
 	combineEpics(
-		// notepadEpics$,
-		// storageEpics$,
-		// helpEpics$,
-		// searchEpics$,
-		// noteEpics$,
-		// explorerEpics$,
-		// appEpics$,
-		// printEpics$,
-		// syncEpics$,
-		// cryptoEpics$,
-		// dueDatesEpics$,
+		notepadEpics$,
+		storageEpics$,
+		helpEpics$,
+		searchEpics$,
+		noteEpics$,
+		explorerEpics$,
+		appEpics$,
+		printEpics$,
+		syncEpics$,
+		cryptoEpics$,
+		dueDatesEpics$,
 		feelingLuckyEpics$,
-		// editorEpics$
+		editorEpics$
 	)(action$, store$, deps).pipe(
 		catchError((error, source$) => {
 			console.error('Uncaught in epic:', error);

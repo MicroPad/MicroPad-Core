@@ -2,13 +2,11 @@
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import helpNpx from '../assets/Help.npx';
 
-import { createEpicMiddleware } from 'redux-observable';
-import { Action } from 'typescript-fsa';
+import { createEpicMiddleware, StateObservable } from 'redux-observable';
 import { getStorage, StorageMap, TOAST_HANDLER } from '../root';
 import { IStoreState } from '../types';
 import ToastEventHandler from '../services/ToastEventHandler';
 import { NotificationService } from '../services/NotificationService';
-import { Observable } from 'rxjs';
 import { MicroPadAction } from '../actions';
 
 export type EpicDeps = {
@@ -29,4 +27,4 @@ export const epicMiddleware = createEpicMiddleware<MicroPadAction, MicroPadActio
 	}
 });
 
-export type EpicStore = Observable<IStoreState>
+export type EpicStore = StateObservable<IStoreState>;

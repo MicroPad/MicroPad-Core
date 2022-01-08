@@ -29,6 +29,14 @@ import { DrawMode } from './reducers/EditorReducer';
 export type MicroPadAction = ActionTypes[keyof ActionTypes];
 export type ActionNames = keyof ActionFactories;
 
+export type MicroPadActions = {
+	[ActionName in ActionNames]: ActionFactories[ActionName] extends ActionCreator<any>
+		? ReturnType<ActionFactories[ActionName]>
+		: ActionFactories[ActionName] extends AsyncActionCreators<any, any, any>
+			? { started: ReturnType<ActionFactories[ActionName]['started']>, done: ReturnType<ActionFactories[ActionName]['done']>, failed: ReturnType<ActionFactories[ActionName]['failed']> }
+			: never;
+};
+
 type ActionFactories = typeof actions;
 type ActionTypes = {
 	[ActionName in ActionNames]: ActionFactories[ActionName] extends ActionCreator<any>

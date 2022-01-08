@@ -188,7 +188,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 			this.hasTrimmed = true;
 			const drawingBlob$ = new Promise<Blob | null>(resolve => trim(tmpCanvas).toBlob(blob => resolve(blob)));
 			drawingBlob$.then(drawingBlob => {
-				if (this.imageElement) this.imageElement.src = URL.createObjectURL(drawingBlob)
+				if (this.imageElement && drawingBlob) this.imageElement.src = URL.createObjectURL(drawingBlob)
 			});
 		};
 	}

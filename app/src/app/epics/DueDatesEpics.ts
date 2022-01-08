@@ -1,43 +1,43 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { forkJoin, from, Observable, of } from 'rxjs';
-import { Action, Success } from 'typescript-fsa';
-import { actions, MicroPadAction } from '../actions';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { actions, MicroPadAction, MicroPadActions } from '../actions';
+import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { EpicDeps, EpicStore } from './index';
-import { Notepad, Translators } from 'upad-parse/dist';
+import { Translators } from 'upad-parse/dist';
 import { NotepadShell } from 'upad-parse/dist/interfaces';
 import { getDueDates, sortDueDates } from '../services/DueDates';
-import { Dispatch } from 'redux';
+import { IStoreState } from '../types';
 
 export const getDueDatesOnInit$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		ofType<MicroPadAction, Action<Success<void, string[]>>>(actions.getNotepadList.done.type),
-		map((action: Action<Success<void, string[]>>) => actions.getDueDates.started(action.payload.result))
+		ofType(actions.getNotepadList.done.type),
+		map(action => actions.getDueDates.started((action as MicroPadActions['getNotepadList']['done']).payload.result))
 	);
 
-export const getDueDatesOnSave$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+export const getDueDatesOnSave$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType<MicroPadAction, Action<Success<Notepad, void>>>(actions.saveNotepad.done.type),
-		map(() => store.getState().notepads.savedNotepadTitles!),
-		map(titles => actions.getDueDates.started(titles))
+		ofType(actions.saveNotepad.done.type),
+		withLatestFrom(state$),
+		map(([,state]) => actions.getDueDates.started(state.notepads.savedNotepadTitles!))
 	);
 
-export const getDueDates$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
+export const getDueDates$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { getStorage }: EpicDeps) =>
 	action$.pipe(
-		ofType<MicroPadAction, Action<string[]>>(actions.getDueDates.started.type),
-		map((action: Action<string[]>) =>
-			action.payload.map(name =>
+		ofType(actions.getDueDates.started.type),
+		map(action =>
+			(action as MicroPadActions['getDueDates']['started']).payload.map(name =>
 				getStorage().notepadStorage.getItem<string>(name)
 					.then(json => JSON.parse(json!) as NotepadShell)
 			)
 		),
 		switchMap(notebookObjs$ =>
 			from(Promise.all(notebookObjs$)).pipe(
-				switchMap(notebookObjs => {
+				withLatestFrom(state$),
+				switchMap(([notebookObjs, state]) => {
 					const dueDates$ = notebookObjs
-						.filter(obj => !obj.crypto || !!store.getState().notepadPasskeys[obj.title])
+						.filter(obj => !obj.crypto || !!state.notepadPasskeys[obj.title])
 						.map(obj =>
-							from(Translators.Json.toFlatNotepadFromNotepad(obj, store.getState().notepadPasskeys[obj.title])).pipe(
+							from(Translators.Json.toFlatNotepadFromNotepad(obj, state.notepadPasskeys[obj.title])).pipe(
 								map(notepad => getDueDates(notepad))
 							)
 						);
@@ -57,7 +57,7 @@ export const getDueDates$ = (action$: Observable<MicroPadAction>, store: EpicSto
 		)
 	);
 
-export const dueDatesEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
+export const dueDatesEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	getDueDatesOnInit$,
 	getDueDatesOnSave$,
 	getDueDates$
