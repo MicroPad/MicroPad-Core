@@ -48,6 +48,7 @@ import { hasRequiredFeatures } from '../unsupported-page/feature-detect';
 import { showUnsupportedPage } from '../unsupported-page/show-page';
 import { restoreSavedPasswords } from './services/CryptoService';
 import InfoModalsComponent from './components/InfoModalsComponent';
+import { rootEpic$ } from './epics/rootEpic';
 
 window.MicroPadGlobals = {};
 
@@ -63,6 +64,8 @@ export const store = createStore(
 	baseReducer.initialState,
 	composeWithDevTools(compose(applyMiddleware(epicMiddleware), createSentryReduxEnhancer()))
 );
+
+epicMiddleware.run(rootEpic$);
 
 export type MicroPadStore = typeof store;
 

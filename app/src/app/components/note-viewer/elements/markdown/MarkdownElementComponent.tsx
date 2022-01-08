@@ -325,92 +325,90 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 }
 
 function configureShowdown(): Converter {
-	{
-		extension('maths', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /(===[^]+?===|''[^]+?''|;;[^]+?;;)/gi,
-					replace: function(s: string, match: string) {
-						matches.push(match);
-						let n = matches.length - 1;
-						return '%MATHPLACEHOLDER' + n + 'ENDMATHPLACEHOLDER%';
-					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							let pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
-					}
+	extension('maths', () => {
+		let matches: string[] = [];
+		return [
+			{
+				type: 'lang',
+				regex: /(===[^]+?===|''[^]+?''|;;[^]+?;;)/gi,
+				replace: function(s: string, match: string) {
+					matches.push(match);
+					let n = matches.length - 1;
+					return '%MATHPLACEHOLDER' + n + 'ENDMATHPLACEHOLDER%';
 				}
-			];
-		});
-
-		extension('fend', fendTransformer);
-
-		extension('graphs', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi,
-					replace: function(s: string) {
-						matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
-						let n = matches.length - 1;
-						return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
+			},
+			{
+				type: 'output',
+				filter: function(text: string) {
+					for (let i = 0; i < matches.length; ++i) {
+						let pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
+						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							const pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
-					}
+					// reset array
+					matches = [];
+					return text;
 				}
-			];
-		});
+			}
+		];
+	});
 
-		extension('hashtags', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /(^|\s)(#[a-z\d-]+)/gi,
-					replace: function(s: string) {
-						matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${s.split('#')[1]}');">${s}</a>`);
-						const n = matches.length - 1;
-						return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
-					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							const pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
-					}
+	extension('fend', fendTransformer);
+
+	extension('graphs', () => {
+		let matches: string[] = [];
+		return [
+			{
+				type: 'lang',
+				regex: /(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi,
+				replace: function(s: string) {
+					matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
+					let n = matches.length - 1;
+					return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
 				}
-			];
-		});
+			},
+			{
+				type: 'output',
+				filter: function(text: string) {
+					for (let i = 0; i < matches.length; ++i) {
+						const pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
+						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+					}
+					// reset array
+					matches = [];
+					return text;
+				}
+			}
+		];
+	});
 
-		extension('colour', colourTransformer);
-	}
+	extension('hashtags', () => {
+		let matches: string[] = [];
+		return [
+			{
+				type: 'lang',
+				regex: /(^|\s)(#[a-z\d-]+)/gi,
+				replace: function(s: string) {
+					matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${s.split('#')[1]}');">${s}</a>`);
+					const n = matches.length - 1;
+					return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
+				}
+			},
+			{
+				type: 'output',
+				filter: function(text: string) {
+					for (let i = 0; i < matches.length; ++i) {
+						const pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
+						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+					}
+					// reset array
+					matches = [];
+					return text;
+				}
+			}
+		];
+	});
+
+	extension('colour', colourTransformer);
 
 	return new Converter({
 		parseImgDimensions: true,

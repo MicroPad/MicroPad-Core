@@ -1,15 +1,16 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { actions, MicroPadAction } from '../actions';
-import { Dispatch } from 'redux';
 import { EpicDeps, EpicStore } from './index';
 import { from, Observable } from 'rxjs';
-import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
+import { distinctUntilChanged, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { noEmit } from '../util';
+import { IStoreState } from '../types';
 
-export const persistSpellCheck$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
+export const persistSpellCheck$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { getStorage }: EpicDeps) =>
 	action$.pipe(
-		ofType<MicroPadAction>(actions.toggleSpellCheck.type),
-		map(() => store.getState().editor.shouldSpellCheck),
+		ofType(actions.toggleSpellCheck.type),
+		withLatestFrom(state$),
+		map(([,state]) => state.editor.shouldSpellCheck),
 		distinctUntilChanged(),
 		switchMap(shouldSpellCheck => from(
 			getStorage()
@@ -20,10 +21,11 @@ export const persistSpellCheck$ = (action$: Observable<MicroPadAction>, store: E
 		noEmit()
 	);
 
-export const persistWordWrap$ = (action$: Observable<MicroPadAction>, store: EpicStore, { getStorage }: EpicDeps) =>
+export const persistWordWrap$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { getStorage }: EpicDeps) =>
 	action$.pipe(
-		ofType<MicroPadAction>(actions.toggleWordWrap.type),
-		map(() => store.getState().editor.shouldWordWrap),
+		ofType(actions.toggleWordWrap.type),
+		withLatestFrom(state$),
+		map(([,state]) => state.editor.shouldWordWrap),
 		distinctUntilChanged(),
 		switchMap(shouldWordWrap => from(
 			getStorage()
@@ -34,7 +36,7 @@ export const persistWordWrap$ = (action$: Observable<MicroPadAction>, store: Epi
 		noEmit()
 	);
 
-export const editorEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
+export const editorEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	persistSpellCheck$,
 	persistWordWrap$
 );

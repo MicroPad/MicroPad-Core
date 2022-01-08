@@ -1,6 +1,6 @@
 import { AbstractReducer } from './AbstractReducer';
 import { Action } from 'redux';
-import { isType } from 'redux-typescript-actions';
+import { isType } from 'typescript-fsa';
 import { actions } from '../actions';
 import { Note } from 'upad-parse/dist';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';

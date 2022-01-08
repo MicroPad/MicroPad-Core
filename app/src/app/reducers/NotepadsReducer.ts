@@ -2,7 +2,7 @@ import { AbstractReducer } from './AbstractReducer';
 import { Action } from 'redux';
 import { INotepadsStoreState, INotepadStoreState } from '../types/NotepadTypes';
 import { actions } from '../actions';
-import { isType, Success } from 'redux-typescript-actions';
+import { isType, Success } from 'typescript-fsa';
 import stringify from 'json-stringify-safe';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { FlatNotepad, Note } from 'upad-parse/dist';

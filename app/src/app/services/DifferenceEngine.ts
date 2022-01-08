@@ -1,10 +1,10 @@
-import { from, fromEvent, Observable, of } from 'rxjs';
+import { from, fromEvent, lastValueFrom, Observable, of } from 'rxjs';
 import { MICROPAD_URL } from '../types';
 import { concatMap, filter, map, retry, take } from 'rxjs/operators';
 import { AssetList, INotepadSharingData, ISyncedNotepad, SyncedNotepadList } from '../types/SyncTypes';
 import { parse } from 'date-fns';
 import { LAST_MODIFIED_FORMAT, Notepad } from 'upad-parse/dist';
-import { ajax, AjaxResponse } from 'rxjs/ajax';
+import { ajax } from 'rxjs/ajax';
 import { encrypt } from 'upad-parse/dist/crypto';
 import { generateGuid } from '../util';
 import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
@@ -15,7 +15,7 @@ import { WorkerMsgData } from '../workers';
 const AssetHashWorker = new Worker(build.defs.SYNC_WORKER_PATH, { type: 'module' });
 
 export const AccountService = (() => {
-	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);
+	const call = <T>(endpoint: string, resource: string, payload?: Record<string, string>) => callApi<T>('account', endpoint, resource, payload);
 
 	const login = (username: string, password: string): Observable<{ username: string, token: string }> => {
 		return call<{ token: string }>('login', username, { password })
@@ -31,7 +31,7 @@ export const AccountService = (() => {
 })();
 
 export const NotepadService = (() => {
-	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('notepad', endpoint, resource, payload);
+	const call = <T>(endpoint: string, resource: string, payload?: Record<string, string>) => callApi<T>('notepad', endpoint, resource, payload);
 
 	/** @deprecated */
 	const listNotepads = (username: string, token: string): Observable<SyncedNotepadList> =>
@@ -48,7 +48,7 @@ export const NotepadService = (() => {
 })();
 
 export const SyncService = (() => {
-	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('sync', endpoint, resource, payload);
+	const call = <T>(endpoint: string, resource: string, payload?: Record<string, string>) => callApi<T>('sync', endpoint, resource, payload);
 
 	const getLastModified = (syncId: string): Observable<Date> =>
 		call<{ title: string, lastModified: string }>('info', syncId).pipe(map(res => parse(res.lastModified, LAST_MODIFIED_FORMAT, new Date())));
@@ -92,7 +92,7 @@ export const SyncService = (() => {
 			take(1)
 		);
 
-		const getAssetInfo$ = res$.toPromise();
+		const getAssetInfo$ = lastValueFrom(res$);
 		AssetHashWorker.postMessage({
 			cid,
 			type: 'getAssetInfo',
@@ -119,13 +119,13 @@ export const SyncService = (() => {
 })();
 
 export function downloadAsset(url: string): Observable<Blob> {
-	return ajax({
+	return ajax<Blob>({
 		url,
 		method: 'GET',
 		crossDomain: true,
 		responseType: 'blob'
 	}).pipe(
-		map((res: AjaxResponse) => res.response),
+		map(res => res.response),
 		retry(2)
 	);
 }
@@ -145,11 +145,11 @@ export function uploadAsset(url: string, asset: Blob): Observable<void> {
 	);
 }
 
-function callApi<T>(parent: string, endpoint: string, resource: string, payload?: object, method?: string): Observable<T> {
-	return ajax({
+function callApi<T>(parent: string, endpoint: string, resource: string, payload?: Record<string, string>, method?: string): Observable<T> {
+	return ajax<T>({
 		url: `${shouldUseDevApi() ? 'http://localhost:48025' : MICROPAD_URL}/diffeng/${parent}/${endpoint}/${resource}`,
 		method: method || (!payload) ? 'GET' : 'POST',
-		body: payload,
+		body: payload ? new URLSearchParams(payload).toString() : undefined,
 		crossDomain: true,
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -157,7 +157,7 @@ function callApi<T>(parent: string, endpoint: string, resource: string, payload?
 		responseType: 'json',
 		timeout: !!payload ? undefined : 10000 // 10 seconds
 	}).pipe(
-		map((res: AjaxResponse) => res.response),
+		map(res => res.response),
 		retry(2)
 	);
 }
