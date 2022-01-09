@@ -154,11 +154,12 @@ const restoreJsonNotepad$ = (action$: Observable<MicroPadAction>, state$: EpicSt
 			} catch (err) {
 				if (err instanceof DecryptionError) {
 					Dialog.alert(err.message);
+					console.warn(err);
 				} else {
 					Dialog.alert(`Error restoring notepad`);
+					console.error(err);
 				}
 
-				console.error(err);
 				return [actions.parseNpx.failed({
 					params: '',
 					error: err
