@@ -1,0 +1,11 @@
+#export-all-notepads-modal a, #export-all-notepads-modal p {
+	color: var(--mp-theme-text);
+}
+
+.export-all__progress {
+	background-color: var(--mp-theme-chrome);
+}
+
+.export-all__progress .indeterminate {
+	background-color: var(--mp-theme-accent);
+}
