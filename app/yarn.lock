@@ -5580,9 +5580,9 @@ pretty-bytes@^5.3.0:
   resolved "https://registry.yarnpkg.com/pretty-bytes/-/pretty-bytes-5.6.0.tgz#356256f643804773c82f64723fe78c92c62beaeb"
   integrity sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==
 
-"pretty-data@git+https://github.com/vkiryukhin/pretty-data.git#22a34a534745714ea974f72db2e9bf7561b3fdc7":
+"pretty-data@https://github.com/vkiryukhin/pretty-data#22a34a534745714ea974f72db2e9bf7561b3fdc7":
   version "0.50.0"
-  resolved "git+https://github.com/vkiryukhin/pretty-data.git#22a34a534745714ea974f72db2e9bf7561b3fdc7"
+  resolved "https://github.com/vkiryukhin/pretty-data#22a34a534745714ea974f72db2e9bf7561b3fdc7"
 
 pretty-format@^27.0.0, pretty-format@^27.4.6:
   version "27.4.6"
