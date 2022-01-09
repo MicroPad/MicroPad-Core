@@ -5,6 +5,11 @@ import { NoteElement } from 'upad-parse/dist/Note';
 let started = false;
 
 export async function optimiseAssets(assetStorage: LocalForage, assetList: string[], notepad: FlatNotepad): Promise<Array<Blob | null>> {
+	if (assetList.length > 0 && !started) {
+		await initPhoton();
+		started = true;
+	}
+
 	return await Promise.all(assetList.map(async uuid => {
 		// Find element for asset
 		const el = Object.values(notepad.notes)
@@ -20,11 +25,6 @@ export async function optimiseAssets(assetStorage: LocalForage, assetList: strin
 }
 
 export async function shrinkImage(image: Blob, el: NoteElement): Promise<Blob | null> {
-	if (!started) {
-		await initPhoton();
-		started = true;
-	}
-
 	// Right now this uses Photon but in the future with better browser support, `createImageBitmap` will work
 	// https://caniuse.com/mdn-api_createimagebitmap_resizewidth_resizeheight_resizequality
 
