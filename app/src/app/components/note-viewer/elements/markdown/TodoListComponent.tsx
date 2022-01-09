@@ -1,6 +1,8 @@
+import './TodoListComponent.css';
 import React, { useEffect, useState } from 'react';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Button, ProgressBar } from 'react-materialize';
 
 export interface ITodoListComponentProps {
 	html$: Observable<string>;
@@ -23,10 +25,6 @@ const TodoListComponent = (props: ITodoListComponentProps) => {
 
 	if (!progressValues || progressValues.all < 1) return null;
 
-	const meterStyle = {
-		width: '100%'
-	};
-
 	return (
 		<div
 			className="markdown-element__todo-list-tracker"
@@ -35,15 +33,10 @@ const TodoListComponent = (props: ITodoListComponentProps) => {
 				marginRight: '5px',
 				textAlign: 'center'
 			}}>
-			<meter
-				value={progressValues.done}
-				min={0}
-				max={progressValues.all}
-				style={meterStyle}>
-				{Math.round((progressValues.done / progressValues.all) * 100)}%
-			</meter>
-
-			<br /><a href="#!" onClick={toggle}>Show/Hide Completed Items ({progressValues.done}/{progressValues.all})</a>
+			<ProgressBar
+				className="markdown-element__todo-list-tracker__progress-bar"
+				progress={progressValues.done / progressValues.all * 100} />
+			<Button flat onClick={toggle}>Show/Hide Completed Items ({progressValues.done}/{progressValues.all})</Button>
 		</div>
 	);
 }

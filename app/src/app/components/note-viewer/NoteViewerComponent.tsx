@@ -130,7 +130,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 					e.stopPropagation();
 					e.preventDefault();
 				}}>
-				{isLoading && <div id="progress-bar"><ProgressBar className="amber" /></div>}
+				{isLoading && <div id="progress-bar"><ProgressBar /></div>}
 				<div id="note-container" style={containerStyles} ref={div => this.containerDiv = div!}>
 					{elements}
 				</div>
