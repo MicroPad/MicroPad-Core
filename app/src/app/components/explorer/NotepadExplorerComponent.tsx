@@ -82,12 +82,12 @@ const NotepadExplorerComponent = (props: Props) => {
 					</strong>
 
 					<p style={{ marginTop: '0px' }}>
-						(<a href="#!" onClick={props.expandAll}>Expand All</a> | <a href="#!" onClick={() => {
-						if (!!props.openNote) {
+						<Button flat onClick={props.expandAll} tooltip="Expand all"><Icon aria-label="expand all">unfold_more</Icon></Button>
+						{props.openNote && <Button tooltip="Show current note" flat onClick={() => {
 							props.collapseAll();
 							props.expandFromNote(props.openNote);
-						}
-					}}>Focus</a> | <a href="#!" onClick={props.collapseAll}>Collapse All</a>)
+						}}><Icon aria-label="focus">gps_fixed</Icon></Button>}
+						{props.openSections.length > 0 && <Button flat onClick={props.collapseAll} tooltip="Collapse all"><Icon aria-label="collapse all">unfold_less</Icon></Button>}
 					</p>
 
 					<div className="explorer-note add-button" key={`${notepad.title}__new-section`} style={{ margin: 0 }}>
