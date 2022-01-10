@@ -1,10 +1,11 @@
 import React, { FormEvent } from 'react';
-import { Button, TextInput } from 'react-materialize';
+import { TextInput } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL, SYNC_NAME } from '../../types';
 import { SyncUser } from '../../types/SyncTypes';
 import { Dialog } from '../../services/dialogs';
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
 import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
+import Button2 from '../Button';
 
 export interface ILoginComponentProps {
 	syncUser?: SyncUser;
@@ -29,10 +30,10 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 				header={`Connect to ${SYNC_NAME}`}
 				actions={[
 					<React.Fragment>
-						<Button className="btn-flat modal-action" onClick={() => this.login()}>
+						<Button2 className="btn-flat modal-action" onClick={() => this.login()}>
 							Login
-						</Button>
-						<Button className="btn-flat modal-action modal-close">Close</Button>
+						</Button2>
+						<Button2 className="btn-flat modal-action modal-close">Close</Button2>
 					</React.Fragment>
 				]}
 				trigger={trigger}

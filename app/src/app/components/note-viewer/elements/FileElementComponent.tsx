@@ -1,9 +1,10 @@
 import React from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
-import { Button, Row } from 'react-materialize';
+import { Row } from 'react-materialize';
 import { Dialog } from '../../../services/dialogs';
 import { ITheme } from '../../../types/Themes';
 import { readFile } from '../../../services/files';
+import Button2 from '../../Button';
 
 export interface IFileElementComponent extends INoteElementComponentProps {
 	downloadAsset: (filename: string, uuid: string) => void;
@@ -26,9 +27,9 @@ export default class FileElementComponent extends React.Component<IFileElementCo
 					{
 						!isEditing &&
 						!!element.args.filename &&
-						<Button className="accent-btn" waves="light" onClick={() => downloadAsset(element.args.filename!, element.args.ext!)}>
+						<Button2 className="accent-btn" waves="light" onClick={() => downloadAsset(element.args.filename!, element.args.ext!)}>
 							Download File
-						</Button>
+						</Button2>
 					}
 
 					{

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Button, Icon } from 'react-materialize';
+import { Icon } from 'react-materialize';
 import './RecordingElementComponent.css';
 import { IFileElementComponent } from './FileElementComponent';
 import { BAD_BROWSER_AUDIO } from '../../../types';
 import Recorder from 'opus-recorder';
+import Button2 from '../../Button';
 
 export default class RecordingElementComponent extends React.Component<IFileElementComponent> {
 	private readonly recorder;
@@ -36,8 +37,8 @@ export default class RecordingElementComponent extends React.Component<IFileElem
 				{
 					isEditing &&
 					<div ref={e => this.buttonContainer = e!} className="recording-inactive">
-						<Button className="accent-btn" waves="light" onClick={() => this.recorder.start()}><Icon left={true}>record_voice_over</Icon> Start Recording</Button>
-						<Button className="red" waves="light" onClick={() => this.recorder.stop()}><Icon left={true}>stop</Icon> Stop Recording</Button>
+						<Button2 className="accent-btn" waves="light" onClick={() => this.recorder.start()}><Icon left={true}>record_voice_over</Icon> Start Recording</Button2>
+						<Button2 className="red" waves="light" onClick={() => this.recorder.stop()}><Icon left={true}>stop</Icon> Stop Recording</Button2>
 					</div>
 				}
 

@@ -10,7 +10,7 @@ import * as MarkDownViewer from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
 import TodoListComponent from './TodoListComponent';
-import { Button, Checkbox, Col, Row, TextInput } from 'react-materialize';
+import { Checkbox, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
@@ -20,6 +20,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ConnectedProps } from 'react-redux';
 import { markdownElementConnector } from './MarkdownElementConnector';
 import { NotificationService } from '../../../../services/NotificationService';
+import Button2 from '../../../Button';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -145,7 +146,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 
 				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>
 					Markdown Editor (<NoteElementModalComponent
-						trigger={<Button flat small waves="light" style={{ padding: '0' }}>Formatting Help</Button>}
+						trigger={<Button2 flat small waves="light" style={{ padding: '0' }}>Formatting Help</Button2>}
 						npx={helpNpx}
 						findNote={np => np.sections[1].notes[0]} />)
 				</span>}

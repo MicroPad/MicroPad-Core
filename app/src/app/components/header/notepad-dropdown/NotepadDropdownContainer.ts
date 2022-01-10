@@ -1,7 +1,6 @@
 import { connect } from 'react-redux';
 import NotepadDropdownComponent from './NotepadDropdownComponent';
 import { IStoreState } from '../../../types';
-import { ThemeValues } from '../../../ThemeValues';
 import { actions } from '../../../actions';
 
 export const notepadDropdownConnector = connect(

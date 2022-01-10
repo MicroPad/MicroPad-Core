@@ -1,11 +1,11 @@
 import './QuickSwitchComponent.css';
 import React, { useRef, useState } from 'react';
-import { Button } from 'react-materialize';
 import { ConnectedProps } from 'react-redux';
 import { DEFAULT_MODAL_OPTIONS } from '../../../util';
 import { quickSwitchConnector } from './QuickSwitchContainer';
 import Select from 'react-select';
 import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
+import Button2 from '../../Button';
 
 type Props = ConnectedProps<typeof quickSwitchConnector>;
 
@@ -23,7 +23,7 @@ const QuickSwitchComponent = (props: Props) => {
 		<SingletonModalComponent
 			id={MODAL_ID}
 			header="Quick Switcher"
-			trigger={<Button flat>Quick notebook switcher</Button>}
+			trigger={<Button2 flat>Quick notebook switcher</Button2>}
 			options={{
 				...DEFAULT_MODAL_OPTIONS,
 				onOpenEnd: modal => {

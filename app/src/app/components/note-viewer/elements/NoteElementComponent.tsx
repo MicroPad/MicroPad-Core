@@ -6,7 +6,7 @@ import FileElementComponent from './FileElementComponent';
 import RecordingElement from './RecordingElementComponent';
 import DrawingElementComponent from './drawing/DrawingElementContainer';
 import { INoteViewerComponentProps } from '../NoteViewerComponent';
-import { Button, Icon, Row } from 'react-materialize';
+import { Icon, Row } from 'react-materialize';
 import Draggable, { DraggableData } from 'react-draggable';
 import SourcesComponent from '../sources/SourcesContainer';
 import { NoteElement } from 'upad-parse/dist/Note';
@@ -14,6 +14,7 @@ import { EditDueDateComponent } from './EditDueDateComponent';
 import PdfElementComponent from './PdfElementComponent';
 import { TOAST_HANDLER } from '../../../root';
 import { ThemeValues } from '../../../ThemeValues';
+import Button2 from '../../Button';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
@@ -164,11 +165,11 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 								<EditDueDateComponent element={element} theme={theme} updateElement={updateElement!} />
 
 								<Row style={{ paddingLeft: '5px', paddingTop: '10px' }}>
-									<Button className="red" waves="light" onClick={this.delete} style={{ marginRight: '5px' }}><Icon left={true}>delete_forever</Icon> Delete</Button>
+									<Button2 className="red" waves="light" onClick={this.delete} style={{ marginRight: '5px' }}><Icon left={true}>delete_forever</Icon> Delete</Button2>
 								</Row>
 
 								<Row style={{ paddingLeft: '5px' }}>
-									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{ marginRight: '5px', float: 'right' }}>Close editor (autosaved)</Button>
+									<Button2 className="btn-flat" waves="light" onClick={() => edit('')} style={{ marginRight: '5px', float: 'right' }}>Close editor (autosaved)</Button2>
 								</Row>
 							</div>
 						}
