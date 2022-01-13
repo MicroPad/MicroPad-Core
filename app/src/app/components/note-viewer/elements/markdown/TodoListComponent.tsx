@@ -51,12 +51,10 @@ export default class TodoListComponent extends React.Component<ITodoListComponen
 		return new Promise<IProgressValues>(resolve => {
 			html
 				.then(htmlValue => {
-					// Create virtual element of the html given
-					const element = document.createElement('div');
-					element.innerHTML = htmlValue;
+					const virtualDOM = new DOMParser().parseFromString(htmlValue, 'text/html');
 
-					const done = element.querySelectorAll('.task-list-item input:checked').length;
-					const all = element.querySelectorAll('.task-list-item').length;
+					const done = virtualDOM.querySelectorAll('.task-list-item input:checked').length;
+					const all = virtualDOM.querySelectorAll('.task-list-item').length;
 
 					resolve({
 						done,
