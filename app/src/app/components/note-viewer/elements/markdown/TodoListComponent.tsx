@@ -44,12 +44,10 @@ const TodoListComponent = (props: ITodoListComponentProps) => {
 export default TodoListComponent;
 
 function getProgress(html: string): IProgressValues {
-	// Create virtual element of the html given
-	const element = document.createElement('div');
-	element.innerHTML = html;
+	const virtualDOM = new DOMParser().parseFromString(html, 'text/html');
 
-	const done = element.querySelectorAll('.task-list-item input:checked').length;
-	const all = element.querySelectorAll('.task-list-item').length;
+	const done = virtualDOM.querySelectorAll('.task-list-item input:checked').length;
+	const all = virtualDOM.querySelectorAll('.task-list-item').length;
 
 	return { done, all };
 }
