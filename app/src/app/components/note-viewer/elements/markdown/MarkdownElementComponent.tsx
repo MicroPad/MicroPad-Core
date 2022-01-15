@@ -9,7 +9,7 @@ import { Converter, ConverterOptions, extension } from 'showdown';
 import * as MarkDownViewer from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
-import TodoListComponent from './TodoListComponent';
+import TodoListComponent, { IProgressValues } from './TodoListComponent';
 import { Checkbox, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
@@ -45,7 +45,7 @@ const converter = configureShowdown();
 
 export default class MarkdownElementComponent extends React.Component<Props> {
 	private iframe: HTMLIFrameElement | undefined;
-	private readonly html$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+	private readonly progress$: BehaviorSubject<IProgressValues> = new BehaviorSubject<IProgressValues>({ done: 0, total: 0 });
 
 	render() {
 		const { element, elementEditing, theme } = this.props;
@@ -88,7 +88,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 				onResizeStop={(e, d, ref) => {
 					this.onSizeEdit('width', ref.style.width!);
 				}}>
-				{isEditing || <TodoListComponent html$={this.html$} toggle={() => this.sendMessage({
+				{isEditing || <TodoListComponent progress$={this.progress$} toggle={() => this.sendMessage({
 					id: element.args.id,
 					type: 'toggle',
 					payload: {}
@@ -146,9 +146,9 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 
 				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>
 					Markdown Editor (<NoteElementModalComponent
-						trigger={<Button2 flat small waves="light" style={{ padding: '0' }}>Formatting Help</Button2>}
-						npx={helpNpx}
-						findNote={np => np.sections[1].notes[0]} />)
+					trigger={<Button2 flat small waves="light" style={{ padding: '0' }}>Formatting Help</Button2>}
+					npx={helpNpx}
+					findNote={np => np.sections[1].notes[0]} />)
 				</span>}
 
 				<div>
@@ -265,9 +265,10 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 	}
 
 	private generateHtml = (element: NoteElement): string => {
-		const html = converter.makeHtml(element.content);
-		this.html$.next(html);
-		return html;
+		const rawHtml = converter.makeHtml(element.content);
+		const res = this.props.enableCheckboxes(element.content, rawHtml);
+		this.progress$.next(res);
+		return res.html;
 	}
 
 	private handleMessages = event => {
@@ -312,6 +313,24 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 
 			case 'ready':
 				if (!!onReady) onReady();
+				break;
+
+			case 'toggle_checkbox':
+				(() => {
+					const newElement = {
+						...element,
+						content: this.props.toggleMdCheckbox(element.content, message.payload)
+					};
+					this.props.updateElement!(element.args.id, newElement);
+					this.sendMessage({
+						type: 'render',
+						id: element.args.id,
+						payload: {
+							...element,
+							content: this.generateHtml(newElement)
+						}
+					});
+				})();
 				break;
 
 			default:
