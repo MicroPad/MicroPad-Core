@@ -40,9 +40,6 @@ export interface IShowdownOpts extends ConverterOptions {
 }
 
 type Props = ConnectedProps<typeof markdownElementConnector> & IMarkdownElementComponentProps;
-type State = {
-	html: string;
-} & IProgressValues;
 
 const converter = configureShowdown();
 
