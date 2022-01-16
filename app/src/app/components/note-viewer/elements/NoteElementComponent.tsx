@@ -27,7 +27,15 @@ export interface INoteElementComponentProps extends Partial<INoteViewerComponent
 	insert?: (element: NoteElement) => void;
 }
 
-export default class NoteElementComponent extends React.Component<INoteElementComponentProps> {
+type State = {
+	isDragging: boolean,
+	preDragSize: {
+		width: number,
+		height: number
+	}
+};
+
+export default class NoteElementComponent extends React.Component<INoteElementComponentProps, State> {
 	private element!: HTMLDivElement;
 	private container!: HTMLDivElement;
 	private oldZIndex?: string | null;
@@ -139,6 +147,20 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					if (!this.container) return;
 					this.oldZIndex = this.container.style.zIndex;
 					this.container.style.zIndex = '5000';
+
+					if (element.type === 'markdown') {
+						const mdEl = document.querySelector<HTMLIFrameElement>(`.noteElement[data-el-id=${element.args.id}] iframe`);
+						if (mdEl) {
+							const size = mdEl.getBoundingClientRect();
+							const resizeBlock = document.createElement('div');
+							resizeBlock.id = 'note-element__resize-block';
+							resizeBlock.innerHTML = '<i class="material-icons" aria-label="moving element symbol">explore</i>';
+							resizeBlock.style.width = `${size.width}px`;
+							resizeBlock.style.height = `${size.height}px`;
+							mdEl.insertAdjacentElement('beforebegin', resizeBlock);
+							mdEl.style.display = 'none';
+						}
+					}
 				}}
 				bounds={{
 					left: 0,
@@ -150,6 +172,14 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					this.handleDrag(event, data);
 					this.isDragging = false;
 					if (this.container) this.container.style.zIndex = (!!this.oldZIndex) ? this.oldZIndex : 'auto';
+
+					if (element.type === 'markdown') {
+						document.getElementById('note-element__resize-block')?.remove();
+						const mdEl = document.querySelector<HTMLIFrameElement>(`.noteElement[data-el-id=${element.args.id}] iframe`);
+						if (mdEl) {
+							mdEl.style.display = 'block';
+						}
+					}
 				}}
 				defaultPosition={{ x: parseInt(element.args.x, 10), y: parseInt(element.args.y, 10) }}
 				handle=".handle">
