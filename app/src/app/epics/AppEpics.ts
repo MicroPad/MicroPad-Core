@@ -67,8 +67,13 @@ export const checkVersion$ = (action$: Observable<MicroPadAction>, state$: EpicS
 		)
 	);
 
-export const getInfoMessages$ = () =>
-	timer(5 * 1000, 5 * 60 * 1000).pipe(
+export const getInfoMessages$ = () => {
+	// eslint-disable-next-line no-restricted-globals
+	const params = new URLSearchParams(location.search);
+	const isInTest = params.has('integration');
+	if (isInTest) return EMPTY;
+
+	return timer(5 * 1000, 5 * 60 * 1000).pipe(
 		switchMap(() =>
 			ajax<AppInfoMessage>({
 				url: `${MICROPAD_URL}/info.json?rnd=${Math.random()}`,
@@ -82,7 +87,8 @@ export const getInfoMessages$ = () =>
 				catchError(() => { return EMPTY; })
 			)
 		)
-	)
+	);
+};
 
 export const persistTheme$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
