@@ -49,6 +49,7 @@ import { showUnsupportedPage } from '../unsupported-page/show-page';
 import { restoreSavedPasswords } from './services/CryptoService';
 import InfoModalsComponent from './components/InfoModalsComponent';
 import { rootEpic$ } from './epics/rootEpic';
+import InfoBannerComponent from './components/header/info-banner/InfoBannerContainer';
 
 window.MicroPadGlobals = {};
 
@@ -128,9 +129,9 @@ export function getStorage(): StorageMap {
 	await hydrateStoreFromLocalforage();
 	createDynamicCss(store);
 
-	if (window.isElectron) store.dispatch(actions.checkVersion(undefined));
-	store.dispatch(actions.getNotepadList.started(undefined));
-	store.dispatch(actions.indexNotepads.started(undefined));
+	if (window.isElectron) store.dispatch(actions.checkVersion());
+	store.dispatch(actions.getNotepadList.started());
+	store.dispatch(actions.indexNotepads.started());
 
 	enableKeyboardShortcuts(store);
 
@@ -138,14 +139,17 @@ export function getStorage(): StorageMap {
 	ReactDOM.render(
 		<Provider store={store}>
 			<PrintViewOrAppContainerComponent>
-				<HeaderComponent />
+				<React.StrictMode><HeaderComponent /></React.StrictMode>
 				<AppBodyComponent>
 					<NoteViewerComponent />
-					<NotepadExplorerComponent />
-					<NoteElementModalComponent id={"whats-new-modal"} npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
-					<InsertElementComponent />
-					<InfoModalsComponent />
+					<React.StrictMode>
+						<NotepadExplorerComponent />
+						<NoteElementModalComponent id={"whats-new-modal"} npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
+						<InsertElementComponent />
+						<InfoModalsComponent />
+					</React.StrictMode>
 				</ AppBodyComponent>
+				<React.StrictMode><InfoBannerComponent /></React.StrictMode>
 			</PrintViewOrAppContainerComponent>
 		</Provider>,
 		document.getElementById('app')!

@@ -6,7 +6,7 @@ import SingletonModalComponent from '../../singleton-modal/SingletonModalContain
 import NpxIcon from '../../../assets/npx.png';
 import MarkdownIcon from '../../../assets/md.svg';
 import { ConnectedProps } from 'react-redux';
-import { exportAllConnector } from './ExportAllConnector';
+import { exportAllConnector } from './ExportAllContainer';
 
 const ICON_STYLES = {
 	width: '6rem',

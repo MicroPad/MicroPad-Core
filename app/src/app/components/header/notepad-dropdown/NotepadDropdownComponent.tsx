@@ -12,7 +12,7 @@ import ImportMarkdownComponent from '../import-markdown/ImportMarkdownContainer'
 import { ConnectedProps } from 'react-redux';
 import { notepadDropdownConnector } from './NotepadDropdownContainer';
 import { NavPos } from '../HeaderContainer';
-import ExportAllComponent from '../export-all/ExportAllConnector';
+import ExportAllComponent from '../export-all/ExportAllContainer';
 
 export type NotepadDropdownProps = {
 	position: NavPos

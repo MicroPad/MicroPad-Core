@@ -15,6 +15,7 @@ import { Action, Reducer } from 'redux';
 import { isReadOnlyNotebook } from '../ReadOnly';
 import deepFreeze from 'deep-freeze';
 import { EditorReducer } from './EditorReducer';
+import { AppInfoReducer } from './AppInfoReducer';
 
 export const REDUCERS: Array<AbstractReducer<any>> = [
 	new AppReducer(),
@@ -26,7 +27,8 @@ export const REDUCERS: Array<AbstractReducer<any>> = [
 	new PrintReducer(),
 	new SyncReducer(),
 	new IsExportingReducer(),
-	new EditorReducer()
+	new EditorReducer(),
+	new AppInfoReducer()
 ];
 
 interface ReduxReducer<S, A extends Action> {

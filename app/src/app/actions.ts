@@ -25,6 +25,7 @@ import { SearchResults } from './reducers/SearchReducer';
 import { ThemeName } from './types/Themes';
 import { DueItem } from './services/DueDates';
 import { DrawMode } from './reducers/EditorReducer';
+import { AppInfoMessage } from './reducers/AppInfoReducer';
 
 export type MicroPadAction = ActionTypes[keyof ActionTypes];
 export type ActionNames = keyof ActionFactories;
@@ -134,7 +135,9 @@ export const actions = {
 	openModal: actionCreator<string>('OPEN_MODAL'),
 	closeModal: actionCreator<void>('CLOSE_MODAL'),
 	setDrawMode: actionCreator<DrawMode>('SET_DRAW_MODE'),
-	setDrawingLineColour: actionCreator<string>('SET_DRAWING_LINE_COLOUR')
+	setDrawingLineColour: actionCreator<string>('SET_DRAWING_LINE_COLOUR'),
+	dismissInfoBanner: actionCreator<void>('DISMISS_INFO_BANNER'),
+	setInfoMessage: actionCreator<AppInfoMessage>('SET_INFO_MESSAGE')
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
