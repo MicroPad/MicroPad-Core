@@ -12,7 +12,7 @@ import elementInstructionsDark from './assets/click-to-insert-dark.png';
 export const ThemeValues: { [K in ThemeName]: ITheme } = {
 	Classic: {
 		background: '#fff',
-		accent: '#ffb300',
+		accent: '#e7a500',
 		chrome: '#607d8b',
 		text: '#000',
 		links: '#039be5',
