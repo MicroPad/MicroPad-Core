@@ -18,5 +18,12 @@ module.exports = {
 	},
 	'roots': ['<rootDir>/src/', '<rootDir>/integration/src/'],
 	setupFilesAfterEnv: ['<rootDir>/integration/src/utils/jest-image.ts'],
-	testTimeout: 60000
+	testTimeout: 60000,
+	reporters: [
+		'default',
+		['jest-junit', {
+			outputDirectory: '.reports',
+			outputName: 'junit.xml'
+		}]
+	]
 };

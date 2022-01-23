@@ -4,7 +4,7 @@ import { openMicroPadRaw } from './utils/general-ui';
 describe(`App Info Messages`, () => {
 	it(`should not show the info banner if there is no informational message available`, async () => {
 		// Arrange
-		const page = await browser.newPage();
+		const page = await browser.newContext().then(ctx => ctx.newPage());
 		await page.route(/info\.json\?.*$/, route => {
 			route.fulfill({
 				status: 404,
@@ -24,7 +24,7 @@ describe(`App Info Messages`, () => {
 
 	it(`should not show the info banner if there is a malformed message`, async () => {
 		// Arrange
-		const page = await browser.newPage();
+		const page = await browser.newContext().then(ctx => ctx.newPage());
 		await page.route(/info\.json\?.*$/, route => {
 			route.fulfill({
 				status: 200,
@@ -48,7 +48,7 @@ describe(`App Info Messages`, () => {
 		// Arrange
 		const expected = 'Hello test software! beep boop';
 
-		const page = await browser.newPage();
+		const page = await browser.newContext().then(ctx => ctx.newPage());
 		await page.route(/info\.json\?.*$/, route => {
 			route.fulfill({
 				status: 200,
@@ -100,11 +100,6 @@ describe(`App Info Messages`, () => {
 });
 
 async function openMicroPad(page: Page) {
-	page.on('console', msg => {
-		if (msg.type() === 'error') {
-			console.error('forwarded', msg.text());
-		}
-	})
 	await openMicroPadRaw(page);
 	await page.waitForSelector('.brand-logo');
 }

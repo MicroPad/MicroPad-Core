@@ -4,37 +4,6 @@
 #
 version: 2
 jobs:
-  test:
-    docker:
-      # specify the version you desire here
-      - image: cimg/node:lts
-      
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
-
-    environment:
-      NODE_ENV: development
-
-    steps:
-      - checkout
-      - run: cd app && yarn
-      - run: cd app && yarn global add playwright && yarn playwright install-deps
-
-      # Load in the built MicroPad to run an instance for testing
-      - attach_workspace:
-          at: /tmp/mp-build
-      - run:
-          command: python3 -m http.server 3000
-          working_directory: /tmp/mp-build/build
-          background: true
-
-      # Run the e2e integration tests
-      - run: cd app && yarn test
-
   build:
     docker:
       - image: cimg/node:lts
@@ -46,9 +15,6 @@ jobs:
           name: Restore Yarn Package Cache
           keys:
             - yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
-            - yarn-packages-{{ .Branch }}
-            - yarn-packages-master
-            - yarn-packages-
 
       - run: cd app && yarn
 
@@ -72,6 +38,45 @@ jobs:
           paths:
             - build/*
             - micropad.tar.xz
+
+  test:
+    docker:
+      # specify the version you desire here
+      - image: mcr.microsoft.com/playwright:focal
+      
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+
+    working_directory: ~/repo/app
+
+    environment:
+      NODE_ENV: development
+
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
+
+      - run: cd app && yarn
+
+      # Load in the built MicroPad to run an instance for testing
+      - attach_workspace:
+          at: /tmp/mp-build
+      - run:
+          command: python3 -m http.server 3000
+          working_directory: /tmp/mp-build/build
+          background: true
+
+      # Run the e2e integration tests
+      - run: cd app && yarn test
+      - store_test_results:
+          path: app/reports
+      - store_artifacts:
+          path: app/reports
 
   deploy:
     docker:
