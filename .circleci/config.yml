@@ -74,9 +74,9 @@ jobs:
       # Run the e2e integration tests
       - run: cd app && yarn test
       - store_test_results:
-          path: app/reports
+          path: app/.reports
       - store_artifacts:
-          path: app/reports
+          path: app/.reports
 
   deploy:
     docker:
