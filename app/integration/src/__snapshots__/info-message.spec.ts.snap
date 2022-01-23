@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`App Info Messages should show the info banner with link if there is a message with a call-to-action 1`] = `"<strong>Hello test software! beep boop</strong><a class=\\"info-banner__cta\\" target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\\">Learn more.</a>"`;

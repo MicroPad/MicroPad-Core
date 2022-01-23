@@ -5,12 +5,11 @@ import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
 import * as localforage from 'localforage';
 import { Action } from 'typescript-fsa';
 import { ajax } from 'rxjs/ajax';
-import { EMPTY, interval, Observable, timer } from 'rxjs';
+import { EMPTY, Observable, timer } from 'rxjs';
 import { lt as versionLessThan } from 'semver';
 import { EpicDeps, EpicStore } from './index';
 import { IVersion } from '../reducers/AppReducer';
 import { actions, MicroPadAction, MicroPadActions } from '../actions';
-import { Dialog } from '../services/dialogs';
 import { AppInfoMessage } from '../reducers/AppInfoReducer';
 
 export const closeDrawingEditorOnZoom$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
@@ -46,7 +45,6 @@ export const checkVersion$ = (action$: Observable<MicroPadAction>, state$: EpicS
 		switchMap((version: string) =>
 			ajax<string>({
 				url: `${MICROPAD_URL}/version.txt?rnd=${Math.random()}`,
-				crossDomain: true,
 				headers: {
 					'Content-Type': 'text/plain; charset=UTF-8'
 				},
@@ -67,13 +65,8 @@ export const checkVersion$ = (action$: Observable<MicroPadAction>, state$: EpicS
 		)
 	);
 
-export const getInfoMessages$ = () => {
-	// eslint-disable-next-line no-restricted-globals
-	const params = new URLSearchParams(location.search);
-	const isInTest = params.has('integration');
-	if (isInTest) return EMPTY;
-
-	return timer(5 * 1000, 5 * 60 * 1000).pipe(
+export const getInfoMessages$ = () =>
+	timer(5 * 1000, 5 * 60 * 1000).pipe(
 		switchMap(() =>
 			ajax<AppInfoMessage>({
 				url: `${MICROPAD_URL}/info.json?rnd=${Math.random()}`,
@@ -88,7 +81,6 @@ export const getInfoMessages$ = () => {
 			)
 		)
 	);
-};
 
 export const persistTheme$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
