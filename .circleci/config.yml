@@ -57,11 +57,12 @@ jobs:
     steps:
       - checkout
 
-      # Skip the `yarn install` because build always runs first
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
             - yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
+
+      run: cd app && yarn
 
       # Load in the built MicroPad to run an instance for testing
       - attach_workspace:
