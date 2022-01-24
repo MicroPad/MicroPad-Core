@@ -9,7 +9,7 @@ export const MD_END_ATTR = 'data-md-end';
 const VALID_MD_TASK_LIST = /^[\t ]*(\d+\.|[-+*])[\t ]+(\[[xX ]?\])/gm;
 const CHECKED = /^[\t ]*(\d+\.|[-+*])[\t ]+\[[xX]\]/;
 
-export const markdownElementContainer = connect(
+export const markdownElementConnector = connect(
 	(state: IStoreState) => ({
 		shouldSpellCheck: state.editor.shouldSpellCheck,
 		shouldWordWrap: state.editor.shouldWordWrap
@@ -56,5 +56,5 @@ export const markdownElementContainer = connect(
 	})
 );
 
-export default markdownElementContainer(MarkdownElementComponent);
+export default markdownElementConnector(MarkdownElementComponent);
 

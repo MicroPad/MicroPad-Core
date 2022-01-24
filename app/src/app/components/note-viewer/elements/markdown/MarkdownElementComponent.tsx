@@ -18,7 +18,7 @@ import { colourTransformer, fendTransformer } from './MarkdownTransformers';
 import NoteElementModalComponent from '../../../note-element-modal/NoteElementModalComponent';
 import { BehaviorSubject } from 'rxjs';
 import { ConnectedProps } from 'react-redux';
-import { markdownElementContainer } from './MarkdownElementContainer';
+import { markdownElementConnector } from './MarkdownElementContainer';
 import { NotificationService } from '../../../../services/NotificationService';
 import Button2 from '../../../Button';
 
@@ -39,7 +39,7 @@ export interface IShowdownOpts extends ConverterOptions {
 	emoji: boolean;
 }
 
-type Props = ConnectedProps<typeof markdownElementContainer> & IMarkdownElementComponentProps;
+type Props = ConnectedProps<typeof markdownElementConnector> & IMarkdownElementComponentProps;
 
 const converter = configureShowdown();
 

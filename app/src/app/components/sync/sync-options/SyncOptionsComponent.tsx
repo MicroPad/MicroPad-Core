@@ -1,22 +1,13 @@
 import React from 'react';
-import { MICROPAD_URL, SYNC_NAME } from '../../types';
-import { ISyncedNotepad, SyncUser } from '../../types/SyncTypes';
-import * as DifferenceEngine from '../../services/DifferenceEngine';
-import { Dialog } from '../../services/dialogs';
-import LoginComponent from '../../containers/LoginContainer';
-import { FlatNotepad } from 'upad-parse/dist';
-import { ISyncState } from '../../reducers/SyncReducer';
+import { MICROPAD_URL, SYNC_NAME } from '../../../types';
+import * as DifferenceEngine from '../../../services/DifferenceEngine';
+import { Dialog } from '../../../services/dialogs';
+import LoginComponent from '../../../containers/LoginContainer';
+import { syncOptionsConnector } from './SyncOptionsContainer';
+import { ConnectedProps } from 'react-redux';
+import Button2 from '../../Button';
 
-export interface ISyncOptionsComponentProps {
-	syncState: ISyncState;
-	syncId?: string;
-	notepad?: FlatNotepad;
-	sync?: (syncId: string, notepad: ISyncedNotepad) => void;
-	deleteNotepad?: (syncId: string) => void;
-	addNotepad?: (user: SyncUser, title: string) => void;
-}
-
-export default class SyncOptionsComponent extends React.Component<ISyncOptionsComponentProps> {
+export default class SyncOptionsComponent extends React.Component<ConnectedProps<typeof syncOptionsConnector>> {
 	render() {
 		const { syncState, syncId, notepad, addNotepad } = this.props;
 		if (!notepad || (!syncState.sharedNotepadList && syncState.user)) return null;
@@ -24,10 +15,13 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 		if (!syncState.user) {
 			return (
 				<LoginComponent trigger={
-					<strong><a href="#!" style={{
-						textDecoration: 'underline',
-						whiteSpace: 'normal'
-					}}>Connect to {SYNC_NAME} to have this notebook on all of your devices</a></strong>
+					<Button2 className="accent-btn" waves="light" style={{
+						paddingLeft: '16px',
+						paddingRight: '16px',
+						height: 'auto'
+					}}>
+						Connect to <span style={{ textTransform: 'initial'}}>{SYNC_NAME}</span>
+					</Button2>
 				} />
 			);
 		}
@@ -35,7 +29,13 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 		return (
 			<React.Fragment>
 				<strong>{SYNC_NAME} Options for <em>{notepad.title}</em></strong>
-				{!syncId && <span><a href="#!" onClick={() => addNotepad!(syncState.user!, notepad.title)} style={{ textDecoration: 'underline' }}><br /> Start syncing this notepad</a></span>}
+				{!syncId && <span><Button2 className="accent-btn" waves="light" style={{
+					paddingLeft: '16px',
+					paddingRight: '16px',
+					height: 'auto'
+				}} disabled={syncState.isLoading} onClick={() => addNotepad(syncState.user, notepad.title)}>
+					Start syncing this notepad
+				</Button2></span>}
 
 				{
 					!!syncId &&
@@ -50,12 +50,18 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 									</li>
 
 									<li>
-										<a
-											href="#!"
-											style={{ textDecorationColor: '#F44336' }}
+										<Button2
+											className="danger"
+											flat
+											waves="light"
+											style={{
+												paddingLeft: '16px',
+												paddingRight: '16px',
+												height: 'auto'
+											}}
 											onClick={() => setTimeout(() => this.stopSyncing(), 0)}>
 											Stop syncing this notepad
-										</a>
+										</Button2>
 									</li>
 
 									<li style={{ paddingTop: '1em' }}>
@@ -75,7 +81,7 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 
 	private manualSync = async () => {
 		const { syncId, notepad, sync } = this.props;
-		if (!syncId || !notepad || !sync) return;
+		if (!syncId || !notepad) return;
 
 		const syncedNotepad = await DifferenceEngine.SyncService.notepadToSyncedNotepad(notepad.toNotepad());
 		sync(syncId, syncedNotepad);
@@ -83,7 +89,7 @@ export default class SyncOptionsComponent extends React.Component<ISyncOptionsCo
 
 	private stopSyncing = async () => {
 		const { syncId, notepad, deleteNotepad } = this.props;
-		if (!syncId || !notepad || !deleteNotepad) return;
+		if (!syncId || !notepad) return;
 
 		if (!await Dialog.confirm(`Are you sure you want to remove ${notepad.title} from ${SYNC_NAME}?`)) return;
 		deleteNotepad(syncId);

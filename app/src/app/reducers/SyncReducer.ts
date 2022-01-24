@@ -22,6 +22,7 @@ export class SyncReducer extends AbstractReducer<ISyncState> {
 			|| isType(action, actions.syncDownload.started)
 			|| isType(action, actions.syncUpload.started)
 			|| isType(action, actions.deleteFromSync.started)
+			|| isType(action, actions.addToSync.started)
 		) {
 			return {
 				...state,
@@ -34,6 +35,7 @@ export class SyncReducer extends AbstractReducer<ISyncState> {
 			|| isType(action, actions.deleteFromSync.failed)
 			|| isType(action, actions.syncProError)
 			|| isType(action, actions.parseNpx.failed)
+			|| isType(action, actions.addToSync.failed)
 		) {
 			return {
 				...state,
@@ -42,6 +44,7 @@ export class SyncReducer extends AbstractReducer<ISyncState> {
 		} else if (
 			isType(action, actions.syncDownload.done)
 			|| isType(action, actions.syncUpload.done)
+			|| isType(action, actions.addToSync.done)
 		) {
 			return {
 				...state,
