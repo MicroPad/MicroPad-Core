@@ -166,3 +166,16 @@ strong {
 	border-bottom: 2px solid var(--mp-theme-accentContent);
 }
 
+.btn:hover, .btn-flat:hover, .btn-large:hover, .btn-small:hover {
+	background-color: var(--mp-theme-accent);
+	color: var(--mp-theme-accentContent);
+}
+
+.red.btn, .red.btn-large, .red.btn-small {
+	color: #fff !important;
+}
+
+.btn:focus, .btn-large:focus, .btn-small:focus, .btn-floating:focus {
+	background-color: var(--mp-theme-chrome);
+	color: var(--mp-theme-explorerContent);
+}
