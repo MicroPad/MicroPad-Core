@@ -7,7 +7,7 @@ describe(`Core Flows`, () => {
 		await stabiliseMicroPad(); // Load MicroPad
 	})
 
-	it.jestPlaywrightSkip({ browsers: ['chromium'] }, `Create a notebook using the dropdown`, async () => {
+	it(`Create a notebook using the dropdown`, async () => {
 		// Arrange
 		await createNotebookUsingDropdown();
 
