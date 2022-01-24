@@ -6,7 +6,7 @@ import ExplorerOptionsComponent from './explorer-options/ExplorerOptionsContaine
 import { NewNotepadObjectAction } from '../../types/ActionTypes';
 import HelpMessageComponent from '../help-message/HelpMessageContainer';
 import { Dialog } from '../../services/dialogs';
-import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
+import SyncOptionsComponent from '../sync/sync-options/SyncOptionsContainer';
 import { Note, Parent, Section } from 'upad-parse/dist';
 import { NEW_SECTION_HELP, OPEN_NOTE_HELP, OPEN_NOTEPAD_HELP } from '../../types';
 import DueDateListComponent from './due-date-list/DueDateListContainer';

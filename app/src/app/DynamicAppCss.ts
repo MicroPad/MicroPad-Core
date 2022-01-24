@@ -48,6 +48,11 @@ export function createDynamicCss(store: Store<IStoreState, MicroPadAction>): voi
 				color: ${theme.accentContent};
 			}
 			
+			.danger.btn:hover, .danger.btn-flat:hover, .danger.btn-large:hover, .danger.btn-small:hover {
+				background-color: #F44336;
+				color: #fff;
+			}
+			
 			.modal {
 				background-color: ${theme.background};
 				color: ${theme.text};
