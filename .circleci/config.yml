@@ -49,7 +49,7 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/mongo:3.4.4
 
-    working_directory: ~/repo/app
+    working_directory: ~/repo
 
     environment:
       NODE_ENV: development
@@ -75,7 +75,7 @@ jobs:
       # Run the e2e integration tests
       - run: cd app && yarn test --runInBand
       - store_test_results:
-          path: ~/repo/app/.reports/junit.xml
+          path: app/.reports/junit.xml
 
   deploy:
     docker:
