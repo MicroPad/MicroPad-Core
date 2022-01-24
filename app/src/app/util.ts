@@ -93,5 +93,3 @@ export function getUsedAssets(notepad: FlatNotepad): Set<string> {
 export function unreachable() {
 	return new Error('Unreachable Error!');
 }
-
-export function noop() {}

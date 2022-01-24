@@ -39,7 +39,11 @@ export const markdownElementConnector = connect(
 			const checkboxes = virtualDOM.querySelectorAll('.task-list-item > input');
 
 			// Exit early if there's something fancy going on here, and we can't just do this naively.
-			if (checkboxes.length !== taskCursors.length) return { done, total, html };
+			if (checkboxes.length !== taskCursors.length) return {
+				done: virtualDOM.querySelectorAll('.task-list-item > input:checked').length,
+				total: checkboxes.length,
+				html
+			};
 
 			let i = 0;
 			for (const checkbox of virtualDOM.querySelectorAll('.task-list-item > input')) {

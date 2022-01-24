@@ -41,7 +41,6 @@ import { ThemeName } from './types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './services/ToastEventHandler';
 import { LastOpenedNotepad } from './epics/StorageEpics';
-import { noop } from './util';
 import { createSentryReduxEnhancer } from '../sentry';
 import { createDynamicCss } from './DynamicAppCss';
 import { hasRequiredFeatures } from '../unsupported-page/feature-detect';
@@ -144,7 +143,7 @@ export function getStorage(): StorageMap {
 					<NoteViewerComponent />
 					<React.StrictMode>
 						<NotepadExplorerComponent />
-						<NoteElementModalComponent id={"whats-new-modal"} npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
+						<NoteElementModalComponent id="whats-new-modal" npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
 						<InsertElementComponent />
 						<InfoModalsComponent />
 					</React.StrictMode>
@@ -155,13 +154,8 @@ export function getStorage(): StorageMap {
 		document.getElementById('app')!
 	);
 
-	// Some clean up of an old storage item, this line can be deleted at some point in the future
-	localforage.removeItem('hasRunBefore').then(noop);
-
 	await displayWhatsNew();
-
 	notepadDownloadHandler();
-
 	pasteWatcher();
 
 	store.dispatch(actions.clearOldData.started({ silent: true }));
@@ -214,8 +208,11 @@ async function hydrateStoreFromLocalforage() {
 }
 
 async function displayWhatsNew() {
+	// some clean up of an old item, can be removed in the future
+	localforage.removeItem('oldMinorVersion').catch(e => console.error(e));
+
 	const minorVersion = store.getState().app.version.minor;
-	const oldMinorVersion = await localforage.getItem('oldMinorVersion');
+	const oldMinorVersion = await SETTINGS_STORAGE.getItem<number>('oldMinorVersion');
 	if (minorVersion === oldMinorVersion) return;
 
 	// Open "What's New"
@@ -223,7 +220,7 @@ async function displayWhatsNew() {
 		store.dispatch(actions.openModal('whats-new-modal'));
 	}, 0);
 
-	await localforage.setItem('oldMinorVersion', minorVersion);
+	SETTINGS_STORAGE.setItem<number>('oldMinorVersion', minorVersion).catch(e => console.error(e));
 }
 
 function notepadDownloadHandler() {

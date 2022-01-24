@@ -88,7 +88,9 @@
           ],
           "key-spacing": "error",
           "@typescript-eslint/prefer-ts-expect-error": "warn",
-          "no-debugger": "error"
+          "no-debugger": "error",
+          "quotes": ["error", "single", { "allowTemplateLiterals":  true }],
+          "jsx-quotes": ["error", "prefer-double"]
         }
       }
     ]

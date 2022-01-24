@@ -20,7 +20,7 @@ export default class SyncOptionsComponent extends React.Component<ConnectedProps
 						paddingRight: '16px',
 						height: 'auto'
 					}}>
-						Connect to <span style={{ textTransform: 'initial'}}>{SYNC_NAME}</span>
+						Connect to <span style={{ textTransform: 'initial' }}>{SYNC_NAME}</span>
 					</Button2>
 				} />
 			);

@@ -9,7 +9,7 @@ import Button2 from '../../Button';
 
 type Props = ConnectedProps<typeof quickSwitchConnector>;
 
-const MODAL_ID = "quick-switch-modal";
+const MODAL_ID = 'quick-switch-modal';
 
 const QuickSwitchComponent = (props: Props) => {
 	const selectEl = useRef<HTMLElement | null>(null);
