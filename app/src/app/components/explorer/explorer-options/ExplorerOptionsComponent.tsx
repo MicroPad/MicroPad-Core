@@ -64,7 +64,11 @@ const ExplorerOptionsComponent = (props: ConnectedProps<typeof explorerOptionsCo
 			id={modalId}
 			key={modalId}
 			header={`Options for ${props.objToEdit.title}`}
-			trigger={<a href="#!" className="exp-options-trigger" style={{ color: props.colour }}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}
+			trigger={<a href="#!" className="exp-options-trigger" style={{ color: props.colour }} onContextMenu={e => {
+				e.preventDefault();
+				(e.target as Node).parentElement?.querySelector<HTMLAnchorElement>('.exp-options-trigger')?.click();
+				return false;
+			}}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}
 			options={DEFAULT_MODAL_OPTIONS}>
 			<div className="explorer-options-modal">
 				<Row>
