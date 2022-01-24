@@ -1,6 +1,6 @@
 import React from 'react';
 import './NoteElementComponent.css';
-import MarkdownElementComponent from './markdown/MarkdownElementConnector';
+import MarkdownElementComponent from './markdown/MarkdownElementContainer';
 import ImageElementComponent from './ImageElementComponent';
 import FileElementComponent from './FileElementComponent';
 import RecordingElement from './RecordingElementComponent';

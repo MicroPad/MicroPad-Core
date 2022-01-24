@@ -6,10 +6,10 @@ import { IProgressValues } from './TodoListComponent';
 
 export const MD_START_ATTR = 'data-md-start';
 export const MD_END_ATTR = 'data-md-end';
-const VALID_MD_TASK_LIST = /^[\t ]*[-+*][\t ]+(\[[xX ]?\])/gm;
-const CHECKED = /^[\t ]*[-+*][\t ]+\[[xX]\]/;
+const VALID_MD_TASK_LIST = /^[\t ]*(\d+\.|[-+*])[\t ]+(\[[xX ]?\])/gm;
+const CHECKED = /^[\t ]*(\d+\.|[-+*])[\t ]+\[[xX]\]/;
 
-export const markdownElementConnector = connect(
+export const markdownElementContainer = connect(
 	(state: IStoreState) => ({
 		shouldSpellCheck: state.editor.shouldSpellCheck,
 		shouldWordWrap: state.editor.shouldWordWrap
@@ -23,9 +23,9 @@ export const markdownElementConnector = connect(
 			let done = 0;
 
 			for (const match of md.matchAll(VALID_MD_TASK_LIST)) {
-				if (match.index == null || match.length < 2) continue;
+				if (match.index == null || match.length < 3) continue;
 
-				const offset = match[0].length - match[1].length;
+				const offset = match[0].length - match[2].length;
 
 				if (CHECKED.test(match[0])) done++;
 				taskCursors.push({
@@ -56,5 +56,5 @@ export const markdownElementConnector = connect(
 	})
 );
 
-export default markdownElementConnector(MarkdownElementComponent);
+export default markdownElementContainer(MarkdownElementComponent);
 

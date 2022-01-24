@@ -8,7 +8,7 @@ import hljsCssDark from '../../../../assets/highlight.js/monokai.raw.css';
 
 import { ITheme } from '../../../../types/Themes';
 import { isDev } from '../../../../util';
-import { MD_END_ATTR, MD_START_ATTR } from './MarkdownElementConnector';
+import { MD_END_ATTR, MD_START_ATTR } from './MarkdownElementContainer';
 
 export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): string => `<!DOCTYPE html>
 <html lang="en">
