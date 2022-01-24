@@ -179,3 +179,8 @@ strong {
 	background-color: var(--mp-theme-chrome);
 	color: var(--mp-theme-explorerContent);
 }
+
+.danger.btn:hover, .danger.btn-flat:hover, .danger.btn-large:hover, .danger.btn-small:hover {
+	background-color: #F44336;
+	color: #fff;
+}
