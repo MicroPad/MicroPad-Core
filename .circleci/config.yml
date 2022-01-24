@@ -62,7 +62,7 @@ jobs:
           keys:
             - yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
 
-      run: cd app && yarn
+      - run: cd app && yarn
 
       # Load in the built MicroPad to run an instance for testing
       - attach_workspace:
