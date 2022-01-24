@@ -73,11 +73,9 @@ jobs:
           background: true
 
       # Run the e2e integration tests
-      - run: cd app && yarn test
+      - run: cd app && yarn test --runInBand
       - store_test_results:
-          path: app/.reports/junit.xml
-      - store_artifacts:
-          path: app/.reports
+          path: ~/repo/app/.reports/junit.xml
 
   deploy:
     docker:
