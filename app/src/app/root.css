@@ -184,3 +184,8 @@ strong {
 	background-color: #F44336;
 	color: #fff;
 }
+
+::placeholder {
+	color: var(--mp-theme-text);
+	opacity: 0.5;
+}
