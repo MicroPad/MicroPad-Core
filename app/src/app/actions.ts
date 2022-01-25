@@ -58,7 +58,6 @@ export const actions = {
 	renameNotepad: actionCreator.async<string, string, any>('RENAME_NOTEPAD'),
 	checkNoteAssets: actionCreator.async<[string, NoteElement[]], FlatNotepad, any>('CHECK_NOTE_ASSETS'),
 	loadNote: actionCreator.async<string, object, any>('LOAD_NOTE'),
-	downloadAsset: actionCreator.async<{ filename: string, uuid: string }, void, any>('DOWNLOAD_ASSET'),
 	expandAllExplorer: actionCreator.async<void, string[], any>('EXPAND_ALL_EXPLORER'),
 	print: actionCreator.async<void, NoteElement, void>('PRINT'),
 	syncLogin: actionCreator.async<SyncLoginRequest, SyncUser, any>('SYNC_LOGIN'),

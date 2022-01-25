@@ -4,7 +4,6 @@ import { Row } from 'react-materialize';
 import { Dialog } from '../../../services/dialogs';
 import { ITheme } from '../../../types/Themes';
 import { readFile } from '../../../services/files';
-import Button2 from '../../Button';
 
 export interface IFileElementComponent extends INoteElementComponentProps {
 	theme: ITheme;

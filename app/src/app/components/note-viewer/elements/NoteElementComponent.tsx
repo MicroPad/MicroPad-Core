@@ -41,7 +41,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 	private isDragging = false;
 
 	render() {
-		const { element, noteAssets, theme, search, downloadAsset, elementEditing, edit, updateElement } = this.props;
+		const { element, noteAssets, theme, search, elementEditing, edit, updateElement } = this.props;
 		if (!theme) return null;
 
 		const isEditing = element.args.id === elementEditing;

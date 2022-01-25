@@ -40,7 +40,6 @@ export function mapStateToProps({ notepads, currentNote, app }: IStoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteViewerComponentProps> {
 	return {
 		search: query => dispatch(actions.search.started(query)),
-		downloadAsset: (filename, uuid) => dispatch(actions.downloadAsset.started({ filename, uuid })),
 		edit: id => dispatch(actions.openEditor(id)),
 		deleteElement: elementId => dispatch(actions.deleteElement({ elementId, noteRef })),
 		updateElement: (id, changes, newAsset) => dispatch(
