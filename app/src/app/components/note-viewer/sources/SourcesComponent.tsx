@@ -8,14 +8,14 @@ import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
 import Button2 from '../../Button';
+import { isDynamicUri } from '../../../services/uri-helpers';
 
 const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 	const { note, element } = props;
 	if (!note || !element) return null;
 
 	const bibliography = note.bibliography
-		// eslint-disable-next-line no-script-url
-		.filter(source => source.item === element.args.id && !source.content.startsWith('javascript:'));
+		.filter(source => source.item === element.args.id && !isDynamicUri(source.content));
 
 	const sources: JSX.Element[] = [];
 	bibliography.forEach(source => sources.push(
@@ -60,8 +60,7 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 		const { updateBibliography } = props;
 
 		const url = await Dialog.prompt('Source URL:');
-		// eslint-disable-next-line no-script-url
-		if (!url || url.length === 0 || url.startsWith('javascript:')) return;
+		if (!url || url.length === 0 || isDynamicUri(url)) return;
 
 		updateBibliography([
 			...note.bibliography,
