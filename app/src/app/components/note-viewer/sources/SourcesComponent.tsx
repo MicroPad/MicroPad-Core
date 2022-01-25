@@ -13,7 +13,8 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 	const { note, element } = props;
 	if (!note || !element) return null;
 
-	const bibliography = note.bibliography.filter(source => source.item === element.args.id);
+	const bibliography = note.bibliography
+		.filter(source => source.item === element.args.id && !source.content.startsWith('javascript:'));
 
 	const sources: JSX.Element[] = [];
 	bibliography.forEach(source => sources.push(
@@ -58,7 +59,7 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 		const { updateBibliography } = props;
 
 		const url = await Dialog.prompt('Source URL:');
-		if (!url || url.length === 0) return;
+		if (!url || url.length === 0 || url.startsWith('javascript:')) return;
 
 		updateBibliography([
 			...note.bibliography,
