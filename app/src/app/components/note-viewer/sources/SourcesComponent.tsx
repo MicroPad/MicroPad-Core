@@ -14,6 +14,7 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 	if (!note || !element) return null;
 
 	const bibliography = note.bibliography
+		// eslint-disable-next-line no-script-url
 		.filter(source => source.item === element.args.id && !source.content.startsWith('javascript:'));
 
 	const sources: JSX.Element[] = [];
@@ -59,6 +60,7 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 		const { updateBibliography } = props;
 
 		const url = await Dialog.prompt('Source URL:');
+		// eslint-disable-next-line no-script-url
 		if (!url || url.length === 0 || url.startsWith('javascript:')) return;
 
 		updateBibliography([
