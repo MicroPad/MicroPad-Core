@@ -24,7 +24,6 @@ export interface INoteViewerComponentProps {
 	theme: ITheme;
 	edit?: (id: string) => void;
 	search?: (query: string) => void;
-	downloadAsset?: (filename: string, uuid: string) => void;
 	updateElement?: (id: string, changes: NoteElement, newAsset?: Blob) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
 	hideInsert?: () => void;
@@ -59,7 +58,6 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			note,
 			noteAssets,
 			search,
-			downloadAsset,
 			elementEditing,
 			theme,
 			isNotepadOpen,
@@ -112,7 +110,6 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				deleteElement={deleteElement!}
 				search={search!}
 				updateElement={updateElement}
-				downloadAsset={downloadAsset}
 				elementEditing={elementEditing}
 				insert={insert} />
 		));

@@ -4,7 +4,6 @@ import { from, Observable, of } from 'rxjs';
 import { actions, MicroPadAction, MicroPadActions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { filterTruthy, generateGuid } from '../util';
-import saveAs from 'save-as';
 import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
@@ -67,29 +66,6 @@ const checkNoteAssets$ = (action$: Observable<MicroPadAction>, state$: EpicStore
 				actions.loadNote.done({ params: ref, result: blobUrls })
 			];
 		})
-	);
-
-const downloadAsset$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { notificationService }: EpicDeps) =>
-	action$.pipe(
-		ofType(actions.downloadAsset.started.type),
-		map(action => (action as MicroPadActions['downloadAsset']['started']).payload),
-		switchMap(({ filename, uuid }: { filename: string, uuid: string }) =>
-			from(ASSET_STORAGE.getItem<Blob>(uuid))
-				.pipe(
-					filter((blob: Blob | null): blob is Blob => {
-						if (!blob) {
-							notificationService.toast({
-								html: `This file cannot be downloaded because the file isn't stored in this notebook.`
-							});
-							return false;
-						}
-						return true;
-					}),
-					map((blob): [Blob, string] => [blob as Blob, filename])
-				)
-		),
-		tap(([blob, filename]: [Blob, string]) => saveAs(blob, filename)),
-		map(([_blob, filename]: [Blob, string]) => actions.downloadAsset.done({ params: { filename, uuid: '' }, result: undefined }))
 	);
 
 const binaryElementUpdate$ = (action$: Observable<MicroPadAction>) =>
@@ -238,7 +214,6 @@ const imagePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 export const noteEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	loadNote$,
 	checkNoteAssets$,
-	downloadAsset$,
 	binaryElementUpdate$,
 	reloadNote$,
 	autoLoadNewNote$,

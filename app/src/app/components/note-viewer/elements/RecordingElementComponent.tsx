@@ -27,26 +27,30 @@ export default class RecordingElementComponent extends React.Component<IFileElem
 	}
 
 	render() {
-		const { element, noteAssets, downloadAsset, elementEditing } = this.props;
+		const { element, noteAssets, elementEditing } = this.props;
 		const isEditing = elementEditing === element.args.id;
+		const hasAsset = !!element.args.filename && !!element.args.ext && !!noteAssets[element.args.ext];
 
 		if (isEditing && !this.canRecord) return <div style={{ padding: '5px', width: '400px' }}><p>Recording is not supported</p></div>;
 
 		return (
 			<div style={{ padding: '5px', width: (!isEditing) ? 'max-content' : '400px' }}>
 				{
-					isEditing &&
-					<div ref={e => this.buttonContainer = e!} className="recording-inactive">
+					isEditing
+					&& <div ref={e => this.buttonContainer = e!} className="recording-inactive">
 						<Button2 className="accent-btn" waves="light" onClick={() => this.recorder.start()}><Icon left={true}>record_voice_over</Icon> Start Recording</Button2>
 						<Button2 className="red" waves="light" onClick={() => this.recorder.stop()}><Icon left={true}>stop</Icon> Stop Recording</Button2>
 					</div>
 				}
 
+				{ !isEditing && !hasAsset && <em onClick={this.openEditor}>Tap here to start a recording…</em>}
+
 				{
-					!isEditing &&
-					<div onClick={this.openEditor}>
+					!isEditing
+					&& hasAsset
+					&& <div onClick={this.openEditor}>
 						<p>
-							<a title={BAD_BROWSER_AUDIO} href="#!" onClick={() => downloadAsset(element.args.filename!, element.args.ext!)}>
+							<a title={BAD_BROWSER_AUDIO} href={noteAssets[element.args.ext!]} download={element.args.filename} onClick={e => e.stopPropagation()}>
 								<em>{element.args.filename}</em>
 							</a>
 						</p>

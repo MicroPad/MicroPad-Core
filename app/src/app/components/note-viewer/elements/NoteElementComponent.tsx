@@ -23,7 +23,6 @@ export interface INoteElementComponentProps extends Partial<INoteViewerComponent
 	edit: (id: string) => void;
 	deleteElement?: (id: string) => void;
 	search?: (query: string) => void;
-	downloadAsset?: (filename: string, uuid: string) => void;
 	insert?: (element: NoteElement) => void;
 }
 
@@ -105,7 +104,6 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					elementEditing={elementEditing}
 					updateElement={updateElement}
 					noteAssets={noteAssets}
-					downloadAsset={downloadAsset!}
 					edit={edit} />
 				);
 				break;
@@ -118,7 +116,6 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					elementEditing={elementEditing}
 					updateElement={updateElement}
 					noteAssets={noteAssets}
-					downloadAsset={downloadAsset!}
 					edit={edit} />
 				);
 				break;

@@ -15,7 +15,10 @@ export const markdownElementConnector = connect(
 		shouldWordWrap: state.editor.shouldWordWrap
 	}),
 	dispatch => ({
-		toggleSpellCheck: () => dispatch(actions.toggleSpellCheck()),
+		toggleSpellCheck: () => {
+			dispatch(actions.toggleSpellCheck());
+			dispatch(actions.setInfoMessage({ text: 'You may need to close and re-open the editor to see any effect from the spellcheck change.' }));
+		},
 		toggleWordWrap: () => dispatch(actions.toggleWordWrap()),
 		openModal: (modal: string) => dispatch(actions.openModal(modal)),
 		enableCheckboxes: (md: string, html: string): IProgressValues & { html: string } => {

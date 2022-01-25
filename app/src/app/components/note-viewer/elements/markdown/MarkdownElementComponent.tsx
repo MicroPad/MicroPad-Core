@@ -19,7 +19,6 @@ import NoteElementModalComponent from '../../../note-element-modal/NoteElementMo
 import { BehaviorSubject } from 'rxjs';
 import { ConnectedProps } from 'react-redux';
 import { markdownElementConnector } from './MarkdownElementContainer';
-import { NotificationService } from '../../../../services/NotificationService';
 import Button2 from '../../../Button';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
@@ -120,13 +119,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 										label="Spellcheck"
 										value="1"
 										checked={this.props.shouldSpellCheck}
-										onChange={() => {
-											this.props.toggleSpellCheck();
-											NotificationService.toast({
-												html: `Updated spell check preferences.<br/>You may need to close and re-open the editor to see any effect.`,
-												displayLength: 3000
-											})
-										}}
+										onChange={() => this.props.toggleSpellCheck()}
 										filledIn
 									/>
 								</Col>
