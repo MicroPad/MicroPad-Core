@@ -256,13 +256,15 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 	}
 	
 	function setToDoItemVisibilities() {
-		document.querySelectorAll('.task-list-item input:checked').forEach(function(item) {
+		document.querySelectorAll('.task-list-item > input:checked').forEach(function(item) {
 			if (showHidden) {
 				getParentsUntil(item, '#content').forEach(function(parent) {
 					parent.classList.remove('hidden');
 				});
 			} else {
-				getParentsUntil(item, 'ul').forEach(function(parent) {
+				let tree = getParentsUntil(item, 'ul');
+				if (tree[tree.length - 1].nodeName.toLowerCase() === 'html') tree = getParentsUntil(item, 'ol');
+				tree.forEach(parent => {
 					parent.classList.add('hidden');
 				});
 			}
