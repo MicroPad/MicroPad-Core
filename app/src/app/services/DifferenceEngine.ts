@@ -11,6 +11,7 @@ import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
 import { actions } from '../actions';
 import { store } from '../root';
 import { WorkerMsgData } from '../workers';
+import { SYNC_ASSET_OVERSIZED_MESSAGE } from '../strings.enNZ';
 
 const AssetHashWorker = new Worker(build.defs.SYNC_WORKER_PATH, { type: 'module' });
 
@@ -80,7 +81,6 @@ export const SyncService = (() => {
 		token
 	});
 
-	let oversizedAssetCount = 0;
 	async function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
 		const cid = generateGuid();
 		const res$ = fromEvent<MessageEvent<WorkerMsgData<ReturnType<typeof getAssetInfoImpl>>>>(AssetHashWorker, 'message').pipe(
@@ -100,9 +100,10 @@ export const SyncService = (() => {
 		});
 
 		const { assets, hasOversizedAssets } = await getAssetInfo$;
-		if (hasOversizedAssets && hasOversizedAssets !== oversizedAssetCount) {
-			oversizedAssetCount = hasOversizedAssets;
-			store.dispatch(actions.openModal('sync-oversized-assets-modal'));
+		if (hasOversizedAssets) {
+			store.dispatch(actions.setInfoMessage({
+				text: SYNC_ASSET_OVERSIZED_MESSAGE
+			}));
 		}
 
 		return Object.assign({}, notepad, { assetHashList: assets });
