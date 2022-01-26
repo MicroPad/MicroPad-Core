@@ -30,7 +30,6 @@
     "materialize-css": "^1.0.0",
     "mousetrap": "^1.6.1",
     "opus-recorder": "^4.1.0",
-    "paste-image": "^0.0.3",
     "pdfobject": "^2.1.1",
     "re-resizable": "^6.9.0",
     "react": "^17.0.2",
@@ -99,12 +98,12 @@
   },
   "browserslist": {
     "production": [
-      "chrome >= 80",
+      "chrome >= 84",
       "electron >= 12",
       "edge >= 80",
       "firefox >= 78",
-      "safari >= 13",
-      "ios_saf >= 13",
+      "safari >= 13.1",
+      "ios_saf >= 13.4",
       "unreleased versions"
     ],
     "development": [

@@ -1,6 +1,6 @@
 import { combineEpics, ofType } from 'redux-observable';
-import { catchError, concatMap, filter, map, mergeMap, switchMap, tap, withLatestFrom } from 'rxjs/operators';
-import { from, Observable, of } from 'rxjs';
+import { concatMap, filter, map, mergeMap, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
 import { actions, MicroPadAction, MicroPadActions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { filterTruthy, generateGuid } from '../util';
@@ -172,43 +172,42 @@ const quickMarkdownInsert$ = (action$: Observable<MicroPadAction>, state$: EpicS
 
 const imagePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType(actions.imagePasted.started.type),
-		filter(() => state$.value.currentNote.ref.length > 0),
-		map(action => (action as MicroPadActions['imagePasted']['started']).payload),
-		switchMap(imageUrl =>
-			from(fetch(imageUrl).then(res => res.blob())).pipe(
-				concatMap(image => {
-					let id = `image${generateGuid()}`;
+		ofType(actions.filePasted.type),
+		map(action => (action as MicroPadActions['filePasted']).payload),
+		switchMap(file => state$.pipe(
+			take(1),
+			filter(state => state.currentNote.ref.length > 0),
+			concatMap(state => {
+				const type = file.type.startsWith('image/') ? 'image' : 'file';
+				const id = type + generateGuid();
+				const element: NoteElement = {
+					type,
+					content: 'AS',
+					args: {
+						id,
+						x: state.app.cursorPos.x + 'px',
+						y: state.app.cursorPos.y + 'px',
+						width: 'auto',
+						height: 'auto',
+						ext: generateGuid(),
+						filename: file.name
+					}
+				};
 
-					const element: NoteElement = {
-						type: 'image',
-						args: {
-							id,
-							x: '10px',
-							y: '10px',
-							width: 'auto',
-							height: 'auto',
-						},
-						content: 'AS'
-					};
-
-					return [
-						actions.insertElement({
-							noteRef: state$.value.currentNote.ref,
-							element
-						}),
-
-						actions.updateElement({
-							element,
-							noteRef: state$.value.currentNote.ref,
-							elementId: id,
-							newAsset: image
-						})
-					];
-				}),
-				catchError(error => of(actions.imagePasted.failed({ params: '', error })))
-			)
-		)
+				return [
+					actions.insertElement({
+						noteRef: state$.value.currentNote.ref,
+						element
+					}),
+					actions.updateElement({
+						element,
+						noteRef: state$.value.currentNote.ref,
+						elementId: id,
+						newAsset: file
+					})
+				];
+			})
+		))
 	);
 
 export const noteEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(

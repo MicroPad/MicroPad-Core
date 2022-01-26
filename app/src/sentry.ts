@@ -31,10 +31,13 @@ export function initSentry() {
 export function createSentryReduxEnhancer() {
 	return Sentry.createReduxEnhancer({
 		stateTransformer: _state => null,
-		actionTransformer: (action: MicroPadAction) => ({
-			type: action.type,
-			error: (action?.payload as Failure<unknown, unknown>)?.error
-		})
+		actionTransformer: (action: MicroPadAction) => {
+			if (action.type === 'MOUSE_MOVE') return null;
+			return {
+				type: action.type,
+				error: (action?.payload as Failure<unknown, unknown>)?.error
+			};
+		}
 	});
 }
 

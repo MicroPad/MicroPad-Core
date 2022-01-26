@@ -258,10 +258,9 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		const { insert, note, updateElement } = this.props;
 		if (!insert || !note || !updateElement) return;
 
-		const ext = file.name.split('.').pop()!;
-		const type = ['png', 'jpeg', 'jpg', 'gif'].includes(ext) ? 'image' : 'file';
+		const type = file.type.startsWith('image/') ? 'image' : 'file';
 
-		const id = type + note.elements.filter(e => e.type === type).length + 1;
+		const id = type + generateGuid();
 		const element: NoteElement = {
 			type,
 			content: 'AS',

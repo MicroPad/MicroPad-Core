@@ -32,7 +32,6 @@ import HeaderComponent from './components/header/HeaderContainer';
 import NotepadExplorerComponent from './components/explorer/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './services/shortcuts';
-import * as PasteImage from 'paste-image';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import NoteElementModalComponent from './components/note-element-modal/NoteElementModalComponent';
 import { SyncUser } from './types/SyncTypes';
@@ -49,6 +48,7 @@ import { restoreSavedPasswords } from './services/CryptoService';
 import InfoModalsComponent from './components/InfoModalsComponent';
 import { rootEpic$ } from './epics/rootEpic';
 import InfoBannerComponent from './components/header/info-banner/InfoBannerContainer';
+import { watchPastes } from './services/paste-watcher';
 
 window.MicroPadGlobals = {};
 
@@ -133,6 +133,10 @@ export function getStorage(): StorageMap {
 	store.dispatch(actions.indexNotepads.started());
 
 	enableKeyboardShortcuts(store);
+	document.addEventListener('mousemove', e => store.dispatch(actions.mouseMove({
+		x: e.clientX,
+		y: e.clientY
+	})));
 
 	// Render the main UI
 	ReactDOM.render(
@@ -156,7 +160,7 @@ export function getStorage(): StorageMap {
 
 	await displayWhatsNew();
 	notepadDownloadHandler();
-	pasteWatcher();
+	watchPastes(store);
 
 	store.dispatch(actions.clearOldData.started({ silent: true }));
 
@@ -227,17 +231,4 @@ function notepadDownloadHandler() {
 	// eslint-disable-next-line no-restricted-globals
 	const downloadNotepadUrl = new URLSearchParams(location.search).get('download');
 	if (!!downloadNotepadUrl) store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
-}
-
-function pasteWatcher() {
-	/*
-		The paste watcher breaks text inputs in Safari (https://github.com/MicroPad/Web/issues/179).
-		TODO: Consider re-enabling this when https://github.com/MicroPad/Web/issues/143 is done.
-	*/
-	const isSafariLike = navigator.vendor === 'Apple Computer, Inc.';
-	if (isSafariLike) return;
-
-	PasteImage.on('paste-image', async (image: HTMLImageElement) => {
-		store.dispatch(actions.imagePasted.started(image.src));
-	});
 }

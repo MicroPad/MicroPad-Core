@@ -68,7 +68,6 @@ export const actions = {
 	addToSync: actionCreator.async<AddToSyncAction, string, any>('SYNC_CREATE'),
 	quickNote: actionCreator.async<void, string, void>('QUICK_NOTE'),
 	indexNotepads: actionCreator.async<void, SearchIndices, any>('INDEX_NOTEPADS'),
-	imagePasted: actionCreator.async<string, void, Error>('IMAGE_PASTED'),
 	exportAll: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS'),
 	exportToMarkdown: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS_TO_MD'),
 	clearOldData: actionCreator.async<{ silent: boolean }, void, Error>('CLEAR_OLD_DATA'),
@@ -136,7 +135,9 @@ export const actions = {
 	setDrawMode: actionCreator<DrawMode>('SET_DRAW_MODE'),
 	setDrawingLineColour: actionCreator<string>('SET_DRAWING_LINE_COLOUR'),
 	dismissInfoBanner: actionCreator<void>('DISMISS_INFO_BANNER'),
-	setInfoMessage: actionCreator<AppInfoMessage>('SET_INFO_MESSAGE')
+	setInfoMessage: actionCreator<AppInfoMessage>('SET_INFO_MESSAGE'),
+	mouseMove: actionCreator<{ x: number, y: number }>('MOUSE_MOVE'),
+	filePasted: actionCreator<File>('FILE_PASTED'),
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
@@ -144,10 +145,7 @@ export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
 	actions.quickNote.done.type,
 	actions.quickNote.failed.type,
 
-	actions.imagePasted.started.type,
-	actions.imagePasted.done.type,
-	actions.imagePasted.failed.type,
-
+	actions.filePasted.type,
 	actions.updateElement.type,
 	actions.quickMarkdownInsert.type,
 	actions.insertElement.type,
