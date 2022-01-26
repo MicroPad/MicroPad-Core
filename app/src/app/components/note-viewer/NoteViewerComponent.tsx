@@ -228,8 +228,15 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		const { note, isFullscreen } = this.props;
 		if (!note) return;
 
-		const x = event.clientX;
-		const y = event.clientY - FullScreenService.getOffset(isFullscreen);
+		const noteViewer = document.getElementById('note-viewer')!;
+		const notepadExplorerWidth = document.querySelector<HTMLDivElement>('.notepad-explorer')?.offsetWidth ?? 0;
+		const offsets = {
+			left: notepadExplorerWidth - noteViewer.scrollLeft,
+			top: FullScreenService.getOffset(isFullscreen) - noteViewer.scrollTop
+		};
+
+		const x = event.clientX - offsets.left;
+		const y = event.clientY - offsets.top;
 
 		if (!!event.dataTransfer && !!event.dataTransfer.items) {
 			Array.from(event.dataTransfer.items)
@@ -248,11 +255,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 	}
 
 	private insertFileFromDrag = (file: File, x: number, y: number) => {
-		const { insert, note, isFullscreen, updateElement } = this.props;
+		const { insert, note, updateElement } = this.props;
 		if (!insert || !note || !updateElement) return;
-
-		const insertX = Math.abs(Math.floor(this.containerDiv.getBoundingClientRect().left)) + x;
-		const insertY = (Math.abs(Math.floor(this.containerDiv.getBoundingClientRect().top)) + y) - FullScreenService.getOffset(isFullscreen);
 
 		const ext = file.name.split('.').pop()!;
 		const type = ['png', 'jpeg', 'jpg', 'gif'].includes(ext) ? 'image' : 'file';
@@ -263,8 +267,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			content: 'AS',
 			args: {
 				id,
-				x: insertX + 'px',
-				y: insertY + 'px',
+				x: x + 'px',
+				y: y + 'px',
 				width: 'auto',
 				height: 'auto',
 				ext: generateGuid(),
