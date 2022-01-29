@@ -379,9 +379,10 @@ function configureShowdown(): Converter {
 				type: 'listener',
 				listeners: {
 					'hashHTMLBlocks.after': (evtName, text) => {
+						console.log(evtName, text);
 						let i = 0;
 						return text.replaceAll(/(^|\s)(#[a-z\d-]+)/gi, match => {
-							matches.push(match);
+							matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${match.split('#')[1]}');">${match}</a>`);
 							return '%PLACEHOLDER3' + i++ + 'ENDPLACEHOLDER3%';
 						});
 					}
