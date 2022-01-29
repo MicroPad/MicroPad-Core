@@ -142,32 +142,33 @@ const loadNoteOnMove$ = (action$: Observable<MicroPadAction>) =>
 const quickMarkdownInsert$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
 		ofType(actions.quickMarkdownInsert.type),
-		map(() => state$.value.currentNote.ref),
-		filter(ref => ref.length > 0 && !!state$.value.notepads.notepad && !!state$.value.notepads.notepad!.item),
-		map(ref => state$.value.notepads.notepad!.item!.notes[ref]),
-		concatMap(note => {
-			const id = `markdown${generateGuid()}`;
-
-			return [
-				actions.insertElement({
-					noteRef: note.internalRef,
-					element: {
-						type: 'markdown',
-						args: {
-							id,
-							x: '10px',
-							y: '10px',
-							width: 'auto',
-							height: 'auto',
-							fontSize: state$.value.app.defaultFontSize
-						},
-						content: ''
+		switchMap(() => state$.pipe(
+			take(1),
+			filter(state => !!state.currentNote.ref.length),
+			concatMap(state => {
+				const element: NoteElement = {
+					type: 'markdown',
+					content: '',
+					args: {
+						id: 'markdown' + generateGuid(),
+						x: state.app.cursorPos.x + 'px',
+						y: state.app.cursorPos.y + 'px',
+						width: 'auto',
+						height: 'auto',
+						ext: generateGuid(),
+						fontSize: state.app.defaultFontSize
 					}
-				}),
+				};
 
-				actions.openEditor(id)
-			];
-		})
+				return [
+					actions.insertElement({
+						noteRef: state.currentNote.ref,
+						element
+					}),
+					actions.openEditor(element.args.id)
+				];
+			})
+		))
 	);
 
 const imagePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
@@ -176,7 +177,7 @@ const imagePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 		map(action => (action as MicroPadActions['filePasted']).payload),
 		switchMap(file => state$.pipe(
 			take(1),
-			filter(state => state.currentNote.ref.length > 0),
+			filter(state => !!state.currentNote.ref.length),
 			concatMap(state => {
 				const type = file.type.startsWith('image/') ? 'image' : 'file';
 				const id = type + generateGuid();
@@ -196,12 +197,12 @@ const imagePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 
 				return [
 					actions.insertElement({
-						noteRef: state$.value.currentNote.ref,
+						noteRef: state.currentNote.ref,
 						element
 					}),
 					actions.updateElement({
 						element,
-						noteRef: state$.value.currentNote.ref,
+						noteRef: state.currentNote.ref,
 						elementId: id,
 						newAsset: file
 					})
