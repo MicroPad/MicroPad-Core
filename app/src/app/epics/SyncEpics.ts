@@ -163,7 +163,7 @@ export const download$ = (action$: Observable<MicroPadAction>, state$: EpicStore
 					const message = (!!error.response) ? error.response : 'There was an error syncing';
 					if (message === 'Invalid token') {
 						Dialog.alert('Your token has expired. Please login again.');
-						return of(actions.syncLogout(undefined));
+						return of(actions.syncLogout());
 					}
 
 					Dialog.alert(message);
@@ -235,14 +235,14 @@ export const upload$ = (action$: Observable<MicroPadAction>, state$: EpicStore, 
 					uploadCount$.next(0);
 
 					if (error && error.message === 'too many assets') {
-						return of(actions.syncProError(undefined));
+						return of(actions.syncProError());
 					}
 
 					console.error(error);
 					const message = (!!error.response) ? error.response.error : 'There was an error syncing';
 					if (message === 'Invalid token') {
 						Dialog.alert('Your token has expired. Please login again.');
-						return of(actions.syncLogout(undefined));
+						return of(actions.syncLogout());
 					}
 
 					Dialog.alert(message);
@@ -281,7 +281,7 @@ export const getNotepadList$ = (action$: Observable<MicroPadAction>) =>
 							const message: string = error.response.error;
 							if (message === 'Invalid token') {
 								Dialog.alert('Your sync token has expired. Please login again.');
-								return of(actions.syncLogout(undefined));
+								return of(actions.syncLogout());
 							}
 							Dialog.alert(message);
 						}
@@ -321,7 +321,7 @@ export const addNotepad$ = (action$: Observable<MicroPadAction>) =>
 					if (!!error.response && !!error.response.error) {
 						if (error.response.error === 'Invalid token') {
 							Dialog.alert('Your token has expired. Please login again.');
-							return of(actions.syncLogout(undefined));
+							return of(actions.syncLogout());
 						}
 
 						Dialog.alert(error.response.error);

@@ -26,7 +26,7 @@ export function mapStateToProps({ notepads, currentNote, print, app }: IStoreSta
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IPrintViewComponentProps> {
 	return {
-		clearPrintView: () => dispatch(actions.clearPrintView(undefined))
+		clearPrintView: () => dispatch(actions.clearPrintView())
 	};
 }
 

@@ -91,7 +91,7 @@ const binaryElementUpdate$ = (action$: Observable<MicroPadAction>) =>
 					}
 				}
 			}),
-			actions.reloadNote(undefined)
+			actions.reloadNote()
 		])
 	);
 
@@ -128,7 +128,7 @@ const closeNoteOnDeletedParent$ = (action$: Observable<MicroPadAction>, state$: 
 
 		// Has the currently opened note been deleted?
 		filter(notepad => state$.value.currentNote.ref.length > 0 && !notepad.notes[state$.value.currentNote.ref]),
-		map(() => actions.closeNote(undefined))
+		map(() => actions.closeNote())
 	);
 
 const loadNoteOnMove$ = (action$: Observable<MicroPadAction>) =>

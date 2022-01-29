@@ -33,12 +33,12 @@ export function mapStateToProps({ notepads, explorer, app, currentNote }: IStore
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 	return {
-		flipFullScreenState: () => dispatch(actions.flipFullScreenState(undefined)),
+		flipFullScreenState: () => dispatch(actions.flipFullScreenState()),
 		loadNote: (ref: string) => dispatch(actions.loadNote.started(ref)),
 		expandSection: (guid: string) => dispatch(actions.expandSection(guid)),
 		collapseSection: (guid: string) => dispatch(actions.collapseSelection(guid)),
-		expandAll: () => dispatch(actions.expandAllExplorer.started(undefined)),
-		collapseAll: () => dispatch(actions.collapseAllExplorer(undefined)),
+		expandAll: () => dispatch(actions.expandAllExplorer.started()),
+		collapseAll: () => dispatch(actions.collapseAllExplorer()),
 		newSection: obj => dispatch(actions.newSection(obj)),
 		newNote: obj => dispatch(actions.newNote(obj)),
 		expandFromNote: note => {

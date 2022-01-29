@@ -61,8 +61,8 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 			},
 			noteRef
 		})),
-		makeQuickNotepad: () => dispatch(actions.quickNotepad(undefined)),
-		makeQuickNote: () => dispatch(actions.quickNote.started(undefined)),
+		makeQuickNotepad: () => dispatch(actions.quickNotepad()),
+		makeQuickNote: () => dispatch(actions.quickNote.started()),
 		deleteNotepad: () => dispatch(actions.deleteNotepad(notepadTitle)),
 		hideInsert: () => {
 			if (!isInsertMenuOpen) return;
