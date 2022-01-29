@@ -6,18 +6,17 @@ export type MarkdownTransformer = ShowdownExtension;
 export const fendTransformer: MarkdownTransformer = {
 	type: 'listener',
 	listeners: {
-		'images.after': (evtName, text) => {
+		'hashHTMLBlocks.after': (evtName, text) => {
 			// e.g. [[1+1]] -> 2
 			let expressions: string[] = [];
 			for (let match of text.matchAll(/\[\[([^]+?)\]\]/gi)) {
 				expressions.push(match[1]);
 			}
-			if (expressions.length === 0) {
-				return text;
-			}
+			if (expressions.length === 0) return text;
+
 			const results = evaluateFendWithTimeoutMultiple(expressions.join('\0'), 500).split('\0');
 			let index = 0;
-			return text.replace(/\[\[([^]+?)\]\]/gi, (match, content) => {
+			return text.replace(/\[\[([^]+?)\]\]/gi, () => {
 				let result = results[index++];
 				if (result === 'Error: interrupted') {
 					result = 'Error: Calculation timed out';
@@ -41,3 +40,33 @@ export const colourTransformer: MarkdownTransformer = {
 			)
 	}
 };
+
+export const mathsTransformer: () => MarkdownTransformer[] = () => {
+	let matches: string[] = [];
+	return [
+		{
+			type: 'listener',
+			listeners: {
+				'hashHTMLBlocks.after': (evtName, text) => {
+					let i = 0;
+					return text.replaceAll(/(===[^]+?===|''[^]+?''|;;[^]+?;;)/gi, match => {
+						matches.push(match);
+						return '%MATHPLACEHOLDER' + i++ + 'ENDMATHPLACEHOLDER%';
+					});
+				}
+			}
+		},
+		{
+			type: 'output',
+			filter: text => {
+				for (let i = 0; i < matches.length; ++i) {
+					let pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
+					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
+				}
+
+				matches = [];
+				return text;
+			}
+		}
+	]
+}

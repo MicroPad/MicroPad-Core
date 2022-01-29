@@ -14,7 +14,7 @@ import { Checkbox, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
-import { colourTransformer, fendTransformer } from './MarkdownTransformers';
+import { colourTransformer, fendTransformer, mathsTransformer } from './MarkdownTransformers';
 import NoteElementModalComponent from '../../../note-element-modal/NoteElementModalComponent';
 import { BehaviorSubject } from 'rxjs';
 import { ConnectedProps } from 'react-redux';
@@ -338,32 +338,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 }
 
 function configureShowdown(): Converter {
-	extension('maths', () => {
-		let matches: string[] = [];
-		return [
-			{
-				type: 'lang',
-				regex: /(===[^]+?===|''[^]+?''|;;[^]+?;;)/gi,
-				replace: function(s: string, match: string) {
-					matches.push(match);
-					let n = matches.length - 1;
-					return '%MATHPLACEHOLDER' + n + 'ENDMATHPLACEHOLDER%';
-				}
-			},
-			{
-				type: 'output',
-				filter: function(text: string) {
-					for (let i = 0; i < matches.length; ++i) {
-						let pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
-						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-					}
-					// reset array
-					matches = [];
-					return text;
-				}
-			}
-		];
-	});
+	extension('maths', mathsTransformer);
 
 	extension('fend', fendTransformer);
 
@@ -371,12 +346,15 @@ function configureShowdown(): Converter {
 		let matches: string[] = [];
 		return [
 			{
-				type: 'lang',
-				regex: /(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi,
-				replace: function(s: string) {
-					matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
-					let n = matches.length - 1;
-					return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
+				type: 'listener',
+				listeners: {
+					'hashHTMLBlocks.after': (evtName, text) => {
+						let i = 0;
+						return text.replaceAll(/(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi, match => {
+							matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
+							return '%PLACEHOLDER2' + i++ + 'ENDPLACEHOLDER2%';
+						});
+					}
 				}
 			},
 			{
@@ -398,12 +376,15 @@ function configureShowdown(): Converter {
 		let matches: string[] = [];
 		return [
 			{
-				type: 'lang',
-				regex: /(^|\s)(#[a-z\d-]+)/gi,
-				replace: function(s: string) {
-					matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${s.split('#')[1]}');">${s}</a>`);
-					const n = matches.length - 1;
-					return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
+				type: 'listener',
+				listeners: {
+					'hashHTMLBlocks.after': (evtName, text) => {
+						let i = 0;
+						return text.replaceAll(/(^|\s)(#[a-z\d-]+)/gi, match => {
+							matches.push(match);
+							return '%PLACEHOLDER3' + i++ + 'ENDPLACEHOLDER3%';
+						});
+					}
 				}
 			},
 			{
