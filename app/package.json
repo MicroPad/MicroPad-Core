@@ -91,7 +91,8 @@
           "quotes": ["error", "single", { "allowTemplateLiterals":  true }],
           "jsx-quotes": ["error", "prefer-double"],
           "no-script-url": "error",
-          "no-eval": "error"
+          "no-eval": "error",
+          "no-console": ["error", { "allow": ["warn", "error"] }]
         }
       }
     ]
