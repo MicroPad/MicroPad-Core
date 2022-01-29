@@ -261,6 +261,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		const type = file.type.startsWith('image/') ? 'image' : 'file';
 
 		const id = type + generateGuid();
+		console.log(id);
 		const element: NoteElement = {
 			type,
 			content: 'AS',

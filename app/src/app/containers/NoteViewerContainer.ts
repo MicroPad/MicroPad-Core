@@ -52,13 +52,7 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 		),
 		toggleInsertMenu: opts => dispatch(actions.toggleInsertMenu(opts)),
 		insert: element => dispatch(actions.insertElement({
-			element: {
-				...element,
-				args: {
-					...element.args,
-					id: `${element.type}${note!.elements.filter(e => e.type === element.type).length + 1}`
-				}
-			},
+			element,
 			noteRef
 		})),
 		makeQuickNotepad: () => dispatch(actions.quickNotepad()),
