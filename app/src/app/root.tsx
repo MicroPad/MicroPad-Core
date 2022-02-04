@@ -62,7 +62,9 @@ const baseReducer: BaseReducer = new BaseReducer();
 export const store = createStore(
 	baseReducer.reducer,
 	baseReducer.initialState,
-	composeWithDevTools(compose(applyMiddleware(epicMiddleware), createSentryReduxEnhancer()))
+	composeWithDevTools({
+		actionsBlacklist: ['MOUSE_MOVE']
+	})(compose(applyMiddleware(epicMiddleware), createSentryReduxEnhancer()))
 );
 
 epicMiddleware.run(rootEpic$);

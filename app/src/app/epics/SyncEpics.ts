@@ -11,7 +11,8 @@ import {
 	map,
 	mergeMap,
 	switchMap,
-	tap
+	tap,
+	withLatestFrom
 } from 'rxjs/operators';
 import { Action } from 'typescript-fsa';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
@@ -348,7 +349,7 @@ export const syncOnAdded$ = (action$: Observable<MicroPadAction>, state$: EpicSt
 
 export const refreshNotepadListOnAction$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType(actions.deleteFromSync.done.type),
+		ofType(actions.deleteFromSync.done.type, actions.renameNotepad.done.type, actions.addToSync.done.type),
 		map(() => state$.value),
 		map((state: IStoreState) => state.sync.user),
 		filterTruthy(),
@@ -369,6 +370,17 @@ export const openSyncProErrorModal$ = (action$: Observable<MicroPadAction>) =>
 		map(() => actions.openModal('sync-pro-error-modal'))
 	);
 
+export const syncOnRenameNotebook$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+	action$.pipe(
+		ofType(actions.renameNotepad.done.type),
+		withLatestFrom(store.pipe(map(state => state.notepads.notepad))),
+		filter(([,notepadState]) => !!notepadState?.activeSyncId && !!notepadState?.item),
+		map(([,notepadState]) => actions.actWithSyncNotepad({
+			notepad: notepadState!.item!.toNotepad(),
+			action: notepad => actions.sync({ notepad, syncId: notepadState!.activeSyncId! })
+		}))
+	);
+
 export const syncEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	persistOnLogin$,
 	login$,
@@ -385,5 +397,6 @@ export const syncEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreSta
 	syncOnAdded$,
 	refreshNotepadListOnAction$,
 	clearStorageOnLogout$,
-	openSyncProErrorModal$
+	openSyncProErrorModal$,
+	syncOnRenameNotebook$
 );
