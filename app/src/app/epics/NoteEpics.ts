@@ -224,14 +224,14 @@ export const noteEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreSta
 );
 
 function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {
-	const storageRequests: Promise<Blob>[] = [];
+	const storageRequests: Promise<Blob | null>[] = [];
 	const blobRefs: string[] = [];
 
 	elements = elements.map(element => {
 		// Is this a notebook before v2?
 		if (element.type !== 'markdown' && element.content !== 'AS') {
 			const asset = new Asset(dataURItoBlob(element.content));
-			storageRequests.push(ASSET_STORAGE.setItem(asset.uuid, asset.data));
+			storageRequests.push(ASSET_STORAGE.setItem<Blob>(asset.uuid, asset.data));
 			blobRefs.push(asset.uuid);
 
 			return { ...element, args: { ...element.args, ext: asset.uuid }, content: 'AS' };
@@ -240,9 +240,9 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 		// Notebooks from v2 or higher
 		if (!!element.args.ext) {
 			storageRequests.push(
-				ASSET_STORAGE.getItem(element.args.ext)
-					.then((blobObj) => {
-						const blob = blobObj as Blob;
+				ASSET_STORAGE.getItem<Blob>(element.args.ext)
+					.then(blob => {
+						if (!blob) return null;
 
 						if (element.type === 'pdf') {
 							return blob.slice(0, blob.size, 'application/pdf');
@@ -260,9 +260,12 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 
 	return new Promise(resolve =>
 		Promise.all(storageRequests)
-			.then((blobs: Blob[]) => {
+			.then((blobs: Array<Blob | null>) => {
 				const blobUrls = {};
-				blobs.filter(b => !!b).forEach((blob, i) => blobUrls[blobRefs[i]] = URL.createObjectURL(blob));
+				blobs.forEach((blob, i) => {
+					if (!blob) return;
+					blobUrls[blobRefs[i]] = URL.createObjectURL(blob);
+				});
 
 				resolve({
 					elements,

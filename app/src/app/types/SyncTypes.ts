@@ -7,8 +7,9 @@ export type SyncLoginRequest = {
 };
 
 export type SyncUser = {
-	username: string;
-	token: string;
+	username: string,
+	token: string,
+	isPro?: boolean
 };
 
 export type AssetList = { [uuid: string]: string };

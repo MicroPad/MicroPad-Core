@@ -380,9 +380,9 @@ function configureShowdown(): Converter {
 				listeners: {
 					'hashHTMLBlocks.after': (evtName, text) => {
 						let i = 0;
-						return text.replaceAll(/(^|\s)(#[a-z\d-]+)/gi, match => {
+						return text.replaceAll(/(^|\s)(#[a-z\d-]+)/gi, (match, whitespace) => {
 							matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${match.split('#')[1]}');">${match}</a>`);
-							return '%PLACEHOLDER3' + i++ + 'ENDPLACEHOLDER3%';
+							return whitespace + '%PLACEHOLDER3' + i++ + 'ENDPLACEHOLDER3%';
 						});
 					}
 				}

@@ -113,6 +113,7 @@ export const actions = {
 	actWithSyncNotepad: actionCreator<NotepadToSyncNotepadAction>('ACT_WITH_SYNC_NOTEPAD'),
 	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD'),
 	syncProError: actionCreator<void>('SYNC_PRO_ERROR'),
+	setSyncProStatus: actionCreator<boolean>('SET_SYNC_PRO_STATUS'),
 	setHelpPref: actionCreator<boolean>('SET_HELP_PREF'),
 	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON'),
 	closeNote: actionCreator<void>('CLOSE_NOTE'),

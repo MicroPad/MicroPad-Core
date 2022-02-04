@@ -6,6 +6,7 @@ import LoginComponent from '../../../containers/LoginContainer';
 import { syncOptionsConnector } from './SyncOptionsContainer';
 import { ConnectedProps } from 'react-redux';
 import Button2 from '../../Button';
+import { Icon } from 'react-materialize';
 
 export default class SyncOptionsComponent extends React.Component<ConnectedProps<typeof syncOptionsConnector>> {
 	render() {
@@ -25,6 +26,8 @@ export default class SyncOptionsComponent extends React.Component<ConnectedProps
 				} />
 			);
 		}
+
+		const shouldShowCollaborationOptions = syncState.sharedNotepadList?.[notepad.title]?.scribe || syncState.user.isPro;
 
 		return (
 			<React.Fragment>
@@ -46,7 +49,8 @@ export default class SyncOptionsComponent extends React.Component<ConnectedProps
 							<div>
 								<ul className="sync-settings-component__action-list">
 									<li>
-										Synced! (<a href="#!" style={{ textDecoration: 'underline' }} onClick={this.manualSync}>Refresh</a>)
+										Synced!
+										<Button2 flat style={{ lineHeight: 'initial' }} onClick={this.manualSync}><Icon>sync</Icon></Button2>
 									</li>
 
 									<li>
@@ -64,12 +68,12 @@ export default class SyncOptionsComponent extends React.Component<ConnectedProps
 										</Button2>
 									</li>
 
-									<li style={{ paddingTop: '1em' }}>
+									{shouldShowCollaborationOptions && <li style={{ paddingTop: '1em' }}>
 										<a target="_blank" rel="noopener noreferrer nofollow" href={`${MICROPAD_URL}/sync/manage`}>Collaboration/Sharing Options</a>
 										<ul className="sync-settings-component__action-list">
 											{!!syncState.sharedNotepadList![notepad.title] && <li>Scribe: <em>{syncState.sharedNotepadList![notepad.title].scribe}</em></li>}
 										</ul>
-									</li>
+									</li>}
 								</ul>
 							</div>
 						}

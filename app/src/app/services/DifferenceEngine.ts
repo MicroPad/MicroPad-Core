@@ -1,4 +1,4 @@
-import { from, fromEvent, lastValueFrom, Observable, of } from 'rxjs';
+import { from, fromEvent, lastValueFrom, Observable, of, retryWhen } from 'rxjs';
 import { MICROPAD_URL } from '../types';
 import { concatMap, filter, map, retry, take } from 'rxjs/operators';
 import { AssetList, INotepadSharingData, ISyncedNotepad, SyncedNotepadList } from '../types/SyncTypes';
@@ -159,7 +159,14 @@ function callApi<T>(parent: string, endpoint: string, resource: string, payload?
 		timeout: !!payload ? undefined : 10000 // 10 seconds
 	}).pipe(
 		map(res => res.response),
-		retry(2)
+		retryWhen(errors => errors.pipe(
+			map((error, i) => {
+				if (i > 2 || error?.response?.error === 'Too many assets on a non-pro notepad') {
+					throw error;
+				}
+				return error;
+			})
+		))
 	);
 }
 

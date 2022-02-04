@@ -23,7 +23,6 @@ import { MICROPAD_URL } from './types';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
-import { composeWithDevTools } from 'redux-devtools-extension';
 import localforage from 'localforage';
 import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
@@ -49,6 +48,7 @@ import InfoModalsComponent from './components/InfoModalsComponent';
 import { rootEpic$ } from './epics/rootEpic';
 import InfoBannerComponent from './components/header/info-banner/InfoBannerContainer';
 import { watchPastes } from './services/paste-watcher';
+import { composeWithDevTools } from '@redux-devtools/extension';
 
 window.MicroPadGlobals = {};
 
@@ -63,7 +63,7 @@ export const store = createStore(
 	baseReducer.reducer,
 	baseReducer.initialState,
 	composeWithDevTools({
-		actionsBlacklist: ['MOUSE_MOVE']
+		actionsDenylist: ['MOUSE_MOVE']
 	})(compose(applyMiddleware(epicMiddleware), createSentryReduxEnhancer()))
 );
 
