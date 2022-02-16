@@ -19,6 +19,7 @@ export async function optimiseAssets(assetStorage: LocalForage, assetList: strin
 		const asset = await assetStorage.getItem<Blob>(uuid);
 		if (!asset) return null;
 		if (!el || el.type !== 'image') return asset;
+		if (asset.type.includes('gif')) return asset;
 
 		return await shrinkImage(asset, el);
 	}));
