@@ -204,9 +204,7 @@ const exportNotepad$ = (action$: Observable<MicroPadAction>, state$: EpicStore) 
 	action$.pipe(
 		ofType(actions.exportNotepad.type),
 		withLatestFrom(state$),
-		map(([,state]) => state.notepads),
-		filterTruthy(),
-		map((state: INotepadsStoreState) => (state.notepad || {} as INotepadStoreState).item),
+		map(([,state]) => state.notepads?.notepad?.item),
 		filterTruthy(),
 		switchMap((notepad: FlatNotepad) =>
 			from(getNotepadXmlWithAssets(notepad.toNotepad()))

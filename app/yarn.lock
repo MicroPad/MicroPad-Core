@@ -5635,9 +5635,9 @@ pretty-bytes@^5.3.0:
   resolved "https://registry.yarnpkg.com/pretty-bytes/-/pretty-bytes-5.6.0.tgz#356256f643804773c82f64723fe78c92c62beaeb"
   integrity sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==
 
-"pretty-data@https://github.com/vkiryukhin/pretty-data#22a34a534745714ea974f72db2e9bf7561b3fdc7":
+"pretty-data@git+https://github.com/vkiryukhin/pretty-data.git#22a34a534745714ea974f72db2e9bf7561b3fdc7":
   version "0.50.0"
-  resolved "https://github.com/vkiryukhin/pretty-data#22a34a534745714ea974f72db2e9bf7561b3fdc7"
+  resolved "git+https://github.com/vkiryukhin/pretty-data.git#22a34a534745714ea974f72db2e9bf7561b3fdc7"
 
 pretty-format@^27.0.0, pretty-format@^27.5.1:
   version "27.5.1"
@@ -6740,10 +6740,10 @@ universalify@^2.0.0:
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-2.0.0.tgz#75a4984efedc4b08975c5aeb73f530d02df25717"
   integrity sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==
 
-upad-parse@^7.3.0:
-  version "7.3.3"
-  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-7.3.3.tgz#76dc6ade0409b99594e78563c635b619cb4e8689"
-  integrity sha512-EXiPegQqRS8cX9jFwrFtPSmQP8pVMUztiyepFULeKhhTFuMV+zjk7a8fbqNuQYMsg1mTdfj1hlhcea4q4k1a+Q==
+upad-parse@^7.4.0:
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-7.4.0.tgz#121ea3b80b211181c7461c7eaa7cd202f8b989b0"
+  integrity sha512-cV/CF5mSZQ/RuRYLo16BnM/Tg57YMJZ7hQ5y65t5c6FVwDp748l/eoyVYWz88eTbAThxlK8jMJ62joIuxrWJIA==
   dependencies:
     aes-js "^3.1.2"
     buffer "^6.0.3"

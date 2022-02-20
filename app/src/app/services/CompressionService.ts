@@ -1,6 +1,6 @@
 import { FlatNotepad } from 'upad-parse';
 import { default as initPhoton, open_image, resize_img_browser } from '@nick_webster/photon';
-import { NoteElement } from 'upad-parse/dist/Note';
+import { canOptimiseElement, NoteElement } from 'upad-parse/dist/Note';
 
 let started = false;
 
@@ -19,7 +19,7 @@ export async function optimiseAssets(assetStorage: LocalForage, assetList: strin
 		const asset = await assetStorage.getItem<Blob>(uuid);
 		if (!asset) return null;
 		if (!el || el.type !== 'image') return asset;
-		if (asset.type.includes('gif')) return asset;
+		if (!canOptimiseElement(el) || asset.type.includes('gif')) return asset;
 
 		return await shrinkImage(asset, el);
 	}));
