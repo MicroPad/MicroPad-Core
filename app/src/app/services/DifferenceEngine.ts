@@ -138,7 +138,7 @@ export function uploadAsset(url: string, asset: Blob): Observable<void> {
 		body: asset,
 		crossDomain: true,
 		headers: {
-			'Content-Type': 'application/octet-stream'
+			'Content-Type': asset.type
 		}
 	}).pipe(
 		map(() => undefined),
