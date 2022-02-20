@@ -73,6 +73,16 @@ const binaryElementUpdate$ = (action$: Observable<MicroPadAction>) =>
 		ofType(actions.updateElement.type),
 		map(action => (action as MicroPadActions['updateElement']).payload),
 		filter((params: UpdateElementAction) => !!params.newAsset),
+		map(params => {
+			if (params.newAsset!.type !== 'image/gif') return params;
+			return {
+				...params,
+				element: {
+					...params.element,
+					args: { ...params.element.args, canOptimise: false }
+				}
+			};
+		}),
 		switchMap((params: UpdateElementAction) => {
 			const key = params.element.args.ext || generateGuid();
 			return from(ASSET_STORAGE.setItem(key, params.newAsset).then((): [UpdateElementAction, string] => [params, key]));
