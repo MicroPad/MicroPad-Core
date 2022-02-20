@@ -99,14 +99,14 @@ export const SyncService = (() => {
 			flatNotepad: notepad.flatten()
 		});
 
-		const { assets, hasOversizedAssets } = await getAssetInfo$;
+		const { assets, hasOversizedAssets, assetTypes } = await getAssetInfo$;
 		if (hasOversizedAssets) {
 			store.dispatch(actions.setInfoMessage({
 				text: SYNC_ASSET_OVERSIZED_MESSAGE
 			}));
 		}
 
-		return Object.assign({}, notepad, { assetHashList: assets });
+		return Object.assign({}, notepad, { assetHashList: assets, assetTypes });
 	}
 
 	return {
