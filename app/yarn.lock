@@ -6740,10 +6740,10 @@ universalify@^2.0.0:
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-2.0.0.tgz#75a4984efedc4b08975c5aeb73f530d02df25717"
   integrity sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==
 
-upad-parse@^7.4.0:
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-7.4.0.tgz#121ea3b80b211181c7461c7eaa7cd202f8b989b0"
-  integrity sha512-cV/CF5mSZQ/RuRYLo16BnM/Tg57YMJZ7hQ5y65t5c6FVwDp748l/eoyVYWz88eTbAThxlK8jMJ62joIuxrWJIA==
+upad-parse@^7.4.1:
+  version "7.4.1"
+  resolved "https://registry.yarnpkg.com/upad-parse/-/upad-parse-7.4.1.tgz#a35b75db63d975cbdab4ecb9fe7cba319c090d29"
+  integrity sha512-SRMZnLVc0t90T/EStCP6p61OAj2SRxs52ld9j7nSXfLN1Ir2wrLH/OtuRYCAmkI7jYTghw+21VvtSymnmFqs2w==
   dependencies:
     aes-js "^3.1.2"
     buffer "^6.0.3"
