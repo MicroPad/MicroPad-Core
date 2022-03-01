@@ -3,6 +3,7 @@ import { getUsedAssets } from '../../util';
 import { crc32 } from '../../services/crc';
 import { FlatNotepad } from 'upad-parse/dist';
 import { ISyncedNotepad } from '../../types/SyncTypes';
+import {canOptimiseElement} from "upad-parse/dist/Note";
 
 const ASSET_STORAGE = localforage.createInstance({
 	name: 'MicroPad',
@@ -40,6 +41,8 @@ export async function getAssetInfoImpl(notepad: FlatNotepad): Promise<{ assets: 
 			.flatMap(note => note.elements)
 			.find(el => el.args.ext === notepadAssets[i]);
 		if (el?.type === 'image') {
+			if (canOptimiseElement(el)) assetTypes[notepadAssets[i]] = 'image/png';
+
 			assets[notepadAssets[i]] = `${crc32(new Uint8Array(await blob.arrayBuffer()))}-w=${el.args.width}&h=${el.args.height}`;
 		} else {
 			assets[notepadAssets[i]] = crc32(new Uint8Array(await blob.arrayBuffer()));
