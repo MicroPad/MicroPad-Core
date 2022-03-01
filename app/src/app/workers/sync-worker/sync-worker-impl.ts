@@ -3,7 +3,7 @@ import { getUsedAssets } from '../../util';
 import { crc32 } from '../../services/crc';
 import { FlatNotepad } from 'upad-parse/dist';
 import { ISyncedNotepad } from '../../types/SyncTypes';
-import {canOptimiseElement} from "upad-parse/dist/Note";
+import { canOptimiseElement } from 'upad-parse/dist/Note';
 
 const ASSET_STORAGE = localforage.createInstance({
 	name: 'MicroPad',
