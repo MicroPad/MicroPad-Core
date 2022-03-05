@@ -150,7 +150,22 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 	}
 
 	shouldComponentUpdate(nextProps: INoteElementComponentProps) {
-		return stringify(nextProps) !== stringify(this.props);
+		const sanNextProps: INoteElementComponentProps = {
+			...nextProps,
+			element: {
+				...nextProps.element,
+				args: { ...nextProps.element.args, dueDate: undefined }
+			}
+		};
+		const sanProps: INoteElementComponentProps = {
+			...this.props,
+			element: {
+				...this.props.element,
+				args: { ...this.props.element.args, dueDate: undefined }
+			}
+		};
+
+		return stringify(sanNextProps) !== stringify(sanProps);
 	}
 
 	getSnapshotBeforeUpdate(prevProps, prevState) {
