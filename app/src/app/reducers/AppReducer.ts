@@ -39,7 +39,7 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 			major,
 			minor,
 			patch,
-			status: isDev() ? 'dev' : 'stable'
+			status: isDev() ? 'dev' : 'alpha'
 		},
 		isFullScreen: false,
 		defaultFontSize: '16px',
