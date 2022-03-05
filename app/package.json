@@ -13,6 +13,9 @@
     "typecheck:watch": "tsc --noEmit --watch -p ./tsconfig.json",
     "lint": "eslint src/"
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "@fontsource/abeezee": "^4.4.5",
     "@nick_webster/photon": "^0.3.1",
