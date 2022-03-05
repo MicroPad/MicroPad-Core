@@ -11,6 +11,9 @@
     "lint": "yarn eslint src/",
     "eject": "react-scripts eject"
   },
+  "engines": {
+    "node": ">= 12.0.0 <= 17.0.0"
+  },
   "dependencies": {
     "@material-ui/core": "^4.0.2",
     "@material-ui/icons": "^4.0.1",
