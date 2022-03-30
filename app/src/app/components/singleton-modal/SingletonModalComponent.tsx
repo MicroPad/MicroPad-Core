@@ -7,7 +7,7 @@ import Button2 from '../Button';
 
 export type SingletonModalProps = {
 	children: React.ReactNode,
-	id?: string,
+	id: string,
 	trigger?: React.ReactNode,
 	header?: string,
 	fixedFooter?: boolean,
@@ -17,10 +17,8 @@ export type SingletonModalProps = {
 
 type Props = ConnectedProps<typeof singletonModalConnector> & SingletonModalProps;
 
-let ID_COUNTER = 0;
-
 const SingletonModalComponent = (props: Props) => {
-	const [id] = useState<string>(props.id ?? `singleton-modal-${ID_COUNTER++}`);
+	const [id] = useState<string>(props.id);
 
 	const isOpen = id === props.currentModalId;
 	if (!isOpen) {

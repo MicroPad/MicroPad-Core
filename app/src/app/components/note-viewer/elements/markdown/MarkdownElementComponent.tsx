@@ -139,6 +139,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 
 				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>
 					Markdown Editor (<NoteElementModalComponent
+					id={`formatting-help-modal-${element.args.id}`}
 					trigger={<Button2 flat small waves="light" style={{ padding: '0' }}>Formatting Help</Button2>}
 					npx={helpNpx}
 					findNote={np => np.sections[1].notes[0]} />)

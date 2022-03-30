@@ -18,6 +18,7 @@ export default class ManageSyncComponent extends React.Component<IManageSyncComp
 
 		return (
 			<SingletonModalComponent
+				id="manage-microsync-modal"
 				header={`Manage ${SYNC_NAME}`}
 				trigger={<NavItem href="#!">Manage {SYNC_NAME}</NavItem>}
 				actions={[

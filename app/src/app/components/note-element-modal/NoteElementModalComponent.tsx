@@ -11,7 +11,7 @@ import SingletonModalComponent from '../singleton-modal/SingletonModalContainer'
 export type Props = {
 	npx: string,
 	findNote: (notepad: Notepad) => Note,
-	id?: string,
+	id: string,
 	trigger?: React.ReactNode
 };
 

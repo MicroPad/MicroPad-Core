@@ -27,6 +27,7 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 
 	return (
 		<SingletonModalComponent
+			id={`bib-modal-${element.args.id}-${note.internalRef}`}
 			header="Bibliography"
 			trigger={
 				<Button2 flat small waves="light" style={{ padding: '0' }}>

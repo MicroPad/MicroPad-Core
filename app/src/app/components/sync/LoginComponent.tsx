@@ -27,6 +27,7 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 
 		return (
 			<SingletonModalComponent
+				id="microsync-login-modal"
 				header={`Connect to ${SYNC_NAME}`}
 				actions={[
 					<React.Fragment>

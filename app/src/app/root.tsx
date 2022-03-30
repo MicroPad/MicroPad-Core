@@ -146,15 +146,15 @@ export function getStorage(): StorageMap {
 	root.render(
 		<Provider store={store}>
 			<PrintViewOrAppContainerComponent>
-				<React.StrictMode><HeaderComponent /></React.StrictMode>
+				<HeaderComponent />
 				<AppBodyComponent>
 					<NoteViewerComponent />
-					<React.StrictMode>
+					{/*<React.StrictMode>*/}
 						<NotepadExplorerComponent />
 						<NoteElementModalComponent id="whats-new-modal" npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
 						<InsertElementComponent />
 						<InfoModalsComponent />
-					</React.StrictMode>
+					{/*</React.StrictMode>*/}
 				</ AppBodyComponent>
 				<React.StrictMode><InfoBannerComponent /></React.StrictMode>
 			</PrintViewOrAppContainerComponent>
