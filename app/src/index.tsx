@@ -11,8 +11,9 @@ if (window.isSupported) {
 	if (!isInTest && navigator.storage && navigator.storage.persist) {
 		navigator.storage.persist().then(storageAllowed => {
 			if (!storageAllowed) {
-				console.warn(`Failed to get permission for long-term storage. Notebooks may be removed from your devices storage under storage pressure.`);
-				alert(`Failed to get permission for long-term storage. Notebooks may be removed from your devices storage under storage pressure.`);
+				console.warn(`Failed to get permission for long-term storage. Notebooks may be removed from your device's storage under storage pressure.`);
+				// TODO: Show an info notif with a link to more info telling them to save notebooks more often
+				// alert(`Failed to get permission for long-term storage. Notebooks may be removed from your device's storage under storage pressure.`);
 			}
 			initMicroPad();
 		});
