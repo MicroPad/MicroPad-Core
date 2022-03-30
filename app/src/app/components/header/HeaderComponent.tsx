@@ -70,7 +70,7 @@ export const HeaderComponent = (props: ConnectedProps<typeof headerConnector>) =
 			<Navbar className="menu-items" brand={<AppNameComponent />} style={navStyle} alignLinks="right" menuIcon={<Icon>menu</Icon>} sidenav={sideNav}>
 				{isWideScreenView && generateNavInteractables(NavPos.MainNav)}
 			</Navbar>
-			{!isFullScreen && <NotepadBreadcrumbs />}
+			{!isFullScreen && <React.StrictMode><NotepadBreadcrumbs /></React.StrictMode>}
 		</header>
 	);
 }

@@ -24,7 +24,7 @@ import { applyMiddleware, compose, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
 import localforage from 'localforage';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { actions } from './actions';
 import { Provider } from 'react-redux';
 import HeaderComponent from './components/header/HeaderContainer';
@@ -141,7 +141,9 @@ export function getStorage(): StorageMap {
 	})));
 
 	// Render the main UI
-	ReactDOM.render(
+	const appContainer = document.getElementById('app')!;
+	const root = createRoot(appContainer);
+	root.render(
 		<Provider store={store}>
 			<PrintViewOrAppContainerComponent>
 				<React.StrictMode><HeaderComponent /></React.StrictMode>
@@ -156,8 +158,7 @@ export function getStorage(): StorageMap {
 				</ AppBodyComponent>
 				<React.StrictMode><InfoBannerComponent /></React.StrictMode>
 			</PrintViewOrAppContainerComponent>
-		</Provider>,
-		document.getElementById('app')!
+		</Provider>
 	);
 
 	await displayWhatsNew();
