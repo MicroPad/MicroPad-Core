@@ -24,7 +24,7 @@ import { applyMiddleware, compose, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
 import localforage from 'localforage';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { actions } from './actions';
 import { Provider } from 'react-redux';
 import HeaderComponent from './components/header/HeaderContainer';
@@ -142,9 +142,7 @@ export function getStorage(): StorageMap {
 
 	// Render the main UI
 	const appContainer = document.getElementById('app')!;
-	// TODO: Remove this react-dom's types get updated
-	// @ts-expect-error @types/react-dom hasn't been updated for React 18 yet
-	const root = ReactDOM.createRoot(appContainer);
+	const root = createRoot(appContainer);
 	root.render(
 		<Provider store={store}>
 			<PrintViewOrAppContainerComponent>
