@@ -1,7 +1,3 @@
 .header__notepad-dropdown {
 	max-height: 75vh;
 }
-
-#export-all-notepads-modal a, #export-all-notepads-modal p {
-	color: var(--mp-theme-text);
-}

@@ -7,8 +7,9 @@ export type SyncLoginRequest = {
 };
 
 export type SyncUser = {
-	username: string;
-	token: string;
+	username: string,
+	token: string,
+	isPro?: boolean
 };
 
 export type AssetList = { [uuid: string]: string };
@@ -27,4 +28,5 @@ export type CombinedNotepadSyncList = Record<string, INotepadSharingData>;
 
 export interface ISyncedNotepad extends Notepad {
 	assetHashList: { [uuid: string]: string | number };
+	assetTypes?: { [uuid: string]: string };
 }

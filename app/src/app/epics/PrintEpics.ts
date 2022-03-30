@@ -32,7 +32,7 @@ export const generateMarkdownForPrint$ = (action$: Observable<MicroPadAction>, s
 				const assets: Asset[] = resolvedAssets
 					.filter(res => {
 						if (!res.data) {
-							console.log(`Missing data for ${res.uuid}`);
+							console.warn(`Missing data for ${res.uuid}`);
 						}
 
 						return !!res.data;

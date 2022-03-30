@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Icon, TextInput } from 'react-materialize';
+import { Icon, TextInput } from 'react-materialize';
 import { Dialog } from '../../../services/dialogs';
 import { DEFAULT_MODAL_OPTIONS } from '../../../util';
 import { sourcesConnector } from './SourcesContainer';
@@ -7,12 +7,15 @@ import { ConnectedProps } from 'react-redux';
 import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
+import Button2 from '../../Button';
+import { isDynamicUri } from '../../../services/uri-helpers';
 
 const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 	const { note, element } = props;
 	if (!note || !element) return null;
 
-	const bibliography = note.bibliography.filter(source => source.item === element.args.id);
+	const bibliography = note.bibliography
+		.filter(source => source.item === element.args.id && !isDynamicUri(source.content));
 
 	const sources: JSX.Element[] = [];
 	bibliography.forEach(source => sources.push(
@@ -26,14 +29,14 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 		<SingletonModalComponent
 			header="Bibliography"
 			trigger={
-				<Button flat small waves="light" style={{ padding: '0' }}>
+				<Button2 flat small waves="light" style={{ padding: '0' }}>
 					<Icon left style={{ marginRight: '5px' }}>school</Icon> Bibliography ({bibliography.length})
-				</Button>
+				</Button2>
 			}
 			options={DEFAULT_MODAL_OPTIONS}>
-			<Button className="accent-btn" waves="light" onClick={() => addSource(note, element)}>
+			<Button2 className="accent-btn" waves="light" onClick={() => addSource(note, element)}>
 				<Icon left={true}>add</Icon> Add Source
-			</Button>
+			</Button2>
 			<br /><br />
 
 			{sources}
@@ -57,7 +60,7 @@ const SourcesComponent = (props: ConnectedProps<typeof sourcesConnector>) => {
 		const { updateBibliography } = props;
 
 		const url = await Dialog.prompt('Source URL:');
-		if (!url || url.length === 0) return;
+		if (!url || url.length === 0 || isDynamicUri(url)) return;
 
 		updateBibliography([
 			...note.bibliography,

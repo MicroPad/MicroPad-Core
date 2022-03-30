@@ -1,4 +1,4 @@
-import { from, fromEvent, lastValueFrom, Observable, of } from 'rxjs';
+import { from, fromEvent, lastValueFrom, Observable, of, retryWhen } from 'rxjs';
 import { MICROPAD_URL } from '../types';
 import { concatMap, filter, map, retry, take } from 'rxjs/operators';
 import { AssetList, INotepadSharingData, ISyncedNotepad, SyncedNotepadList } from '../types/SyncTypes';
@@ -11,6 +11,7 @@ import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
 import { actions } from '../actions';
 import { store } from '../root';
 import { WorkerMsgData } from '../workers';
+import { SYNC_ASSET_OVERSIZED_MESSAGE } from '../strings.enNZ';
 
 const AssetHashWorker = new Worker(build.defs.SYNC_WORKER_PATH, { type: 'module' });
 
@@ -80,7 +81,6 @@ export const SyncService = (() => {
 		token
 	});
 
-	let oversizedAssetCount = 0;
 	async function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
 		const cid = generateGuid();
 		const res$ = fromEvent<MessageEvent<WorkerMsgData<ReturnType<typeof getAssetInfoImpl>>>>(AssetHashWorker, 'message').pipe(
@@ -99,13 +99,14 @@ export const SyncService = (() => {
 			flatNotepad: notepad.flatten()
 		});
 
-		const { assets, hasOversizedAssets } = await getAssetInfo$;
-		if (hasOversizedAssets && hasOversizedAssets !== oversizedAssetCount) {
-			oversizedAssetCount = hasOversizedAssets;
-			store.dispatch(actions.openModal('sync-oversized-assets-modal'));
+		const { assets, hasOversizedAssets, assetTypes } = await getAssetInfo$;
+		if (hasOversizedAssets) {
+			store.dispatch(actions.setInfoMessage({
+				text: SYNC_ASSET_OVERSIZED_MESSAGE
+			}));
 		}
 
-		return Object.assign({}, notepad, { assetHashList: assets });
+		return Object.assign({}, notepad, { assetHashList: assets, assetTypes });
 	}
 
 	return {
@@ -137,7 +138,7 @@ export function uploadAsset(url: string, asset: Blob): Observable<void> {
 		body: asset,
 		crossDomain: true,
 		headers: {
-			'Content-Type': 'application/octet-stream'
+			'Content-Type': asset.type
 		}
 	}).pipe(
 		map(() => undefined),
@@ -158,7 +159,14 @@ function callApi<T>(parent: string, endpoint: string, resource: string, payload?
 		timeout: !!payload ? undefined : 10000 // 10 seconds
 	}).pipe(
 		map(res => res.response),
-		retry(2)
+		retryWhen(errors => errors.pipe(
+			map((error, i) => {
+				if (i > 2 || error?.response?.error === 'Too many assets on a non-pro notepad') {
+					throw error;
+				}
+				return error;
+			})
+		))
 	);
 }
 

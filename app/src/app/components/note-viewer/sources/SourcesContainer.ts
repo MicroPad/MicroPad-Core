@@ -10,7 +10,7 @@ export const sourcesConnector = connect(
 
 		return {
 			note,
-			element: note?.elements?.filter(e => e.args.id === currentNote.elementEditing)[0]
+			element: note?.elements?.find(e => e.args.id === currentNote.elementEditing)
 		};
 	},
 	(dispatch) => ({

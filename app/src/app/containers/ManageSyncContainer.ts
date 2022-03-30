@@ -12,7 +12,7 @@ export function mapStateToProps({ sync }: IStoreState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IManageSyncComponentProps> {
 	return {
-		logout: () => dispatch(actions.syncLogout(undefined))
+		logout: () => dispatch(actions.syncLogout())
 	};
 }
 

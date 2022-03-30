@@ -1,34 +1,34 @@
 import React from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
-import { Button, Row } from 'react-materialize';
+import { Row } from 'react-materialize';
 import { Dialog } from '../../../services/dialogs';
 import { ITheme } from '../../../types/Themes';
 import { readFile } from '../../../services/files';
 
 export interface IFileElementComponent extends INoteElementComponentProps {
-	downloadAsset: (filename: string, uuid: string) => void;
 	theme: ITheme;
 }
 
 export default class FileElementComponent extends React.Component<IFileElementComponent> {
 	render() {
-		const { element, downloadAsset, theme, elementEditing } = this.props;
+		const { element, theme, elementEditing, noteAssets } = this.props;
 		const isEditing = elementEditing === element.args.id;
+		const hasAsset = !!element.args.filename && !!element.args.ext && !!noteAssets[element.args.ext];
 
 		return (
 			<div style={{ padding: '5px', width: 'max-content' }} onClick={this.openEditor}>
 				<em style={{ color: theme.text }}>
-					{!isEditing && element.args.filename}
-					{(isEditing || !element.args.filename) && `Upload a file...`}
+					{isEditing && `Upload a file...`}
+					{!isEditing && !hasAsset && `Tap here to upload a file…`}
 				</em>
 
 				<Row>
 					{
-						!isEditing &&
-						!!element.args.filename &&
-						<Button className="accent-btn" waves="light" onClick={() => downloadAsset(element.args.filename!, element.args.ext!)}>
-							Download File
-						</Button>
+						!isEditing
+						&& hasAsset
+						&& <a href={noteAssets[element.args.ext!]} download={element.args.filename} onClick={e => e.stopPropagation()}>
+							{element.args.filename}
+						</a>
 					}
 
 					{

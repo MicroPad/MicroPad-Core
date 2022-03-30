@@ -157,7 +157,7 @@ const openNotepadFromStorage$ = (action$: Observable<MicroPadAction>, state$: Ep
 const cleanUnusedAssets$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$
 		.pipe(
-			ofType(actions.parseNpx.done.type, actions.deleteElement.type),
+			ofType(actions.parseNpx.done.type, actions.deleteElement.type, actions.deleteNotepadObject.type),
 			map(() => state$.value),
 			map((state: IStoreState) => state.notepads.notepad),
 			filterTruthy(),
@@ -216,7 +216,7 @@ const persistLastOpenedNote$ = (action$: Observable<MicroPadAction>, state$: Epi
 
 const clearLastOpenNoteOnClose$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { getStorage }: EpicDeps) =>
 	action$.pipe(
-		ofType(actions.closeNote.type),
+		ofType(actions.closeNote.type, actions.deleteNotepadObject.type),
 		map(() => state$.value.notepads.notepad?.item?.title),
 		tap(currentNotepad => {
 			if (currentNotepad) {

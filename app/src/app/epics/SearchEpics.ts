@@ -9,7 +9,7 @@ import { IStoreState } from '../types';
 export const refreshIndices$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		ofType(actions.saveNotepad.done.type, actions.deleteNotepad.type),
-		map(() => actions.indexNotepads.started(undefined))
+		map(() => actions.indexNotepads.started())
 	);
 
 export const indexNotepads$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>

@@ -9,17 +9,17 @@ import { Converter, ConverterOptions, extension } from 'showdown';
 import * as MarkDownViewer from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
-import TodoListComponent from './TodoListComponent';
-import { Button, Checkbox, Col, Row, TextInput } from 'react-materialize';
+import TodoListComponent, { IProgressValues } from './TodoListComponent';
+import { Checkbox, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
-import { colourTransformer, fendTransformer } from './MarkdownTransformers';
+import { colourTransformer, fendTransformer, mathsTransformer } from './MarkdownTransformers';
 import NoteElementModalComponent from '../../../note-element-modal/NoteElementModalComponent';
 import { BehaviorSubject } from 'rxjs';
 import { ConnectedProps } from 'react-redux';
-import { markdownElementConnector } from './MarkdownElementConnector';
-import { NotificationService } from '../../../../services/NotificationService';
+import { markdownElementConnector } from './MarkdownElementContainer';
+import Button2 from '../../../Button';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -44,7 +44,7 @@ const converter = configureShowdown();
 
 export default class MarkdownElementComponent extends React.Component<Props> {
 	private iframe: HTMLIFrameElement | undefined;
-	private readonly html$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+	private readonly progress$: BehaviorSubject<IProgressValues> = new BehaviorSubject<IProgressValues>({ done: 0, total: 0 });
 
 	render() {
 		const { element, elementEditing, theme } = this.props;
@@ -87,7 +87,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 				onResizeStop={(e, d, ref) => {
 					this.onSizeEdit('width', ref.style.width!);
 				}}>
-				{isEditing || <TodoListComponent html$={this.html$} toggle={() => this.sendMessage({
+				{isEditing || <TodoListComponent progress$={this.progress$} toggle={() => this.sendMessage({
 					id: element.args.id,
 					type: 'toggle',
 					payload: {}
@@ -119,13 +119,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 										label="Spellcheck"
 										value="1"
 										checked={this.props.shouldSpellCheck}
-										onChange={() => {
-											this.props.toggleSpellCheck();
-											NotificationService.toast({
-												html: `Updated spell check preferences.<br/>You may need to close and re-open the editor to see any effect.`,
-												displayLength: 3000
-											})
-										}}
+										onChange={() => this.props.toggleSpellCheck()}
 										filledIn
 									/>
 								</Col>
@@ -145,9 +139,9 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 
 				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>
 					Markdown Editor (<NoteElementModalComponent
-						trigger={<Button flat small waves="light" style={{ padding: '0' }}>Formatting Help</Button>}
-						npx={helpNpx}
-						findNote={np => np.sections[1].notes[0]} />)
+					trigger={<Button2 flat small waves="light" style={{ padding: '0' }}>Formatting Help</Button2>}
+					npx={helpNpx}
+					findNote={np => np.sections[1].notes[0]} />)
 				</span>}
 
 				<div>
@@ -264,9 +258,10 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 	}
 
 	private generateHtml = (element: NoteElement): string => {
-		const html = converter.makeHtml(element.content);
-		this.html$.next(html);
-		return html;
+		const rawHtml = converter.makeHtml(element.content);
+		const res = this.props.enableCheckboxes(element.content, rawHtml);
+		this.progress$.next(res);
+		return res.html;
 	}
 
 	private handleMessages = event => {
@@ -313,6 +308,24 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 				if (!!onReady) onReady();
 				break;
 
+			case 'toggle_checkbox':
+				(() => {
+					const newElement = {
+						...element,
+						content: this.props.toggleMdCheckbox(element.content, message.payload)
+					};
+					this.props.updateElement!(element.args.id, newElement);
+					this.sendMessage({
+						type: 'render',
+						id: element.args.id,
+						payload: {
+							...element,
+							content: this.generateHtml(newElement)
+						}
+					});
+				})();
+				break;
+
 			default:
 				break;
 		}
@@ -325,32 +338,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 }
 
 function configureShowdown(): Converter {
-	extension('maths', () => {
-		let matches: string[] = [];
-		return [
-			{
-				type: 'lang',
-				regex: /(===[^]+?===|''[^]+?''|;;[^]+?;;)/gi,
-				replace: function(s: string, match: string) {
-					matches.push(match);
-					let n = matches.length - 1;
-					return '%MATHPLACEHOLDER' + n + 'ENDMATHPLACEHOLDER%';
-				}
-			},
-			{
-				type: 'output',
-				filter: function(text: string) {
-					for (let i = 0; i < matches.length; ++i) {
-						let pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
-						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-					}
-					// reset array
-					matches = [];
-					return text;
-				}
-			}
-		];
-	});
+	extension('maths', mathsTransformer);
 
 	extension('fend', fendTransformer);
 
@@ -358,12 +346,15 @@ function configureShowdown(): Converter {
 		let matches: string[] = [];
 		return [
 			{
-				type: 'lang',
-				regex: /(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi,
-				replace: function(s: string) {
-					matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
-					let n = matches.length - 1;
-					return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
+				type: 'listener',
+				listeners: {
+					'hashHTMLBlocks.after': (evtName, text) => {
+						let i = 0;
+						return text.replaceAll(/(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi, match => {
+							matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
+							return '%PLACEHOLDER2' + i++ + 'ENDPLACEHOLDER2%';
+						});
+					}
 				}
 			},
 			{
@@ -385,12 +376,15 @@ function configureShowdown(): Converter {
 		let matches: string[] = [];
 		return [
 			{
-				type: 'lang',
-				regex: /(^|\s)(#[a-z\d-]+)/gi,
-				replace: function(s: string) {
-					matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${s.split('#')[1]}');">${s}</a>`);
-					const n = matches.length - 1;
-					return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
+				type: 'listener',
+				listeners: {
+					'hashHTMLBlocks.after': (evtName, text) => {
+						let i = 0;
+						return text.replaceAll(/(^|\s)(#[a-z\d-]+)/gi, (match, whitespace) => {
+							matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${match.split('#')[1]}');">${match}</a>`);
+							return whitespace + '%PLACEHOLDER3' + i++ + 'ENDPLACEHOLDER3%';
+						});
+					}
 				}
 			},
 			{

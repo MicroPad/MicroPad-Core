@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Col, Icon, Row, TextInput } from 'react-materialize';
+import { Col, Icon, Row, TextInput } from 'react-materialize';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import PathChangeComponent from '../path-change/PathChangeContainer';
@@ -8,6 +8,7 @@ import { explorerOptionsConnector } from './ExplorerOptionsContainer';
 import MoveComponent from '../move/MoveContainer';
 import { DEFAULT_MODAL_OPTIONS } from '../../../util';
 import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
+import Button2 from '../../Button';
 
 export type ExplorerOptionsProps = {
 	objToEdit: NPXObject | Notepad;
@@ -22,15 +23,15 @@ const ExplorerOptionsComponent = (props: ConnectedProps<typeof explorerOptionsCo
 	const notepadOptions: JSX.Element = (
 		<div>
 			<Row>
-				<Button className="accent-btn" waves="light" onClick={props.exportNotepad}>
+				<Button2 className="accent-btn" waves="light" onClick={props.exportNotepad}>
 					<Icon left={true}>file_download</Icon> Export Notebook
-				</Button>
+				</Button2>
 			</Row>
 
 			<Row>
-				<Button className="accent-btn" waves="light" onClick={() => props.encrypt()}>
+				<Button2 className="accent-btn" waves="light" onClick={() => props.encrypt()}>
 					<Icon left={true}>enhanced_encryption</Icon> Encrypt Notebook
-				</Button>
+				</Button2>
 
 				{!!(props.objToEdit as Notepad).crypto && <p>
 					This notebook is currently secured with {(props.objToEdit as Notepad).crypto}.
@@ -49,10 +50,10 @@ const ExplorerOptionsComponent = (props: ConnectedProps<typeof explorerOptionsCo
 
 	const noteOptions: JSX.Element = (
 		<div>
-			<Row><Button className="accent-btn" waves="light" onClick={() => {
+			<Row><Button2 className="accent-btn" waves="light" onClick={() => {
 				props.loadNote((props.objToEdit as NPXObject).internalRef);
 				setTimeout(() => props.print(), 500);
-			}}>Export/Print Note (PDF)</Button></Row>
+			}}>Export/Print Note (PDF)</Button2></Row>
 		</div>
 	);
 
@@ -63,7 +64,11 @@ const ExplorerOptionsComponent = (props: ConnectedProps<typeof explorerOptionsCo
 			id={modalId}
 			key={modalId}
 			header={`Options for ${props.objToEdit.title}`}
-			trigger={<a href="#!" className="exp-options-trigger" style={{ color: props.colour }}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}
+			trigger={<a href="#!" className="exp-options-trigger" style={{ color: props.colour }} onContextMenu={e => {
+				e.preventDefault();
+				(e.target as Node).parentElement?.querySelector<HTMLAnchorElement>('.exp-options-trigger')?.click();
+				return false;
+			}}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}
 			options={DEFAULT_MODAL_OPTIONS}>
 			<div className="explorer-options-modal">
 				<Row>
@@ -73,11 +78,11 @@ const ExplorerOptionsComponent = (props: ConnectedProps<typeof explorerOptionsCo
 						return false;
 					}}>
 						<TextInput s={8} label="Title" value={titleView} onChange={e => setTitleView(e.target.value)} />
-						<Col s={4}><Button className="accent-btn" waves="light">Rename {displayType}</Button></Col>
+						<Col s={4}><Button2 className="accent-btn" waves="light">Rename {displayType}</Button2></Col>
 					</form>
 				</Row>
-				<Row><Button className="red" waves="light" onClick={() => props.deleteObj()}><Icon
-					left={true}>delete_forever</Icon> Delete {displayType}</Button></Row>
+				<Row><Button2 className="red" waves="light" onClick={() => props.deleteObj()}><Icon
+					left={true}>delete_forever</Icon> Delete {displayType}</Button2></Row>
 				{(props.type === 'notepad') && notepadOptions}
 				{(props.type === 'note') && noteOptions}
 				{

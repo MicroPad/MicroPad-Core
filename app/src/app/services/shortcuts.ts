@@ -5,7 +5,7 @@ import { actions, MicroPadAction } from '../actions';
 
 export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction>) {
 	// Fullscreen
-	mousetrap.bind('f', () => store.dispatch(actions.flipFullScreenState(undefined)));
+	mousetrap.bind('f', () => store.dispatch(actions.flipFullScreenState()));
 
 	// Search
 	mousetrap.bind('mod+f', e => {
@@ -33,7 +33,7 @@ export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction
 		e.preventDefault();
 
 		if (store.getState().notepads?.notepad?.item) {
-			store.dispatch(actions.exportNotepad(undefined));
+			store.dispatch(actions.exportNotepad());
 		}
 	});
 
@@ -51,7 +51,7 @@ export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction
 
 	mousetrap.bind('mod+p', e => {
 		e.preventDefault();
-		store.dispatch(actions.print.started(undefined));
+		store.dispatch(actions.print.started());
 	});
 
 	// Help
@@ -66,13 +66,13 @@ export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction
 
 		if (store.getState().currentNote.ref.length > 0) {
 			// In a note, insert markdown
-			store.dispatch(actions.quickMarkdownInsert(undefined));
+			store.dispatch(actions.quickMarkdownInsert());
 		} else if (!!store.getState().notepads.notepad && !!store.getState().notepads.notepad!.item) {
 			// In a notepad, insert a note
-			store.dispatch(actions.quickNote.started(undefined));
+			store.dispatch(actions.quickNote.started());
 		} else {
 			// Outside of a notepad, make a notepad
-			store.dispatch(actions.quickNotepad(undefined));
+			store.dispatch(actions.quickNotepad());
 		}
 	});
 }

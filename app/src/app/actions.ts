@@ -25,6 +25,7 @@ import { SearchResults } from './reducers/SearchReducer';
 import { ThemeName } from './types/Themes';
 import { DueItem } from './services/DueDates';
 import { DrawMode } from './reducers/EditorReducer';
+import { AppInfoMessage } from './reducers/AppInfoReducer';
 
 export type MicroPadAction = ActionTypes[keyof ActionTypes];
 export type ActionNames = keyof ActionFactories;
@@ -57,7 +58,6 @@ export const actions = {
 	renameNotepad: actionCreator.async<string, string, any>('RENAME_NOTEPAD'),
 	checkNoteAssets: actionCreator.async<[string, NoteElement[]], FlatNotepad, any>('CHECK_NOTE_ASSETS'),
 	loadNote: actionCreator.async<string, object, any>('LOAD_NOTE'),
-	downloadAsset: actionCreator.async<{ filename: string, uuid: string }, void, any>('DOWNLOAD_ASSET'),
 	expandAllExplorer: actionCreator.async<void, string[], any>('EXPAND_ALL_EXPLORER'),
 	print: actionCreator.async<void, NoteElement, void>('PRINT'),
 	syncLogin: actionCreator.async<SyncLoginRequest, SyncUser, any>('SYNC_LOGIN'),
@@ -68,7 +68,6 @@ export const actions = {
 	addToSync: actionCreator.async<AddToSyncAction, string, any>('SYNC_CREATE'),
 	quickNote: actionCreator.async<void, string, void>('QUICK_NOTE'),
 	indexNotepads: actionCreator.async<void, SearchIndices, any>('INDEX_NOTEPADS'),
-	imagePasted: actionCreator.async<string, void, Error>('IMAGE_PASTED'),
 	exportAll: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS'),
 	exportToMarkdown: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS_TO_MD'),
 	clearOldData: actionCreator.async<{ silent: boolean }, void, Error>('CLEAR_OLD_DATA'),
@@ -114,6 +113,7 @@ export const actions = {
 	actWithSyncNotepad: actionCreator<NotepadToSyncNotepadAction>('ACT_WITH_SYNC_NOTEPAD'),
 	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD'),
 	syncProError: actionCreator<void>('SYNC_PRO_ERROR'),
+	setSyncProStatus: actionCreator<boolean>('SET_SYNC_PRO_STATUS'),
 	setHelpPref: actionCreator<boolean>('SET_HELP_PREF'),
 	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON'),
 	closeNote: actionCreator<void>('CLOSE_NOTE'),
@@ -134,7 +134,11 @@ export const actions = {
 	openModal: actionCreator<string>('OPEN_MODAL'),
 	closeModal: actionCreator<void>('CLOSE_MODAL'),
 	setDrawMode: actionCreator<DrawMode>('SET_DRAW_MODE'),
-	setDrawingLineColour: actionCreator<string>('SET_DRAWING_LINE_COLOUR')
+	setDrawingLineColour: actionCreator<string>('SET_DRAWING_LINE_COLOUR'),
+	dismissInfoBanner: actionCreator<void>('DISMISS_INFO_BANNER'),
+	setInfoMessage: actionCreator<AppInfoMessage>('SET_INFO_MESSAGE'),
+	mouseMove: actionCreator<{ x: number, y: number }>('MOUSE_MOVE'),
+	filePasted: actionCreator<File>('FILE_PASTED'),
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
@@ -142,10 +146,7 @@ export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
 	actions.quickNote.done.type,
 	actions.quickNote.failed.type,
 
-	actions.imagePasted.started.type,
-	actions.imagePasted.done.type,
-	actions.imagePasted.failed.type,
-
+	actions.filePasted.type,
 	actions.updateElement.type,
 	actions.quickMarkdownInsert.type,
 	actions.insertElement.type,

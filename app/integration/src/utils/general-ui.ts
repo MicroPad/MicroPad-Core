@@ -4,6 +4,13 @@
 import { Page } from 'playwright';
 
 export async function stabiliseMicroPad() {
+	await page.route(/info\.json\?.*$/, route => {
+		route.fulfill({
+			status: 404,
+			headers: { 'access-control-allow-origin': '*' }
+		});
+	});
+
 	await openMicroPad()
 		.then(dismissWhatsNew);
 }

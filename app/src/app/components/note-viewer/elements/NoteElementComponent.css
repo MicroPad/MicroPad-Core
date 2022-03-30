@@ -33,3 +33,8 @@
 .bib-container > div {
 	display: inline;
 }
+
+#note-element__resize-block {
+	color: var(--mp-theme-text);
+	text-align: center;
+}

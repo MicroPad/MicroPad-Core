@@ -23,7 +23,6 @@ import { MICROPAD_URL } from './types';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
-import { composeWithDevTools } from 'redux-devtools-extension';
 import localforage from 'localforage';
 import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
@@ -32,7 +31,6 @@ import HeaderComponent from './components/header/HeaderContainer';
 import NotepadExplorerComponent from './components/explorer/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './services/shortcuts';
-import * as PasteImage from 'paste-image';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import NoteElementModalComponent from './components/note-element-modal/NoteElementModalComponent';
 import { SyncUser } from './types/SyncTypes';
@@ -41,7 +39,6 @@ import { ThemeName } from './types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './services/ToastEventHandler';
 import { LastOpenedNotepad } from './epics/StorageEpics';
-import { noop } from './util';
 import { createSentryReduxEnhancer } from '../sentry';
 import { createDynamicCss } from './DynamicAppCss';
 import { hasRequiredFeatures } from '../unsupported-page/feature-detect';
@@ -49,6 +46,9 @@ import { showUnsupportedPage } from '../unsupported-page/show-page';
 import { restoreSavedPasswords } from './services/CryptoService';
 import InfoModalsComponent from './components/InfoModalsComponent';
 import { rootEpic$ } from './epics/rootEpic';
+import InfoBannerComponent from './components/header/info-banner/InfoBannerContainer';
+import { watchPastes } from './services/paste-watcher';
+import { composeWithDevTools } from '@redux-devtools/extension';
 
 window.MicroPadGlobals = {};
 
@@ -62,7 +62,9 @@ const baseReducer: BaseReducer = new BaseReducer();
 export const store = createStore(
 	baseReducer.reducer,
 	baseReducer.initialState,
-	composeWithDevTools(compose(applyMiddleware(epicMiddleware), createSentryReduxEnhancer()))
+	composeWithDevTools({
+		actionsDenylist: ['MOUSE_MOVE']
+	})(compose(applyMiddleware(epicMiddleware), createSentryReduxEnhancer()))
 );
 
 epicMiddleware.run(rootEpic$);
@@ -128,11 +130,15 @@ export function getStorage(): StorageMap {
 	await hydrateStoreFromLocalforage();
 	createDynamicCss(store);
 
-	if (window.isElectron) store.dispatch(actions.checkVersion(undefined));
-	store.dispatch(actions.getNotepadList.started(undefined));
-	store.dispatch(actions.indexNotepads.started(undefined));
+	if (window.isElectron) store.dispatch(actions.checkVersion());
+	store.dispatch(actions.getNotepadList.started());
+	store.dispatch(actions.indexNotepads.started());
 
 	enableKeyboardShortcuts(store);
+	document.addEventListener('mousemove', e => store.dispatch(actions.mouseMove({
+		x: e.clientX,
+		y: e.clientY
+	})));
 
 	// Render the main UI
 	const appContainer = document.getElementById('app')!;
@@ -141,26 +147,24 @@ export function getStorage(): StorageMap {
 	root.render(
 		<Provider store={store}>
 			<PrintViewOrAppContainerComponent>
-				<HeaderComponent />
+				<React.StrictMode><HeaderComponent /></React.StrictMode>
 				<AppBodyComponent>
 					<NoteViewerComponent />
-					<NotepadExplorerComponent />
-					<NoteElementModalComponent id={"whats-new-modal"} npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
-					<InsertElementComponent />
-					<InfoModalsComponent />
+					<React.StrictMode>
+						<NotepadExplorerComponent />
+						<NoteElementModalComponent id="whats-new-modal" npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
+						<InsertElementComponent />
+						<InfoModalsComponent />
+					</React.StrictMode>
 				</ AppBodyComponent>
+				<React.StrictMode><InfoBannerComponent /></React.StrictMode>
 			</PrintViewOrAppContainerComponent>
 		</Provider>
 	);
 
-	// Some clean up of an old storage item, this line can be deleted at some point in the future
-	localforage.removeItem('hasRunBefore').then(noop);
-
 	await displayWhatsNew();
-
 	notepadDownloadHandler();
-
-	pasteWatcher();
+	watchPastes(store);
 
 	store.dispatch(actions.clearOldData.started({ silent: true }));
 
@@ -212,8 +216,11 @@ async function hydrateStoreFromLocalforage() {
 }
 
 async function displayWhatsNew() {
+	// some clean up of an old item, can be removed in the future
+	localforage.removeItem('oldMinorVersion').catch(e => console.error(e));
+
 	const minorVersion = store.getState().app.version.minor;
-	const oldMinorVersion = await localforage.getItem('oldMinorVersion');
+	const oldMinorVersion = await SETTINGS_STORAGE.getItem<number>('oldMinorVersion');
 	if (minorVersion === oldMinorVersion) return;
 
 	// Open "What's New"
@@ -221,24 +228,11 @@ async function displayWhatsNew() {
 		store.dispatch(actions.openModal('whats-new-modal'));
 	}, 0);
 
-	await localforage.setItem('oldMinorVersion', minorVersion);
+	SETTINGS_STORAGE.setItem<number>('oldMinorVersion', minorVersion).catch(e => console.error(e));
 }
 
 function notepadDownloadHandler() {
 	// eslint-disable-next-line no-restricted-globals
 	const downloadNotepadUrl = new URLSearchParams(location.search).get('download');
 	if (!!downloadNotepadUrl) store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
-}
-
-function pasteWatcher() {
-	/*
-		The paste watcher breaks text inputs in Safari (https://github.com/MicroPad/Web/issues/179).
-		TODO: Consider re-enabling this when https://github.com/MicroPad/Web/issues/143 is done.
-	*/
-	const isSafariLike = navigator.vendor === 'Apple Computer, Inc.';
-	if (isSafariLike) return;
-
-	PasteImage.on('paste-image', async (image: HTMLImageElement) => {
-		store.dispatch(actions.imagePasted.started(image.src));
-	});
 }

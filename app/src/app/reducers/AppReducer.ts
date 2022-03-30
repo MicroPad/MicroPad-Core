@@ -9,6 +9,7 @@ import { parse } from 'semver';
 import { isDev } from '../util';
 import { ZoomChange } from '../types/ActionTypes';
 import { ThemeValues } from '../ThemeValues';
+import * as FullScreenService from '../services/FullscreenService';
 
 export interface IAppStoreState {
 	version: IVersion;
@@ -18,6 +19,7 @@ export interface IAppStoreState {
 	showHelp: boolean;
 	theme: ThemeName;
 	explorerWidth: string;
+	cursorPos: { x: number, y: number };
 	currentModalId?: string;
 }
 
@@ -37,18 +39,36 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 			major,
 			minor,
 			patch,
-			status: isDev() ? 'dev' : 'stable'
+			status: isDev() ? 'dev' : 'alpha'
 		},
 		isFullScreen: false,
 		defaultFontSize: '16px',
 		zoom: 1,
 		showHelp: true,
 		theme: 'Classic',
-		explorerWidth: '280px'
+		explorerWidth: '280px',
+		cursorPos: { x: 0, y: 0 }
 	};
 
 	public reducer(state: IAppStoreState, action: Action): IAppStoreState {
-		if (isType(action, actions.openModal)) {
+		if (isType(action, actions.mouseMove)) {
+			// This breaks the pure reducer rule, but the perf hit from doing this properly with epics is too much to justify it
+			const noteViewer = document.getElementById('note-viewer');
+			if (!noteViewer) return state;
+			const notepadExplorerWidth = document.querySelector<HTMLDivElement>('.notepad-explorer')?.offsetWidth ?? 0;
+			const offsets = {
+				left: notepadExplorerWidth - noteViewer.scrollLeft,
+				top: FullScreenService.getOffset(state.isFullScreen) - noteViewer.scrollTop
+			};
+
+			return {
+				...state,
+				cursorPos: {
+					x: Math.max(0, action.payload.x - offsets.left),
+					y: Math.max(0, action.payload.y - offsets.top)
+				}
+			};
+		} else if (isType(action, actions.openModal)) {
 			return {
 				...state,
 				currentModalId: action.payload

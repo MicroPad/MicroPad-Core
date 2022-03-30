@@ -11,7 +11,8 @@ import {
 	map,
 	mergeMap,
 	switchMap,
-	tap
+	tap,
+	withLatestFrom
 } from 'rxjs/operators';
 import { Action } from 'typescript-fsa';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
@@ -163,7 +164,7 @@ export const download$ = (action$: Observable<MicroPadAction>, state$: EpicStore
 					const message = (!!error.response) ? error.response : 'There was an error syncing';
 					if (message === 'Invalid token') {
 						Dialog.alert('Your token has expired. Please login again.');
-						return of(actions.syncLogout(undefined));
+						return of(actions.syncLogout());
 					}
 
 					Dialog.alert(message);
@@ -181,47 +182,38 @@ export const upload$ = (action$: Observable<MicroPadAction>, state$: EpicStore, 
 		map((action): [SyncAction, SyncUser] => [(action as MicroPadActions['syncUpload']['started']).payload, state$.value.sync.user!]),
 		filter(([payload, user]: [SyncAction, SyncUser]) => !!payload && !!user),
 		concatMap(([payload, user]: [SyncAction, SyncUser]) =>
-			DifferenceEngine.AccountService.isPro(user.username, user.token).pipe(
-				tap((isPro: boolean) => {
-					if (Object.keys(payload.notepad.assetHashList).length < 10 || isPro) return;
-					throw new Error('too many assets');
-				}),
-				concatMap(() =>
-					DifferenceEngine.SyncService.uploadNotepad(
-						user.username,
-						user.token,
-						payload.syncId,
-						payload.notepad,
-						state$.value.notepadPasskeys[payload.notepad.title]
-					)
-						.pipe(
-							concatMap((assetList: AssetList) => from((async () => {
-								const requests: UploadAssetAction[] = [];
+			DifferenceEngine.SyncService.uploadNotepad(
+				user.username,
+				user.token,
+				payload.syncId,
+				payload.notepad,
+				state$.value.notepadPasskeys[payload.notepad.title]
+			).pipe(
+				concatMap((assetList: AssetList) => from((async () => {
+					const requests: UploadAssetAction[] = [];
 
-								const orderedAssetList = Object.entries(assetList);
-								const blobs: Array<Blob | null> = await optimiseAssets(
-									getStorage().assetStorage,
-									orderedAssetList.map(([uuid]) => uuid),
-									state$.value.notepads.notepad?.item!
-								);
-								orderedAssetList
-									.map(([, url]) => url)
-									.filter((url, i) => {
-										if (!blobs[i]) {
-											console.error('Asset was null, skipping ', url);
-											return false;
-										}
-										return true;
-									})
-									.forEach((url, i) => requests.push({ url, asset: blobs[i]! }));
+					const orderedAssetList = Object.entries(assetList);
+					const blobs: Array<Blob | null> = await optimiseAssets(
+						getStorage().assetStorage,
+						orderedAssetList.map(([uuid]) => uuid),
+						state$.value.notepads.notepad?.item!
+					);
+					orderedAssetList
+						.map(([, url]) => url)
+						.filter((url, i) => {
+							if (!blobs[i]) {
+								console.error('Asset was null, skipping ', url);
+								return false;
+							}
+							return true;
+						})
+						.forEach((url, i) => requests.push({ url, asset: blobs[i]! }));
 
-								return requests;
-							})())),
-							concatMap((requests: UploadAssetAction[]) => from(
-								Promise.all(requests.map(req => DifferenceEngine.uploadAsset(req.url, req.asset).toPromise()))
-							))
-						)
-				),
+					return requests;
+				})())),
+				concatMap((requests: UploadAssetAction[]) => from(
+					Promise.all(requests.map(req => DifferenceEngine.uploadAsset(req.url, req.asset).toPromise()))
+				)),
 				switchMap(() =>
 					uploadCount$.pipe(
 						first(),
@@ -234,15 +226,15 @@ export const upload$ = (action$: Observable<MicroPadAction>, state$: EpicStore, 
 				catchError((error): Observable<Action<any>> => {
 					uploadCount$.next(0);
 
-					if (error && error.message === 'too many assets') {
-						return of(actions.syncProError(undefined));
+					if (error?.response?.error === 'Too many assets on a non-pro notepad') {
+						return of(actions.syncProError());
 					}
 
 					console.error(error);
 					const message = (!!error.response) ? error.response.error : 'There was an error syncing';
 					if (message === 'Invalid token') {
 						Dialog.alert('Your token has expired. Please login again.');
-						return of(actions.syncLogout(undefined));
+						return of(actions.syncLogout());
 					}
 
 					Dialog.alert(message);
@@ -281,7 +273,7 @@ export const getNotepadList$ = (action$: Observable<MicroPadAction>) =>
 							const message: string = error.response.error;
 							if (message === 'Invalid token') {
 								Dialog.alert('Your sync token has expired. Please login again.');
-								return of(actions.syncLogout(undefined));
+								return of(actions.syncLogout());
 							}
 							Dialog.alert(message);
 						}
@@ -321,7 +313,7 @@ export const addNotepad$ = (action$: Observable<MicroPadAction>) =>
 					if (!!error.response && !!error.response.error) {
 						if (error.response.error === 'Invalid token') {
 							Dialog.alert('Your token has expired. Please login again.');
-							return of(actions.syncLogout(undefined));
+							return of(actions.syncLogout());
 						}
 
 						Dialog.alert(error.response.error);
@@ -348,7 +340,7 @@ export const syncOnAdded$ = (action$: Observable<MicroPadAction>, state$: EpicSt
 
 export const refreshNotepadListOnAction$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType(actions.deleteFromSync.done.type),
+		ofType(actions.deleteFromSync.done.type, actions.renameNotepad.done.type, actions.addToSync.done.type),
 		map(() => state$.value),
 		map((state: IStoreState) => state.sync.user),
 		filterTruthy(),
@@ -369,6 +361,32 @@ export const openSyncProErrorModal$ = (action$: Observable<MicroPadAction>) =>
 		map(() => actions.openModal('sync-pro-error-modal'))
 	);
 
+export const syncOnRenameNotebook$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+	action$.pipe(
+		ofType(actions.renameNotepad.done.type),
+		withLatestFrom(store.pipe(map(state => state.notepads.notepad))),
+		filter(([,notepadState]) => !!notepadState?.activeSyncId && !!notepadState?.item),
+		map(([,notepadState]) => actions.actWithSyncNotepad({
+			notepad: notepadState!.item!.toNotepad(),
+			action: notepad => actions.sync({ notepad, syncId: notepadState!.activeSyncId! })
+		}))
+	);
+
+export const getProStatus$ = (action$: Observable<MicroPadAction>) =>
+	action$.pipe(
+		ofType(actions.syncLogin.done.type),
+		map(action => (action as MicroPadActions['syncLogin']['done']).payload.result),
+		switchMap(user =>
+			DifferenceEngine.AccountService.isPro(user.username, user.token).pipe(
+				map(proStatus => actions.setSyncProStatus(proStatus)),
+				catchError(error => {
+					console.error(error);
+					return EMPTY;
+				})
+			)
+		)
+	);
+
 export const syncEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	persistOnLogin$,
 	login$,
@@ -385,5 +403,7 @@ export const syncEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreSta
 	syncOnAdded$,
 	refreshNotepadListOnAction$,
 	clearStorageOnLogout$,
-	openSyncProErrorModal$
+	openSyncProErrorModal$,
+	syncOnRenameNotebook$,
+	getProStatus$
 );

@@ -8,6 +8,7 @@ import hljsCssDark from '../../../../assets/highlight.js/monokai.raw.css';
 
 import { ITheme } from '../../../../types/Themes';
 import { isDev } from '../../../../util';
+import { MD_END_ATTR, MD_START_ATTR } from './MarkdownElementContainer';
 
 export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): string => `<!DOCTYPE html>
 <html lang="en">
@@ -163,7 +164,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 	
 	document.body.onclick = function(event) {
 		var path = event.path || (event.composedPath && event.composedPath()) || [event.target];
-		if (path.some(p => !!p.tagName && p.tagName.toLowerCase() === 'a') || window.getSelection().toString() !== "") return;
+		if (path.some(p => !!p.tagName && (p.tagName.toLowerCase() === 'a' || p.tagName.toLowerCase() === 'input')) || window.getSelection().toString() !== "") return;
 		
 		parent.postMessage({
 			id,
@@ -214,7 +215,8 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 					hljs.highlightBlock(block);
 				});
 
-				manageToDoItems();
+				activateToDoItems();
+				setToDoItemVisibilities();
 				adjustWidth();
 
 				if (isPrinting) break;
@@ -230,19 +232,39 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 				
 			case 'toggle':
 				showHidden = !showHidden;
-				manageToDoItems();
+				setToDoItemVisibilities();
 				break;
 		}
 	}
 	
-	function manageToDoItems() {
+	function activateToDoItems() {
+		for (const task of document.querySelectorAll('.task-list-item > input')) {
+			task.onchange = () => {
+				document.querySelectorAll('.task-list-item > input').forEach(t => t.setAttribute('disabled', ''));
+				
+				parent.postMessage({
+					id,
+					type: 'toggle_checkbox',
+					payload: {
+						start: +task.getAttribute('${MD_START_ATTR}'),
+						end: +task.getAttribute('${MD_END_ATTR}'),
+						state: task.checked
+					}
+				}, '*');
+			}
+		}
+	}
+	
+	function setToDoItemVisibilities() {
 		document.querySelectorAll('.task-list-item input:checked').forEach(function(item) {
 			if (showHidden) {
 				getParentsUntil(item, '#content').forEach(function(parent) {
 					parent.classList.remove('hidden');
 				});
 			} else {
-				getParentsUntil(item, 'ul').forEach(function(parent) {
+				let tree = getParentsUntil(item, 'ul');
+				if (tree[tree.length - 1].nodeName.toLowerCase() === 'html') tree = getParentsUntil(item, 'ol');
+				tree.forEach(parent => {
 					parent.classList.add('hidden');
 				});
 			}

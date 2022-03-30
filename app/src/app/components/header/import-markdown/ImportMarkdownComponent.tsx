@@ -4,19 +4,19 @@ import { ConnectedProps } from 'react-redux';
 import { importMarkdownConnector } from './ImportMarkdownContainer';
 
 export default class ImportMarkdownComponent extends React.Component<ConnectedProps<typeof importMarkdownConnector>> {
-	private uploadInput!: HTMLInputElement;
+	private uploadInput: HTMLInputElement | null = null;
 
 	render() {
 		return (
 			<NavItem href="#!" onClick={this.triggerUpload}>
 				<Icon left={true}>insert_drive_file</Icon> Import Markdown Files
-				<input id="upload-notepad-input" ref={input => this.uploadInput = input!} onChange={this.onUploadChanged} style={{ display: 'none' }} type="file" multiple={true} />
+				<input id="upload-notepad-input" ref={input => this.uploadInput = input} onChange={this.onUploadChanged} style={{ display: 'none' }} type="file" multiple={true} />
 			</NavItem>
 		);
 	}
 
 	private triggerUpload = () => {
-		this.uploadInput.click();
+		this.uploadInput?.click();
 	}
 
 	private onUploadChanged = async (event: SyntheticEvent<HTMLInputElement>) => {
@@ -37,7 +37,9 @@ export default class ImportMarkdownComponent extends React.Component<ConnectedPr
 		importMd(imports);
 
 		// Ensure we can re-upload the same file again
-		this.uploadInput.value = '';
+		if (this.uploadInput) {
+			this.uploadInput.value = '';
+		}
 	}
 
 	private readFileAsText(file: File): Promise<string> {

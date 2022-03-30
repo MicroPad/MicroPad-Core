@@ -5,12 +5,12 @@ import { APP_NAME, IStoreState, MICROPAD_URL } from '../types';
 import * as localforage from 'localforage';
 import { Action } from 'typescript-fsa';
 import { ajax } from 'rxjs/ajax';
-import { EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, timer } from 'rxjs';
 import { lt as versionLessThan } from 'semver';
 import { EpicDeps, EpicStore } from './index';
 import { IVersion } from '../reducers/AppReducer';
 import { actions, MicroPadAction, MicroPadActions } from '../actions';
-import { Dialog } from '../services/dialogs';
+import { AppInfoMessage } from '../reducers/AppInfoReducer';
 
 export const closeDrawingEditorOnZoom$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
@@ -45,7 +45,6 @@ export const checkVersion$ = (action$: Observable<MicroPadAction>, state$: EpicS
 		switchMap((version: string) =>
 			ajax<string>({
 				url: `${MICROPAD_URL}/version.txt?rnd=${Math.random()}`,
-				crossDomain: true,
 				headers: {
 					'Content-Type': 'text/plain; charset=UTF-8'
 				},
@@ -54,16 +53,33 @@ export const checkVersion$ = (action$: Observable<MicroPadAction>, state$: EpicS
 			}).pipe(
 				map(res => res.response.trim()),
 				filter(latestVersion => versionLessThan(version, latestVersion)),
-				tap((latestVersion: string) =>
-					Dialog.confirmUnsafe(`v${latestVersion} of ${APP_NAME} is out now! <a target="_blank" href="${MICROPAD_URL}/#download">Update here</a>.`)
-				),
+				map((latestVersion: string) => actions.setInfoMessage({
+					text: `v${latestVersion} of ${APP_NAME} is out now! Update for all the latest goodies.`,
+					cta: `${MICROPAD_URL}/#download`
+				})),
 				catchError(err => {
 					console.error(err);
 					return EMPTY;
 				})
 			)
-		),
-		noEmit()
+		)
+	);
+
+export const getInfoMessages$ = () =>
+	timer(5 * 1000, 5 * 60 * 1000).pipe(
+		switchMap(() =>
+			ajax<AppInfoMessage>({
+				url: `${MICROPAD_URL}/info.json?rnd=${Math.random()}`,
+				headers: {
+					'Content-Type': 'application/json; charset=UTF-8'
+				},
+				responseType: 'json',
+				timeout: 10000 // 10 seconds
+			}).pipe(
+				map(res => actions.setInfoMessage(res.response)),
+				catchError(() => { return EMPTY; })
+			)
+		)
 	);
 
 export const persistTheme$ = (action$: Observable<MicroPadAction>) =>
@@ -101,6 +117,7 @@ export const appEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreStat
 	saveHelpPreference$,
 	revertHelpPrefOnHelpLoad$,
 	checkVersion$,
+	getInfoMessages$,
 	persistTheme$,
 	openModal$,
 	closeModal$

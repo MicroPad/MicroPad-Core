@@ -85,6 +85,7 @@ export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
 				}
 			};
 		} else if (isType(action, actions.closeNote) || isType(action, actions.closeNotepad)) {
+			NoteReducer.cleanUpObjectUrls(state.assetUrls);
 			return this.initialState;
 		} else if (isType(action, actions.flipFullScreenState)) {
 			return {

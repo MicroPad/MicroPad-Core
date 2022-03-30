@@ -1,10 +1,9 @@
 import { combineEpics, ofType } from 'redux-observable';
-import { catchError, concatMap, filter, map, mergeMap, switchMap, tap, withLatestFrom } from 'rxjs/operators';
-import { from, Observable, of } from 'rxjs';
+import { concatMap, filter, map, mergeMap, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
 import { actions, MicroPadAction, MicroPadActions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { filterTruthy, generateGuid } from '../util';
-import saveAs from 'save-as';
 import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
@@ -69,34 +68,21 @@ const checkNoteAssets$ = (action$: Observable<MicroPadAction>, state$: EpicStore
 		})
 	);
 
-const downloadAsset$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { notificationService }: EpicDeps) =>
-	action$.pipe(
-		ofType(actions.downloadAsset.started.type),
-		map(action => (action as MicroPadActions['downloadAsset']['started']).payload),
-		switchMap(({ filename, uuid }: { filename: string, uuid: string }) =>
-			from(ASSET_STORAGE.getItem<Blob>(uuid))
-				.pipe(
-					filter((blob: Blob | null): blob is Blob => {
-						if (!blob) {
-							notificationService.toast({
-								html: `This file cannot be downloaded because the file isn't stored in this notebook.`
-							});
-							return false;
-						}
-						return true;
-					}),
-					map((blob): [Blob, string] => [blob as Blob, filename])
-				)
-		),
-		tap(([blob, filename]: [Blob, string]) => saveAs(blob, filename)),
-		map(([_blob, filename]: [Blob, string]) => actions.downloadAsset.done({ params: { filename, uuid: '' }, result: undefined }))
-	);
-
 const binaryElementUpdate$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		ofType(actions.updateElement.type),
 		map(action => (action as MicroPadActions['updateElement']).payload),
 		filter((params: UpdateElementAction) => !!params.newAsset),
+		map(params => {
+			if (params.newAsset!.type !== 'image/gif') return params;
+			return {
+				...params,
+				element: {
+					...params.element,
+					args: { ...params.element.args, canOptimise: false }
+				}
+			};
+		}),
 		switchMap((params: UpdateElementAction) => {
 			const key = params.element.args.ext || generateGuid();
 			return from(ASSET_STORAGE.setItem(key, params.newAsset).then((): [UpdateElementAction, string] => [params, key]));
@@ -115,7 +101,7 @@ const binaryElementUpdate$ = (action$: Observable<MicroPadAction>) =>
 					}
 				}
 			}),
-			actions.reloadNote(undefined)
+			actions.reloadNote()
 		])
 	);
 
@@ -152,7 +138,7 @@ const closeNoteOnDeletedParent$ = (action$: Observable<MicroPadAction>, state$: 
 
 		// Has the currently opened note been deleted?
 		filter(notepad => state$.value.currentNote.ref.length > 0 && !notepad.notes[state$.value.currentNote.ref]),
-		map(() => actions.closeNote(undefined))
+		map(() => actions.closeNote())
 	);
 
 const loadNoteOnMove$ = (action$: Observable<MicroPadAction>) =>
@@ -166,79 +152,78 @@ const loadNoteOnMove$ = (action$: Observable<MicroPadAction>) =>
 const quickMarkdownInsert$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
 		ofType(actions.quickMarkdownInsert.type),
-		map(() => state$.value.currentNote.ref),
-		filter(ref => ref.length > 0 && !!state$.value.notepads.notepad && !!state$.value.notepads.notepad!.item),
-		map(ref => state$.value.notepads.notepad!.item!.notes[ref]),
-		concatMap(note => {
-			const id = `markdown${generateGuid()}`;
-
-			return [
-				actions.insertElement({
-					noteRef: note.internalRef,
-					element: {
-						type: 'markdown',
-						args: {
-							id,
-							x: '10px',
-							y: '10px',
-							width: 'auto',
-							height: 'auto',
-							fontSize: state$.value.app.defaultFontSize
-						},
-						content: ''
+		switchMap(() => state$.pipe(
+			take(1),
+			filter(state => !!state.currentNote.ref.length),
+			concatMap(state => {
+				const element: NoteElement = {
+					type: 'markdown',
+					content: '',
+					args: {
+						id: 'markdown' + generateGuid(),
+						x: state.app.cursorPos.x + 'px',
+						y: state.app.cursorPos.y + 'px',
+						width: 'auto',
+						height: 'auto',
+						ext: generateGuid(),
+						fontSize: state.app.defaultFontSize
 					}
-				}),
+				};
 
-				actions.openEditor(id)
-			];
-		})
+				return [
+					actions.insertElement({
+						noteRef: state.currentNote.ref,
+						element
+					}),
+					actions.openEditor(element.args.id)
+				];
+			})
+		))
 	);
 
 const imagePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType(actions.imagePasted.started.type),
-		filter(() => state$.value.currentNote.ref.length > 0),
-		map(action => (action as MicroPadActions['imagePasted']['started']).payload),
-		switchMap(imageUrl =>
-			from(fetch(imageUrl).then(res => res.blob())).pipe(
-				concatMap(image => {
-					let id = `image${generateGuid()}`;
+		ofType(actions.filePasted.type),
+		map(action => (action as MicroPadActions['filePasted']).payload),
+		switchMap(file => state$.pipe(
+			take(1),
+			filter(state => !!state.currentNote.ref.length),
+			concatMap(state => {
+				const type = file.type.startsWith('image/') ? 'image' : 'file';
+				const id = type + generateGuid();
+				const element: NoteElement = {
+					type,
+					content: 'AS',
+					args: {
+						id,
+						x: state.app.cursorPos.x + 'px',
+						y: state.app.cursorPos.y + 'px',
+						width: 'auto',
+						height: 'auto',
+						ext: generateGuid(),
+						filename: file.name
+					}
+				};
 
-					const element: NoteElement = {
-						type: 'image',
-						args: {
-							id,
-							x: '10px',
-							y: '10px',
-							width: 'auto',
-							height: 'auto',
-						},
-						content: 'AS'
-					};
-
-					return [
-						actions.insertElement({
-							noteRef: state$.value.currentNote.ref,
-							element
-						}),
-
-						actions.updateElement({
-							element,
-							noteRef: state$.value.currentNote.ref,
-							elementId: id,
-							newAsset: image
-						})
-					];
-				}),
-				catchError(error => of(actions.imagePasted.failed({ params: '', error })))
-			)
-		)
+				return [
+					actions.insertElement({
+						noteRef: state.currentNote.ref,
+						element
+					}),
+					actions.updateElement({
+						element,
+						noteRef: state.currentNote.ref,
+						elementId: id,
+						newAsset: file
+					})
+				];
+			})
+		))
 	);
 
 export const noteEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	loadNote$,
 	checkNoteAssets$,
-	downloadAsset$,
 	binaryElementUpdate$,
 	reloadNote$,
 	autoLoadNewNote$,
@@ -249,14 +234,14 @@ export const noteEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreSta
 );
 
 function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {
-	const storageRequests: Promise<Blob>[] = [];
+	const storageRequests: Promise<Blob | null>[] = [];
 	const blobRefs: string[] = [];
 
 	elements = elements.map(element => {
 		// Is this a notebook before v2?
 		if (element.type !== 'markdown' && element.content !== 'AS') {
 			const asset = new Asset(dataURItoBlob(element.content));
-			storageRequests.push(ASSET_STORAGE.setItem(asset.uuid, asset.data));
+			storageRequests.push(ASSET_STORAGE.setItem<Blob>(asset.uuid, asset.data));
 			blobRefs.push(asset.uuid);
 
 			return { ...element, args: { ...element.args, ext: asset.uuid }, content: 'AS' };
@@ -265,9 +250,9 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 		// Notebooks from v2 or higher
 		if (!!element.args.ext) {
 			storageRequests.push(
-				ASSET_STORAGE.getItem(element.args.ext)
-					.then((blobObj) => {
-						const blob = blobObj as Blob;
+				ASSET_STORAGE.getItem<Blob>(element.args.ext)
+					.then(blob => {
+						if (!blob) return null;
 
 						if (element.type === 'pdf') {
 							return blob.slice(0, blob.size, 'application/pdf');
@@ -285,9 +270,12 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 
 	return new Promise(resolve =>
 		Promise.all(storageRequests)
-			.then((blobs: Blob[]) => {
+			.then((blobs: Array<Blob | null>) => {
 				const blobUrls = {};
-				blobs.filter(b => !!b).forEach((blob, i) => blobUrls[blobRefs[i]] = URL.createObjectURL(blob));
+				blobs.forEach((blob, i) => {
+					if (!blob) return;
+					blobUrls[blobRefs[i]] = URL.createObjectURL(blob);
+				});
 
 				resolve({
 					elements,

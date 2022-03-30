@@ -40,7 +40,6 @@ export function mapStateToProps({ notepads, currentNote, app }: IStoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteViewerComponentProps> {
 	return {
 		search: query => dispatch(actions.search.started(query)),
-		downloadAsset: (filename, uuid) => dispatch(actions.downloadAsset.started({ filename, uuid })),
 		edit: id => dispatch(actions.openEditor(id)),
 		deleteElement: elementId => dispatch(actions.deleteElement({ elementId, noteRef })),
 		updateElement: (id, changes, newAsset) => dispatch(
@@ -53,17 +52,11 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<INoteVie
 		),
 		toggleInsertMenu: opts => dispatch(actions.toggleInsertMenu(opts)),
 		insert: element => dispatch(actions.insertElement({
-			element: {
-				...element,
-				args: {
-					...element.args,
-					id: `${element.type}${note!.elements.filter(e => e.type === element.type).length + 1}`
-				}
-			},
+			element,
 			noteRef
 		})),
-		makeQuickNotepad: () => dispatch(actions.quickNotepad(undefined)),
-		makeQuickNote: () => dispatch(actions.quickNote.started(undefined)),
+		makeQuickNotepad: () => dispatch(actions.quickNotepad()),
+		makeQuickNote: () => dispatch(actions.quickNote.started()),
 		deleteNotepad: () => dispatch(actions.deleteNotepad(notepadTitle)),
 		hideInsert: () => {
 			if (!isInsertMenuOpen) return;

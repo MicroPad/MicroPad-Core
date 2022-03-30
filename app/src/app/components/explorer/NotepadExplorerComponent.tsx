@@ -1,12 +1,12 @@
 import React, { CSSProperties } from 'react';
 import './NotepadExplorerComponent.css';
-import { Button, Icon } from 'react-materialize';
+import { Icon } from 'react-materialize';
 import TreeView from 'react-treeview';
 import ExplorerOptionsComponent from './explorer-options/ExplorerOptionsContainer';
 import { NewNotepadObjectAction } from '../../types/ActionTypes';
 import HelpMessageComponent from '../help-message/HelpMessageContainer';
 import { Dialog } from '../../services/dialogs';
-import SyncOptionsComponent from '../../containers/SyncOptionsContainer';
+import SyncOptionsComponent from '../sync/sync-options/SyncOptionsContainer';
 import { Note, Parent, Section } from 'upad-parse/dist';
 import { NEW_SECTION_HELP, OPEN_NOTE_HELP, OPEN_NOTEPAD_HELP } from '../../types';
 import DueDateListComponent from './due-date-list/DueDateListContainer';
@@ -21,6 +21,7 @@ import OpenNotepadVideo from '../../assets/instructions/open-notepad.mp4';
 import { notepadExplorerConnector } from './NotepadExplorerContainer';
 import { ConnectedProps } from 'react-redux';
 import { Resizable } from 're-resizable';
+import Button2 from '../Button';
 
 type Props = ConnectedProps<typeof notepadExplorerConnector>;
 
@@ -82,18 +83,18 @@ const NotepadExplorerComponent = (props: Props) => {
 					</strong>
 
 					<p style={{ marginTop: '0px' }}>
-						(<a href="#!" onClick={props.expandAll}>Expand All</a> | <a href="#!" onClick={() => {
-						if (!!props.openNote) {
+						<Button2 flat onClick={props.expandAll} tooltip="Expand all"><Icon aria-label="expand all">unfold_more</Icon></Button2>
+						{props.openNote && <Button2 tooltip="Show current note" flat onClick={() => {
 							props.collapseAll();
 							props.expandFromNote(props.openNote);
-						}
-					}}>Focus</a> | <a href="#!" onClick={props.collapseAll}>Collapse All</a>)
+						}}><Icon aria-label="focus">gps_fixed</Icon></Button2>}
+						{props.openSections.length > 0 && <Button2 flat onClick={props.collapseAll} tooltip="Collapse all"><Icon aria-label="collapse all">unfold_less</Icon></Button2>}
 					</p>
 
 					<div className="explorer-note add-button" key={`${notepad.title}__new-section`} style={{ margin: 0 }}>
-						<Button flat onClick={() => newNotepadObject(props, 'section', notepad)}>
+						<Button2 flat onClick={() => newNotepadObject(props, 'section', notepad)}>
 							<Icon>add</Icon> Section
-						</Button>
+						</Button2>
 					</div>
 
 					{treeViews}
@@ -206,12 +207,12 @@ function generateSectionTreeView(props: Props, section: Section, openSections: S
 			}
 			collapsed={!openSections.has(section.internalRef)}>
 			<div className="explorer-note add-button" key={`${section.internalRef}__new-obj`}>
-				<Button flat onClick={() => newNotepadObject(props, 'note', section)}>
+				<Button2 flat onClick={() => newNotepadObject(props, 'note', section)}>
 					<Icon>add</Icon> Note
-				</Button>
-				<Button flat onClick={() => newNotepadObject(props, 'section', section)}>
+				</Button2>
+				<Button2 flat onClick={() => newNotepadObject(props, 'section', section)}>
 					<Icon>add</Icon> Section
-				</Button>
+				</Button2>
 			</div>
 
 			{childSections}

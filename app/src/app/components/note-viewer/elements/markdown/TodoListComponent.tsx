@@ -1,15 +1,17 @@
+import './TodoListComponent.css';
 import React, { useEffect, useState } from 'react';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { ProgressBar } from 'react-materialize';
+import Button2 from '../../../Button';
 
 export interface ITodoListComponentProps {
-	html$: Observable<string>;
+	progress$: Observable<IProgressValues>;
 	toggle: () => void;
 }
 
-interface IProgressValues {
+export interface IProgressValues {
 	done: number;
-	all: number;
+	total: number;
 }
 
 const TodoListComponent = (props: ITodoListComponentProps) => {
@@ -17,15 +19,11 @@ const TodoListComponent = (props: ITodoListComponentProps) => {
 
 	const [progressValues, setProgressValues] = useState<IProgressValues | null>(null);
 	useEffect(() => {
-		const watcher$ = props.html$.pipe(map(getProgress)).subscribe(setProgressValues);
+		const watcher$ = props.progress$.subscribe(setProgressValues);
 		return () => watcher$.unsubscribe();
-	}, [props.html$]);
+	}, [props.progress$]);
 
-	if (!progressValues || progressValues.all < 1) return null;
-
-	const meterStyle = {
-		width: '100%'
-	};
+	if (!progressValues || progressValues.total < 1) return null;
 
 	return (
 		<div
@@ -35,27 +33,11 @@ const TodoListComponent = (props: ITodoListComponentProps) => {
 				marginRight: '5px',
 				textAlign: 'center'
 			}}>
-			<meter
-				value={progressValues.done}
-				min={0}
-				max={progressValues.all}
-				style={meterStyle}>
-				{Math.round((progressValues.done / progressValues.all) * 100)}%
-			</meter>
-
-			<br /><a href="#!" onClick={toggle}>Show/Hide Completed Items ({progressValues.done}/{progressValues.all})</a>
+			<ProgressBar
+				className="markdown-element__todo-list-tracker__progress-bar"
+				progress={progressValues.done / progressValues.total * 100} />
+			<Button2 flat onClick={toggle} style={{ height: 'auto' }}>Show/Hide Completed Items ({progressValues.done}/{progressValues.total})</Button2>
 		</div>
 	);
 }
 export default TodoListComponent;
-
-function getProgress(html: string): IProgressValues {
-	// Create virtual element of the html given
-	const element = document.createElement('div');
-	element.innerHTML = html;
-
-	const done = element.querySelectorAll('.task-list-item input:checked').length;
-	const all = element.querySelectorAll('.task-list-item').length;
-
-	return { done, all };
-}

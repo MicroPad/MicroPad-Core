@@ -1,4 +1,4 @@
-const INDENT_AND_LIST_PATTERN = /^([\t ]*[-*] \[] |[\t ]*[-*] \[ ] |[\t ]*[-*] \[x] |[\t ]*[-*] |\s*)/;
+const INDENT_AND_LIST_PATTERN = /^([\t ]*[-*+] \[] |[\t ]*[-*+] \[ ] |[\t ]*[-*+] \[[Xx]] |[\t ]*[-*+] |\s*)/;
 
 export function enableTabs(el: HTMLTextAreaElement, event): boolean | void {
 	const value = el.value;

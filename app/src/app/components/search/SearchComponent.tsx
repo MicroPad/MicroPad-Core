@@ -69,7 +69,13 @@ export default class SearchComponent extends React.Component<Props, never> {
 					styles={{
 						control: (styles, props) => ({
 							...styles,
-							backgroundColor: 'var(--mp-theme-chrome)'
+							backgroundColor: 'var(--mp-theme-chrome)',
+							borderColor: props.isFocused ? 'var(--mp-theme-accent)' : undefined,
+							boxShadow: props.isFocused ? '0 0 0 1px var(--mp-theme-accent)' : undefined,
+							'&:hover': {
+								borderColor: 'var(--mp-theme-accent)',
+								boxShadow: '0 0 0 1px var(--mp-theme-accent)'
+							}
 						}),
 						option: (styles, props) => ({
 							...styles,

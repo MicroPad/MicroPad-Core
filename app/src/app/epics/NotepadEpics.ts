@@ -154,11 +154,12 @@ const restoreJsonNotepad$ = (action$: Observable<MicroPadAction>, state$: EpicSt
 			} catch (err) {
 				if (err instanceof DecryptionError) {
 					Dialog.alert(err.message);
+					console.warn(err);
 				} else {
 					Dialog.alert(`Error restoring notepad`);
+					console.error(err);
 				}
 
-				console.error(err);
 				return [actions.parseNpx.failed({
 					params: '',
 					error: err
@@ -203,9 +204,7 @@ const exportNotepad$ = (action$: Observable<MicroPadAction>, state$: EpicStore) 
 	action$.pipe(
 		ofType(actions.exportNotepad.type),
 		withLatestFrom(state$),
-		map(([,state]) => state.notepads),
-		filterTruthy(),
-		map((state: INotepadsStoreState) => (state.notepad || {} as INotepadStoreState).item),
+		map(([,state]) => state.notepads?.notepad?.item),
 		filterTruthy(),
 		switchMap((notepad: FlatNotepad) =>
 			from(getNotepadXmlWithAssets(notepad.toNotepad()))
@@ -600,27 +599,18 @@ async function getNotepadMarkdownWithAssets(notepad: Notepad): Promise<IExported
 	return { title: notepad.title, content: await notepad.toMarkdown(assets) };
 }
 
-export function getAssets(notepadAssets: string[]): Promise<Asset[]> {
-	return new Promise<Asset[]>(resolve => {
-		const assets: Asset[] = [];
+export async function getAssets(notepadAssets: string[]): Promise<Asset[]> {
+	const resolvedAssets: Array<Asset | null> = await Promise.all(notepadAssets.map(uuid =>
+		ASSET_STORAGE.getItem<Blob>(uuid)
+			.then(blob => {
+				if (!blob) return null;
+				return new Asset(blob, uuid);
+			})
+			.catch(e => {
+				console.warn('skipping asset in export because: ', e);
+				return null;
+			})
+	));
 
-		if (!notepadAssets || notepadAssets.length === 0) {
-			resolve(assets);
-			return;
-		}
-
-		const resolvedAssets: Promise<Blob | null>[] = [];
-		for (let uuid of notepadAssets) {
-			resolvedAssets.push(ASSET_STORAGE.getItem(uuid));
-		}
-
-		Promise.all(resolvedAssets)
-			.then((blobs: Array<Blob | null>) => {
-				blobs
-					.filter((blob): blob is Blob => !!blob)
-					.forEach((blob: Blob, i: number) => assets.push(new Asset(blob, notepadAssets[i])));
-
-				resolve(assets);
-			});
-	});
+	return resolvedAssets.filter((asset): asset is Asset => !!asset);
 }
