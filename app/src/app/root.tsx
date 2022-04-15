@@ -24,7 +24,7 @@ import { applyMiddleware, compose, createStore } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
 import localforage from 'localforage';
-import { createRoot } from 'react-dom/client';
+import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
 import { Provider } from 'react-redux';
 import HeaderComponent from './components/header/HeaderContainer';
@@ -141,24 +141,23 @@ export function getStorage(): StorageMap {
 	})));
 
 	// Render the main UI
-	const appContainer = document.getElementById('app')!;
-	const root = createRoot(appContainer);
-	root.render(
+	ReactDOM.render(
 		<Provider store={store}>
 			<PrintViewOrAppContainerComponent>
-				<HeaderComponent />
+				<React.StrictMode><HeaderComponent /></React.StrictMode>
 				<AppBodyComponent>
 					<NoteViewerComponent />
-					{/*<React.StrictMode>*/}
+					<React.StrictMode>
 						<NotepadExplorerComponent />
 						<NoteElementModalComponent id="whats-new-modal" npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
 						<InsertElementComponent />
 						<InfoModalsComponent />
-					{/*</React.StrictMode>*/}
+					</React.StrictMode>
 				</ AppBodyComponent>
 				<React.StrictMode><InfoBannerComponent /></React.StrictMode>
 			</PrintViewOrAppContainerComponent>
-		</Provider>
+		</Provider>,
+		document.getElementById('app')!
 	);
 
 	await displayWhatsNew();
