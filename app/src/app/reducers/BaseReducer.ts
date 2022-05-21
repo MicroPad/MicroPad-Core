@@ -42,28 +42,18 @@ const REDUCERS: Reducer<IStoreState, MicroPadAction> = (() => {
 })();
 
 export class BaseReducer implements ReduxReducer<IStoreState, MicroPadAction> {
-	public readonly initialState: IStoreState;
-	public readonly key = '';
-
-	constructor() {
-		this.initialState = REDUCERS(undefined, { type: '@@FAKE_INIT' } as MicroPadAction);
-	}
-
 	public reducer = (state: IStoreState | undefined, action: MicroPadAction): IStoreState => {
-		if (!state) {
-			state = this.initialState;
-		}
-
 		if (BaseReducer.isReadonlyViolation(state, action)) {
 			// Skip any state updates if we're in a readonly notebook
-			return state;
+			return state!;
 		}
 
 		const newState = REDUCERS(state, action);
 		return isDev() ? deepFreeze(newState) as IStoreState : newState;
 	}
 
-	private static isReadonlyViolation(state: IStoreState, action: MicroPadAction): boolean {
+	private static isReadonlyViolation(state: IStoreState | undefined, action: MicroPadAction): boolean {
+		if (!state) return false;
 		if (!isReadOnlyNotebook(state.notepads?.notepad?.item?.title ?? '')) {
 			return false;
 		}
