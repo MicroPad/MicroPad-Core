@@ -17,7 +17,8 @@ export class NotepadsReducer extends AbstractReducer<INotepadsStoreState> {
 		dueDates: { isLoading: false, dueItems: [] }
 	};
 
-	public reducer(state: INotepadsStoreState, action: Action): INotepadsStoreState {
+	public reducer(state: INotepadsStoreState | undefined, action: Action): INotepadsStoreState {
+		if (!state) state = this.initialState;
 		let newState = this.reducerImpl(state, action);
 
 		const isReadOnly = isReadOnlyNotebook(newState.notepad?.item?.title ?? '');

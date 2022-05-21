@@ -31,7 +31,8 @@ export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
 		}
 	};
 
-	public reducer(state: ICurrentNoteState, action: Action): ICurrentNoteState {
+	public reducer(state: ICurrentNoteState | undefined, action: Action): ICurrentNoteState {
+		if (!state) state = this.initialState;
 		if (
 			isType(action, actions.parseNpx.started)
 			|| isType(action, actions.syncDownload.started)

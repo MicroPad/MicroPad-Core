@@ -43,7 +43,7 @@
     "react-redux": "^8.0.1",
     "react-select": "^5.2.1",
     "react-treeview": "~0.4.7",
-    "redux": "^4.1.0",
+    "@reduxjs/toolkit": "^1.8.1",
     "redux-observable": "^2.0.0",
     "rxjs": "^7.5.1",
     "save-as": "^0.1.8",
@@ -181,6 +181,7 @@
   },
   "resolutions": {
     "@types/react": "^17",
-    "react": "^17"
+    "react": "^17",
+    "redux": "^4"
   }
 }

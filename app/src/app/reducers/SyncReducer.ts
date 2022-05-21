@@ -16,7 +16,8 @@ export class SyncReducer extends AbstractReducer<ISyncState> {
 		isLoading: false
 	};
 
-	public reducer(state: ISyncState, action: Action): ISyncState {
+	public reducer(state: ISyncState | undefined, action: Action): ISyncState {
+		if (!state) state = this.initialState;
 		if (
 			isType(action, actions.syncLogin.started)
 			|| isType(action, actions.syncDownload.started)

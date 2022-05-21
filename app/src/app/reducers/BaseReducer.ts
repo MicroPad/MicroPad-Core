@@ -1,4 +1,3 @@
-import { AbstractReducer } from './AbstractReducer';
 import { IStoreState } from '../types';
 import { isDev } from '../util';
 import { NotepadsReducer } from './NotepadsReducer';
@@ -11,41 +10,46 @@ import { AppReducer } from './AppReducer';
 import { IsExportingReducer } from './IsExportingReducer';
 import { NotepadPasskeysReducer } from './NotepadPasskeysReducer';
 import { MicroPadAction, READ_ONLY_ACTIONS } from '../actions';
-import { Action, Reducer } from 'redux';
+import { Action, Reducer, ReducersMapObject } from 'redux';
 import { isReadOnlyNotebook } from '../ReadOnly';
 import deepFreeze from 'deep-freeze';
-import { EditorReducer } from './EditorReducer';
-import { AppInfoReducer } from './AppInfoReducer';
-
-export const REDUCERS: Array<AbstractReducer<any>> = [
-	new AppReducer(),
-	new NotepadPasskeysReducer(),
-	new NotepadsReducer(),
-	new NoteReducer(),
-	new ExplorerReducer(),
-	new SearchReducer(),
-	new PrintReducer(),
-	new SyncReducer(),
-	new IsExportingReducer(),
-	new EditorReducer(),
-	new AppInfoReducer()
-];
+import { appInfoSlice } from './AppInfoReducer';
+import { editorSlice } from './EditorReducer';
+import { combineReducers } from '@reduxjs/toolkit';
 
 interface ReduxReducer<S, A extends Action> {
 	reducer: Reducer<S, A>
 }
+
+const REDUCERS: Reducer<IStoreState, MicroPadAction> = (() => {
+	const reducers: ReducersMapObject<IStoreState, MicroPadAction> = {
+		/* Legacy reducers */
+		app: new AppReducer().reducer,
+		currentNote: new NoteReducer().reducer,
+		explorer: new ExplorerReducer().reducer,
+		isExporting: new IsExportingReducer().reducer,
+		notepadPasskeys: new NotepadPasskeysReducer().reducer,
+		notepads: new NotepadsReducer().reducer,
+		print: new PrintReducer().reducer,
+		search: new SearchReducer().reducer,
+		sync: new SyncReducer().reducer,
+		/* New reducers */
+		[editorSlice.name]: editorSlice.reducer,
+		[appInfoSlice.name]: appInfoSlice.reducer
+	};
+
+	return combineReducers(reducers);
+})();
 
 export class BaseReducer implements ReduxReducer<IStoreState, MicroPadAction> {
 	public readonly initialState: IStoreState;
 	public readonly key = '';
 
 	constructor() {
-		const initialState = {};
-		REDUCERS.forEach(reducer => initialState[reducer.key] = reducer.initialState);
-		this.initialState = Object.freeze(initialState as IStoreState);
+		this.initialState = REDUCERS(undefined, { type: '@@FAKE_INIT' } as MicroPadAction);
 	}
 
-	public reducer(state: IStoreState | undefined, action: MicroPadAction): IStoreState {
+	public reducer = (state: IStoreState | undefined, action: MicroPadAction): IStoreState => {
 		if (!state) {
 			state = this.initialState;
 		}
@@ -55,11 +59,7 @@ export class BaseReducer implements ReduxReducer<IStoreState, MicroPadAction> {
 			return state;
 		}
 
-		let newState = {
-			...state
-		};
-		REDUCERS.forEach(reducer => newState[reducer.key] = reducer.reducer(state![reducer.key], action));
-		
+		const newState = REDUCERS(state, action);
 		return isDev() ? deepFreeze(newState) as IStoreState : newState;
 	}
 

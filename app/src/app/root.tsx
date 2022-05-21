@@ -20,7 +20,7 @@ import './theme-styles/Purple.css';
 import React from 'react';
 import 'materialize-css/dist/js/materialize.js';
 import { MICROPAD_URL } from './types';
-import { applyMiddleware, compose, createStore } from 'redux';
+import { applyMiddleware } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
 import localforage from 'localforage';
@@ -48,7 +48,7 @@ import InfoModalsComponent from './components/InfoModalsComponent';
 import { rootEpic$ } from './epics/rootEpic';
 import InfoBannerComponent from './components/header/info-banner/InfoBannerContainer';
 import { watchPastes } from './services/paste-watcher';
-import { composeWithDevTools } from '@redux-devtools/extension';
+import { configureStore } from '@reduxjs/toolkit';
 
 window.MicroPadGlobals = {};
 
@@ -59,13 +59,27 @@ try {
 }
 
 const baseReducer: BaseReducer = new BaseReducer();
-export const store = createStore(
-	baseReducer.reducer,
-	baseReducer.initialState,
-	composeWithDevTools({
-		actionsDenylist: ['MOUSE_MOVE']
-	})(compose(applyMiddleware(epicMiddleware), createSentryReduxEnhancer()))
-);
+
+export const store = configureStore({
+	reducer: baseReducer.reducer,
+	enhancers: [applyMiddleware(epicMiddleware), createSentryReduxEnhancer()],
+	middleware: getDefaultMiddleware => getDefaultMiddleware({
+		serializableCheck: false,
+		thunk: false,
+		immutableCheck: false
+	}),
+	devTools: {
+		actionsBlacklist: [actions.mouseMove.type],
+		actionSanitizer: action => {
+			switch (action.type) {
+				case actions.parseNpx.started.type:
+					return { ...action, payload: null };
+				default:
+					return action;
+			}
+		}
+	}
+});
 
 epicMiddleware.run(rootEpic$);
 

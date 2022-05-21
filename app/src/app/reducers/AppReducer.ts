@@ -50,7 +50,8 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 		cursorPos: { x: 0, y: 0 }
 	};
 
-	public reducer(state: IAppStoreState, action: Action): IAppStoreState {
+	public reducer(state: IAppStoreState | undefined, action: Action): IAppStoreState {
+		if (!state) state = this.initialState;
 		if (isType(action, actions.mouseMove)) {
 			// This breaks the pure reducer rule, but the perf hit from doing this properly with epics is too much to justify it
 			const noteViewer = document.getElementById('note-viewer');

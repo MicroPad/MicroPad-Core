@@ -1,6 +1,7 @@
 import { Action, ActionCreator } from 'typescript-fsa';
 import { IStoreState } from '../types';
 import { MicroPadAction } from '../actions';
+import { AnyAction } from 'redux';
 
 export type ReducerHandler<S, ActionPayload> = (state: S, action: Action<ActionPayload>) => S;
 
@@ -11,8 +12,15 @@ export abstract class AbstractReducer<S> {
 	private memo: Map<number, string> = new Map<number, string>();
 	private memoId: number = 0;
 
-	public reducer(state: S, action: MicroPadAction): S {
-		return !!this.handlers[action.type] ? this.handlers[action.type](state, action) : state;
+	constructor() {
+		this.reducer = this.reducer.bind(this);
+		this.handle = this.handle.bind(this);
+		this.handleMemo = this.handleMemo.bind(this);
+	}
+
+	public reducer(state: S | undefined, action: AnyAction): S {
+		if (!state) state = this.initialState;
+		return !!this.handlers[action.type] ? this.handlers[action.type](state, action as MicroPadAction) : state;
 	}
 
 	protected handle<ActionPayload>(handler: ReducerHandler<S, ActionPayload>, ...actions: ActionCreator<ActionPayload>[]): void {
