@@ -154,7 +154,7 @@
     "@typescript-eslint/parser": "^5.3.1",
     "babel-eslint": "^10.1.0",
     "browserslist": "^4.16.6",
-    "esbuild": "0.14.39",
+    "esbuild": "^0.14.41",
     "esbuild-plugin-browserslist": "^0.4.1",
     "esbuild-plugin-manifest": "^0.5.0",
     "eslint": "^8.2.0",
