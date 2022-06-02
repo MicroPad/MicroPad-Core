@@ -51,7 +51,7 @@
     "showdown": "^1.9.1",
     "typescript": "~4.7.2",
     "typescript-fsa": "^3.0.0",
-    "upad-parse": "^7.4.1",
+    "upad-parse": "^7.5.0",
     "vex-dialog": "^1.1.0",
     "vex-js": "^4.1.0",
     "workbox-core": "^6.1.5",
