@@ -32,10 +32,11 @@ export const search$ = (action$: Observable<MicroPadAction>, state$: EpicStore) 
 		ofType(actions.search.started.type),
 		debounceTime(100),
 		map(action => (action as MicroPadActions['search']['started'])),
+		map(action => action.payload.trim()),
 		withLatestFrom(state$),
-		map(([action, state]) => actions.search.done({
-			params: action.payload,
-			result: search(action.payload, state.search.indices)
+		map(([query, state]) => actions.search.done({
+			params: query,
+			result: search(query, state.search.indices)
 		}))
 	);
 
