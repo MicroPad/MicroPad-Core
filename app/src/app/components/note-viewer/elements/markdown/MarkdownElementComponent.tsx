@@ -199,7 +199,8 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 									minimap: { enabled: false },
 									wordWrap: this.props.shouldWordWrap ? 'on' : 'off',
 									wrappingIndent: 'same',
-									wrappingStrategy: 'advanced'
+									wrappingStrategy: 'advanced',
+									lineNumbers: 'off'
 								}} />
 						</div>
 					}
