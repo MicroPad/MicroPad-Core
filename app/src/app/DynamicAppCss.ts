@@ -4,6 +4,7 @@ import { MicroPadAction } from './actions';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { ThemeValues } from './ThemeValues';
+import * as monaco from 'monaco-editor';
 
 const STYLE_ELEMENT = 'dynamic-styles';
 
@@ -84,5 +85,15 @@ export function createDynamicCss(store: Store<IStoreState, MicroPadAction>): voi
 				color: ${theme.text};
 			}
 		`;
+
+		monaco.editor.defineTheme('micropad', {
+			base: theme.text === '#000000' ? 'vs' : 'vs-dark',
+			inherit: true,
+			rules: [],
+			colors: {
+				'editor.background': theme.background,
+				'editor.foreground': theme.text
+			}
+		});
 	});
 }

@@ -14,7 +14,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<style>${theme.text === '#000' ? hljsCss : hljsCssDark}</style>
+	<style>${theme.text === '#000000' ? hljsCss : hljsCssDark}</style>
 	<link href="${isDev() ? 'https://fonts.googleapis.com/css?family=Open+Sans' : 'assets/open-sans/index.css'}" rel="stylesheet" as="font">
 	<style>
 		html, body, #content {
@@ -77,7 +77,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 		}
 
 		blockquote {
-			background: #${theme.text === '#000' ? 'f9f9f9' : '272822'};
+			background: #${theme.text === '#000000' ? 'f9f9f9' : '272822'};
 			border-left: 10px solid #ffb300;
 			margin: 1.5em 10px;
 			padding: 0.5em 10px;

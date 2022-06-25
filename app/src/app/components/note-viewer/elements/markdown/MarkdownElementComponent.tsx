@@ -20,7 +20,8 @@ import { BehaviorSubject } from 'rxjs';
 import { ConnectedProps } from 'react-redux';
 import { markdownElementConnector } from './MarkdownElementContainer';
 import Button2 from '../../../Button';
-import Editor from '@monaco-editor/react';
+import Editor, { loader } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -42,6 +43,9 @@ export interface IShowdownOpts extends ConverterOptions {
 type Props = ConnectedProps<typeof markdownElementConnector> & IMarkdownElementComponentProps;
 
 const converter = configureShowdown();
+
+// TODO: https://stackoverflow.com/questions/67710949/unexpected-usage-when-bundled-using-esbuild
+loader.config({ monaco });
 
 export default class MarkdownElementComponent extends React.Component<Props> {
 	private iframe: HTMLIFrameElement | undefined;
@@ -70,7 +74,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 		const width = isEditing ? 'auto' : element.args.width!;
 		const height = isEditing ? 'auto' : element.args.height!;
 
-		const shouldUseCodeEditor = isEditing && !this.props.shouldSpellCheck && !this.props.shouldWordWrap;
+		const shouldUseCodeEditor = isEditing && !this.props.shouldSpellCheck;
 
 		return (
 			<Resizable
@@ -148,7 +152,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 					findNote={np => np.sections[1].notes[0]} />)
 				</span>}
 
-				<div>
+				<React.Fragment>
 					{
 						!isEditing
 						&& <iframe
@@ -184,14 +188,22 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 
 					{
 						shouldUseCodeEditor &&
-						<Editor
-							height="400px"
-							language="markdown"
-							value={element.content}
-							onChange={newContent => this.onElementEdit({ target: { value: newContent } })}
-						/>
+						<div className="markdown-element__code-editor" style={{ minWidth }}>
+							<Editor
+								language="markdown"
+								value={element.content}
+								onChange={newContent => this.onElementEdit({ target: { value: newContent } })}
+								theme="micropad"
+								options={{
+									automaticLayout: true,
+									minimap: { enabled: false },
+									wordWrap: this.props.shouldWordWrap ? 'on' : 'off',
+									wrappingIndent: 'same',
+									wrappingStrategy: 'advanced'
+								}} />
+						</div>
 					}
-				</div>
+				</React.Fragment>
 			</Resizable>
 		);
 	}

@@ -34,7 +34,7 @@
     "localforage": "^1.5.6",
     "material-icons-font": "^2.1.0",
     "materialize-css": "^1.0.0",
-    "monaco-editor": "^0.33.0",
+    "monaco-editor": "~0.33.0",
     "mousetrap": "^1.6.1",
     "opus-recorder": "^4.1.0",
     "pdfobject": "^2.1.1",

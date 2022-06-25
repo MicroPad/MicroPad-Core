@@ -1,3 +1,12 @@
 .markdown-element__options-input {
 	color: var(--mp-theme-text);
 }
+
+.markdown-element__code-editor {
+	resize: both;
+	overflow: auto;
+}
+
+.markdown-element__code-editor > * {
+	min-height: 400px;
+}

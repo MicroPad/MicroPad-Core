@@ -50,7 +50,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 			zIndex: (isEditing) ? 5000 : 'auto' as 'auto'
 		};
 
-		const backgroundColour = theme.background === '#000' ? ThemeValues.Midnight.background : theme.background;
+		const backgroundColour = theme.background === '#000000' ? ThemeValues.Midnight.background : theme.background;
 		const elementStyles = {
 			width: (element.type !== 'image' && element.type !== 'markdown') ? element.args.width : 'auto',
 			backgroundColor: (isEditing) ? backgroundColour : undefined,
