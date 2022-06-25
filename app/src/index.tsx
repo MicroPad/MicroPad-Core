@@ -1,6 +1,8 @@
 import { isDev } from './app/util';
 import * as serviceWorker from './registerServiceWorker';
 import { initWasm } from './app/init-wasm';
+import * as monaco from 'monaco-editor';
+import { loader } from '@monaco-editor/react';
 
 // `window.isSupported` is set by the Unsupported Browser logic.
 if (window.isSupported) {
@@ -31,6 +33,9 @@ function initMicroPad() {
 	} else {
 		serviceWorker.register();
 	}
+
+	// TODO: https://stackoverflow.com/questions/67710949/unexpected-usage-when-bundled-using-esbuild
+	loader.config({ monaco });
 
 	initWasm().then(() => import('./app/root'));
 }

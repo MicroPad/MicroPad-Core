@@ -20,6 +20,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ConnectedProps } from 'react-redux';
 import { markdownElementConnector } from './MarkdownElementContainer';
 import Button2 from '../../../Button';
+import Editor from '@monaco-editor/react';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -68,6 +69,8 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 		const minWidth = isEditing ? Math.max(400, numericSizes.width) : 170;
 		const width = isEditing ? 'auto' : element.args.width!;
 		const height = isEditing ? 'auto' : element.args.height!;
+
+		const shouldUseCodeEditor = isEditing && !this.props.shouldSpellCheck && !this.props.shouldWordWrap;
 
 		return (
 			<Resizable
@@ -158,7 +161,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 					}
 
 					{
-						isEditing &&
+						isEditing && !shouldUseCodeEditor &&
 						<textarea
 							style={
 								{
@@ -177,6 +180,16 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 							onKeyDown={e => enableTabs(e.target as HTMLTextAreaElement, e)}
 							spellCheck={this.props.shouldSpellCheck}
 							autoFocus={true} />
+					}
+
+					{
+						shouldUseCodeEditor &&
+						<Editor
+							height="400px"
+							language="markdown"
+							value={element.content}
+							onChange={newContent => this.onElementEdit({ target: { value: newContent } })}
+						/>
 					}
 				</div>
 			</Resizable>
