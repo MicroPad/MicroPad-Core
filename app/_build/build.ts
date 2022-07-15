@@ -90,7 +90,45 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 	const syncWorkerJsPath: string | undefined = Object.entries(syncWorkerMetafile.outputs)
 		.find(([, metadata]) => metadata.entryPoint === 'src/app/workers/sync-worker/sync.worker.ts')?.[0]
 		.replace(`${OUT_DIR}/`, '');
-	if (!syncWorkerJsPath) throw new Error('Missing sync.worker.js');
+
+	const { metafile: monacoMetafile } = await build({
+		entryPoints: {
+			'monaco.worker': 'node_modules/monaco-editor/esm/vs/editor/editor.worker.js'
+		},
+		entryNames: isDev ? '[name]' : '[name]-[hash]',
+		bundle: true,
+		outdir: `${OUT_DIR}/dist`,
+		platform: 'browser',
+		format: 'iife',
+		loader: {
+			'.npx': 'text',
+			'.raw.js': 'text',
+			'.raw.css': 'text',
+			'.woff': 'file',
+			'.woff2': 'file',
+			'.png': 'file',
+			'.mp4': 'file',
+			'.svg': 'file',
+			'.ttf': 'file',
+			'.wasm': 'file'
+		},
+		minify: !isDev,
+		sourcemap: true,
+		publicPath: '/dist',
+		metafile: true,
+		watch: isDev,
+		define: {
+			'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
+			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
+		},
+		plugins: [
+			esbuildPluginBrowserslist(esBuildTargets)
+		],
+	}).catch(() => process.exit(1));
+	const monacoWorkerJsPath: string | undefined = Object.entries(monacoMetafile.outputs)
+		.find(([, metadata]) => metadata.entryPoint === 'node_modules/monaco-editor/esm/vs/editor/editor.worker.js')?.[0]
+		.replace(`${OUT_DIR}/`, '');
+	if (!monacoWorkerJsPath) throw new Error('Missing monaco.worker.js');
 
 	const { metafile } = await build({
 		entryPoints: ['src/index.tsx'],
@@ -121,6 +159,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
 			'process.env.PUBLIC_URL': `'${process.env.PUBLIC_URL}'`,
 			'build.defs.SYNC_WORKER_PATH': `'${syncWorkerJsPath}'`,
+			'build.defs.MONACO_WORKER_PATH': `'${monacoWorkerJsPath}'`
 		},
 		plugins: [
 			esbuildPluginBrowserslist(esBuildTargets)

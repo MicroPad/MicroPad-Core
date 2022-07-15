@@ -45,7 +45,8 @@ declare global {
 	const build: {
 		defs: {
 			SYNC_WORKER_PATH: string,
-			SUPPORTED_BROWSERS_REGEX: string
+			SUPPORTED_BROWSERS_REGEX: string,
+			MONACO_WORKER_PATH: string
 		}
 	}
 }

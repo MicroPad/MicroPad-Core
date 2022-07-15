@@ -44,7 +44,11 @@ type Props = ConnectedProps<typeof markdownElementConnector> & IMarkdownElementC
 
 const converter = configureShowdown();
 
-// TODO: https://stackoverflow.com/questions/67710949/unexpected-usage-when-bundled-using-esbuild
+// @ts-expect-error TS2339
+// eslint-disable-next-line no-restricted-globals
+self.MonacoEnvironment = {
+	getWorkerUrl: (moduleId, label) => build.defs.MONACO_WORKER_PATH
+}
 loader.config({ monaco });
 
 export default class MarkdownElementComponent extends React.Component<Props> {
