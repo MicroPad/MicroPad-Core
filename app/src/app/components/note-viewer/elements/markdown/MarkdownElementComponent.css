@@ -4,7 +4,7 @@
 
 .markdown-element__code-editor {
 	resize: both;
-	overflow: auto;
+	overflow: hidden;
 }
 
 .markdown-element__code-editor > * {
