@@ -3636,10 +3636,10 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "2.1.1"
 
-fend-wasm-web@^1.0.1:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/fend-wasm-web/-/fend-wasm-web-1.0.3.tgz#f0d6e13fbab49828b426c975171d857a91855b0d"
-  integrity sha512-bmCb/XxG6j52qRdztVzqgUeAofOg4uEEW7aCf3UnDY3K+tG0/tQgBxPv62y+OwEUpONtECFF5b9iiSsE07wXRQ==
+fend-wasm-web@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/fend-wasm-web/-/fend-wasm-web-1.0.5.tgz#705735635d285d66551e310f154c6596b7f033fb"
+  integrity sha512-fmra/Ow5JG22uEQyG9XmCz6twdB1qp/O50X9RgTURQ+YWTHsZGjOqzOYfHcjKz2WxvrqbuDj+biWRWr3SfBFHQ==
 
 file-entry-cache@^6.0.1:
   version "6.0.1"
