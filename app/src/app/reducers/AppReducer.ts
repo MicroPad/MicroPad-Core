@@ -21,6 +21,7 @@ export interface IAppStoreState {
 	explorerWidth: string;
 	cursorPos: { x: number, y: number };
 	currentModalId?: string;
+	hasEncryptedNotebooks: boolean;
 }
 
 export interface IVersion {
@@ -47,7 +48,8 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 		showHelp: true,
 		theme: 'Classic',
 		explorerWidth: '280px',
-		cursorPos: { x: 0, y: 0 }
+		cursorPos: { x: 0, y: 0 },
+		hasEncryptedNotebooks: false
 	};
 
 	public reducer(state: IAppStoreState | undefined, action: Action): IAppStoreState {
@@ -131,6 +133,11 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 				...state,
 				explorerWidth: action.payload
 			};
+		} else if (isType(action, actions.updateEncryptionStatus)) {
+			return {
+				...state,
+				hasEncryptedNotebooks: action.payload
+			}
 		}
 
 		return state;

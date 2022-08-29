@@ -61,3 +61,13 @@ export async function restoreSavedPasswords(store: MicroPadStore, storage: Local
 	// Join
 	await Promise.all(forks);
 }
+
+export async function hasEncryptedNotebooks(storage: LocalForage): Promise<boolean> {
+	return !!await storage.iterate<string, boolean | undefined>((notepadJson) => {
+		try {
+			const shell: NotepadShell = JSON.parse(notepadJson);
+			if (!!shell.crypto) return true;
+		} catch (_) {}
+		return undefined;
+	});
+}

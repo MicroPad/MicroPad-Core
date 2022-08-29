@@ -139,6 +139,7 @@ export const actions = {
 	setInfoMessage: actionCreator<AppInfoMessage>('SET_INFO_MESSAGE'),
 	mouseMove: actionCreator<{ x: number, y: number }>('MOUSE_MOVE'),
 	filePasted: actionCreator<File>('FILE_PASTED'),
+	updateEncryptionStatus: actionCreator<boolean>('UPDATE_CRYPTO_STATUS'),
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
