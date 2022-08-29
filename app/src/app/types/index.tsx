@@ -46,7 +46,9 @@ declare global {
 		defs: {
 			SYNC_WORKER_PATH: string,
 			SUPPORTED_BROWSERS_REGEX: string,
-			MONACO_WORKER_PATH: string
+			MONACO_WORKER_PATH: string,
+			FEND_WASM_PATH: string,
+			PHOTON_WASM_PATH: string
 		}
 	}
 }

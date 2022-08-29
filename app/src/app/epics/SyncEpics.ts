@@ -21,7 +21,7 @@ import * as DifferenceEngine from '../services/DifferenceEngine';
 import { Dialog } from '../services/dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
 import { AddToSyncAction, NotepadToSyncNotepadAction, SyncAction, UploadAssetAction } from '../types/ActionTypes';
-import { BehaviorSubject, EMPTY, forkJoin, from, Observable, of } from 'rxjs';
+import { BehaviorSubject, EMPTY, forkJoin, from, lastValueFrom, Observable, of } from 'rxjs';
 import { parse } from 'date-fns';
 import { INotepadStoreState } from '../types/NotepadTypes';
 import { FlatNotepad, LAST_MODIFIED_FORMAT } from 'upad-parse/dist';
@@ -212,7 +212,7 @@ export const upload$ = (action$: Observable<MicroPadAction>, state$: EpicStore, 
 					return requests;
 				})())),
 				concatMap((requests: UploadAssetAction[]) => from(
-					Promise.all(requests.map(req => DifferenceEngine.uploadAsset(req.url, req.asset).toPromise()))
+					Promise.all(requests.map(req => lastValueFrom(DifferenceEngine.uploadAsset(req.url, req.asset))))
 				)),
 				switchMap(() =>
 					uploadCount$.pipe(

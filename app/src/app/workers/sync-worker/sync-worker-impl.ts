@@ -42,7 +42,6 @@ export async function getAssetInfoImpl(notepad: FlatNotepad): Promise<{ assets: 
 			.find(el => el.args.ext === notepadAssets[i]);
 		if (el?.type === 'image') {
 			if (canOptimiseElement(el)) assetTypes[notepadAssets[i]] = 'image/png';
-
 			assets[notepadAssets[i]] = `${crc32(new Uint8Array(await blob.arrayBuffer()))}-w=${el.args.width}&h=${el.args.height}`;
 		} else {
 			assets[notepadAssets[i]] = crc32(new Uint8Array(await blob.arrayBuffer()));

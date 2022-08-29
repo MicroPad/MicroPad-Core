@@ -7,6 +7,7 @@ import { esbuildPluginBrowserslist } from 'esbuild-plugin-browserslist';
 import browserslist, { clearCaches as clearBrowserslistCache } from 'browserslist';
 import servor from 'servor';
 import { getUserAgentRegExp } from 'browserslist-useragent-regexp';
+import { createHash } from 'crypto';
 
 const OUT_DIR = 'build';
 const isDev = process.env.NODE_ENV !== 'production';
@@ -43,7 +44,8 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'build.defs.SUPPORTED_BROWSERS_REGEX': `"${getUserAgentRegExp({ allowHigherVersions: true }).source.replaceAll('\\', '\\\\')}"`,
 			'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
-		}
+		},
+		assetNames: 'assets/[name].[hash]',
 	}).catch(() => process.exit(1));
 
 	if (!browserCheckMetafile) throw new Error('Missing metafile');
@@ -71,6 +73,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'.ttf': 'file',
 			'.wasm': 'file'
 		},
+		assetNames: 'assets/[name].[hash]',
 		minify: !isDev,
 		sourcemap: true,
 		splitting: true,
@@ -112,6 +115,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'.ttf': 'file',
 			'.wasm': 'file'
 		},
+		assetNames: 'assets/[name].[hash]',
 		minify: !isDev,
 		sourcemap: true,
 		publicPath: '/dist',
@@ -130,6 +134,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		.replace(`${OUT_DIR}/`, '');
 	if (!monacoWorkerJsPath) throw new Error('Missing monaco.worker.js');
 
+	const wasmPaths = await copyWasm();
 	const { metafile } = await build({
 		entryPoints: ['src/index.tsx'],
 		entryNames: isDev ? '[name]-a' : '[name]-[hash]',
@@ -149,6 +154,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'.ttf': 'file',
 			'.wasm': 'file'
 		},
+		assetNames: 'assets/[name].[hash]',
 		minify: !isDev,
 		sourcemap: true,
 		splitting: true,
@@ -159,7 +165,9 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
 			'process.env.PUBLIC_URL': `'${process.env.PUBLIC_URL}'`,
 			'build.defs.SYNC_WORKER_PATH': `'${syncWorkerJsPath}'`,
-			'build.defs.MONACO_WORKER_PATH': `'${monacoWorkerJsPath}'`
+			'build.defs.MONACO_WORKER_PATH': `'${monacoWorkerJsPath}'`,
+			'build.defs.FEND_WASM_PATH': `'${wasmPaths['fend_wasm_bg.wasm']}'`,
+			'build.defs.PHOTON_WASM_PATH': `'${wasmPaths['photon_rs_bg.wasm']}'`
 		},
 		plugins: [
 			esbuildPluginBrowserslist(esBuildTargets)
@@ -203,6 +211,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'.svg': 'file',
 			'.ttf': 'file'
 		},
+		assetNames: 'assets/[name].[hash]',
 		minify: !isDev,
 		sourcemap: true,
 		define: {
@@ -221,10 +230,6 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		globDirectory: OUT_DIR
 	});
 
-	// Copy in WASM
-	await copyFile(join('node_modules', 'fend-wasm-web', 'fend_wasm_bg.wasm'), join(OUT_DIR, 'dist', 'fend_wasm_bg.wasm'));
-	await copyFile(join('node_modules', '@nick_webster', 'photon', 'photon_rs_bg.wasm'), join(OUT_DIR, 'dist', 'photon_rs_bg.wasm'));
-
 	console.log('Built!');
 
 	if (isDev) {
@@ -234,6 +239,25 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 	console.error(err);
 	process.exit(1);
 });
+
+async function copyWasm(): Promise<{ [originalName: string]: string }> {
+	const fendPath = join('node_modules', 'fend-wasm-web', 'fend_wasm_bg.wasm');
+	const fendHash = createHash('sha256').update(await readFile(fendPath)).digest('hex').substring(0,8);
+	const fendName = `fend_wasm_bg.${fendHash}.wasm`;
+	const fend$ = copyFile(fendPath, join(OUT_DIR, 'dist', fendName));
+
+	const photonPath = join('node_modules', '@nick_webster', 'photon', 'photon_rs_bg.wasm');
+	const photonHash = createHash('sha256').update(await readFile(photonPath)).digest('hex').substring(0,8);
+	const photonName = `photon_rs_bg.${photonHash}.wasm`;
+	const photon$ = copyFile(photonPath, join(OUT_DIR, 'dist', photonName));
+
+	await Promise.all([fend$, photon$]);
+
+	return {
+		'fend_wasm_bg.wasm': `dist/fend_wasm_bg.${fendHash}.wasm`,
+		'photon_rs_bg.wasm': `dist/photon_rs_bg.${photonHash}.wasm`
+	}
+}
 
 async function buildHtml(path: string, browserCheckPath: string, indexJsPath: string, indexCssPath: string): Promise<string> {
 	const html = await readFile(path).then(buffer => buffer.toString('utf-8'));

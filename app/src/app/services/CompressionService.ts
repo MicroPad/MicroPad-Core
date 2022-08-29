@@ -6,7 +6,7 @@ let started = false;
 
 export async function optimiseAssets(assetStorage: LocalForage, assetList: string[], notepad: FlatNotepad): Promise<Array<Blob | null>> {
 	if (assetList.length > 0 && !started) {
-		await initPhoton();
+		await initPhoton(build.defs.PHOTON_WASM_PATH);
 		started = true;
 	}
 
@@ -29,14 +29,8 @@ export async function shrinkImage(image: Blob, el: NoteElement): Promise<Blob | 
 	// Right now this uses Photon but in the future with better browser support, `createImageBitmap` will work
 	// https://caniuse.com/mdn-api_createimagebitmap_resizewidth_resizeheight_resizequality
 
-	let width = parseInt(el.args.width!, 10);
-	let height = parseInt(el.args.height!, 10);
-	if (!el.args.width?.endsWith('px') || !el.args.height?.endsWith('px')) {
-		const domEl = document.querySelector<HTMLImageElement>(`[data-el-id="${el.args.id}"] img`);
-		if (!domEl) return image;
-		if (!el.args.width?.endsWith('px')) width = domEl.width;
-		if (!el.args.height?.endsWith('px')) height = domEl.height;
-	}
+	const width = parseInt(el.args.width!, 10);
+	const height = parseInt(el.args.height!, 10);
 	if (isNaN(width) || isNaN(height)) return image;
 
 	// Create a tmp canvas for photon to perform its operations on
