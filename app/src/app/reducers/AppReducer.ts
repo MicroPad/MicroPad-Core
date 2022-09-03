@@ -48,7 +48,7 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 		zoom: 1,
 		showHelp: true,
 		theme: 'Classic',
-		explorerWidth: '280px',
+		explorerWidth: '270px',
 		cursorPos: { x: 0, y: 0 },
 		hasEncryptedNotebooks: false
 	};

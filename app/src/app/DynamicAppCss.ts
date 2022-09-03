@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { ThemeValues } from './ThemeValues';
 import * as monaco from 'monaco-editor';
+import { NAV_HEIGHT } from './services/FullscreenService';
 
 const STYLE_ELEMENT = 'dynamic-styles';
 
@@ -25,6 +26,7 @@ export function createDynamicCss(store: Store<IStoreState, MicroPadAction>): voi
 		Object.entries(theme)
 			.filter(([_k, v]) => typeof v === 'string')
 			.forEach(([k, v]: [string, string]) => rootStyles.setProperty(`--mp-theme-${k}`, v));
+		rootStyles.setProperty(`--mp-nav-height`, `${NAV_HEIGHT}px`);
 
 		let styleEl: HTMLStyleElement | undefined = document.getElementById(STYLE_ELEMENT) as HTMLStyleElement | undefined;
 		if (!styleEl) {

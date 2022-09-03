@@ -8,6 +8,7 @@ import SearchComponent from '../search/SearchContainer';
 import ThemeDropdownComponent from './theme-dropdown/ThemeDropdownContainer';
 import { headerConnector, NavPos } from './HeaderContainer';
 import { ConnectedProps } from 'react-redux';
+import { NAV_HEIGHT } from '../../services/FullscreenService';
 
 export const HeaderComponent = (props: ConnectedProps<typeof headerConnector>) => {
 	/*
@@ -28,8 +29,8 @@ export const HeaderComponent = (props: ConnectedProps<typeof headerConnector>) =
 
 	const navStyle: CSSProperties = {
 		position: 'fixed',
-		height: '52px',
-		lineHeight: '52px',
+		height: `${NAV_HEIGHT}px`,
+		lineHeight: `${NAV_HEIGHT}px`,
 		boxShadow: 'none',
 		backgroundColor: props.theme.chrome,
 		transition: 'background-color .3s'

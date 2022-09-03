@@ -36,6 +36,6 @@ ul.dropdown-content > li:hover > a, ul.dropdown-content > li:hover > span {
 }
 
 #mobile-nav.sidenav li {
-	line-height: 52px;
+	line-height: var(--mp-nav-height);
 	margin-bottom: 10px;
 }

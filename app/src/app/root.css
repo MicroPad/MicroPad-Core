@@ -14,6 +14,8 @@ body {
 	user-select: none;
 
 	font-family: "ABeeZee", "Roboto", sans-serif;
+
+	font-size: 14px;
 }
 
 #body {
@@ -140,8 +142,8 @@ strong {
 }
 
 .header__top-level-item .material-icons {
-	height: 52px !important;
-	line-height: 52px !important;
+	height: var(--mp-nav-height) !important;
+	line-height: var(--mp-nav-height) !important;
 }
 
 .accent-btn {

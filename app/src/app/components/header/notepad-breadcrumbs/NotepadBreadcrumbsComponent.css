@@ -1,7 +1,7 @@
 #breadcrumb-holder {
 	position: fixed;
 	width: 100%;
-	top: 52px;
+	top: var(--mp-nav-height);
 }
 
 #breadcrumb-holder > nav {
@@ -9,8 +9,8 @@
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
-	height: 52px;
-	line-height: 52px;
+	height: var(--mp-nav-height);
+	line-height: var(--mp-nav-height);
 	margin-bottom: 0;
 }
 
@@ -26,7 +26,7 @@
 }
 
 #breadcrumb-holder .notepad-breadcrumbs__timestamp-icon {
-	height: 52px;
-	line-height: 52px;
+	height: var(--mp-nav-height);
+	line-height: var(--mp-nav-height);
 	margin-right: 3px;
 }
