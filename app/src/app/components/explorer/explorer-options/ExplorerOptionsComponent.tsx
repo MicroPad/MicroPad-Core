@@ -10,6 +10,7 @@ import { DEFAULT_MODAL_OPTIONS } from '../../../util';
 import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
 import Button2 from '../../Button';
 import { ModalId } from '../../../types/ModalIds';
+import { SYNC_NAME } from '../../../types';
 
 export type ExplorerOptionsProps = {
 	objToEdit: NPXObject | Notepad;
@@ -23,6 +24,20 @@ const ExplorerOptionsComponent = (props: ConnectedProps<typeof explorerOptionsCo
 
 	const notepadOptions: JSX.Element = (
 		<div>
+			{!!props.syncId && <Row>
+				<Button2
+					className="red"
+					waves="light"
+					style={{
+						paddingLeft: '16px',
+						paddingRight: '16px',
+						height: 'auto'
+					}}
+					onClick={() => setTimeout(() => props.stopSyncing(props.syncId!), 0)}>
+					<Icon left={true}>sync_disabled</Icon> Remove from <span style={{ textTransform: 'initial' }}>{SYNC_NAME}</span>
+				</Button2>
+			</Row>}
+
 			<Row>
 				<Button2 className="accent-btn" waves="light" onClick={props.exportNotepad}>
 					<Icon left={true}>file_download</Icon> Export Notebook

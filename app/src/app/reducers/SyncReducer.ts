@@ -75,6 +75,15 @@ export class SyncReducer extends AbstractReducer<ISyncState> {
 			};
 		} else if (isType(action, actions.syncLogout)) {
 			return { ...this.initialState };
+		} else if (isType(action, actions.setSyncProStatus)) {
+			if (!state.user) return state;
+			return {
+				...state,
+				user: {
+					...state.user,
+					isPro: action.payload
+				}
+			}
 		}
 
 		return state;

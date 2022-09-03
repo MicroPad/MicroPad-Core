@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import ExplorerOptionsComponent, { ExplorerOptionsProps } from './ExplorerOptionsComponent';
-import { IStoreState } from '../../../types';
+import { IStoreState, SYNC_NAME } from '../../../types';
 import { ThemeValues } from '../../../ThemeValues';
 import { actions } from '../../../actions';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
@@ -9,7 +9,8 @@ import { Notepad } from 'upad-parse';
 
 export const explorerOptionsConnector = connect(
 	(store: IStoreState) => ({
-		colour: ThemeValues[store.app.theme].explorerContent
+		colour: ThemeValues[store.app.theme].explorerContent,
+		syncId: store.notepads.notepad?.activeSyncId
 	}),
 	(dispatch, directProps: ExplorerOptionsProps) => ({
 		rename: (newName: string) => {
@@ -55,7 +56,10 @@ export const explorerOptionsConnector = connect(
 
 			dispatch(actions.encryptNotepad(passkey))
 		},
-
+		stopSyncing: async (syncId: string) => {
+			if (!await Dialog.confirm(`Are you sure you want to remove ${directProps.objToEdit.title} from ${SYNC_NAME}?`)) return;
+			dispatch(actions.deleteFromSync.started(syncId));
+		},
 		exportNotepad: () => dispatch(actions.exportNotepad()),
 		loadNote: (ref: string) => dispatch(actions.loadNote.started(ref)),
 		print: () => dispatch(actions.print.started())
