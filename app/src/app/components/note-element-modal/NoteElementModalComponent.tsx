@@ -7,11 +7,12 @@ import { colourTransformer, fendTransformer } from '../note-viewer/elements/mark
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
 import { Note, Notepad } from 'upad-parse/dist';
 import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
+import { ModalId } from '../../types/ModalIds';
 
 export type Props = {
 	npx: string,
 	findNote: (notepad: Notepad) => Note,
-	id: string,
+	id: ModalId,
 	trigger?: React.ReactNode
 };
 

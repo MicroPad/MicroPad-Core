@@ -44,7 +44,7 @@ import { createDynamicCss } from './DynamicAppCss';
 import { hasRequiredFeatures } from '../unsupported-page/feature-detect';
 import { showUnsupportedPage } from '../unsupported-page/show-page';
 import { hasEncryptedNotebooks, restoreSavedPasswords } from './services/CryptoService';
-import InfoModalsComponent from './components/InfoModalsComponent';
+import TopLevelModalsComponent from './components/TopLevelModalsComponent';
 import { rootEpic$ } from './epics/rootEpic';
 import InfoBannerComponent from './components/header/info-banner/InfoBannerContainer';
 import { watchPastes } from './services/paste-watcher';
@@ -165,7 +165,7 @@ export function getStorage(): StorageMap {
 						<NotepadExplorerComponent />
 						<NoteElementModalComponent id="whats-new-modal" npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
 						<InsertElementComponent />
-						<InfoModalsComponent />
+						<TopLevelModalsComponent />
 					</React.StrictMode>
 				</ AppBodyComponent>
 				<React.StrictMode><InfoBannerComponent /></React.StrictMode>

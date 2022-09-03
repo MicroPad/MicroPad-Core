@@ -26,6 +26,7 @@ import { ThemeName } from './types/Themes';
 import { DueItem } from './services/DueDates';
 import { DrawMode } from './reducers/EditorReducer';
 import { AppInfoMessage } from './reducers/AppInfoReducer';
+import { ModalId } from './types/ModalIds';
 
 export type MicroPadAction = ActionTypes[keyof ActionTypes];
 export type ActionNames = keyof ActionFactories;
@@ -131,7 +132,7 @@ export const actions = {
 	setSearchResultVisibility: actionCreator<boolean>('SET_SEARCH_RESULT_VISIBILITY'),
 	toggleSpellCheck: actionCreator<boolean | void>('TOGGLE_SPELL_CHECK'),
 	toggleWordWrap: actionCreator<boolean | void>('TOGGLE_WORD_WRAP'),
-	openModal: actionCreator<string>('OPEN_MODAL'),
+	openModal: actionCreator<ModalId>('OPEN_MODAL'),
 	closeModal: actionCreator<void>('CLOSE_MODAL'),
 	setDrawMode: actionCreator<DrawMode>('SET_DRAW_MODE'),
 	setDrawingLineColour: actionCreator<string>('SET_DRAWING_LINE_COLOUR'),

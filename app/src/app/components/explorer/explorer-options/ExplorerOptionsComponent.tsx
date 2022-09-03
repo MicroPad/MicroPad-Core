@@ -9,6 +9,7 @@ import MoveComponent from '../move/MoveContainer';
 import { DEFAULT_MODAL_OPTIONS } from '../../../util';
 import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
 import Button2 from '../../Button';
+import { ModalId } from '../../../types/ModalIds';
 
 export type ExplorerOptionsProps = {
 	objToEdit: NPXObject | Notepad;
@@ -57,7 +58,7 @@ const ExplorerOptionsComponent = (props: ConnectedProps<typeof explorerOptionsCo
 		</div>
 	);
 
-	const modalId = `notepad-edit-object-modal-${(props.objToEdit as NPXObject).internalRef ?? `np-title-${props.objToEdit.title}`}`
+	const modalId: ModalId = `notepad-edit-object-modal-${(props.objToEdit as NPXObject).internalRef ?? `np-title-${props.objToEdit.title}`}`
 
 	return (
 		<SingletonModalComponent

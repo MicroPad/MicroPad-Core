@@ -4,10 +4,11 @@ import { DEFAULT_MODAL_OPTIONS } from '../../util';
 import { ConnectedProps } from 'react-redux';
 import { singletonModalConnector } from './SingletonModalContainer';
 import Button2 from '../Button';
+import { ModalId } from '../../types/ModalIds';
 
 export type SingletonModalProps = {
 	children: React.ReactNode,
-	id: string,
+	id: ModalId,
 	trigger?: React.ReactNode,
 	header?: string,
 	fixedFooter?: boolean,
@@ -18,7 +19,7 @@ export type SingletonModalProps = {
 type Props = ConnectedProps<typeof singletonModalConnector> & SingletonModalProps;
 
 const SingletonModalComponent = (props: Props) => {
-	const [id] = useState<string>(props.id);
+	const [id] = useState<ModalId>(props.id);
 
 	const isOpen = id === props.currentModalId;
 	if (!isOpen) {

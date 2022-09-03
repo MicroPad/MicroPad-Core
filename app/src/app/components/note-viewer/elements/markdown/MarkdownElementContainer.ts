@@ -3,6 +3,7 @@ import MarkdownElementComponent from './MarkdownElementComponent';
 import { IStoreState } from '../../../../types';
 import { actions } from '../../../../actions';
 import { IProgressValues } from './TodoListComponent';
+import { ModalId } from '../../../../types/ModalIds';
 
 export const MD_START_ATTR = 'data-md-start';
 export const MD_END_ATTR = 'data-md-end';
@@ -17,7 +18,7 @@ export const markdownElementConnector = connect(
 	dispatch => ({
 		toggleSpellCheck: () => dispatch(actions.toggleSpellCheck()),
 		toggleWordWrap: () => dispatch(actions.toggleWordWrap()),
-		openModal: (modal: string) => dispatch(actions.openModal(modal)),
+		openModal: (modal: ModalId) => dispatch(actions.openModal(modal)),
 		enableCheckboxes: (md: string, html: string): IProgressValues & { html: string } => {
 			const taskCursors: Array<{ start: number, end: number }> = [];
 			let done = 0;

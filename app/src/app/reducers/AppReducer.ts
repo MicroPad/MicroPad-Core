@@ -10,6 +10,7 @@ import { isDev } from '../util';
 import { ZoomChange } from '../types/ActionTypes';
 import { ThemeValues } from '../ThemeValues';
 import * as FullScreenService from '../services/FullscreenService';
+import { ModalId } from '../types/ModalIds';
 
 export interface IAppStoreState {
 	version: IVersion;
@@ -20,7 +21,7 @@ export interface IAppStoreState {
 	theme: ThemeName;
 	explorerWidth: string;
 	cursorPos: { x: number, y: number };
-	currentModalId?: string;
+	currentModalId?: ModalId;
 	hasEncryptedNotebooks: boolean;
 }
 
