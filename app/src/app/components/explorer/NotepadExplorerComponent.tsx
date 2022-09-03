@@ -59,7 +59,6 @@ const NotepadExplorerComponent = (props: Props) => {
 				}
 			}}
 			onResizeStop={(_e, _d, ref) => {
-				console.log(parseInt(ref.style.width, 10));
 				if (parseInt(ref.style.width, 10) <= 242) { // 20px diff to the explorer size in the store
 					setTimeout(() => props.flipFullScreenState(), 0);
 				} else {
