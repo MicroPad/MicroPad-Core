@@ -15,7 +15,9 @@ export class DecryptionError extends Error {
 	}
 }
 
-export async function fromShell(shell: NotepadShell, key?: string): Promise<EncryptNotepadAction> {
+export async function fromShell(shell?: NotepadShell, key?: string): Promise<EncryptNotepadAction> {
+	if (!shell) throw new Error(`This notebook does not exist`);
+
 	// Notepad is unencrypted, just return it
 	if (typeof shell.sections === 'object') return {
 		notepad: await Translators.Json.toNotepadFromNotepad(shell),

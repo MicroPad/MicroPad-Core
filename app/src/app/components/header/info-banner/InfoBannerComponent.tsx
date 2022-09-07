@@ -22,6 +22,14 @@ const InfoBannerComponent = (props: ConnectedProps<typeof infoBannerContainer>) 
 							Learn more.
 						</a>
 					}
+					{props.message.localButton
+						&& <Button2
+							className="chrome-btn info-banner__local-btn"
+							waves="light"
+							onClick={() => props.localButtonClicked(props.message!.localButton!.action)}>
+							{props.message.localButton.title}
+						</Button2>
+					}
 				</p>
 				<Button2 className="info-banner__close" flat onClick={props.dismiss}><Icon>close</Icon></Button2>
 			</div>

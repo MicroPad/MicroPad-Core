@@ -9,7 +9,8 @@ export const infoBannerContainer = connect(
 		message: appInfo.message
 	}),
 	dispatch => ({
-		dismiss: () => dispatch(actions.dismissInfoBanner())
+		dismiss: () => dispatch(actions.dismissInfoBanner()),
+		localButtonClicked: task => task(dispatch),
 	})
 );
 

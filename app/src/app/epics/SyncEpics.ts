@@ -28,6 +28,7 @@ import { FlatNotepad, LAST_MODIFIED_FORMAT } from 'upad-parse/dist';
 import stringify from 'json-stringify-safe';
 import { EpicDeps, EpicStore } from './index';
 import { optimiseAssets } from '../services/CompressionService';
+import { DOWNLOAD_NOTEBOOK_MESSAGE } from '../strings.enNZ';
 
 export const uploadCount$ = new BehaviorSubject<number>(0);
 
@@ -103,14 +104,21 @@ export const sync$ = (action$: Observable<MicroPadAction>, _, { notificationServ
 		filterTruthy()
 	);
 
-export const requestDownload$ = (action$: Observable<MicroPadAction>, _, { getToastEventHandler, notificationService }: EpicDeps) =>
+export const requestDownload$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		ofType(actions.requestSyncDownload.type),
-		tap(action => {
-			const guid = getToastEventHandler().register(() => STORE.dispatch(actions.syncDownload.started((action as MicroPadActions['requestSyncDownload']).payload)));
-			notificationService.toast({ html: `A newer copy of your notepad is online <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">DOWNLOAD</a>` });
-		}),
-		noEmit()
+		map(action => {
+			return actions.setInfoMessage({
+				text: DOWNLOAD_NOTEBOOK_MESSAGE,
+				localButton: {
+					title: `Download`,
+					action: dispatch => {
+						dispatch(actions.syncDownload.started((action as MicroPadActions['requestSyncDownload']).payload));
+						dispatch(actions.dismissInfoBanner());
+					}
+				}
+			});
+		})
 	);
 
 export const download$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>

@@ -30,3 +30,7 @@
 .info-banner__close > .material-icons {
 	line-height: 1;
 }
+
+.info-banner__local-btn {
+	margin-left: 10px;
+}

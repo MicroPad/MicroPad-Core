@@ -15,6 +15,7 @@ export interface ICurrentNoteState {
 	assetUrls: object;
 	elementEditing: string;
 	insertElement: IInsertElementState;
+	oldRef?: string;
 }
 
 export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
@@ -42,7 +43,7 @@ export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
 			|| isType(action, actions.renameNotepad.done)
 		) {
 			NoteReducer.cleanUpObjectUrls(state.assetUrls);
-			return this.initialState;
+			return { ...this.initialState, oldRef: state.ref };
 		} else if (isType(action, actions.loadNote.started)) {
 			return {
 				...state,

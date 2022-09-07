@@ -40,7 +40,7 @@ const ExportAllComponent = (props: ConnectedProps<typeof exportAllConnector>) =>
 				}}>
 					<img src={MarkdownIcon} className="export-all__md-icon" style={{
 						...ICON_STYLES,
-						filter: props.theme.text !== '#000' ? 'invert(100%)' : undefined
+						filter: props.theme.text !== '#000000' ? 'invert(100%)' : undefined
 					}} title="Export notepads as a zip archive of markdown files" alt="" />
 					<p style={{ textAlign: 'center' }}>Export notepads as a zip archive of markdown files</p>
 				</a>

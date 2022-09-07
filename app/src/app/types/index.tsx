@@ -26,7 +26,8 @@ export interface IStoreState {
 }
 
 export type MicroPadGlobals = {
-	currentModalId?: string
+	currentModalId?: string,
+	isPersistenceAllowed?: boolean
 };
 declare global {
 	interface Window {

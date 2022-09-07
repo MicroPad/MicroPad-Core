@@ -17,9 +17,7 @@ export class ExplorerReducer extends AbstractReducer<IExplorerState> {
 
 	public reducer(state: IExplorerState | undefined, action: Action): IExplorerState {
 		if (!state) state = this.initialState;
-		if (isType(action, actions.parseNpx.done) || isType(action, actions.parseNpx.failed) || isType(action, actions.deleteNotepad)) {
-			return this.initialState;
-		} else if (isType(action, actions.expandSection)) {
+		if (isType(action, actions.expandSection)) {
 			const guid: string = action.payload;
 
 			return {

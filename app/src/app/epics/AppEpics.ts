@@ -126,7 +126,7 @@ export const appEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreStat
 function openModal(id: string) {
 	const modalEl = document.getElementById(id);
 	if (!modalEl) {
-		throw new Error(`${id} is not a modal because it doesn't exist in th DOM.`);
+		throw new Error(`${id} is not a modal because it doesn't exist in the DOM.`);
 	}
 
 	open();

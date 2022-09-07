@@ -2,6 +2,8 @@ import { isDev } from './app/util';
 import * as serviceWorker from './registerServiceWorker';
 import { initWasm } from './app/init-wasm';
 
+window.MicroPadGlobals = {};
+
 // `window.isSupported` is set by the Unsupported Browser logic.
 if (window.isSupported) {
 	// eslint-disable-next-line no-restricted-globals
@@ -10,14 +12,14 @@ if (window.isSupported) {
 
 	if (!isInTest && navigator.storage && navigator.storage.persist) {
 		navigator.storage.persist().then(storageAllowed => {
+			window.MicroPadGlobals.isPersistenceAllowed = storageAllowed;
 			if (!storageAllowed) {
 				console.warn(`Failed to get permission for long-term storage. Notebooks may be removed from your device's storage under storage pressure.`);
-				// TODO: Show an info notif with a link to more info telling them to save notebooks more often
-				// alert(`Failed to get permission for long-term storage. Notebooks may be removed from your device's storage under storage pressure.`);
 			}
 			initMicroPad();
 		});
 	} else {
+		window.MicroPadGlobals.isPersistenceAllowed = true;
 		initMicroPad();
 	}
 }

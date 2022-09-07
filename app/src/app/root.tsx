@@ -50,8 +50,6 @@ import InfoBannerComponent from './components/header/info-banner/InfoBannerConta
 import { watchPastes } from './services/paste-watcher';
 import { configureStore } from '@reduxjs/toolkit';
 
-window.MicroPadGlobals = {};
-
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
 } catch (err) {
@@ -143,6 +141,13 @@ export function getStorage(): StorageMap {
 
 	await hydrateStoreFromLocalforage();
 	createDynamicCss(store);
+
+	if (!window.MicroPadGlobals.isPersistenceAllowed) {
+		store.dispatch(actions.setInfoMessage({
+			text: `Failed to get permission for long-term storage. You may need to save your notebooks manually.`,
+			cta: 'https://example.org' // TODO
+		}));
+	}
 
 	if (window.isElectron) store.dispatch(actions.checkVersion());
 	store.dispatch(actions.getNotepadList.started());

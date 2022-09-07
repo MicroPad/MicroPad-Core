@@ -221,6 +221,16 @@ const imagePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 		))
 	);
 
+export const restoreNoteOnOpen$ = (action$: Observable<MicroPadAction>, state$: EpicStore) => action$.pipe(
+	ofType<MicroPadAction, MicroPadActions['parseNpx']['done']['type'], MicroPadActions['parseNpx']['done']>(actions.parseNpx.done.type),
+	switchMap(action => state$.pipe(
+		take(1),
+		map(s => s.currentNote.oldRef),
+		filter(oldRef => !!oldRef && !!action.payload.result.notes[oldRef]),
+		map(oldRef => actions.loadNote.started(oldRef!))
+	))
+);
+
 export const noteEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	loadNote$,
 	checkNoteAssets$,
@@ -230,7 +240,8 @@ export const noteEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreSta
 	closeNoteOnDeletedParent$,
 	loadNoteOnMove$,
 	quickMarkdownInsert$,
-	imagePasted$
+	imagePasted$,
+	restoreNoteOnOpen$
 );
 
 function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement[], blobUrls: object }> {

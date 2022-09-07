@@ -1,5 +1,6 @@
-import { actions } from '../actions';
+import { actions, MicroPadAction } from '../actions';
 import { createSlice, SliceCaseReducers } from '@reduxjs/toolkit';
+import { DOWNLOAD_NOTEBOOK_MESSAGE } from '../strings.enNZ';
 
 export type AppInfoState = {
 	message?: AppInfoMessage,
@@ -8,7 +9,11 @@ export type AppInfoState = {
 
 export type AppInfoMessage = {
 	text: string,
-	cta?: string
+	cta?: string,
+	localButton?: {
+		title: string,
+		action: (dispatch: (action: MicroPadAction) => void) => void,
+	},
 };
 
 export const appInfoSlice = createSlice<AppInfoState, SliceCaseReducers<AppInfoState>, 'appInfo'>({
@@ -18,8 +23,7 @@ export const appInfoSlice = createSlice<AppInfoState, SliceCaseReducers<AppInfoS
 	extraReducers: builder => builder
 		.addCase(actions.dismissInfoBanner, state => ({ ...state, dismissed: true }))
 		.addCase(actions.setInfoMessage, (state, action) => ({
-			...state,
-			dismissed: state.message?.text === action.payload.text ? state.dismissed : false, // only re-show if new message
+			dismissed: state.message?.text === action.payload.text && action.payload.text !== DOWNLOAD_NOTEBOOK_MESSAGE ? state.dismissed : false, // only re-show if new message
 			message: action.payload
 		}))
 });
