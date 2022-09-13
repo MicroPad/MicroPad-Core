@@ -16,7 +16,7 @@ import {
 } from 'rxjs/operators';
 import { Action } from 'typescript-fsa';
 import { AssetList, ISyncedNotepad, SyncLoginRequest, SyncUser } from '../types/SyncTypes';
-import { ASSET_STORAGE, store as STORE, SYNC_STORAGE } from '../root';
+import { ASSET_STORAGE, SYNC_STORAGE } from '../root';
 import * as DifferenceEngine from '../services/DifferenceEngine';
 import { Dialog } from '../services/dialogs';
 import { IStoreState, SYNC_NAME } from '../types';
