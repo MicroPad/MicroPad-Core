@@ -1,17 +1,18 @@
 import React, { SyntheticEvent } from 'react';
-import { Icon, NavItem } from 'react-materialize';
+import { Icon } from 'react-materialize';
 import { ConnectedProps } from 'react-redux';
 import { importMarkdownConnector } from './ImportMarkdownContainer';
+import NavItem2 from '../../NavItem';
 
 export default class ImportMarkdownComponent extends React.Component<ConnectedProps<typeof importMarkdownConnector>> {
 	private uploadInput: HTMLInputElement | null = null;
 
 	render() {
 		return (
-			<NavItem href="#!" onClick={this.triggerUpload}>
+			<NavItem2 href="#!" onClick={this.triggerUpload}>
 				<Icon left={true}>insert_drive_file</Icon> Import Markdown Files
 				<input id="upload-notepad-input" ref={input => this.uploadInput = input} onChange={this.onUploadChanged} style={{ display: 'none' }} type="file" multiple={true} />
-			</NavItem>
+			</NavItem2>
 		);
 	}
 

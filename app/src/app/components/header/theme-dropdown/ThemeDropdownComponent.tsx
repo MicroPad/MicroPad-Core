@@ -1,8 +1,8 @@
 import React from 'react';
-import { Dropdown, Icon, NavItem } from 'react-materialize';
+import { Dropdown, Icon } from 'react-materialize';
 import { ThemeName } from '../../../types/Themes';
 import { ThemeValues } from '../../../ThemeValues';
-import { isIOS } from '../../../services/BrowserDetection';
+import NavItem2 from '../../NavItem';
 
 export interface IThemeDropdownComponentProps {
 	selectedTheme: ThemeName;
@@ -14,23 +14,19 @@ export default class ThemeDropdownComponent extends React.Component<IThemeDropdo
 		const { selectedTheme, select } = this.props;
 		if (!select) return null;
 
-		const handleChange = (name: string) => () => select(name as ThemeName);
-		const onClick = (name: string) => !isIOS() ? handleChange(name) : undefined;
-
 		return (
 			<Dropdown trigger={
 				<ul>
-					<NavItem href="#!" className="header__top-level-item">
+					<NavItem2 href="#!" className="header__top-level-item">
 						<Icon left={true}>format_paint</Icon> Themes <Icon right={true}>arrow_drop_down</Icon>
-					</NavItem>
+					</NavItem2>
 				</ul>
 			}>
 				{
 					Object.keys(ThemeValues).map(theme =>
-						// @ts-expect-error
-						<NavItem key={theme} href="#!" onClick={onClick(theme)} onTouchEnd={handleChange(theme)}>
+						<NavItem2 key={theme} onClick={() => select(theme as ThemeName)}>
 							{theme} {selectedTheme === theme && <Icon left={true}>done</Icon>}
-						</NavItem>
+						</NavItem2>
 					)
 				}
 			</Dropdown>

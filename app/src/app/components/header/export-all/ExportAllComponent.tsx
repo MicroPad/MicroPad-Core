@@ -1,12 +1,13 @@
 import './ExportAllComponent.css';
 import React from 'react';
-import { Col, Icon, NavItem, ProgressBar, Row } from 'react-materialize';
+import { Col, Icon, ProgressBar, Row } from 'react-materialize';
 import { DEFAULT_MODAL_OPTIONS } from '../../../util';
 import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
 import NpxIcon from '../../../assets/npx.png';
 import MarkdownIcon from '../../../assets/md.svg';
 import { ConnectedProps } from 'react-redux';
 import { exportAllConnector } from './ExportAllContainer';
+import NavItem2 from '../../NavItem';
 
 const ICON_STYLES = {
 	width: '6rem',
@@ -19,7 +20,7 @@ const ExportAllComponent = (props: ConnectedProps<typeof exportAllConnector>) =>
 		id="export-all-notepads-modal"
 		key="export-all-notepads-modal"
 		header="Export All Notepads"
-		trigger={<NavItem href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem>}
+		trigger={<NavItem2 href="#!"><Icon left={true}>file_download</Icon> Export All</NavItem2>}
 		options={DEFAULT_MODAL_OPTIONS}>
 		<Row>
 			<Col s={12} m={6} style={{ cursor: 'pointer' }}>

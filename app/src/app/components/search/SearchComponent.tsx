@@ -1,12 +1,13 @@
 import './SearchComponent.css';
 import React from 'react';
-import { Icon, NavItem } from 'react-materialize';
+import { Icon } from 'react-materialize';
 import { ConnectedProps } from 'react-redux';
 import { searchConnector } from './SearchContainer';
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
 import Select, { GroupBase } from 'react-select';
 import { SearchResult } from '../../reducers/SearchReducer';
 import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
+import NavItem2 from '../NavItem';
 
 type Props = ConnectedProps<typeof searchConnector>;
 
@@ -32,9 +33,9 @@ export default class SearchComponent extends React.Component<Props, never> {
 				key={`search-${this.props.notepad?.title ?? 'all'}`}
 				header="Search"
 				trigger={
-					<NavItem href="#!" className="header__top-level-item">
+					<NavItem2 href="#!" className="header__top-level-item">
 						<Icon left={true}>search</Icon> Search
-					</NavItem>
+					</NavItem2>
 				}
 				options={{
 					...DEFAULT_MODAL_OPTIONS,

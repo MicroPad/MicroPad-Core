@@ -1,7 +1,8 @@
 import React, { SyntheticEvent } from 'react';
-import { Icon, NavItem } from 'react-materialize';
+import { Icon } from 'react-materialize';
 import JSZip from 'jszip';
 import { readFileInputEventAsText } from '../../../util';
+import NavItem2 from '../../NavItem';
 
 export interface IUploadNotepadsComponentProps {
 	parseNpx?: (xml: string) => void;
@@ -13,10 +14,10 @@ export default class UploadNotepadsComponent extends React.Component<IUploadNote
 
 	render() {
 		return (
-			<NavItem href="#!" onClick={this.triggerUpload}>
+			<NavItem2 href="#!" onClick={this.triggerUpload}>
 				<Icon left={true}>file_upload</Icon> Import (npx/zip/enex)
 				<input id="upload-notepad-input" ref={input => this.uploadInput = input} onChange={this.onUploadChanged} style={{ display: 'none' }} type="file" />
-			</NavItem>
+			</NavItem2>
 		);
 	}
 

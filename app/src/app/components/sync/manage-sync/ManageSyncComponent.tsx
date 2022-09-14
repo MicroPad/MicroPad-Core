@@ -1,10 +1,10 @@
 import React from 'react';
-import { NavItem } from 'react-materialize';
 import { MICROPAD_URL, SYNC_NAME } from '../../../types';
 import { ISyncState } from '../../../reducers/SyncReducer';
 import { DEFAULT_MODAL_OPTIONS } from '../../../util';
 import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
 import Button2 from '../../Button';
+import NavItem2 from '../../NavItem';
 
 export interface IManageSyncComponentProps {
 	syncState: ISyncState;
@@ -20,7 +20,7 @@ export default class ManageSyncComponent extends React.Component<IManageSyncComp
 			<SingletonModalComponent
 				id="manage-microsync-modal"
 				header={`Manage ${SYNC_NAME}`}
-				trigger={<NavItem href="#!">Manage {SYNC_NAME}</NavItem>}
+				trigger={<NavItem2 href="#!">Manage {SYNC_NAME}</NavItem2>}
 				actions={[
 					<Button2 className="modal-close" flat onClick={logout}>Logout</Button2>,
 					<Button2 className="modal-close" flat>Close</Button2>

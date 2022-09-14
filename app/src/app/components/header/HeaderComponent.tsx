@@ -1,7 +1,7 @@
 import './HeaderComponent.css';
 import React, { CSSProperties, useEffect, useState } from 'react';
 import AppNameComponent from './app-name/AppNameContainer';
-import { Icon, Navbar, NavItem } from 'react-materialize';
+import { Icon, Navbar } from 'react-materialize';
 import NotepadDropdownComponent from './notepad-dropdown/NotepadDropdownContainer';
 import NotepadBreadcrumbs from './notepad-breadcrumbs/NotepadBreadcrumbsContainer';
 import SearchComponent from '../search/SearchContainer';
@@ -9,6 +9,7 @@ import ThemeDropdownComponent from './theme-dropdown/ThemeDropdownContainer';
 import { headerConnector, NavPos } from './HeaderContainer';
 import { ConnectedProps } from 'react-redux';
 import { NAV_HEIGHT } from '../../services/FullscreenService';
+import NavItem2 from '../NavItem';
 
 export const HeaderComponent = (props: ConnectedProps<typeof headerConnector>) => {
 	/*
@@ -50,8 +51,8 @@ export const HeaderComponent = (props: ConnectedProps<typeof headerConnector>) =
 			<ThemeDropdownComponent key="theme" />,
 			<NotepadDropdownComponent key="notepads" position={position} />,
 			<SearchComponent key="search" />,
-			<NavItem key="help" href="#!" className="header__top-level-item" onClick={() => setTimeout(getHelp!, 0)}><Icon left={true}>help_outline</Icon> Help</NavItem>,
-			isFullScreen ? <NavItem key="fullscreen" href="#!" className="header__top-level-item" onClick={flipFullScreenState}><Icon left={true}>fullscreen_exit</Icon> Exit Full Screen</NavItem> : null
+			<NavItem2 key="help" href="#!" className="header__top-level-item" onClick={() => setTimeout(getHelp!, 0)}><Icon left={true}>help_outline</Icon> Help</NavItem2>,
+			isFullScreen ? <NavItem2 key="fullscreen" href="#!" className="header__top-level-item" onClick={flipFullScreenState}><Icon left={true}>fullscreen_exit</Icon> Exit Full Screen</NavItem2> : null
 		];
 	}
 

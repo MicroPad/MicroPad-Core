@@ -1,6 +1,6 @@
 import './NotepadDropdownComponent.css';
 import React from 'react';
-import { Dropdown, Icon, NavItem } from 'react-materialize';
+import { Dropdown, Icon } from 'react-materialize';
 import UploadNotepadsComponent from '../upload-notepads/UploadNotepadsContainer';
 import { generateGuid } from '../../../util';
 import { Dialog } from '../../../services/dialogs';
@@ -13,6 +13,7 @@ import { ConnectedProps } from 'react-redux';
 import { notepadDropdownConnector } from './NotepadDropdownContainer';
 import { NavPos } from '../HeaderContainer';
 import ExportAllComponent from '../export-all/ExportAllContainer';
+import NavItem2 from '../../NavItem';
 
 export type NotepadDropdownProps = {
 	position: NavPos
@@ -41,23 +42,23 @@ const NotepadDropdownComponent = React.memo((props: Props) => {
 	}
 
 	const notepadNavItems: JSX.Element[] = [];
-	notepadTitles?.forEach(title => notepadNavItems.push(<NavItem key={generateGuid()} href="#!" onClick={openNotepad}>{title}</NavItem>));
+	notepadTitles?.forEach(title => notepadNavItems.push(<NavItem2 key={generateGuid()} href="#!" onClick={openNotepad}>{title}</NavItem2>));
 
 	return (
 		<Dropdown className="header__notepad-dropdown" trigger={
 			<ul id="notepad-dropdown">
-				<NavItem className="header__top-level-item">
+				<NavItem2 className="header__top-level-item">
 					<Icon left={true}>collections_bookmark</Icon> Notebooks <Icon right={true}>arrow_drop_down</Icon>
-				</NavItem>
+				</NavItem2>
 			</ul>
 		}>
-			<NavItem href="#!" onClick={createNotepad}><Icon left={true}>add</Icon> New</NavItem>
+			<NavItem2 href="#!" onClick={createNotepad}><Icon left={true}>add</Icon> New</NavItem2>
 			<UploadNotepadsComponent />
 			<ImportMarkdownComponent />
 			<ExportAllComponent />
 
 			<LoginComponent
-				trigger={<NavItem href="#!"><Icon left={true}>cloud_download</Icon> Connect to {SYNC_NAME}</NavItem>}
+				trigger={<NavItem2 href="#!"><Icon left={true}>cloud_download</Icon> Connect to {SYNC_NAME}</NavItem2>}
 				manageTrigger={<ManageSyncComponent />}
 			/>
 
@@ -66,13 +67,13 @@ const NotepadDropdownComponent = React.memo((props: Props) => {
 			{notepadNavItems}
 
 			<li className="divider" />
-			{!syncState.sharedNotepadList && syncState.isLoading && <NavItem href="#!">Loading...</NavItem>}
+			{!syncState.sharedNotepadList && syncState.isLoading && <NavItem2 href="#!">Loading...</NavItem2>}
 			{!!syncState.sharedNotepadList && Object.keys(syncState.sharedNotepadList).map(title =>
-				<NavItem key={generateGuid()} href="#!" onClick={() => {
+				<NavItem2 key={generateGuid()} href="#!" onClick={() => {
 					downloadNotepad!(syncState.sharedNotepadList![title].notepad);
 				}}>
 					{title} ({SYNC_NAME} - {syncState.sharedNotepadList![title].owner})
-				</NavItem>
+				</NavItem2>
 			)}
 		</Dropdown>
 	);
