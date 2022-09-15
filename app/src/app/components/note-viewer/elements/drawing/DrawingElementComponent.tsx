@@ -131,6 +131,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 			);
 		}
 
+		console.log(noteAssets[element.args.ext!]);
 		return (
 			<div className="drawing-element__view" style={{
 				overflow: 'hidden',
@@ -139,7 +140,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 				minHeight: '130px',
 				backgroundColor: theme.drawingBackground
 			}} onClick={this.openEditor}>
-				<img ref={elm => this.imageElement = elm!} style={{ height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px' }} src={noteAssets[element.args.ext!]} alt="" />
+				<img ref={elm => this.imageElement = elm!} style={{ height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px' }} alt="" />
 			</div>
 		);
 	}
@@ -161,7 +162,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 			const isNewEditor = this.props.elementEditing !== prevProps?.elementEditing;
 			if (isNewEditor) {
 				// Restore saved image to canvas
-				const img = new Image();
+				let img: HTMLImageElement = new Image();
 				img.onload = () => {
 					const canvasElement = this.canvasElement;
 					if (!canvasElement) return;
@@ -174,23 +175,28 @@ export default class DrawingElementComponent extends React.Component<Props> {
 			return;
 		}
 
-		this.imageElement.onload = () => {
+		let img: HTMLImageElement = new Image();
+		img.onload = () => {
 			if (this.hasTrimmed) return;
 
 			const tmpCanvas: HTMLCanvasElement = document.createElement('canvas');
-			tmpCanvas.setAttribute('width', this.imageElement.naturalWidth.toString());
-			tmpCanvas.setAttribute('height', this.imageElement.naturalHeight.toString());
+			tmpCanvas.setAttribute('width', img.naturalWidth.toString());
+			tmpCanvas.setAttribute('height', img.naturalHeight.toString());
 
 			const tmpContext = tmpCanvas.getContext('2d')!;
 			tmpContext.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
-			tmpContext.drawImage(this.imageElement, 0, 0);
+			tmpContext.drawImage(img!, 0, 0);
 
 			this.hasTrimmed = true;
 			const drawingBlob$ = new Promise<Blob | null>(resolve => trim(tmpCanvas).toBlob(blob => resolve(blob)));
 			drawingBlob$.then(drawingBlob => {
 				if (this.imageElement && drawingBlob) this.imageElement.src = URL.createObjectURL(drawingBlob)
 			});
+			img!.onload = null;
+			img = null!;
+
 		};
+		img.src = noteAssets[element.args.ext!];
 	}
 
 	override getSnapshotBeforeUpdate(prevProps: Readonly<Props>, prevState) {
