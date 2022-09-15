@@ -66,7 +66,7 @@ const NotepadExplorerComponent = (props: Props) => {
 				}
 			}}>
 			<div>
-				<a href="#!" onClick={props.flipFullScreenState} style={{ fontSize: '24px', marginRight: '10px' }}>«</a>
+				<Button2 tooltip="Enter full screen" flat onClick={props.flipFullScreenState}><Icon aria-label="full screen">fullscreen</Icon></Button2>
 				<DueDateListComponent />
 			</div>
 

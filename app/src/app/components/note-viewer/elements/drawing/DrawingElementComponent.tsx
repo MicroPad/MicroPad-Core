@@ -43,7 +43,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 	private rainbowIndex = 0;
 
 	render() {
-		const { element, noteAssets, elementEditing, theme } = this.props;
+		const { element, elementEditing, theme } = this.props;
 		if (!theme) return null;
 
 		const isEditing = element.args.id === elementEditing;
@@ -131,7 +131,6 @@ export default class DrawingElementComponent extends React.Component<Props> {
 			);
 		}
 
-		console.log(noteAssets[element.args.ext!]);
 		return (
 			<div className="drawing-element__view" style={{
 				overflow: 'hidden',
