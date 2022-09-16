@@ -121,7 +121,7 @@ jobs:
             wget "$GHR_URL"
             tar xzf ghr_v${GHR_VERSION}_linux_amd64.tar.gz
             mv ghr_v${GHR_VERSION}_linux_amd64/ghr .
-            VERSION=$(npm pkg get version | sed 's/"//g')
+            VERSION=v$(npm pkg get version | sed 's/"//g')
             echo "Publishing ${VERSION}"
             ./ghr -t ${GH_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ~/repo/app/micropad.tar.xz
 
