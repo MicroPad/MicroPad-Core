@@ -36,6 +36,8 @@ jobs:
       - persist_to_workspace:
           root: app/
           paths:
+            - package.json
+            - yarn.lock
             - build/*
             - micropad.tar.xz
 
