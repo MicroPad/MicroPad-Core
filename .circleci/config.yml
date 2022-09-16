@@ -103,7 +103,7 @@ jobs:
 
   publish-github-release:
     docker:
-      - image: cibuilds/github:latest
+      - image: cimg/node:lts
 
     steps:
       - attach_workspace:
@@ -111,9 +111,14 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            apk add --update nodejs npm
+            GHR_VERSION=0.13.0
+            GHR_URL=https://github.com/tcnksm/ghr/releases/download/v${GHR_VERSION}/ghr_v${GHR_VERSION}_linux_amd64.tar.gz
+            wget "$GHR_URL"
+            tar xzf ghr_v${GHR_VERSION}_linux_amd64.tar.gz
+            mv ghr_v${GHR_VERSION}_linux_amd64/ghr .
             VERSION=$(npm pkg get version | sed 's/"//g')
-            ghr -t ${GH_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ~/repo/app/micropad.tar.xz
+            echo "Publishing ${VERSION}"
+            ./ghr -t ${GH_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ~/repo/app/micropad.tar.xz
 
 workflows:
   version: 2
@@ -144,3 +149,4 @@ workflows:
           filters:
             branches:
               only: master
+        only: master
