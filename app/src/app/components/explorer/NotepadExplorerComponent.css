@@ -1,9 +1,11 @@
-#notepad-explorer {
-	order: 1;
-	padding: 5px;
-	width: 350px;
+.notepad-explorer {
+	order: 0;
+	width: 100%;
 	overflow: auto;
-	white-space: nowrap;
+	overflow-wrap: break-word;
+	white-space: normal;
+
+	padding: 5px 5px 5px 10px;
 
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -13,20 +15,28 @@
 	z-index: 10;
 }
 
-#notepad-explorer .due-date-list {
+.notepad-explorer a {
+	color: var(--mp-theme-explorerContent);
+}
+
+.notepad-explorer .due-date-list {
 	margin-bottom: 20px;
 	display: inline;
 }
 
-.tree-view_children {
-	margin-left: 16px;
+.notepad-explorer .tree-view {
+	width: 100%;
 }
 
-.tree-view_children-collapsed {
+.notepad-explorer .tree-view_children {
+	padding-left: 16px;
+}
+
+.notepad-explorer .tree-view_children-collapsed {
 	height: 0;
 }
 
-.tree-view_arrow {
+.notepad-explorer .tree-view_arrow {
 	cursor: pointer;
 	margin-right: 6px;
 	display: inline-block;
@@ -36,27 +46,31 @@
 	user-select: none;
 }
 
-.tree-view_arrow:after {
+.notepad-explorer .tree-view_arrow:after {
 	content: '▾';
 }
 
-.tree-view_arrow-collapsed {
+.notepad-explorer .tree-view_arrow-collapsed {
 	-webkit-transform: rotate(-90deg);
 	-moz-transform: rotate(-90deg);
 	-ms-transform: rotate(-90deg);
 	transform: rotate(-90deg);
 }
 
-.explorer-note {
-	display: inline-flex;
-	white-space: nowrap;
-	margin-left: 16px;
+.notepad-explorer .tree-view_item > span > a {
+	padding-left: 5px;
+}
+
+.notepad-explorer .tree-view_item > span > div, .explorer-note > span > div {
+	padding-left: 5px;
+	display: inline-block;
 }
 
 .explorer-note {
 	display: flex;
+	width: 100%;
 	white-space: nowrap;
-	margin-left: 16px;
+	padding-left: 16px;
 	padding-bottom: 10px;
 	padding-top: 10px;
 }
@@ -65,7 +79,18 @@
 	padding-right: 5px;
 }
 
-.add-button > a > .material-icons {
+.add-button {
+	padding: 0;
+}
+
+.add-button > button, .notepad-explorer button {
+	color: var(--mp-theme-explorerContent);
+	padding-left: 3px;
+	padding-right: 3px;
+	margin-right: 3px;
+}
+
+.add-button > button > .material-icons {
 	vertical-align: bottom;
 }
 
@@ -74,24 +99,15 @@
 	display: inline-flex;
 }
 
-#notepad-explorer > div > strong > a {
+.notepad-explorer > div > strong > a {
 	padding-left: 5px;
 }
 
-.tree-view_item > span > a {
-	padding-left: 5px;
-}
-
-.tree-view_item > span > div, .explorer-note > span > div {
-	padding-left: 5px;
-	display: inline-block;
-}
-
-#explorer-options-modal button {
+.explorer-options-modal button {
 	width: 260px;
 }
 
-#explorer-options-modal .col > button {
+.explorer-options-modal .col > button {
 	width: initial;
 }
 
@@ -100,15 +116,27 @@
 	width: max-content;
 }
 
+.app-settings-component__action-list {
+	margin-top: 5px;
+}
+
 .app-settings-component__action-list > li {
-	margin-left: 1em;
-	text-decoration: underline;
+	padding-left: 1em;
+}
+
+.due-date-list > ol {
+	margin-top: 5px;
 }
 
 .sync-settings-component__action-list > li {
-	margin-left: 1em;
+	padding-left: 1em;
 }
 
 .sync-settings-component__action-list > li > a {
 	text-decoration: underline;
+}
+
+.notepad-explorer .tree-view_item {
+	width: 100%;
+	white-space: nowrap;
 }

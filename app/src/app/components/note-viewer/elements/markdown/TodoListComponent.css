@@ -1,0 +1,7 @@
+.markdown-element__todo-list-tracker__progress-bar {
+	background-color: var(--mp-theme-chrome);
+}
+
+.markdown-element__todo-list-tracker__progress-bar .determinate {
+	background-color: var(--mp-theme-accent);
+}

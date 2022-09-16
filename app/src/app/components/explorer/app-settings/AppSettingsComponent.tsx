@@ -1,15 +1,18 @@
-import * as React from 'react';
+import React from 'react';
 import { APP_NAME } from '../../../types';
 import { ConnectedProps } from 'react-redux';
 import { appSettingsContainer } from './AppSettingsContainer';
+import Button2 from '../../Button';
+import QuickSwitchButton from '../quick-switch/button/QuickSwitchButton';
 
 const AppSettingsComponent = (props: ConnectedProps<typeof appSettingsContainer>) => (
 	<div style={{ marginLeft: '10px' }}>
 		<strong>{APP_NAME} Controls</strong>
 
 		<ul className="app-settings-component__action-list">
-			{/*<li><a href="#!" onClick={() => setTimeout(() => Dialog.alert(`Nick hasn't done this thing yet`), 0)}>Quick notebook switcher</a></li>*/}
-			<li><a href="#!" onClick={() => props.clearOldData()}>Clear old data</a></li>
+			<li><QuickSwitchButton /></li>
+			<li><Button2 flat onClick={() => props.feelingLucky()}>I'm feeling lucky</Button2></li>
+			{props.hasEncryptedNotebooks && <li><Button2 flat onClick={() => props.clearOldData()}>Clear old/unused data</Button2></li>}
 		</ul>
 	</div>
 );

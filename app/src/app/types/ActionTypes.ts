@@ -1,7 +1,7 @@
 import { ISyncedNotepad, SyncUser } from './SyncTypes';
-import { Action } from 'redux-typescript-actions';
 import { NoteElement, Source } from 'upad-parse/dist/Note';
 import { FlatNotepad, Note, Notepad, Trie } from 'upad-parse/dist';
+import { MicroPadAction } from '../actions';
 
 export type UpdateElementAction = {
 	noteRef: string;
@@ -47,7 +47,7 @@ export type UploadAssetAction = {
 
 export type NotepadToSyncNotepadAction = {
 	notepad: Notepad;
-	action: (notepad: ISyncedNotepad) => Action<any>;
+	action: (notepad: ISyncedNotepad) => MicroPadAction;
 };
 
 export type ExpandFromNoteAction = {
@@ -67,20 +67,37 @@ export type MoveNotepadObjectAction = {
 };
 
 export type EncryptNotepadAction = {
-	notepad: Notepad;
-	passkey: string;
+	notepad: Notepad,
+	passkey: string,
+	rememberKey: boolean
 };
 
 export type AddCryptoPasskeyAction = {
-	notepadTitle?: string;
-	passkey: string;
+	notepadTitle?: string,
+	passkey: string,
+	remember: boolean
 };
 
-export type SearchIndex = { notepad: FlatNotepad, trie: Trie };
+export type SearchIndex = {
+	notepadTitle: string,
+	trie: Trie,
+	searchResultInfo: SearchResultInfo
+};
+
+export type SearchResultInfo = {
+	results: {
+		[noteRef: string]: {
+			title: string;
+			parentRef: string;
+			noteRef: string;
+		}
+	},
+	parentTitles: { [parentRef: string]: string }
+};
 
 export type SearchIndices = SearchIndex[];
 
-export enum ZoomChange {
+export const enum ZoomChange {
 	INCREASE,
 	DECREASE
 }

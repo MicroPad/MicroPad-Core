@@ -1,6 +1,6 @@
 #note-viewer {
-	order: 0;
-	width: calc(100vw - 350px);
+	order: 1;
+	width: 100%;
 	overflow: auto;
 
 	background-position: center center, left top;
@@ -17,5 +17,10 @@
 }
 
 #progress-bar > .progress {
+	background-color: var(--mp-theme-chrome);
 	position: absolute;
+}
+
+#progress-bar > .progress .indeterminate {
+	background-color: var(--mp-theme-accent);
 }

@@ -8,6 +8,7 @@ import { Action, Dispatch } from 'redux';
 import { actions } from '../actions';
 import { Note } from 'upad-parse/dist';
 import { ThemeValues } from '../ThemeValues';
+import * as Sentry from '@sentry/react';
 
 export function mapStateToProps({ notepads, currentNote, print, app }: IStoreState) {
 	let note: Note | undefined = undefined;
@@ -25,8 +26,8 @@ export function mapStateToProps({ notepads, currentNote, print, app }: IStoreSta
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IPrintViewComponentProps> {
 	return {
-		clearPrintView: () => dispatch(actions.clearPrintView(undefined))
+		clearPrintView: () => dispatch(actions.clearPrintView())
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PrintViewOrAppContainerComponent);
+export default Sentry.withProfiler(connect(mapStateToProps, mapDispatchToProps)(PrintViewOrAppContainerComponent));

@@ -1,4 +1,4 @@
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { actions } from '../actions';
 
 export type IsExportingState = {
@@ -6,7 +6,7 @@ export type IsExportingState = {
 	error?: Error;
 };
 
-export class IsExportingReducer extends MicroPadReducer<IsExportingState> {
+export class IsExportingReducer extends AbstractReducer<IsExportingState> {
 	public readonly key = 'isExporting';
 	public readonly initialState: IsExportingState = { isLoading: false };
 

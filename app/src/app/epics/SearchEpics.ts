@@ -1,65 +1,46 @@
 import { combineEpics, ofType } from 'redux-observable';
-import { catchError, filter, map, switchMap } from 'rxjs/operators';
+import { catchError, debounceTime, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
-import { Action, Success } from 'redux-typescript-actions';
-import { actions, MicroPadAction } from '../actions';
-import { HashTagSearchResult, HashTagSearchResults } from '../reducers/SearchReducer';
-import { Dispatch } from 'redux';
-import { SearchIndices } from '../types/ActionTypes';
-import { indexNotepads } from '../workers/SearchWorker';
+import { actions, MicroPadAction, MicroPadActions } from '../actions';
 import { EpicDeps, EpicStore } from './index';
-import { Notepad } from 'upad-parse/dist';
+import { indexNotepads, search } from '../services/SearchService';
+import { IStoreState } from '../types';
 
 export const refreshIndices$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
-		ofType<MicroPadAction, Action<Success<Notepad, void> | string>>(actions.saveNotepad.done.type, actions.deleteNotepad.type),
-		map(() => actions.indexNotepads.started(undefined))
+		ofType(actions.saveNotepad.done.type, actions.deleteNotepad.type),
+		map(() => actions.indexNotepads.started())
 	);
 
-export const indexNotepads$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+export const indexNotepads$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType<MicroPadAction>(actions.indexNotepads.started.type),
-		map(() => store.getState().search.indices),
-		switchMap((indices: SearchIndices) =>
-			from(indexNotepads(indices, store.getState().notepadPasskeys)).pipe(
+		ofType(actions.indexNotepads.started.type),
+		withLatestFrom(state$),
+		switchMap(([,state]) =>
+			from(indexNotepads(state.search.indices, state.notepadPasskeys)).pipe(
 				map(newIndices => actions.indexNotepads.done({ params: undefined, result: newIndices })),
-				catchError(err => of(actions.indexNotepads.failed({ params: undefined, error: err })))
+				catchError(err => {
+					console.error(err);
+					return of(actions.indexNotepads.failed({ params: undefined, error: err }));
+				})
 			)
 		)
 	);
 
-export const search$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+export const search$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType<MicroPadAction, Action<string>>(actions.search.type),
-		map((action: Action<string>) => action.payload),
-		filter((query: string) => Object.keys(store.getState().search.hashTagResults).length > 0 || !(query.length <= 1 || query.substring(0, 1) !== '#')),
-		switchMap((query: string) => from((async () => {
-			if (query.length <= 1 || query.substring(0, 1) !== '#') return actions.displayHashTagSearchResults({});
-
-			// Create a data structure with each notepad being the key to all the results for that hashtag's search
-			const results: HashTagSearchResults = {};
-			store.getState().search.indices
-				.forEach(index =>
-					index.notepad.search(index.trie, query)
-						.map(note => {
-							return {
-								title: note.title,
-								parentTitle: index.notepad.sections[note.parent as string].title,
-								noteRef: note.internalRef
-							} as HashTagSearchResult;
-						})
-						.forEach(result => results[index.notepad.title] = [
-							...(results[index.notepad.title] || []),
-							result
-						])
-				);
-
-			// Search all of the notepads
-			return actions.displayHashTagSearchResults(results);
-		})()))
+		ofType(actions.search.started.type),
+		debounceTime(100),
+		map(action => (action as MicroPadActions['search']['started'])),
+		map(action => action.payload.trim()),
+		withLatestFrom(state$),
+		map(([query, state]) => actions.search.done({
+			params: query,
+			result: search(query, state.search.indices)
+		}))
 	);
 
-export const searchEpics$ = combineEpics<MicroPadAction, Dispatch, EpicDeps>(
+export const searchEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	refreshIndices$,
 	indexNotepads$,
 	search$

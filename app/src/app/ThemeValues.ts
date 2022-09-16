@@ -11,12 +11,13 @@ import elementInstructionsDark from './assets/click-to-insert-dark.png';
 
 export const ThemeValues: { [K in ThemeName]: ITheme } = {
 	Classic: {
-		background: '#fff',
-		accent: '#ffb300',
+		background: '#ffffff',
+		accent: '#e7a500',
 		chrome: '#607d8b',
-		text: '#000',
+		text: '#000000',
 		links: '#039be5',
-		explorerContent: '#fff',
+		explorerContent: '#ffffff',
+		accentContent: '#ffffff',
 		backgroundImage: classicBackground,
 		instructionImages: {
 			notepad: instructionImageLight,
@@ -31,6 +32,7 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		text: '#839496',
 		links: '#eee8d5',
 		explorerContent: '#eee8d5',
+		accentContent: '#eee8d5',
 		backgroundImage: filledBackground,
 		drawingBackground: '#ffffff30',
 		instructionImages: {
@@ -39,27 +41,14 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 			element: elementInstructionsDark
 		}
 	},
-	IanPad: {
-		background: '#B9F6CA',
-		accent: '#fdff19',
-		chrome: '#40af3a',
-		text: '#000',
-		links: '#039be5',
-		explorerContent: '#fff',
-		backgroundImage: filledBackground,
-		instructionImages: {
-			notepad: instructionImageLight,
-			note: noteInstructionsLight,
-			element: elementInstructionsLight
-		}
-	},
 	Midnight: {
 		background: '#212121',
 		accent: '#424242',
 		chrome: '#303030',
-		text: '#ddd',
+		text: '#dddddd',
 		links: '#039be5',
-		explorerContent: '#ddd',
+		explorerContent: '#dddddd',
+		accentContent: '#dddddd',
 		backgroundImage: filledBackground,
 		drawingBackground: '#ffffff30',
 		instructionImages: {
@@ -69,12 +58,13 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		}
 	},
 	Void: {
-		background: '#000',
+		background: '#000000',
 		accent: '#424242',
 		chrome: '#212121',
-		text: '#ddd',
+		text: '#dddddd',
 		links: '#039be5',
-		explorerContent: '#ddd',
+		explorerContent: '#dddddd',
+		accentContent: '#dddddd',
 		backgroundImage: filledBackground,
 		drawingBackground: '#ffffff30',
 		instructionImages: {
@@ -83,13 +73,74 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 			element: elementInstructionsDark
 		}
 	},
+	Peach: {
+		background: '#fdd1a4',
+		accent: '#fde7a4',
+		chrome: '#fdc3a4',
+		text: '#000000',
+		links: '#444444',
+		explorerContent: '#333333',
+		accentContent: '#333333',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
+	},
+	Pastel: {
+		background: '#f7f2e7',
+		accent: '#d8d3cd',
+		chrome: '#e0ece4',
+		text: '#000000',
+		links: '#444444',
+		explorerContent: '#333333',
+		accentContent: '#333333',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
+	},
+	Wellington: {
+		background: '#F4FFF8',
+		accent: '#5fa7a0',
+		chrome: '#a7ded8',
+		text: '#000000',
+		links: '#444444',
+		explorerContent: '#333333',
+		accentContent: '#333333',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
+	},
 	Purple: {
-		background: '#fff',
+		background: '#ffffff',
 		accent: '#ffcc00',
 		chrome: '#3d0066',
-		text: '#000',
+		text: '#000000',
 		links: '#039be5',
-		explorerContent: '#fff',
+		explorerContent: '#ffffff',
+		accentContent: '#666666',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
+	},
+	IanPad: {
+		background: '#B9F6CA',
+		accent: '#fdff19',
+		chrome: '#40af3a',
+		text: '#000000',
+		links: '#039be5',
+		explorerContent: '#ffffff',
+		accentContent: '#666666',
 		backgroundImage: filledBackground,
 		instructionImages: {
 			notepad: instructionImageLight,

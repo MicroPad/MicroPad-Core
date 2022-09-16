@@ -1,4 +1,4 @@
-.theme-Midnight #notepad-explorer a {
+.theme-Midnight .notepad-explorer a {
 	color: #ddd;
 }
 
@@ -8,8 +8,4 @@
 
 .theme-Midnight .btn:hover, .theme-Midnight .btn-large:hover {
 	background-color: #424242;
-}
-
-#breadcrumb-holder > nav.Midnight {
-	background-color: #303030;
 }

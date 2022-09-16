@@ -1,6 +1,6 @@
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { Action } from 'redux';
-import { isType } from 'redux-typescript-actions';
+import { isType } from 'typescript-fsa';
 import { actions } from '../actions';
 
 export interface IInsertElementState {
@@ -15,9 +15,10 @@ export interface ICurrentNoteState {
 	assetUrls: object;
 	elementEditing: string;
 	insertElement: IInsertElementState;
+	oldRef?: string;
 }
 
-export class NoteReducer extends MicroPadReducer<ICurrentNoteState> {
+export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
 	public readonly key = 'currentNote';
 	public readonly initialState: ICurrentNoteState = {
 		isLoading: false,
@@ -31,7 +32,8 @@ export class NoteReducer extends MicroPadReducer<ICurrentNoteState> {
 		}
 	};
 
-	public reducer(state: ICurrentNoteState, action: Action): ICurrentNoteState {
+	public reducer(state: ICurrentNoteState | undefined, action: Action): ICurrentNoteState {
+		if (!state) state = this.initialState;
 		if (
 			isType(action, actions.parseNpx.started)
 			|| isType(action, actions.syncDownload.started)
@@ -40,8 +42,8 @@ export class NoteReducer extends MicroPadReducer<ICurrentNoteState> {
 			|| isType(action, actions.deleteNotepad)
 			|| isType(action, actions.renameNotepad.done)
 		) {
-			this.cleanUpObjectUrls(state.assetUrls);
-			return this.initialState;
+			NoteReducer.cleanUpObjectUrls(state.assetUrls);
+			return { ...this.initialState, oldRef: state.ref };
 		} else if (isType(action, actions.loadNote.started)) {
 			return {
 				...state,
@@ -53,7 +55,7 @@ export class NoteReducer extends MicroPadReducer<ICurrentNoteState> {
 				isLoading: false
 			};
 		} else if (isType(action, actions.loadNote.done)) {
-			this.cleanUpObjectUrls(state.assetUrls);
+			NoteReducer.cleanUpObjectUrls(state.assetUrls);
 			return {
 				...state,
 				isLoading: false,
@@ -63,7 +65,7 @@ export class NoteReducer extends MicroPadReducer<ICurrentNoteState> {
 			};
 		} else if (isType(action, actions.deleteNotepadObject)) {
 			if (action.payload === state.ref) {
-				this.cleanUpObjectUrls(state.assetUrls);
+				NoteReducer.cleanUpObjectUrls(state.assetUrls);
 				return this.initialState;
 			}
 		} else if (isType(action, actions.openEditor)) {
@@ -85,20 +87,21 @@ export class NoteReducer extends MicroPadReducer<ICurrentNoteState> {
 				}
 			};
 		} else if (isType(action, actions.closeNote) || isType(action, actions.closeNotepad)) {
+			NoteReducer.cleanUpObjectUrls(state.assetUrls);
+			return this.initialState;
+		} else if (isType(action, actions.flipFullScreenState)) {
 			return {
 				...state,
-				ref: ''
-			};
+				insertElement: { ...state.insertElement, enabled: false }
+			}
 		}
 
 		return state;
 	}
 
-	private cleanUpObjectUrls(assetUrls: object) {
-		for (let ref in assetUrls) {
-			if (!assetUrls.hasOwnProperty(ref)) continue;
-
-			URL.revokeObjectURL(assetUrls[ref]);
+	private static cleanUpObjectUrls(assetUrls: object) {
+		for (const url of Object.values(assetUrls)) {
+			URL.revokeObjectURL(assetUrls[url]);
 		}
 	}
 }

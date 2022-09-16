@@ -1,0 +1,18 @@
+.HelpMessage__container {
+	position: fixed;
+	background-color: var(--mp-theme-chrome);
+	border-radius: 10px;
+	right: 25px;
+	top: 150px;
+	padding: 5px;
+	width: 400px;
+	min-height: 100px;
+	transition: background-color .3s;
+	white-space: normal;
+}
+
+@media (max-width: 900px) {
+	.HelpMessage__container {
+		display: none;
+	}
+}

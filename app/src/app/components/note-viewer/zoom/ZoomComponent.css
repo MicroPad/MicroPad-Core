@@ -1,0 +1,20 @@
+.zoom__container {
+	position: absolute;
+
+	right: 25px;
+	bottom: calc(env(safe-area-inset-bottom, 0) + 25px);
+}
+
+@media (max-width: 900px) {
+	.zoom__container {
+		right: 5px;
+		bottom: calc(env(safe-area-inset-bottom, 0) + 5px);
+	}
+}
+
+.zoom__container > button {
+	padding: 0 32px;
+	background-color: var(--mp-theme-chrome);
+	color: var(--mp-theme-explorerContent);
+	transition: background-color .3s;
+}

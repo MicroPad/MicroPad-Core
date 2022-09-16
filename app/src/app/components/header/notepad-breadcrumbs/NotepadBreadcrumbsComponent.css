@@ -1,0 +1,32 @@
+#breadcrumb-holder {
+	position: fixed;
+	width: 100%;
+	top: var(--mp-nav-height);
+}
+
+#breadcrumb-holder > nav {
+	transition: background-color .3s;
+	overflow-x: auto;
+	overflow-y: hidden;
+	white-space: nowrap;
+	height: var(--mp-nav-height);
+	line-height: var(--mp-nav-height);
+	margin-bottom: 0;
+}
+
+#breadcrumb-holder .breadcrumb, #breadcrumb-holder .breadcrumb::before {
+	color: var(--mp-theme-explorerContent);
+}
+
+#breadcrumb-holder .notepad-breadcrumbs__timestamp {
+	position: absolute;
+	padding-left: 20px;
+	opacity: 0.7; /* Don't use percentages due to a bug in the CSS minifier */
+	font-style: italic;
+}
+
+#breadcrumb-holder .notepad-breadcrumbs__timestamp-icon {
+	height: var(--mp-nav-height);
+	line-height: var(--mp-nav-height);
+	margin-right: 3px;
+}

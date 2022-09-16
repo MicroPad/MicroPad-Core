@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
 import { ConnectedProps } from 'react-redux';
@@ -7,22 +7,20 @@ import { getParentList, pathChangeConnector } from './PathChangeContainer';
 type Props = ConnectedProps<typeof pathChangeConnector> & {
 	objToEdit: NPXObject;
 	type: 'section' | 'note';
-	changed: () => void;
 };
 
 const PathChangeComponent = (props: Props) => {
-	const { notepad, objToEdit, type, moveObj, changed } = props;
+	const { notepad, objToEdit, type, moveObj } = props;
 	if (!notepad) return null;
 
 	return (
-		<div>
+		<div className="explorer-options-modal__path-change">
 			<h5>Move {type}</h5>
 			<select
 				defaultValue={(objToEdit.parent as any).internalRef || 'notepad'}
 				style={{ display: 'block', width: 'max-content' }}
 				onChange={event => {
 					moveObj(objToEdit.internalRef, event.currentTarget.value, type);
-					if (!!changed) changed();
 				}}>
 				{
 					getParentList(notepad, objToEdit.internalRef)

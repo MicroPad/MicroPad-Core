@@ -1,18 +1,27 @@
-import * as React from 'react';
+// @ts-expect-error
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import helpNpx from '../../../../assets/Help.npx';
+
+import './MarkdownElementComponent.css';
+import React from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import { Converter, ConverterOptions, extension } from 'showdown';
 import * as MarkDownViewer from './MarkdownViewerHtml';
 import { UNSUPPORTED_MESSAGE } from '../../../../types';
 import { enableTabs } from './enable-tabs';
-import TodoListComponent from './TodoListComponent';
-import { debounce } from '../../../../util';
-import Grid from '@material-ui/core/Grid';
-import { Input } from 'react-materialize';
-import MarkdownHelpComponent from './MarkdownHelpComponent';
+import TodoListComponent, { IProgressValues } from './TodoListComponent';
+import { Checkbox, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
-import { colourTransformer, fendTransformer } from './MarkdownTransformers';
+import { colourTransformer, fendTransformer, mathsTransformer } from './MarkdownTransformers';
+import NoteElementModalComponent from '../../../note-element-modal/NoteElementModalComponent';
+import { BehaviorSubject } from 'rxjs';
+import { ConnectedProps } from 'react-redux';
+import { markdownElementConnector } from './MarkdownElementContainer';
+import Button2 from '../../../Button';
+import Editor, { loader } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
 	search: (query: string) => void;
@@ -31,29 +40,19 @@ export interface IShowdownOpts extends ConverterOptions {
 	emoji: boolean;
 }
 
-export default class MarkdownElementComponent extends React.Component<IMarkdownElementComponentProps> {
+type Props = ConnectedProps<typeof markdownElementConnector> & IMarkdownElementComponentProps;
+
+const converter = configureShowdown();
+
+// eslint-disable-next-line no-restricted-globals
+self.MonacoEnvironment = {
+	getWorkerUrl: (moduleId, label) => build.defs.MONACO_WORKER_PATH
+}
+loader.config({ monaco });
+
+export default class MarkdownElementComponent extends React.Component<Props> {
 	private iframe: HTMLIFrameElement | undefined;
-	private editBox: HTMLTextAreaElement | undefined;
-	private converter: Converter;
-	private readonly updateWithDebounce: (element: NoteElement) => void;
-
-	constructor(props: IMarkdownElementComponentProps, state: object) {
-		super(props, state);
-
-		this.configureExtensions();
-		this.converter = new Converter({
-			parseImgDimensions: true,
-			simplifiedAutoLink: true,
-			strikethrough: true,
-			tables: true,
-			tasklists: true,
-			prefixHeaderId: 'mdheader_',
-			emoji: true,
-			extensions: ['maths', 'fend', 'graphs', 'hashtags', 'colour']
-		} as IShowdownOpts);
-
-		this.updateWithDebounce = this.createUpdateWithDebounce();
-	}
+	private readonly progress$: BehaviorSubject<IProgressValues> = new BehaviorSubject<IProgressValues>({ done: 0, total: 0 });
 
 	render() {
 		const { element, elementEditing, theme } = this.props;
@@ -78,6 +77,8 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		const width = isEditing ? 'auto' : element.args.width!;
 		const height = isEditing ? 'auto' : element.args.height!;
 
+		const shouldUseCodeEditor = isEditing && !this.props.shouldSpellCheck;
+
 		return (
 			<Resizable
 				style={{ overflow: 'hidden' }}
@@ -96,37 +97,65 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				onResizeStop={(e, d, ref) => {
 					this.onSizeEdit('width', ref.style.width!);
 				}}>
-				<TodoListComponent html={this.generateHtml(element)} toggle={() => this.sendMessage({
+				{isEditing || <TodoListComponent progress$={this.progress$} toggle={() => this.sendMessage({
 					id: element.args.id,
 					type: 'toggle',
 					payload: {}
-				})} />
+				})} />}
 
 				{
 					isEditing &&
-					<Grid style={{ paddingLeft: '5px', paddingRight: '5px', marginBottom: 0, color: theme.text }} container={true} spacing={3}>
-						<Grid item={true} xs={6}>
-							<Input
+					<Row style={{ marginBottom: 0, color: theme.text }}>
+						<Col s={4}>
+							<TextInput
+								inputClassName="markdown-element__options-input"
 								label="Font Size"
 								defaultValue={element.args.fontSize}
 								onChange={this.onFontSizeEdit}
 							/>
-						</Grid>
-
-						<Grid item={true} xs={6}>
-							<Input
-								style={{ width: '100%', color: theme.text }}
+						</Col>
+						<Col s={4}>
+							<TextInput
+								inputClassName="markdown-element__options-input"
 								label="Width"
 								defaultValue={element.args.width}
-								onChange={(e, v) => this.onSizeEdit('width', v)}
+								onChange={e => this.onSizeEdit('width', e.target.value)}
 							/>
-						</Grid>
-					</Grid>
+						</Col>
+						<Col s={3}>
+							<Row style={{ marginBottom: 0, color: theme.text }}>
+								<Col s={12}>
+									<Checkbox
+										label="Spellcheck"
+										value="1"
+										checked={this.props.shouldSpellCheck}
+										onChange={() => this.props.toggleSpellCheck()}
+										filledIn
+									/>
+								</Col>
+								<Col s={12}>
+									<Checkbox
+										label="Word Wrap"
+										value="1"
+										checked={this.props.shouldWordWrap}
+										onChange={() => this.props.toggleWordWrap()}
+										filledIn
+									/>
+								</Col>
+							</Row>
+						</Col>
+					</Row>
 				}
 
-				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>Markdown Editor (<MarkdownHelpComponent />)</span>}
+				{isEditing && <span id="markdown-editor-label" style={{ color: theme.text }}>
+					Markdown Editor (<NoteElementModalComponent
+					id={`formatting-help-modal-${element.args.id}`}
+					trigger={<Button2 flat small waves="light" style={{ padding: '0' }}>Formatting Help</Button2>}
+					npx={helpNpx}
+					findNote={np => np.sections[1].notes[0]} />)
+				</span>}
 
-				<div>
+				<React.Fragment>
 					{
 						!isEditing
 						&& <iframe
@@ -139,7 +168,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 					}
 
 					{
-						isEditing &&
+						isEditing && !shouldUseCodeEditor &&
 						<textarea
 							style={
 								{
@@ -147,18 +176,38 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 									height: '400px',
 									backgroundColor: theme.background,
 									color: theme.text,
-									whiteSpace: 'pre',
+									whiteSpace: this.props.shouldWordWrap ? 'break-spaces' : 'pre',
 									overflowWrap: 'normal',
 									overflowX: 'auto'
 								}
 							}
-							ref={input => this.editBox = input!}
 							placeholder="Text (in Markdown)"
-							defaultValue={element.content}
+							value={element.content}
 							onChange={this.onElementEdit}
+							onKeyDown={e => enableTabs(e.target as HTMLTextAreaElement, e)}
+							spellCheck={this.props.shouldSpellCheck}
 							autoFocus={true} />
 					}
-				</div>
+
+					{
+						shouldUseCodeEditor &&
+						<div className="markdown-element__code-editor" style={{ minWidth }}>
+							<Editor
+								language="markdown"
+								value={element.content}
+								onChange={newContent => this.onElementEdit({ target: { value: newContent } })}
+								theme="micropad"
+								options={{
+									automaticLayout: true,
+									minimap: { enabled: false },
+									wordWrap: this.props.shouldWordWrap ? 'on' : 'off',
+									wrappingIndent: 'same',
+									wrappingStrategy: 'advanced',
+									lineNumbers: 'off'
+								}} />
+						</div>
+					}
+				</React.Fragment>
 			</Resizable>
 		);
 	}
@@ -168,21 +217,17 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 		if (!!this.iframe) {
 			this.iframe.onload = () => {
-				this.generateHtml(element)
-					.then(html => {
-						this.sendMessage({
-							type: 'render',
-							id: element.args.id,
-							payload: {
-								...element,
-								content: html,
-								isPrinting
-							}
-						});
-					});
+				const html = this.generateHtml(element);
+				this.sendMessage({
+					type: 'render',
+					id: element.args.id,
+					payload: {
+						...element,
+						content: html,
+						isPrinting
+					}
+				});
 			};
-		} else if (!!this.editBox) {
-			this.editBox.onkeydown = enableTabs;
 		}
 	}
 
@@ -201,26 +246,22 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 	private onElementEdit = (event) => {
 		const { element } = this.props;
 
-		const newElement: NoteElement = {
+		this.props.updateElement!(element.args.id, {
 			...element,
 			content: event.target.value
-		};
-
-		this.updateWithDebounce(newElement);
+		});
 	}
 
 	private onFontSizeEdit = (event) => {
 		const { element } = this.props;
 
-		const newElement: NoteElement = {
+		this.props.updateElement!(element.args.id, {
 			...element,
 			args: {
 				...element.args,
 				fontSize: event.target.value
 			}
-		};
-
-		this.updateWithDebounce(newElement);
+		});
 	}
 
 	private onSizeEdit = (type: 'width' | 'height', value: string) => {
@@ -236,24 +277,21 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 		updateElement!(element.args.id, newElement);
 
-		this.generateHtml(newElement)
-			.then(html => {
-				this.sendMessage({
-					type: 'render',
-					id: element.args.id,
-					payload: {
-						...newElement,
-						content: html
-					}
-				});
-			});
+		this.sendMessage({
+			type: 'render',
+			id: element.args.id,
+			payload: {
+				...newElement,
+				content: this.generateHtml(newElement)
+			}
+		});
 	}
 
-	private generateHtml = (element: NoteElement): Promise<string> => {
-		return new Promise<string>(resolve => {
-			let html = this.converter.makeHtml(element.content);
-			resolve(html);
-		});
+	private generateHtml = (element: NoteElement): string => {
+		const rawHtml = converter.makeHtml(element.content);
+		const res = this.props.enableCheckboxes(element.content, rawHtml);
+		this.progress$.next(res);
+		return res.html;
 	}
 
 	private handleMessages = event => {
@@ -270,7 +308,7 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 
 			case 'hashtag':
 				search(message.payload);
-				(document.querySelector(`#search-button > a`)! as HTMLAnchorElement).click();
+				this.props.openModal('search-modal');
 				break;
 
 			case 'link':
@@ -300,6 +338,24 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 				if (!!onReady) onReady();
 				break;
 
+			case 'toggle_checkbox':
+				(() => {
+					const newElement = {
+						...element,
+						content: this.props.toggleMdCheckbox(element.content, message.payload)
+					};
+					this.props.updateElement!(element.args.id, newElement);
+					this.sendMessage({
+						type: 'render',
+						id: element.args.id,
+						payload: {
+							...element,
+							content: this.generateHtml(newElement)
+						}
+					});
+				})();
+				break;
+
 			default:
 				break;
 		}
@@ -309,99 +365,83 @@ export default class MarkdownElementComponent extends React.Component<IMarkdownE
 		if (!this.iframe) return;
 		this.iframe.contentWindow!.postMessage(message, '*');
 	}
+}
 
-	private createUpdateWithDebounce = () => {
-		const { updateElement } = this.props;
+function configureShowdown(): Converter {
+	extension('maths', mathsTransformer);
 
-		return debounce((element: NoteElement) => {
-			updateElement!(element.args.id, element);
-		}, 100);
-	}
+	extension('fend', fendTransformer);
 
-	private configureExtensions = () => {
-		extension('maths', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /(===[^]+?===|''[^]+?''|;;[^]+?;;)/gi,
-					replace: function(s: string, match: string) {
-						matches.push(match);
-						let n = matches.length - 1;
-						return '%MATHPLACEHOLDER' + n + 'ENDMATHPLACEHOLDER%';
-					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							let pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
+	extension('graphs', () => {
+		let matches: string[] = [];
+		return [
+			{
+				type: 'listener',
+				listeners: {
+					'hashHTMLBlocks.after': (evtName, text) => {
+						let i = 0;
+						return text.replaceAll(/(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi, match => {
+							matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
+							return '%PLACEHOLDER2' + i++ + 'ENDPLACEHOLDER2%';
+						});
 					}
 				}
-			];
-		});
-
-		extension('fend', fendTransformer);
-
-		extension('graphs', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /(=-=([^]+?)=-=)|(!!\(([^]+?)\))/gi,
-					replace: function(s: string) {
-						matches.push(`<em title="${UNSUPPORTED_MESSAGE}">Unsupported Content</em> &#x1F622`);
-						let n = matches.length - 1;
-						return '%PLACEHOLDER2' + n + 'ENDPLACEHOLDER2%';
+			},
+			{
+				type: 'output',
+				filter: function(text: string) {
+					for (let i = 0; i < matches.length; ++i) {
+						const pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
+						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							const pat = '%PLACEHOLDER2' + i + 'ENDPLACEHOLDER2%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
+					// reset array
+					matches = [];
+					return text;
+				}
+			}
+		];
+	});
+
+	extension('hashtags', () => {
+		let matches: string[] = [];
+		return [
+			{
+				type: 'listener',
+				listeners: {
+					'hashHTMLBlocks.after': (evtName, text) => {
+						let i = 0;
+						return text.replaceAll(/(^|\s)(#[a-z\d-]+)/gi, (match, whitespace) => {
+							matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${match.split('#')[1]}');">${match}</a>`);
+							return whitespace + '%PLACEHOLDER3' + i++ + 'ENDPLACEHOLDER3%';
+						});
 					}
 				}
-			];
-		});
-
-		extension('hashtags', () => {
-			let matches: string[] = [];
-			return [
-				{
-					type: 'lang',
-					regex: /(^|\s)(#[a-z\d-]+)/gi,
-					replace: function(s: string) {
-						matches.push(`<a href="javascript:void(0);" onclick="searchHashtag('#${s.split('#')[1]}');">${s}</a>`);
-						const n = matches.length - 1;
-						return '%PLACEHOLDER3' + n + 'ENDPLACEHOLDER3%';
+			},
+			{
+				type: 'output',
+				filter: function(text: string) {
+					for (let i = 0; i < matches.length; ++i) {
+						const pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
+						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 					}
-				},
-				{
-					type: 'output',
-					filter: function(text: string) {
-						for (let i = 0; i < matches.length; ++i) {
-							const pat = '%PLACEHOLDER3' + i + 'ENDPLACEHOLDER3%';
-							text = text.replace(new RegExp(pat, 'gi'), matches[i]);
-						}
-						// reset array
-						matches = [];
-						return text;
-					}
+					// reset array
+					matches = [];
+					return text;
 				}
-			];
-		});
+			}
+		];
+	});
 
-		extension('colour', colourTransformer);
-	}
+	extension('colour', colourTransformer);
+
+	return new Converter({
+		parseImgDimensions: true,
+		simplifiedAutoLink: true,
+		strikethrough: true,
+		tables: true,
+		tasklists: true,
+		noHeaderId: true,
+		emoji: true,
+		extensions: ['maths', 'fend', 'graphs', 'hashtags', 'colour']
+	} as IShowdownOpts);
 }

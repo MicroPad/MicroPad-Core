@@ -1,6 +1,4 @@
-import { MicroPadReducer } from '../types/ReducerType';
 import { IStoreState } from '../types';
-import * as deepFreeze from 'deep-freeze';
 import { isDev } from '../util';
 import { NotepadsReducer } from './NotepadsReducer';
 import { NoteReducer } from './NoteReducer';
@@ -12,54 +10,50 @@ import { AppReducer } from './AppReducer';
 import { IsExportingReducer } from './IsExportingReducer';
 import { NotepadPasskeysReducer } from './NotepadPasskeysReducer';
 import { MicroPadAction, READ_ONLY_ACTIONS } from '../actions';
-import { Action, Reducer } from 'redux';
+import { Action, Reducer, ReducersMapObject } from 'redux';
 import { isReadOnlyNotebook } from '../ReadOnly';
-
-export const REDUCERS: Array<MicroPadReducer<any>> = [
-	new AppReducer(),
-	new NotepadPasskeysReducer(),
-	new NotepadsReducer(),
-	new NoteReducer(),
-	new ExplorerReducer(),
-	new SearchReducer(),
-	new PrintReducer(),
-	new SyncReducer(),
-	new IsExportingReducer()
-];
+import deepFreeze from 'deep-freeze';
+import { appInfoSlice } from './AppInfoReducer';
+import { editorSlice } from './EditorReducer';
+import { combineReducers } from '@reduxjs/toolkit';
 
 interface ReduxReducer<S, A extends Action> {
 	reducer: Reducer<S, A>
 }
 
+const REDUCERS: Reducer<IStoreState, MicroPadAction> = (() => {
+	const reducers: ReducersMapObject<IStoreState, MicroPadAction> = {
+		/* Legacy reducers */
+		app: new AppReducer().reducer,
+		currentNote: new NoteReducer().reducer,
+		explorer: new ExplorerReducer().reducer,
+		isExporting: new IsExportingReducer().reducer,
+		notepadPasskeys: new NotepadPasskeysReducer().reducer,
+		notepads: new NotepadsReducer().reducer,
+		print: new PrintReducer().reducer,
+		search: new SearchReducer().reducer,
+		sync: new SyncReducer().reducer,
+		/* New reducers */
+		[editorSlice.name]: editorSlice.reducer,
+		[appInfoSlice.name]: appInfoSlice.reducer
+	};
+
+	return combineReducers(reducers);
+})();
+
 export class BaseReducer implements ReduxReducer<IStoreState, MicroPadAction> {
-	public readonly initialState: IStoreState;
-	public readonly key = '';
-
-	constructor() {
-		const initialState = {};
-		REDUCERS.forEach(reducer => initialState[reducer.key] = reducer.initialState);
-		this.initialState = Object.freeze(initialState as IStoreState);
-	}
-
-	public reducer(state: IStoreState | undefined, action: MicroPadAction): IStoreState {
-		if (!state) {
-			state = this.initialState;
-		}
-
+	public reducer = (state: IStoreState | undefined, action: MicroPadAction): IStoreState => {
 		if (BaseReducer.isReadonlyViolation(state, action)) {
 			// Skip any state updates if we're in a readonly notebook
-			return state;
+			return state!;
 		}
 
-		let newState = {
-			...state
-		};
-		REDUCERS.forEach(reducer => newState[reducer.key] = reducer.reducer(state![reducer.key], action));
-		
-		return isDev() ? deepFreeze(newState) : newState;
+		const newState = REDUCERS(state, action);
+		return isDev() ? deepFreeze(newState) as IStoreState : newState;
 	}
 
-	private static isReadonlyViolation(state: IStoreState, action: MicroPadAction): boolean {
+	private static isReadonlyViolation(state: IStoreState | undefined, action: MicroPadAction): boolean {
+		if (!state) return false;
 		if (!isReadOnlyNotebook(state.notepads?.notepad?.item?.title ?? '')) {
 			return false;
 		}

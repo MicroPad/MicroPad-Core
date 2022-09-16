@@ -1,0 +1,36 @@
+.info-banner {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	z-index: 1000;
+
+	padding-left: 0.3em;
+	padding-right: 0.3em;
+
+	background-color: var(--mp-theme-accent);
+	color: var(--mp-theme-accentContent);
+}
+
+.info-banner__container {
+	display: grid;
+	grid-template-columns: 1fr min-content;
+}
+
+.info-banner__cta {
+	margin-inline-start: 1rem;
+	text-decoration: underline;
+	color: var(--mp-theme-accentContent);
+}
+
+.info-banner__close {
+	align-self: end;
+	display: inline-block;
+}
+
+.info-banner__close > .material-icons {
+	line-height: 1;
+}
+
+.info-banner__local-btn {
+	margin-left: 10px;
+}

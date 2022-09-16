@@ -18,9 +18,7 @@ def assetChecksum():
 	run(('wasm-pack', 'build', '--release'))
 	os.chdir(base_path)
 
-build_steps = {
-    'asset-checksum': assetChecksum
-}
+build_steps = {}
 
 # Actually run the builds
 print('👷 Building libraries:')

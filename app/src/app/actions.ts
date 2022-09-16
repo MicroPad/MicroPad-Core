@@ -1,4 +1,4 @@
-import actionCreatorFactory, { ActionCreator, AsyncActionCreators } from 'redux-typescript-actions';
+import actionCreatorFactory, { ActionCreator, AsyncActionCreators } from 'typescript-fsa';
 import { IRenameNotepadObjectAction } from './types/NotepadTypes';
 import {
 	AddCryptoPasskeyAction,
@@ -21,12 +21,23 @@ import { IInsertElementState } from './reducers/NoteReducer';
 import { CombinedNotepadSyncList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
 import { FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { HashTagSearchResults } from './reducers/SearchReducer';
+import { SearchResults } from './reducers/SearchReducer';
 import { ThemeName } from './types/Themes';
 import { DueItem } from './services/DueDates';
+import { DrawMode } from './reducers/EditorReducer';
+import { AppInfoMessage } from './reducers/AppInfoReducer';
+import { ModalId } from './types/ModalIds';
 
 export type MicroPadAction = ActionTypes[keyof ActionTypes];
 export type ActionNames = keyof ActionFactories;
+
+export type MicroPadActions = {
+	[ActionName in ActionNames]: ActionFactories[ActionName] extends ActionCreator<any>
+		? ReturnType<ActionFactories[ActionName]>
+		: ActionFactories[ActionName] extends AsyncActionCreators<any, any, any>
+			? { started: ReturnType<ActionFactories[ActionName]['started']>, done: ReturnType<ActionFactories[ActionName]['done']>, failed: ReturnType<ActionFactories[ActionName]['failed']> }
+			: never;
+};
 
 type ActionFactories = typeof actions;
 type ActionTypes = {
@@ -48,7 +59,6 @@ export const actions = {
 	renameNotepad: actionCreator.async<string, string, any>('RENAME_NOTEPAD'),
 	checkNoteAssets: actionCreator.async<[string, NoteElement[]], FlatNotepad, any>('CHECK_NOTE_ASSETS'),
 	loadNote: actionCreator.async<string, object, any>('LOAD_NOTE'),
-	downloadAsset: actionCreator.async<{ filename: string, uuid: string }, void, any>('DOWNLOAD_ASSET'),
 	expandAllExplorer: actionCreator.async<void, string[], any>('EXPAND_ALL_EXPLORER'),
 	print: actionCreator.async<void, NoteElement, void>('PRINT'),
 	syncLogin: actionCreator.async<SyncLoginRequest, SyncUser, any>('SYNC_LOGIN'),
@@ -59,13 +69,13 @@ export const actions = {
 	addToSync: actionCreator.async<AddToSyncAction, string, any>('SYNC_CREATE'),
 	quickNote: actionCreator.async<void, string, void>('QUICK_NOTE'),
 	indexNotepads: actionCreator.async<void, SearchIndices, any>('INDEX_NOTEPADS'),
-	imagePasted: actionCreator.async<string, void, Error>('IMAGE_PASTED'),
 	exportAll: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS'),
 	exportToMarkdown: actionCreator.async<void, Blob, Error>('EXPORT_ALL_NOTEPADS_TO_MD'),
 	clearOldData: actionCreator.async<{ silent: boolean }, void, Error>('CLEAR_OLD_DATA'),
 	getHelp: actionCreator.async<void, void, Error>('GET_HELP'),
 	getDueDates: actionCreator.async<string[], DueItem[], Error>('GET_DUE_DATES'),
 	moveObjAcrossNotepads: actionCreator.async<MoveAcrossNotepadsAction, void, Error>('CROSS_NOTEPAD_MOVE'),
+	search: actionCreator.async<string, SearchResults, Error>('SEARCH'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
@@ -77,8 +87,6 @@ export const actions = {
 	exportNotepad: actionCreator<void>('EXPORT_NOTEPAD'),
 	expandSection: actionCreator<string>('OPEN_SECTION'),
 	collapseSelection: actionCreator<string>('CLOSE_SECTION'),
-	search: actionCreator<string>('SEARCH'),
-	displayHashTagSearchResults: actionCreator<HashTagSearchResults>('DISPLAY_HASH_TAG_SEARCH_RESULTS'),
 	deleteNotepadObject: actionCreator<string>('DELETE_NOTEPAD_OBJECT'),
 	renameNotepadObject: actionCreator<IRenameNotepadObjectAction>('RENAME_NOTEPAD_OBJECT'),
 	expandFromNote: actionCreator<ExpandFromNoteAction>('EXPAND_FROM_NOTE'),
@@ -106,6 +114,7 @@ export const actions = {
 	actWithSyncNotepad: actionCreator<NotepadToSyncNotepadAction>('ACT_WITH_SYNC_NOTEPAD'),
 	requestSyncDownload: actionCreator<string>('REQUEST_SYNC_DOWNLOAD'),
 	syncProError: actionCreator<void>('SYNC_PRO_ERROR'),
+	setSyncProStatus: actionCreator<boolean>('SET_SYNC_PRO_STATUS'),
 	setHelpPref: actionCreator<boolean>('SET_HELP_PREF'),
 	checkVersion: actionCreator<void>('CHECK_VERSION_ELECTRON'),
 	closeNote: actionCreator<void>('CLOSE_NOTE'),
@@ -117,7 +126,21 @@ export const actions = {
 	encryptNotepad: actionCreator<string>('ENCRYPT_NOTEPAD'),
 	addCryptoPasskey: actionCreator<AddCryptoPasskeyAction>('ADD_CRYPTO_PASSKEY'),
 	closeNotepad: actionCreator<void>('CLOSE_NOTEPAD'),
-	importMarkdown: actionCreator<Translators.Markdown.MarkdownImport[]>('IMPORT_FROM_MARKDOWN')
+	importMarkdown: actionCreator<Translators.Markdown.MarkdownImport[]>('IMPORT_FROM_MARKDOWN'),
+	setExplorerWidth: actionCreator<string>('SET_EXPLORER_WIDTH'),
+	feelingLucky: actionCreator<void>('FEELING_LUCKY'),
+	setSearchResultVisibility: actionCreator<boolean>('SET_SEARCH_RESULT_VISIBILITY'),
+	toggleSpellCheck: actionCreator<boolean | void>('TOGGLE_SPELL_CHECK'),
+	toggleWordWrap: actionCreator<boolean | void>('TOGGLE_WORD_WRAP'),
+	openModal: actionCreator<ModalId>('OPEN_MODAL'),
+	closeModal: actionCreator<void>('CLOSE_MODAL'),
+	setDrawMode: actionCreator<DrawMode>('SET_DRAW_MODE'),
+	setDrawingLineColour: actionCreator<string>('SET_DRAWING_LINE_COLOUR'),
+	dismissInfoBanner: actionCreator<void>('DISMISS_INFO_BANNER'),
+	setInfoMessage: actionCreator<AppInfoMessage>('SET_INFO_MESSAGE'),
+	mouseMove: actionCreator<{ x: number, y: number }>('MOUSE_MOVE'),
+	filePasted: actionCreator<File>('FILE_PASTED'),
+	updateEncryptionStatus: actionCreator<boolean>('UPDATE_CRYPTO_STATUS'),
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
@@ -125,10 +148,7 @@ export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
 	actions.quickNote.done.type,
 	actions.quickNote.failed.type,
 
-	actions.imagePasted.started.type,
-	actions.imagePasted.done.type,
-	actions.imagePasted.failed.type,
-
+	actions.filePasted.type,
 	actions.updateElement.type,
 	actions.quickMarkdownInsert.type,
 	actions.insertElement.type,

@@ -1,44 +1,54 @@
+/* Special Imports */
+// @ts-expect-error
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import helpNpx from './assets/Help.npx';
 /* CSS Imports */
+import '@fontsource/abeezee';
 import 'material-icons-font/material-icons-font.css';
-import 'materialize-css/dist/css/materialize.min.css'; // TODO: Roboto will need to be imported here when this isn't
+import 'materialize-css/dist/css/materialize.min.css';
 import './root.css';
+import './ScrollbarPatch.css';
 /* Themes */
-import './theme-styles/Classic.css';
 import './theme-styles/Solarized.css';
-import './theme-styles/IanPad.css';
 import './theme-styles/Midnight.css';
 import './theme-styles/Void.css';
+import './theme-styles/Wellington.css';
+import './theme-styles/Peach.css';
+import './theme-styles/Pastel.css';
 import './theme-styles/Purple.css';
 /* JS Imports */
-import * as React from 'react';
-import 'jquery/dist/jquery.slim.js'; // TODO: Yeet this when Materialize is removed
+import React from 'react';
 import 'materialize-css/dist/js/materialize.js';
-import * as serviceWorker from '../registerServiceWorker';
-import { APP_NAME, IAppWindow, MICROPAD_URL } from './types';
-import { applyMiddleware, createStore } from 'redux';
+import { MICROPAD_URL } from './types';
+import { applyMiddleware } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
-import { composeWithDevTools } from 'redux-devtools-extension';
-import * as localforage from 'localforage';
+import localforage from 'localforage';
 import * as ReactDOM from 'react-dom';
 import { actions } from './actions';
 import { Provider } from 'react-redux';
-import HeaderComponent from './containers/header/HeaderContainer';
+import HeaderComponent from './components/header/HeaderContainer';
 import NotepadExplorerComponent from './components/explorer/NotepadExplorerContainer';
 import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './services/shortcuts';
-import * as QueryString from 'querystring';
-import * as PasteImage from 'paste-image';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
-import WhatsNewModalComponent from './components/WhatsNewModalComponent';
+import NoteElementModalComponent from './components/note-element-modal/NoteElementModalComponent';
 import { SyncUser } from './types/SyncTypes';
-import { SyncProErrorComponent } from './components/sync/SyncProErrorComponent';
 import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from './types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
 import ToastEventHandler from './services/ToastEventHandler';
 import { LastOpenedNotepad } from './epics/StorageEpics';
-import { noop } from './util';
+import { createSentryReduxEnhancer } from '../sentry';
+import { createDynamicCss } from './DynamicAppCss';
+import { hasRequiredFeatures } from '../unsupported-page/feature-detect';
+import { showUnsupportedPage } from '../unsupported-page/show-page';
+import { hasEncryptedNotebooks, restoreSavedPasswords } from './services/CryptoService';
+import TopLevelModalsComponent from './components/TopLevelModalsComponent';
+import { rootEpic$ } from './epics/rootEpic';
+import InfoBannerComponent from './components/header/info-banner/InfoBannerContainer';
+import { watchPastes } from './services/paste-watcher';
+import { configureStore } from '@reduxjs/toolkit';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -47,11 +57,31 @@ try {
 }
 
 const baseReducer: BaseReducer = new BaseReducer();
-export const store = createStore(
-	baseReducer.reducer,
-	baseReducer.initialState,
-	composeWithDevTools(applyMiddleware(epicMiddleware))
-);
+
+export const store = configureStore({
+	reducer: baseReducer.reducer,
+	enhancers: [applyMiddleware(epicMiddleware), createSentryReduxEnhancer()],
+	middleware: getDefaultMiddleware => getDefaultMiddleware({
+		serializableCheck: false,
+		thunk: false,
+		immutableCheck: false
+	}),
+	devTools: {
+		actionsBlacklist: [actions.mouseMove.type],
+		actionSanitizer: action => {
+			switch (action.type) {
+				case actions.parseNpx.started.type:
+					return { ...action, payload: null };
+				default:
+					return action;
+			}
+		}
+	}
+});
+
+epicMiddleware.run(rootEpic$);
+
+export type MicroPadStore = typeof store;
 
 export const TOAST_HANDLER = new ToastEventHandler();
 
@@ -70,10 +100,24 @@ export const SYNC_STORAGE = localforage.createInstance({
 	storeName: 'sync'
 });
 
+export const SETTINGS_STORAGE = localforage.createInstance({
+	name: 'MicroPad',
+	storeName: 'settings'
+});
+
+export const CRYPTO_PASSKEYS_STORAGE = localforage.createInstance({
+	name: 'MicroPad',
+	storeName: 'cryptoPasskeys'
+});
+
 export type StorageMap = {
 	notepadStorage: LocalForage,
 	assetStorage: LocalForage,
 	syncStorage: LocalForage,
+	settingsStorage: LocalForage,
+	cryptoPasskeysStorage: LocalForage,
+
+	/** @deprecated Use settingsStorage instead */
 	generalStorage: LocalForage
 };
 
@@ -82,47 +126,62 @@ export function getStorage(): StorageMap {
 		notepadStorage: NOTEPAD_STORAGE,
 		assetStorage: ASSET_STORAGE,
 		syncStorage: SYNC_STORAGE,
+		settingsStorage: SETTINGS_STORAGE,
+		cryptoPasskeysStorage: CRYPTO_PASSKEYS_STORAGE,
 		generalStorage: localforage
 	};
 }
 
 (async function init() {
-	if (!await compatibilityCheck()) return;
-	await hydrateStoreFromLocalforage();
+	const shouldInit = await hasRequiredFeatures();
+	if (!shouldInit) {
+		showUnsupportedPage();
+		return;
+	}
 
-	if ((window as IAppWindow).isElectron) store.dispatch(actions.checkVersion(undefined));
-	store.dispatch(actions.getNotepadList.started(undefined));
-	store.dispatch(actions.indexNotepads.started(undefined));
+	await hydrateStoreFromLocalforage();
+	createDynamicCss(store);
+
+	if (!window.MicroPadGlobals.isPersistenceAllowed) {
+		store.dispatch(actions.setInfoMessage({
+			text: `Failed to get permission for long-term storage. You may need to save your notebooks manually.`,
+			cta: 'https://example.org' // TODO
+		}));
+	}
+
+	if (window.isElectron) store.dispatch(actions.checkVersion());
+	store.dispatch(actions.getNotepadList.started());
+	store.dispatch(actions.indexNotepads.started());
 
 	enableKeyboardShortcuts(store);
+	document.addEventListener('mousemove', e => store.dispatch(actions.mouseMove({
+		x: e.clientX,
+		y: e.clientY
+	})));
 
 	// Render the main UI
 	ReactDOM.render(
-		<Provider store={store as any}>
-			{/*
-			// @ts-ignore TODO: Type has no properties in common with type 'IntrinsicAttributes & Pick ClassAttributes PrintViewOrAppContainerComponent & IPrintViewComponentProps & IAppProps, "ref" | "key">' */}
+		<Provider store={store}>
 			<PrintViewOrAppContainerComponent>
-				<HeaderComponent />
+				<React.StrictMode><HeaderComponent /></React.StrictMode>
 				<AppBodyComponent>
 					<NoteViewerComponent />
-					<NotepadExplorerComponent />
-					<WhatsNewModalComponent />
-					<SyncProErrorComponent />
-					<InsertElementComponent />
+					<React.StrictMode>
+						<NotepadExplorerComponent />
+						<NoteElementModalComponent id="whats-new-modal" npx={helpNpx} findNote={np => np.sections[0].notes[2]} />
+						<InsertElementComponent />
+						<TopLevelModalsComponent />
+					</React.StrictMode>
 				</ AppBodyComponent>
+				<React.StrictMode><InfoBannerComponent /></React.StrictMode>
 			</PrintViewOrAppContainerComponent>
 		</Provider>,
-		document.getElementById('app') as HTMLElement
+		document.getElementById('app')!
 	);
 
-	// Some clean up of an old storage item, this line can be deleted at some point in the future
-	localforage.removeItem('hasRunBefore').then(noop);
-
 	await displayWhatsNew();
-
 	notepadDownloadHandler();
-
-	pasteWatcher();
+	watchPastes(store);
 
 	store.dispatch(actions.clearOldData.started({ silent: true }));
 
@@ -135,7 +194,11 @@ export function getStorage(): StorageMap {
 })();
 
 async function hydrateStoreFromLocalforage() {
-	await Promise.all([NOTEPAD_STORAGE.ready(), ASSET_STORAGE.ready(), SYNC_STORAGE.ready()]);
+	await Promise.all(Object.values(getStorage()).map(storage => storage.ready()));
+
+	hasEncryptedNotebooks(NOTEPAD_STORAGE)
+		.then(hasEncryptedNotebooks => store.dispatch(actions.updateEncryptionStatus(hasEncryptedNotebooks)));
+	const restoreSavedPasswords$ = restoreSavedPasswords(store, CRYPTO_PASSKEYS_STORAGE);
 
 	const fontSize = await localforage.getItem<string>('font size');
 	if (!!fontSize) store.dispatch(actions.updateDefaultFontSize(fontSize));
@@ -143,11 +206,19 @@ async function hydrateStoreFromLocalforage() {
 	const helpPref: boolean | null = await localforage.getItem<boolean>('show help');
 	if (helpPref !== null) store.dispatch(actions.setHelpPref(helpPref));
 
+	const shouldSpellCheck = await SETTINGS_STORAGE.getItem<boolean>('shouldSpellCheck');
+	if (shouldSpellCheck !== null) store.dispatch(actions.toggleSpellCheck(shouldSpellCheck));
+
+	const shouldWordWrap = await SETTINGS_STORAGE.getItem<boolean>('shouldWordWrap');
+	if (shouldWordWrap !== null) store.dispatch(actions.toggleWordWrap(shouldWordWrap));
+
 	const syncUser: SyncUser | null = await SYNC_STORAGE.getItem<SyncUser>('sync user');
 	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
 
 	const theme = await localforage.getItem<ThemeName>('theme');
 	if (!!theme) store.dispatch(actions.selectTheme(theme));
+
+	await restoreSavedPasswords$;
 
 	// Reopen the last notebook + note
 	const lastOpenedNotepad = await localforage.getItem<string | LastOpenedNotepad>('last opened notepad');
@@ -163,67 +234,24 @@ async function hydrateStoreFromLocalforage() {
 	}
 }
 
-async function compatibilityCheck(): Promise<boolean> {
-	function doesSupportSrcDoc(): boolean {
-		const testIframe = document.createElement('iframe');
-		testIframe.srcdoc = 'test';
-		return testIframe.getAttribute('srcdoc') === 'test';
-	}
-
-	if (!doesSupportSrcDoc()) {
-		ReactDOM.render(
-			<div style={{ margin: '10px' }}>
-				<h1>Bad news <span role="img" aria-label="sad face">😢</span></h1>
-				<p>
-					Your web-browser doesn't support important features required for {APP_NAME} to function.<br />
-					You can try with a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer nofollow">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="noopener noreferrer nofollow">Mozilla Firefox</a>.
-				</p>
-				<p>
-					You could also download {APP_NAME} <a href="https://getmicropad.com/#download">here</a>.
-				</p>
-			</div>,
-			document.getElementById('app') as HTMLElement
-		);
-		return false;
-	}
-
-	return true;
-}
-
 async function displayWhatsNew() {
+	// some clean up of an old item, can be removed in the future
+	localforage.removeItem('oldMinorVersion').catch(e => console.error(e));
+
 	const minorVersion = store.getState().app.version.minor;
-	const oldMinorVersion = await localforage.getItem('oldMinorVersion');
+	const oldMinorVersion = await SETTINGS_STORAGE.getItem<number>('oldMinorVersion');
 	if (minorVersion === oldMinorVersion) return;
 
 	// Open "What's New"
-	document.getElementById('whats-new-modal-trigger')!.click();
-	await localforage.setItem('oldMinorVersion', minorVersion);
+	setTimeout(() => {
+		store.dispatch(actions.openModal('whats-new-modal'));
+	}, 0);
+
+	SETTINGS_STORAGE.setItem<number>('oldMinorVersion', minorVersion).catch(e => console.error(e));
 }
 
 function notepadDownloadHandler() {
 	// eslint-disable-next-line no-restricted-globals
-	const downloadNotepadUrl = QueryString.parse(location.search.slice(1)).download;
-	if (!!downloadNotepadUrl && typeof downloadNotepadUrl === 'string') store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
-}
-
-function pasteWatcher() {
-	/*
-		The paste watcher breaks text inputs in Safari (https://github.com/MicroPad/Web/issues/179).
-		TODO: Consider re-enabling this when https://github.com/MicroPad/Web/issues/143 is done.
-	*/
-	const isSafariLike = navigator.vendor === 'Apple Computer, Inc.';
-	if (isSafariLike) return;
-
-	PasteImage.on('paste-image', async (image: HTMLImageElement) => {
-		store.dispatch(actions.imagePasted.started(image.src));
-	});
-}
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-if ((window as IAppWindow).isElectron) {
-	serviceWorker.unregister();
-} else {
-	serviceWorker.register();
+	const downloadNotepadUrl = new URLSearchParams(location.search).get('download');
+	if (!!downloadNotepadUrl) store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
 }

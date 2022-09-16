@@ -1,0 +1,11 @@
+.theme-Wellington a {
+	color: #333;
+}
+
+.theme-Wellington .notepad-explorer a {
+	color: #231e23;
+}
+
+#breadcrumb-holder > nav.Wellington {
+	background-color: #a7ded8;
+}

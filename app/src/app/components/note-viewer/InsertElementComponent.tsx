@@ -1,5 +1,4 @@
-import * as React from 'react';
-import * as FullScreenService from '../../services/FullscreenService';
+import React from 'react';
 import { ElementArgs, NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';
 import { InsertElementAction } from '../../types/ActionTypes';
@@ -18,6 +17,7 @@ export interface IInsertElementComponentProps {
 	fontSize: string;
 	theme: ITheme;
 	isFullScreen: boolean;
+	explorerWidth: number;
 	insert?: (action: InsertElementAction) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
 	edit?: (id: string) => void;
@@ -25,26 +25,40 @@ export interface IInsertElementComponentProps {
 
 export default class InsertElementComponent extends React.Component<IInsertElementComponentProps> {
 	render() {
-		const { note, x, y, enabled, fontSize, theme, isFullScreen } = this.props;
-		if (!note) return null;
+		const { note, enabled, fontSize, theme } = this.props;
+		if (!enabled || !note) return null;
 
-		const elementHeight = 320;
-		const elementWidth = 286;
+		const noteViewer = document.getElementById('note-viewer');
+		if (!noteViewer) return null;
+		const notepadExplorerWidth = document.querySelector<HTMLDivElement>('.notepad-explorer')?.offsetWidth ?? 0;
+
+		const elementWidth = 307;
+		const elementHeight = 325;
+
+		const offsets = {
+			left: notepadExplorerWidth - noteViewer.scrollLeft,
+			top: noteViewer.scrollTop
+		};
+
+		const x = this.props.x + offsets.left;
+		const y = this.props.y - offsets.top;
+
+		const shouldFlipX = x > noteViewer.getBoundingClientRect().width - (elementWidth * 2);
+
 		const containerStyles = {
 			padding: 0,
 			height: elementHeight + 'px',
 			width: elementWidth + 'px',
-			left: (x < window.innerWidth - elementWidth - 200) ? x : x - elementWidth,
+			left: shouldFlipX ? x - elementWidth : x,
 			top: (y < window.innerHeight - elementHeight - 200) ? y : y - elementHeight,
 			zIndex: 5000,
 			display: (enabled) ? undefined : 'none'
 		};
 
-		const noteContainer = document.getElementById('note-container');
-		if (!noteContainer) return null;
-
-		const insertX = Math.abs(Math.floor(noteContainer.getBoundingClientRect().left)) + x;
-		const insertY = (Math.abs(Math.floor(noteContainer.getBoundingClientRect().top)) + y) - FullScreenService.getOffset(isFullScreen);
+		const insertX = this.props.x;
+		const insertY = this.props.y;
+		// const insertX = Math.abs(Math.floor(noteContainer.getBoundingClientRect().left) - x);
+		// const insertY = (Math.abs(Math.floor(noteViewer.getBoundingClientRect().top)) + y) - FullScreenService.getOffset(isFullScreen);
 
 		const defaultArgs: ElementArgs = {
 			id: '',
@@ -133,10 +147,7 @@ export default class InsertElementComponent extends React.Component<IInsertEleme
 		const { note, insert, toggleInsertMenu, edit } = this.props;
 		toggleInsertMenu!({ enabled: false });
 
-		let count = note.elements.filter(e => e.type === element.type).length + 1;
-		let id = `${element.type}${count}`;
-		// eslint-disable-next-line no-loop-func
-		while (note.elements.some(e => e.args.id === id)) id = `${element.type}${++count}`;
+		const id = `${element.type}${generateGuid()}`;
 		insert!({
 			element: {
 				...element,

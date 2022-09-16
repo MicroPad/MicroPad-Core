@@ -1,4 +1,4 @@
-export type ThemeName = 'Classic' | 'Solarized' | 'IanPad' | 'Midnight' | 'Void' | 'Purple';
+export type ThemeName = 'Classic' | 'Solarized' | 'Midnight' | 'Void' | 'Peach' | 'Pastel' | 'Wellington' | 'Purple' | 'IanPad';
 
 export interface ITheme {
 	background: string;
@@ -7,6 +7,7 @@ export interface ITheme {
 	text: string;
 	links: string;
 	explorerContent: string;
+	accentContent: string;
 	instructionImages: {
 		notepad: string;
 		note: string;

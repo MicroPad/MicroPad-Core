@@ -1,160 +1,116 @@
-import * as React from 'react';
-import { FormEvent } from 'react';
-import { Button, Col, Icon, Input, Modal, Row } from 'react-materialize';
+import React, { useState } from 'react';
+import { Col, Icon, Row, TextInput } from 'react-materialize';
 import { Notepad } from 'upad-parse/dist';
 import { NPXObject } from 'upad-parse/dist/NPXObject';
 import PathChangeComponent from '../path-change/PathChangeContainer';
-import { Dialog } from '../../../services/dialogs';
 import { ConnectedProps } from 'react-redux';
 import { explorerOptionsConnector } from './ExplorerOptionsContainer';
 import MoveComponent from '../move/MoveContainer';
+import { DEFAULT_MODAL_OPTIONS } from '../../../util';
+import SingletonModalComponent from '../../singleton-modal/SingletonModalContainer';
+import Button2 from '../../Button';
+import { ModalId } from '../../../types/ModalIds';
+import { SYNC_NAME } from '../../../types';
 
-type Props = ConnectedProps<typeof explorerOptionsConnector> & {
+export type ExplorerOptionsProps = {
 	objToEdit: NPXObject | Notepad;
 	type: 'notepad' | 'section' | 'note';
 };
 
-export default class ExplorerOptionsComponent extends React.Component<Props> {
-	private titleInput: Input;
+const ExplorerOptionsComponent = (props: ConnectedProps<typeof explorerOptionsConnector> & ExplorerOptionsProps) => {
+	const [titleView, setTitleView] = useState(props.objToEdit.title);
 
-	render() {
-		const { objToEdit, type, colour, exportNotepad, loadNote, print } = this.props;
+	const displayType = props.type === 'notepad' ? 'notebook' : props.type;
 
-		const displayType = type === 'notepad' ? 'notebook' : type;
+	const notepadOptions: JSX.Element = (
+		<div>
+			{!!props.syncId && <Row>
+				<Button2
+					className="red"
+					waves="light"
+					style={{
+						paddingLeft: '16px',
+						paddingRight: '16px',
+						height: 'auto'
+					}}
+					onClick={() => setTimeout(() => props.stopSyncing(props.syncId!), 0)}>
+					<Icon left={true}>sync_disabled</Icon> Remove from <span style={{ textTransform: 'initial' }}>{SYNC_NAME}</span>
+				</Button2>
+			</Row>}
 
-		const notepadOptions: JSX.Element = (
-			<div>
+			<Row>
+				<Button2 className="accent-btn" waves="light" onClick={props.exportNotepad}>
+					<Icon left={true}>file_download</Icon> Export Notebook
+				</Button2>
+			</Row>
+
+			<Row>
+				<Button2 className="accent-btn" waves="light" onClick={() => props.encrypt()}>
+					<Icon left={true}>enhanced_encryption</Icon> Encrypt Notebook
+				</Button2>
+
+				{!!(props.objToEdit as Notepad).crypto && <p>
+					This notebook is currently secured with {(props.objToEdit as Notepad).crypto}.
+				</p>}
+
+				<p>
+					<em>
+						Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.
+						Only titles, sources, markdown text, etc. are encrypted. Images and other binary items will not be encrypted. Exporting
+						to NPX files will export to plain-text.
+					</em>
+				</p>
+			</Row>
+		</div>
+	);
+
+	const noteOptions: JSX.Element = (
+		<div>
+			<Row><Button2 className="accent-btn" waves="light" onClick={() => {
+				props.loadNote((props.objToEdit as NPXObject).internalRef);
+				setTimeout(() => props.print(), 500);
+			}}>Export/Print Note (PDF)</Button2></Row>
+		</div>
+	);
+
+	const modalId: ModalId = `notepad-edit-object-modal-${(props.objToEdit as NPXObject).internalRef ?? `np-title-${props.objToEdit.title}`}`
+
+	return (
+		<SingletonModalComponent
+			id={modalId}
+			key={modalId}
+			header={`Options for ${props.objToEdit.title}`}
+			trigger={<a href="#!" className="exp-options-trigger" style={{ color: props.colour }} onContextMenu={e => {
+				e.preventDefault();
+				(e.target as Node).parentElement?.querySelector<HTMLAnchorElement>('.exp-options-trigger')?.click();
+				return false;
+			}}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}
+			options={DEFAULT_MODAL_OPTIONS}>
+			<div className="explorer-options-modal">
 				<Row>
-					<Button className="blue" waves="light" onClick={exportNotepad}>
-						<Icon left={true}>file_download</Icon> Export Notebook
-					</Button>
+					<form action="#!" onSubmit={e => {
+						e.preventDefault();
+						props.rename(titleView);
+						return false;
+					}}>
+						<TextInput s={8} label="Title" value={titleView} onChange={e => setTitleView(e.target.value)} />
+						<Col s={4}><Button2 className="accent-btn" waves="light">Rename {displayType}</Button2></Col>
+					</form>
 				</Row>
-
-				<Row>
-					<Button className="blue" waves="light" onClick={this.encrypt}>
-						<Icon left={true}>enhanced_encryption</Icon> Encrypt Notebook
-					</Button>
-
-					{!!(objToEdit as Notepad).crypto && <p>
-						This notebook is currently secured with {(objToEdit as Notepad).crypto}.
-					</p>}
-
-					<p>
-						<em>
-							Encrypting a notebook/notepad is irreversible. If you forget your passkey, it will be impossible to recover your notes.<br />
-							Only titles, sources, markdown text, etc. are encrypted. Images and other binary items will not be encrypted. Exporting
-							to NPX files will export to plain-text.
-						</em>
-					</p>
-				</Row>
+				<Row><Button2 className="red" waves="light" onClick={() => props.deleteObj()}><Icon
+					left={true}>delete_forever</Icon> Delete {displayType}</Button2></Row>
+				{(props.type === 'notepad') && notepadOptions}
+				{(props.type === 'note') && noteOptions}
+				{
+					(props.type === 'note' || props.type === 'section') &&
+					<React.Fragment>
+						<PathChangeComponent objToEdit={props.objToEdit as NPXObject} type={props.type} />
+						<br />
+						<MoveComponent internalRef={(props.objToEdit as NPXObject).internalRef} type={props.type} />
+					</React.Fragment>
+				}
 			</div>
-		);
-
-		const noteOptions: JSX.Element = (
-			<div>
-				<Row><Button className="blue" waves="light" onClick={() => {
-					if (!!loadNote) loadNote((objToEdit as NPXObject).internalRef);
-					this.closeModal();
-					setTimeout(() => print!(), 500);
-				}}>Export/Print Note (PDF)</Button></Row>
-			</div>
-		);
-
-		return (
-			<Modal
-				key={`npeo-${objToEdit.title}`}
-				header={`Options for ${objToEdit.title}`}
-				trigger={<a href="#!" className="exp-options-trigger" style={{ color: colour }} data-handle={`npeo-${objToEdit.title}`}><Icon tiny={true} className="exp-options-trigger">settings</Icon></a>}>
-				<div id="explorer-options-modal">
-					<Row>
-						<form action="#" onSubmit={this.rename}>
-							<Input ref={input => this.titleInput = input} s={6} label="Title" defaultValue={objToEdit.title}/>
-							<Col s={6}><Button className="blue" waves="light">Rename {displayType}</Button></Col>
-						</form>
-					</Row>
-					<Row><Button className="red" waves="light" onClick={this.delete}><Icon
-						left={true}>delete_forever</Icon> Delete {displayType}</Button></Row>
-					{(type === 'notepad') && notepadOptions}
-					{(type === 'note') && noteOptions}
-					{
-						(type === 'note' || type === 'section') &&
-							<React.Fragment>
-								<PathChangeComponent objToEdit={objToEdit as NPXObject} type={type} changed={() => this.closeModal()} />
-								<br />
-								<MoveComponent internalRef={(objToEdit as NPXObject).internalRef} type={type} changed={() => this.closeModal()} />
-							</React.Fragment>
-					}
-				</div>
-			</Modal>
-		);
-	}
-
-	private rename = (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		const { objToEdit, type, renameNotepad, renameNotepadObject } = this.props;
-		const value = this.titleInput.state.value;
-
-		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
-
-		switch (type) {
-			case 'notepad':
-				renameNotepad!(value);
-				break;
-
-			case 'section':
-			case 'note':
-				renameNotepadObject!({ internalRef: (objToEdit as NPXObject).internalRef, newName: value });
-				break;
-
-			default:
-				break;
-		}
-
-		return false;
-	}
-
-	private delete = async () => {
-		const { objToEdit, type, deleteNotepad, deleteNotepadObject } = this.props;
-		if (!await Dialog.confirm(`Are you sure you want to delete '${objToEdit.title}'?`)) return;
-
-		document.getElementsByClassName('modal-overlay')[0].outerHTML = '';
-
-		switch (type) {
-			case 'notepad':
-				deleteNotepad!(objToEdit.title);
-				break;
-
-			case 'section':
-			case 'note':
-				deleteNotepadObject!((objToEdit as NPXObject).internalRef);
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	private encrypt = async () => {
-		const { objToEdit, encrypt } = this.props;
-		const notepad = objToEdit as Notepad;
-
-		if (!encrypt) return;
-
-		if (!await Dialog.confirm(`Are you sure you want to encrypt '${notepad.title}'? This will secure all of your note's text contents and the structure of the notebook. Images and other binary assets are not encrypted.`)) return;
-
-		const passkey = await Dialog.promptSecure('Passkey:');
-		if (!passkey) return;
-
-		if (await Dialog.promptSecure('Confirm Passkey:') !== passkey) {
-			Dialog.alert('Your two passkeys did not match');
-			return;
-		}
-
-		encrypt(notepad, passkey);
-	}
-
-	private closeModal = () => {
-		const overlay: HTMLElement | null = document.querySelector('.modal-overlay');
-		if (!!overlay) overlay.click();
-	}
-}
+		</SingletonModalComponent>
+	);
+};
+export default ExplorerOptionsComponent;

@@ -1,9 +1,11 @@
-import * as React from 'react';
-import { FormEvent } from 'react';
-import { Button, Input, Modal } from 'react-materialize';
+import React, { FormEvent } from 'react';
+import { TextInput } from 'react-materialize';
 import { APP_NAME, MICROPAD_URL, SYNC_NAME } from '../../types';
 import { SyncUser } from '../../types/SyncTypes';
 import { Dialog } from '../../services/dialogs';
+import { DEFAULT_MODAL_OPTIONS } from '../../util';
+import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
+import Button2 from '../Button';
 
 export interface ILoginComponentProps {
 	syncUser?: SyncUser;
@@ -24,18 +26,20 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 		if (!!syncUser) return (!!manageTrigger) ? manageTrigger : null;
 
 		return (
-			<Modal
+			<SingletonModalComponent
+				id="microsync-login-modal"
 				header={`Connect to ${SYNC_NAME}`}
-				actions={
+				actions={[
 					<React.Fragment>
-						<Button className="btn-flat modal-action" onClick={() => this.login()}>
+						<Button2 className="btn-flat modal-action" onClick={() => this.login()}>
 							Login
-						</Button>
-						<Button className="btn-flat modal-action modal-close">Close</Button>
+						</Button2>
+						<Button2 className="btn-flat modal-action modal-close">Close</Button2>
 					</React.Fragment>
-				}
+				]}
 				trigger={trigger}
-				fixedFooter={true}>
+				fixedFooter={true}
+				options={DEFAULT_MODAL_OPTIONS}>
 				<React.Fragment>
 					<div className="login-component__promo">
 						<p>
@@ -57,12 +61,12 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 					<p><a target="_blank" rel="noopener noreferrer nofollow" href={`${MICROPAD_URL}/sync/manage`}>Sign up here</a> or login below:</p>
 
 					<form className="login-component__form" style={{ marginTop: '20px' }} action="#" onSubmit={this.login}>
-						<Input s={12} label="Username" onChange={(e, v) => this.username = v} />
-						<Input s={12} label="Password" type="password" onChange={(e, v) => this.password = v} />
+						<TextInput s={12} label="Username" onChange={e => this.username = e.target.value} />
+						<TextInput s={12} label="Password" type="password" onChange={e => this.password = e.target.value} />
 						<button style={{ display: 'none' }} />
 					</form>
 				</React.Fragment>
-			</Modal>
+			</SingletonModalComponent>
 		);
 	}
 

@@ -1,22 +1,22 @@
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import SyncWorker from '!workerize-loader!../workers/SyncWorker.js';
-
-import { from, Observable, of } from 'rxjs';
+import { from, fromEvent, lastValueFrom, Observable, of, retryWhen } from 'rxjs';
 import { MICROPAD_URL } from '../types';
-import { concatMap, map, retry } from 'rxjs/operators';
-import { AssetList, INotepadSharingData, ISyncedNotepad, ISyncWorker, SyncedNotepadList } from '../types/SyncTypes';
+import { concatMap, filter, map, retry, take } from 'rxjs/operators';
+import { AssetList, INotepadSharingData, ISyncedNotepad, SyncedNotepadList } from '../types/SyncTypes';
 import { parse } from 'date-fns';
-import * as QueryString from 'querystring';
 import { LAST_MODIFIED_FORMAT, Notepad } from 'upad-parse/dist';
-import { ajax, AjaxResponse } from 'rxjs/ajax';
+import { ajax } from 'rxjs/ajax';
 import { encrypt } from 'upad-parse/dist/crypto';
-import { checksum } from 'asset-checksum';
+import { generateGuid } from '../util';
+import { getAssetInfoImpl } from '../workers/sync-worker/sync-worker-impl';
+import { actions } from '../actions';
+import { store } from '../root';
+import { WorkerMsgData } from '../workers';
+import { SYNC_ASSET_OVERSIZED_MESSAGE } from '../strings.enNZ';
 
-const SyncThread = new SyncWorker() as ISyncWorker;
+const AssetHashWorker = new Worker(build.defs.SYNC_WORKER_PATH, { type: 'module' });
 
 export const AccountService = (() => {
-	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('account', endpoint, resource, payload);
+	const call = <T>(endpoint: string, resource: string, payload?: Record<string, string>) => callApi<T>('account', endpoint, resource, payload);
 
 	const login = (username: string, password: string): Observable<{ username: string, token: string }> => {
 		return call<{ token: string }>('login', username, { password })
@@ -32,7 +32,7 @@ export const AccountService = (() => {
 })();
 
 export const NotepadService = (() => {
-	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('notepad', endpoint, resource, payload);
+	const call = <T>(endpoint: string, resource: string, payload?: Record<string, string>) => callApi<T>('notepad', endpoint, resource, payload);
 
 	/** @deprecated */
 	const listNotepads = (username: string, token: string): Observable<SyncedNotepadList> =>
@@ -49,7 +49,7 @@ export const NotepadService = (() => {
 })();
 
 export const SyncService = (() => {
-	const call = <T>(endpoint: string, resource: string, payload?: object) => callApi<T>('sync', endpoint, resource, payload);
+	const call = <T>(endpoint: string, resource: string, payload?: Record<string, string>) => callApi<T>('sync', endpoint, resource, payload);
 
 	const getLastModified = (syncId: string): Observable<Date> =>
 		call<{ title: string, lastModified: string }>('info', syncId).pipe(map(res => parse(res.lastModified, LAST_MODIFIED_FORMAT, new Date())));
@@ -76,17 +76,37 @@ export const SyncService = (() => {
 			map(res => res.assetsToUpload)
 		);
 
-	const deleteNotepad = (syncId: string): Observable<void> => call<void>('delete', syncId);
+	const deleteNotepad = (syncId: string, username: string, token: string): Observable<void> => call<void>('delete', syncId, {
+		username,
+		token
+	});
 
 	async function notepadToSyncedNotepad(notepad: Notepad): Promise<ISyncedNotepad> {
-		const { assets, notepadAssets } = await SyncThread.getAssetInfo(notepad);
+		const cid = generateGuid();
+		const res$ = fromEvent<MessageEvent<WorkerMsgData<ReturnType<typeof getAssetInfoImpl>>>>(AssetHashWorker, 'message').pipe(
+			filter(event => event.data?.cid === cid),
+			map(event => {
+				if (event.data.error) throw event.data.error;
+				return event.data;
+			}),
+			take(1)
+		);
 
-		const assetHashList = {};
-		for (const [assetId, buffer] of Object.entries(assets)) {
-			assetHashList[assetId] = checksum(new Uint8Array(buffer));
+		const getAssetInfo$ = lastValueFrom(res$);
+		AssetHashWorker.postMessage({
+			cid,
+			type: 'getAssetInfo',
+			flatNotepad: notepad.flatten()
+		});
+
+		const { assets, hasOversizedAssets, assetTypes } = await getAssetInfo$;
+		if (hasOversizedAssets) {
+			store.dispatch(actions.setInfoMessage({
+				text: SYNC_ASSET_OVERSIZED_MESSAGE
+			}));
 		}
 
-		return Object.assign({}, notepad, { assetHashList, notepadAssets });
+		return Object.assign({}, notepad, { assetHashList: assets, assetTypes });
 	}
 
 	return {
@@ -100,13 +120,13 @@ export const SyncService = (() => {
 })();
 
 export function downloadAsset(url: string): Observable<Blob> {
-	return ajax({
+	return ajax<Blob>({
 		url,
 		method: 'GET',
 		crossDomain: true,
 		responseType: 'blob'
 	}).pipe(
-		map((res: AjaxResponse) => res.response),
+		map(res => res.response),
 		retry(2)
 	);
 }
@@ -118,7 +138,7 @@ export function uploadAsset(url: string, asset: Blob): Observable<void> {
 		body: asset,
 		crossDomain: true,
 		headers: {
-			'Content-Type': 'application/octet-stream'
+			'Content-Type': asset.type
 		}
 	}).pipe(
 		map(() => undefined),
@@ -126,11 +146,11 @@ export function uploadAsset(url: string, asset: Blob): Observable<void> {
 	);
 }
 
-function callApi<T>(parent: string, endpoint: string, resource: string, payload?: object, method?: string): Observable<T> {
-	return ajax({
-		url: `${devServer() ? 'http://localhost:48025' : MICROPAD_URL}/diffeng/${parent}/${endpoint}/${resource}`,
+function callApi<T>(parent: string, endpoint: string, resource: string, payload?: Record<string, string>, method?: string): Observable<T> {
+	return ajax<T>({
+		url: `${shouldUseDevApi() ? 'http://localhost:48025' : MICROPAD_URL}/diffeng/${parent}/${endpoint}/${resource}`,
 		method: method || (!payload) ? 'GET' : 'POST',
-		body: payload,
+		body: payload ? new URLSearchParams(payload).toString() : undefined,
 		crossDomain: true,
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -138,12 +158,19 @@ function callApi<T>(parent: string, endpoint: string, resource: string, payload?
 		responseType: 'json',
 		timeout: !!payload ? undefined : 10000 // 10 seconds
 	}).pipe(
-		map((res: AjaxResponse) => res.response),
-		retry(2)
+		map(res => res.response),
+		retryWhen(errors => errors.pipe(
+			map((error, i) => {
+				if (i > 2 || error?.response?.error === 'Too many assets on a non-pro notepad') {
+					throw error;
+				}
+				return error;
+			})
+		))
 	);
 }
 
-function devServer(): boolean {
+function shouldUseDevApi(): boolean {
 	// eslint-disable-next-line no-restricted-globals
-	return !!QueryString.parse(location.search.slice(1)).local;
+	return !!new URLSearchParams(location.search).get('local');
 }

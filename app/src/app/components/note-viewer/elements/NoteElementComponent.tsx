@@ -1,20 +1,20 @@
-import * as React from 'react';
+import React from 'react';
 import './NoteElementComponent.css';
-import MarkdownElementComponent from './markdown/MarkdownElementComponent';
+import MarkdownElementComponent from './markdown/MarkdownElementContainer';
 import ImageElementComponent from './ImageElementComponent';
 import FileElementComponent from './FileElementComponent';
 import RecordingElement from './RecordingElementComponent';
-import DrawingElementComponent from './drawing/DrawingElementComponent';
+import DrawingElementComponent from './drawing/DrawingElementContainer';
 import { INoteViewerComponentProps } from '../NoteViewerComponent';
-import { Button, Icon, Row } from 'react-materialize';
+import { Icon, Row } from 'react-materialize';
 import Draggable, { DraggableData } from 'react-draggable';
-import SourcesComponent from '../../../containers/SourcesContainer';
+import SourcesComponent from '../sources/SourcesContainer';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { EditDueDateComponent } from './EditDueDateComponent';
-import * as Materialize from 'materialize-css/dist/js/materialize';
 import PdfElementComponent from './PdfElementComponent';
 import { TOAST_HANDLER } from '../../../root';
 import { ThemeValues } from '../../../ThemeValues';
+import Button2 from '../../Button';
 
 export interface INoteElementComponentProps extends Partial<INoteViewerComponentProps> {
 	element: NoteElement;
@@ -23,18 +23,25 @@ export interface INoteElementComponentProps extends Partial<INoteViewerComponent
 	edit: (id: string) => void;
 	deleteElement?: (id: string) => void;
 	search?: (query: string) => void;
-	downloadAsset?: (filename: string, uuid: string) => void;
 	insert?: (element: NoteElement) => void;
 }
 
-export default class NoteElementComponent extends React.Component<INoteElementComponentProps> {
+type State = {
+	isDragging: boolean,
+	preDragSize: {
+		width: number,
+		height: number
+	}
+};
+
+export default class NoteElementComponent extends React.Component<INoteElementComponentProps, State> {
 	private element!: HTMLDivElement;
 	private container!: HTMLDivElement;
 	private oldZIndex?: string | null;
 	private isDragging = false;
 
 	render() {
-		const { element, noteAssets, theme, search, downloadAsset, elementEditing, edit, updateElement, isFullscreen } = this.props;
+		const { element, noteAssets, theme, search, elementEditing, edit, updateElement } = this.props;
 		if (!theme) return null;
 
 		const isEditing = element.args.id === elementEditing;
@@ -43,7 +50,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 			zIndex: (isEditing) ? 5000 : 'auto' as 'auto'
 		};
 
-		const backgroundColour = theme.background === '#000' ? ThemeValues.Midnight.background : theme.background;
+		const backgroundColour = theme.background === '#000000' ? ThemeValues.Midnight.background : theme.background;
 		const elementStyles = {
 			width: (element.type !== 'image' && element.type !== 'markdown') ? element.args.width : 'auto',
 			backgroundColor: (isEditing) ? backgroundColour : undefined,
@@ -97,7 +104,6 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					elementEditing={elementEditing}
 					updateElement={updateElement}
 					noteAssets={noteAssets}
-					downloadAsset={downloadAsset!}
 					edit={edit} />
 				);
 				break;
@@ -110,7 +116,6 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					elementEditing={elementEditing}
 					updateElement={updateElement}
 					noteAssets={noteAssets}
-					downloadAsset={downloadAsset!}
 					edit={edit} />
 				);
 				break;
@@ -123,8 +128,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					elementEditing={elementEditing}
 					updateElement={updateElement}
 					noteAssets={noteAssets}
-					edit={edit}
-					isFullScreen={isFullscreen!} />
+					edit={edit} />
 				);
 				break;
 
@@ -140,6 +144,20 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					if (!this.container) return;
 					this.oldZIndex = this.container.style.zIndex;
 					this.container.style.zIndex = '5000';
+
+					if (element.type === 'markdown') {
+						const mdEl = document.querySelector<HTMLIFrameElement>(`.noteElement[data-el-id=${element.args.id}] iframe`);
+						if (mdEl) {
+							const size = mdEl.getBoundingClientRect();
+							const resizeBlock = document.createElement('div');
+							resizeBlock.id = 'note-element__resize-block';
+							resizeBlock.innerHTML = '<i class="material-icons" aria-label="moving element symbol">explore</i>';
+							resizeBlock.style.width = `${size.width}px`;
+							resizeBlock.style.height = `${size.height}px`;
+							mdEl.insertAdjacentElement('beforebegin', resizeBlock);
+							mdEl.style.display = 'none';
+						}
+					}
 				}}
 				bounds={{
 					left: 0,
@@ -151,10 +169,18 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					this.handleDrag(event, data);
 					this.isDragging = false;
 					if (this.container) this.container.style.zIndex = (!!this.oldZIndex) ? this.oldZIndex : 'auto';
+
+					if (element.type === 'markdown') {
+						document.getElementById('note-element__resize-block')?.remove();
+						const mdEl = document.querySelector<HTMLIFrameElement>(`.noteElement[data-el-id=${element.args.id}] iframe`);
+						if (mdEl) {
+							mdEl.style.display = 'block';
+						}
+					}
 				}}
 				defaultPosition={{ x: parseInt(element.args.x, 10), y: parseInt(element.args.y, 10) }}
 				handle=".handle">
-				<div className="noteElement" style={containerStyles} ref={e => this.container = e!}>
+				<div className="noteElement" style={containerStyles} ref={e => this.container = e!} data-el-id={element.args.id}>
 					<div className="z-depth-2 hoverable" style={elementStyles} ref={e => this.element = e!} onClick={this.openEditor}>
 						{!(isEditing && element.type === 'drawing') && <p className="handle" style={{ color: theme.text }}>::::</p>}
 						{!!elementComponent && elementComponent}
@@ -166,11 +192,11 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 								<EditDueDateComponent element={element} theme={theme} updateElement={updateElement!} />
 
 								<Row style={{ paddingLeft: '5px', paddingTop: '10px' }}>
-									<Button className="red" waves="light" onClick={this.delete} style={{ marginRight: '5px' }}><Icon left={true}>delete_forever</Icon> Delete</Button>
+									<Button2 className="red" waves="light" onClick={this.delete} style={{ marginRight: '5px' }}><Icon left={true}>delete_forever</Icon> Delete</Button2>
 								</Row>
 
 								<Row style={{ paddingLeft: '5px' }}>
-									<Button className="btn-flat" waves="light" onClick={() => edit('')} style={{ marginRight: '5px', float: 'right' }}>Close editor (autosaved)</Button>
+									<Button2 className="btn-flat" waves="light" onClick={() => edit('')} style={{ marginRight: '5px', float: 'right' }}>Close editor (autosaved)</Button2>
 								</Row>
 							</div>
 						}
@@ -218,7 +244,10 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 
 		// Undo dialog
 		const guid = TOAST_HANDLER.register(() => insert(element));
-		Materialize.toast(`Element Deleted <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`, 6000);
+		M.toast({
+			html: `Element Deleted <a class="btn-flat amber-text" style="font-weight: 500;" href="#!" onclick="window.toastEvent('${guid}');">UNDO</a>`,
+			displayLength: 6000
+		});
 	}
 
 	private openEditor = event => {

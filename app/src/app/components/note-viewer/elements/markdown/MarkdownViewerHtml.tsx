@@ -1,22 +1,21 @@
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import MathJax from '!raw-loader!../../../../assets/MathJax.js';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import hljs from '!raw-loader!../../../../assets/highlight.js/highlight.min.js';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import hljsCss from '!raw-loader!../../../../assets/highlight.js/default.css';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import hljsCssDark from '!raw-loader!../../../../assets/highlight.js/monokai.css';
+// @ts-expect-error TS2306
+import MathJax from '../../../../assets/MathJax.raw.js';
+import hljs from '../../../../assets/highlight.js/highlight.min.raw.js';
+// @ts-expect-error TS2307
+import hljsCss from '../../../../assets/highlight.js/default.raw.css';
+// @ts-expect-error TS2307
+import hljsCssDark from '../../../../assets/highlight.js/monokai.raw.css';
+
 import { ITheme } from '../../../../types/Themes';
+import { isDev } from '../../../../util';
+import { MD_END_ATTR, MD_START_ATTR } from './MarkdownElementContainer';
 
 export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): string => `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<style>${theme.text === '#000' ? hljsCss : hljsCssDark}</style>
+	<style>${theme.text === '#000000' ? hljsCss : hljsCssDark}</style>
+	<link href="${isDev() ? 'https://fonts.googleapis.com/css?family=Open+Sans' : 'assets/open-sans/index.css'}" rel="stylesheet" as="font">
 	<style>
 		html, body, #content {
 			margin: 0;
@@ -33,7 +32,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 			min-width: 170px;
 			min-height: 50px;
 			padding: 5px;
-			font-family: "Roboto", sans-serif;
+			font-family: "Open Sans", "Ubuntu", "Roboto", sans-serif;
 			line-height: 1.5;
 			color: ${theme.text}
 		}
@@ -78,7 +77,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 		}
 
 		blockquote {
-			background: #${theme.text === '#000' ? 'f9f9f9' : '272822'};
+			background: #${theme.text === '#000000' ? 'f9f9f9' : '272822'};
 			border-left: 10px solid #ffb300;
 			margin: 1.5em 10px;
 			padding: 0.5em 10px;
@@ -165,7 +164,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 	
 	document.body.onclick = function(event) {
 		var path = event.path || (event.composedPath && event.composedPath()) || [event.target];
-		if (path.some(p => !!p.tagName && p.tagName.toLowerCase() === 'a') || window.getSelection().toString() !== "") return;
+		if (path.some(p => !!p.tagName && (p.tagName.toLowerCase() === 'a' || p.tagName.toLowerCase() === 'input')) || window.getSelection().toString() !== "") return;
 		
 		parent.postMessage({
 			id,
@@ -216,7 +215,8 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 					hljs.highlightBlock(block);
 				});
 
-				manageToDoItems();
+				activateToDoItems();
+				setToDoItemVisibilities();
 				adjustWidth();
 
 				if (isPrinting) break;
@@ -232,19 +232,39 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 				
 			case 'toggle':
 				showHidden = !showHidden;
-				manageToDoItems();
+				setToDoItemVisibilities();
 				break;
 		}
 	}
 	
-	function manageToDoItems() {
+	function activateToDoItems() {
+		for (const task of document.querySelectorAll('.task-list-item > input')) {
+			task.onchange = () => {
+				document.querySelectorAll('.task-list-item > input').forEach(t => t.setAttribute('disabled', ''));
+				
+				parent.postMessage({
+					id,
+					type: 'toggle_checkbox',
+					payload: {
+						start: +task.getAttribute('${MD_START_ATTR}'),
+						end: +task.getAttribute('${MD_END_ATTR}'),
+						state: task.checked
+					}
+				}, '*');
+			}
+		}
+	}
+	
+	function setToDoItemVisibilities() {
 		document.querySelectorAll('.task-list-item input:checked').forEach(function(item) {
 			if (showHidden) {
 				getParentsUntil(item, '#content').forEach(function(parent) {
 					parent.classList.remove('hidden');
 				});
 			} else {
-				getParentsUntil(item, 'ul').forEach(function(parent) {
+				let tree = getParentsUntil(item, 'ul');
+				if (tree[tree.length - 1].nodeName.toLowerCase() === 'html') tree = getParentsUntil(item, 'ol');
+				tree.forEach(parent => {
 					parent.classList.add('hidden');
 				});
 			}

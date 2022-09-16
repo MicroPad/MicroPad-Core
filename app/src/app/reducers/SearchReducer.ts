@@ -1,53 +1,64 @@
-import { MicroPadReducer } from '../types/ReducerType';
-import { Action } from 'redux';
-import { isType } from 'redux-typescript-actions';
+import { AbstractReducer } from './AbstractReducer';
 import { actions } from '../actions';
 import { SearchIndices } from '../types/ActionTypes';
 
 export interface ISearchState {
-	hashTagResults: HashTagSearchResults;
 	query: string;
+	results: SearchResults;
 	indices: SearchIndices;
+	shouldShowResults: boolean;
 }
 
-export type HashTagSearchResult = {
+export type SearchResult = {
 	title: string;
 	parentTitle: string;
 	noteRef: string;
 };
 
-export type HashTagSearchResults = { [notepadTitle: string]: HashTagSearchResult[] };
+export type SearchResults = { [notepadTitle: string]: SearchResult[] };
 
-export class SearchReducer extends MicroPadReducer<ISearchState> {
+export class SearchReducer extends AbstractReducer<ISearchState> {
 	public readonly key = 'search';
 	public readonly initialState: ISearchState = {
-		hashTagResults: {},
+		results: {},
 		query: '',
-		indices: []
+		indices: [],
+		shouldShowResults: false
 	};
 
-	public reducer(state: ISearchState, action: Action): ISearchState {
-		if (isType(action, actions.parseNpx.done) || isType(action, actions.parseNpx.failed) || isType(action, actions.deleteNotepad)) {
-			return this.initialState;
-		} else if (isType(action, actions.search)) {
-			const query: string = action.payload;
+	constructor() {
+		super();
 
-			return {
-				...state,
-				query
-			};
-		} else if (isType(action, actions.displayHashTagSearchResults)) {
-			return {
-				...state,
-				hashTagResults: action.payload
-			};
-		} else if (isType(action, actions.indexNotepads.done)) {
-			return {
-				...state,
-				indices: action.payload.result
-			};
-		}
+		// Reset state on notepad close/update
+		this.handle<any>(() => this.initialState, actions.parseNpx.done, actions.parseNpx.failed, actions.deleteNotepad);
 
-		return state;
+		// Search query/results
+		this.handle(
+			(state, action) => ({ ...state, query: action.payload }),
+			actions.search.started
+		);
+		this.handle((state, action) => ({
+			...state,
+			results: action.payload.result
+		}), actions.search.done);
+
+		this.handle((state, action) => ({
+			...state,
+			shouldShowResults: action.payload
+		}), actions.setSearchResultVisibility);
+
+
+		this.handleMemo((state, action) => ({
+			...state,
+			indices: action.payload.result
+		}), actions.indexNotepads.done);
+
+		this.handle<any>(state => ({
+			...state,
+			query: this.initialState.query,
+			results: this.initialState.results
+		}), actions.loadNote.started, actions.restoreJsonNotepadAndLoadNote)
 	}
+
+
 }

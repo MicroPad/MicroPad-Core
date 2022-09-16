@@ -1,0 +1,11 @@
+.theme-Peach a {
+	color: #333;
+}
+
+.theme-Peach .notepad-explorer a {
+	color: #231e23;
+}
+
+#breadcrumb-holder > nav.Peach {
+	background-color: #fdc3a4;
+}

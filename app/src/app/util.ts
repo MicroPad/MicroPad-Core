@@ -1,17 +1,27 @@
 import { filter } from 'rxjs/operators';
 import { SyntheticEvent } from 'react';
-import * as QueryString from 'querystring';
 import { FlatNotepad } from 'upad-parse/dist';
+import { ModalOptions } from 'react-materialize';
+
+export const DEFAULT_MODAL_OPTIONS: ModalOptions = {
+	onOpenEnd: (modal: HTMLElement) => {
+		window.MicroPadGlobals.currentModalId = modal.id;
+	},
+	onCloseEnd: () => {
+		delete window.MicroPadGlobals.currentModalId;
+	}
+};
 
 export const filterTruthy = <T>() => filter((a: T | undefined | null | false): a is T => !!a);
 
 export const noEmit = () => filter((_a): _a is never => false);
 
-export function isDev(): boolean {
+export function isDev(includeNextDev: boolean = true): boolean {
 	/* eslint-disable no-restricted-globals */
+	const params = new URLSearchParams(location.search);
 	return (
-		!QueryString.parse(location.search.slice(1)).prod
-		&& (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'next.getmicropad.com')
+		!params.get('prod')
+		&& (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || (includeNextDev && location.hostname === 'next.getmicropad.com'))
 	);
 	/* eslint-enable no-restricted-globals */
 }
@@ -71,9 +81,8 @@ export function getBytes(blob: Blob): Promise<ArrayBuffer> {
 
 export function getUsedAssets(notepad: FlatNotepad): Set<string> {
 	return new Set(
-		Object.values(notepad.notes)
-		.map(
-			n => n.elements
+		Object.values(notepad.notes).map(n =>
+			n.elements
 				.map(e => e.args.ext)
 				.filter((a?: string): a is string => !!a)
 		)
@@ -81,61 +90,6 @@ export function getUsedAssets(notepad: FlatNotepad): Set<string> {
 	);
 }
 
-/**
- * Safely travel through data that could be undefined
- */
-export function elvis(obj: any): any {
-	if (obj === undefined || obj === null) obj = { isUndefined: true };
-
-	return new Proxy(typeof obj === 'object' ? { ...obj } : obj, {
-		get: (target: object, key: PropertyKey): any => {
-			// Thanks to https://www.beyondjava.net/elvis-operator-aka-safe-navigation-javascript-typescript
-			const res = target[key];
-			if (!!res) return res instanceof Object ? elvis(res) : res;
-
-			return elvis(undefined);
-		}
-	});
-}
-
-export function resolveElvis(obj: any): any {
-	return !!obj.isUndefined ? undefined : obj;
-}
-
-// Thanks to http://stackoverflow.com/a/12300351/998467
-export function dataURItoBlob(dataURI: string) {
-	// convert base64 to raw binary data held in a string
-	// doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-	let byteString = atob(dataURI.split(',')[1]);
-
-	// separate out the mime component
-	let mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-	// write the bytes of the string to an ArrayBuffer
-	let ab = new ArrayBuffer(byteString.length);
-	let ia = new Uint8Array(ab);
-	for (let i = 0; i < byteString.length; i++) {
-		ia[i] = byteString.charCodeAt(i);
-	}
-
-	// write the ArrayBuffer to a blob, and you're done
-	return new Blob([ab], { type: mimeString });
-}
-
-// Thanks to https://gist.github.com/nmsdvid/8807205
-export function debounce(callback: (...args: any[]) => void, time: number) {
-	let interval;
-	return (...args) => {
-		clearTimeout(interval);
-		interval = setTimeout(() => {
-			interval = null;
-			callback(...args);
-		}, time);
-	};
-}
-
 export function unreachable() {
 	return new Error('Unreachable Error!');
 }
-
-export function noop() {}

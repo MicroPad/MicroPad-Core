@@ -1,18 +1,23 @@
+import './DrawingElementComponent.css';
+import React from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
-import * as React from 'react';
-import { dataURItoBlob } from '../../../../util';
 import { trim } from './trim-canvas';
 import { Resizable } from 're-resizable';
-import { Input, Row } from 'react-materialize';
-import stringify from 'json-stringify-safe';
+// Remove unused imports later
+import { Col, Row, Select } from 'react-materialize';
+
 import * as FullScreenService from '../../../../services/FullscreenService';
+import { ConnectedProps } from 'react-redux';
+import { drawingElementConnector } from './DrawingElementContainer';
+import { DrawMode } from '../../../../reducers/EditorReducer';
+import DrawingCanvas from './DrawingCanvas';
 
 type Position = {
 	x: number,
 	y: number
 };
 
-const rainbow = [
+const rainbow: ReadonlyArray<string> = [
 	'#E70000',
 	'#FF8C00',
 	'#FFEF00',
@@ -21,31 +26,27 @@ const rainbow = [
 	'#760089'
 ];
 
-export interface IDrawingElementComponentProps extends INoteElementComponentProps {
-	isFullScreen: boolean;
-}
+type Props = ConnectedProps<typeof drawingElementConnector> & INoteElementComponentProps;
 
-export default class DrawingElementComponent extends React.Component<IDrawingElementComponentProps> {
+
+export default class DrawingElementComponent extends React.Component<Props> {
 	private readonly supportsPointerEvents = typeof window.onpointerdown === 'object';
 
 	private imageElement!: HTMLImageElement;
 	private hasTrimmed!: boolean;
 
-	private canvasElement!: HTMLCanvasElement;
+	private canvasElement: HTMLCanvasElement | null = null;
 	private ctx!: CanvasRenderingContext2D;
 	private ongoingTouches = new OngoingTouches();
 	private canvasImage?: Blob | null;
 
-	private isErasing = false;
-	private isRainbow = false;
 	private rainbowIndex = 0;
 
 	render() {
-		const { element, noteAssets, elementEditing, theme } = this.props;
+		const { element, elementEditing, theme } = this.props;
 		if (!theme) return null;
 
 		const isEditing = element.args.id === elementEditing;
-
 		this.hasTrimmed = false;
 
 		if (isEditing) {
@@ -57,11 +58,13 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 						minHeight={130}
 						lockAspectRatio={true}
 						onResizeStart={() => {
-							this.canvasElement.toBlob(result => this.canvasImage = result);
+							this.canvasElement?.toBlob(result => this.canvasImage = result, 'image/png', 1);
 						}}
 						onResize={(e, d, ref) => {
-							this.canvasElement.width = parseInt(ref.style.width!, 10) - 10;
-							this.canvasElement.height = parseInt(ref.style.height!, 10) - 10;
+							const canvasElement = this.canvasElement;
+							if (!canvasElement) return;
+							canvasElement.width = parseInt(ref.style.width!, 10) - 10;
+							canvasElement.height = parseInt(ref.style.height!, 10) - 10;
 
 							if (!!this.canvasImage) {
 								const img = new Image();
@@ -78,32 +81,65 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 							}
 						}}
 						>
-						<canvas
-							ref={e => this.canvasElement = e!}
+						<DrawingCanvas
+							// @ts-expect-error
+							ref={(e: DrawingCanvas | undefined) => this.canvasElement = e?.inner ?? null}
+							key={`drawing-canvas-${this.props.element.args.id}`}
+							className="drawing-element__view"
 							width="500"
 							height="450"
 							style={{ border: 'solid black 1px', touchAction: 'none' }} />
 					</Resizable>
 
 					<Row style={{ padding: '5px' }}>
-						<Input label="Erase Mode" type="checkbox" className="filled-in" onChange={(e, v) => this.isErasing = v} />
-						<Input label={<a target="_blank" rel="noopener noreferrer nofollow" href="https://pride.codes">Rainbow Mode</a>} type="checkbox" className="filled-in" onChange={(e, v) => this.isRainbow = v} />
+						<Col s={6}>
+							<Select
+								key={this.props.drawMode}
+								label="Drawing mode"
+								multiple={false}
+								value={this.props.drawMode}
+								onChange={e => this.props.setDrawMode(e.target.value as DrawMode)}>
+								<option value={DrawMode.Line}>Line</option>
+								<option value={DrawMode.ERASE}>Erase</option>
+								<option value={DrawMode.RAINBOW}>Rainbow Mode 🏳️‍🌈</option>
+							</Select>
+						</Col>
+						<div className="input-field col s6"> {/* Manual <Col> so I can make this an <Input> too */}
+							<div className="select-wrapper"> {/* The colour picker should have the same style rules as a Select */}
+								<input
+									id="drawing-element-editor__color-picker"
+									type="color"
+									list="mp-drawing-colours"
+									value={this.props.drawingLineColour}
+									onChange={e => this.props.setDrawingLineColour(e.target.value)} />
+								<datalist key="mp-drawing-colours" id="mp-drawing-colours">
+									<option value="#000000">Black</option>
+									<option value="#FFFFFF">White</option>
+									<option value="#E70000">Red</option>
+									<option value="#FFEF00">Yellow</option>
+									<option value="#00811F">Green</option>
+									<option value="#0044FF">Blue</option>
+									<option value="#FF6900">Orange</option>
+									<option value="#760089">Purple</option>
+								</datalist>
+							</div>
+							<label id="drawing-element-editor__color-picker-label" htmlFor="drawing-element-editor__color-picker">Line colour</label>
+						</div>
 					</Row>
-
 					{!this.supportsPointerEvents && <p><em>Your browser seems to not support pointer events. Drawing may not work.</em></p>}
 				</div>
 			);
 		}
 
 		return (
-			<div style={{
+			<div className="drawing-element__view" style={{
 				overflow: 'hidden',
 				height: 'auto',
 				minWidth: '170px',
 				minHeight: '130px',
-				backgroundColor: !isEditing ? theme.drawingBackground : undefined
+				backgroundColor: theme.drawingBackground
 			}} onClick={this.openEditor}>
-				<img ref={elm => this.imageElement = elm!} style={{ height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px' }} src={noteAssets[element.args.ext!]} alt="" />
+				<img ref={elm => this.imageElement = elm!} style={{ height: 'auto', width: 'auto', minWidth: '0px', minHeight: '0px' }} alt="" />
 			</div>
 		);
 	}
@@ -112,81 +148,82 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 		this.componentDidUpdate();
 	}
 
-	componentDidUpdate() {
+	componentDidUpdate(prevProps?: Readonly<Props>) {
 		const { element, noteAssets } = this.props;
 
 		this.ongoingTouches = new OngoingTouches();
-		this.isErasing = false;
-		this.isRainbow = false;
-		if (!!this.canvasElement) {
+
+		const canvasElement = this.canvasElement;
+		if (!!canvasElement) {
+
 			this.initCanvas();
 
-			// Restore saved image to canvas
-			const img = new Image();
-			img.onload = () => {
-				if (!this.canvasElement) return;
-				this.canvasElement.width = img.naturalWidth;
-				this.canvasElement.height = img.naturalHeight;
-				this.ctx.drawImage(img, 0, 0);
-			};
-			img.src = noteAssets[element.args.ext!];
+			const isNewEditor = this.props.elementEditing !== prevProps?.elementEditing;
+			if (isNewEditor) {
+				// Restore saved image to canvas
+				let img: HTMLImageElement = new Image();
+				img.onload = () => {
+					const canvasElement = this.canvasElement;
+					if (!canvasElement) return;
+					canvasElement.width = img.naturalWidth;
+					canvasElement.height = img.naturalHeight;
+					this.ctx.drawImage(img, 0, 0);
+				};
+				img.src = noteAssets[element.args.ext!];
+			}
 			return;
 		}
 
-		this.imageElement.onload = () => {
+		let img: HTMLImageElement = new Image();
+		img.onload = () => {
 			if (this.hasTrimmed) return;
 
 			const tmpCanvas: HTMLCanvasElement = document.createElement('canvas');
-			tmpCanvas.setAttribute('width', this.imageElement.naturalWidth.toString());
-			tmpCanvas.setAttribute('height', this.imageElement.naturalHeight.toString());
+			tmpCanvas.setAttribute('width', img.naturalWidth.toString());
+			tmpCanvas.setAttribute('height', img.naturalHeight.toString());
 
 			const tmpContext = tmpCanvas.getContext('2d')!;
 			tmpContext.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
-			tmpContext.drawImage(this.imageElement, 0, 0);
+			tmpContext.drawImage(img!, 0, 0);
 
 			this.hasTrimmed = true;
-			this.imageElement.src = URL.createObjectURL(dataURItoBlob(trim(tmpCanvas).toDataURL()));
+			const drawingBlob$ = new Promise<Blob | null>(resolve => trim(tmpCanvas).toBlob(blob => resolve(blob)));
+			drawingBlob$.then(drawingBlob => {
+				if (this.imageElement && drawingBlob) this.imageElement.src = URL.createObjectURL(drawingBlob)
+			});
+			img!.onload = null;
+			img = null!;
+
 		};
+		img.src = noteAssets[element.args.ext!];
 	}
 
-	shouldComponentUpdate(nextProps: INoteElementComponentProps) {
-		const sanNextProps: INoteElementComponentProps = {
-			...nextProps,
-			element: {
-				...nextProps.element,
-				args: { ...nextProps.element.args, dueDate: undefined }
-			}
-		};
-		const sanProps: INoteElementComponentProps = {
-			...this.props,
-			element: {
-				...this.props.element,
-				args: { ...this.props.element.args, dueDate: undefined }
-			}
-		};
-
-		return stringify(sanNextProps) !== stringify(sanProps);
-	}
-
-	getSnapshotBeforeUpdate(prevProps, prevState) {
+	override getSnapshotBeforeUpdate(prevProps: Readonly<Props>, prevState) {
 		const { element, updateElement } = prevProps;
-		if (!this.canvasElement) return null;
+		if (!this.canvasElement || this.props.elementEditing === prevProps.elementEditing) return null;
 
 		// Update element with canvas contents replacing the old asset
-		updateElement!(element.args.id, element, dataURItoBlob(this.canvasElement.toDataURL()));
+		const drawingBlob$ = new Promise<Blob | null>(resolve => this.canvasElement?.toBlob(blob => resolve(blob)));
+		drawingBlob$.then(drawingBlob => updateElement!(element.args.id, element, drawingBlob ?? undefined));
 
 		return null;
 	}
 
 	private initCanvas = () => {
-		this.ctx = this.canvasElement.getContext('2d')!;
+		const canvasElement = this.canvasElement;
+		if (!canvasElement) {
+			console.error(`Missing canvas element`);
+			return;
+		}
 
-		this.canvasElement.onpointerdown = event => {
+		this.ctx = canvasElement.getContext('2d')!;
+
+		canvasElement.onpointerdown = event => {
 			this.ongoingTouches.setTouch(event);
 			this.ctx.beginPath();
 		};
 
-		this.canvasElement.onpointermove = event => {
+		canvasElement.onpointermove = event => {
 			if (!this.ongoingTouches.touches[event.pointerId]) return;
 
 			this.ctx.strokeStyle = this.getLineStyle();
@@ -220,7 +257,7 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 			this.ongoingTouches.setTouch(event);
 		};
 
-		this.canvasElement.onpointerup = event => {
+		canvasElement.onpointerup = event => {
 			const pos = this.getRealPosition(new Touch(event));
 
 			this.ctx.lineWidth = event.pressure * 10;
@@ -234,15 +271,15 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 			this.ongoingTouches.deleteTouch(event.pointerId);
 		};
 
-		this.canvasElement.onpointercancel = event => {
+		canvasElement.onpointercancel = event => {
 			this.ongoingTouches.deleteTouch(event.pointerId);
 		};
 
-		this.canvasElement.onpointerleave = event => {
+		canvasElement.onpointerleave = event => {
 			this.ongoingTouches.deleteTouch(event.pointerId);
 		}
 
-		this.canvasElement.onpointerenter = event => {
+		canvasElement.onpointerenter = event => {
 			// In macOS Safari, pressure is always equal to 0
 			// In desktop Chrome, pressure is equal to 0.5 if the mouse button is held down
 			if (event.pressure > 0) {
@@ -255,9 +292,10 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 		const { element, isFullScreen } = this.props;
 
 		const noteViewer = document.getElementById('note-viewer')!;
+		const notepadExplorerWidth = document.querySelector<HTMLDivElement>('.notepad-explorer')?.offsetWidth ?? 0;
 
 		const canvasOffset = {
-			left: parseInt(element.args.x, 10) - noteViewer.scrollLeft,
+			left: (parseInt(element.args.x, 10) + notepadExplorerWidth) - noteViewer.scrollLeft,
 			top: (parseInt(element.args.y, 10) + FullScreenService.getOffset(isFullScreen)) - noteViewer.scrollTop
 		};
 
@@ -269,18 +307,19 @@ export default class DrawingElementComponent extends React.Component<IDrawingEle
 	}
 
 	private shouldErase = (event: PointerEvent): boolean => {
-		return this.isErasing || event.buttons === 32;
+		return this.props.drawMode === DrawMode.ERASE || event.buttons === 32;
 	}
 
 	private getLineStyle = (): string => {
 		// Increment through the colours of the rainbow and reset to the beginning when reaching the last colour
-		const newIndex = (this.isRainbow)
+		//const newIndex = (this.drawingMode === modes.RAINBOW)
+		const newIndex = (this.props.drawMode === DrawMode.RAINBOW)
 			? (this.rainbowIndex < rainbow.length - 1)
 				? 1
 				: this.rainbowIndex * -1
 			: this.rainbowIndex;
 
-		return (this.isRainbow) ? rainbow[this.rainbowIndex += newIndex] : '#000000';
+		return (this.props.drawMode === DrawMode.RAINBOW) ? rainbow[this.rainbowIndex += newIndex] : this.props.drawingLineColour;
 	}
 
 	// Draws the outline of a line from pos1 to pos2 with the given width

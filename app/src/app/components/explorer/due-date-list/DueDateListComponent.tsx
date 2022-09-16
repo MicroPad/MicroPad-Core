@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { formatDistanceStrict } from 'date-fns';
 import { generateGuid } from '../../../util';
 import { dueDateListConnector } from './DueDateListContainer';

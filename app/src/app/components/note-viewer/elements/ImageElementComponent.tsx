@@ -1,11 +1,13 @@
-import * as React from 'react';
-import { SyntheticEvent } from 'react';
+import React from 'react';
 import { INoteElementComponentProps } from './NoteElementComponent';
-import { dataURItoBlob } from '../../../util';
-import { Col, Input, Row } from 'react-materialize';
+import { Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { Dialog } from '../../../services/dialogs';
 import { NoteElement } from 'upad-parse/dist/Note';
+import { readFile } from '../../../services/files';
+
+const IMAGE_AUTO_MAX_WIDTH = '50vw';
+const IMAGE_AUTO_MAX_HEIGHT = '50vh';
 
 export default class ImageElementComponent extends React.Component<INoteElementComponentProps> {
 	render() {
@@ -28,7 +30,12 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 							this.onSizeEdit('width', ref.style.width!);
 							this.onSizeEdit('height', ref.style.height!);
 						}}>
-						<img style={{ height: (element.args.height !== 'auto') ? '100%' : undefined, width: (element.args.width !== 'auto') ? '100%' : undefined }} src={noteAssets[element.args.ext!]} alt="" />
+						<img style={{
+							height: (element.args.height !== 'auto') ? '100%' : undefined,
+							width: (element.args.width !== 'auto') ? '100%' : undefined,
+							maxHeight: (element.args.height === 'auto') ? IMAGE_AUTO_MAX_HEIGHT : undefined,
+							maxWidth: (element.args.width === 'auto') ? IMAGE_AUTO_MAX_WIDTH : undefined,
+						}} src={noteAssets[element.args.ext!]} alt="" />
 					</Resizable>
 				}
 				{
@@ -39,20 +46,20 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 
 						<Row>
 							<Col s={6}>
-								<Input
+								<TextInput
 									label="Width"
 									defaultValue={element.args.width}
-									onChange={(e, v) => this.onSizeEdit('width', v)}
-									style={{ color: theme.text }}
+									onChange={e => this.onSizeEdit('width', e.target.value)}
+									// style={{ color: theme.text }} TODO
 								/>
 							</Col>
 
 							<Col s={6}>
-								<Input
+								<TextInput
 									label="Height"
 									defaultValue={element.args.height}
-									onChange={(e, v) => this.onSizeEdit('height', v)}
-									style={{ color: theme.text }}
+									onChange={e => this.onSizeEdit('height', e.target.value)}
+									// style={{ color: theme.text }} TODO
 								/>
 							</Col>
 						</Row>
@@ -62,30 +69,17 @@ export default class ImageElementComponent extends React.Component<INoteElementC
 		);
 	}
 
-	private fileSelected = event => {
+	private fileSelected = async event => {
 		const { updateElement, element, edit } = this.props;
 
-		this.readFileInputEventAsDataUrl(event)
-			.then(dataUri => {
-				updateElement!(element.args.id, element, dataURItoBlob(dataUri));
-				edit('');
-			})
-			.catch((err) => {
-				Dialog.alert('Error uploading file');
-				console.error(err);
-			});
-	}
-
-	private readFileInputEventAsDataUrl(event: SyntheticEvent<HTMLInputElement>): Promise<string> {
-		return new Promise((resolve, reject) => {
-			const file = event.currentTarget.files![0];
-			if (!file) reject();
-			const reader = new FileReader();
-
-			reader.onload = () => resolve(reader.result as string);
-
-			reader.readAsDataURL(file);
-		});
+		try {
+			const file = await readFile(event);
+			updateElement!(element.args.id, element, file);
+			edit('');
+		} catch (err) {
+			console.error(err);
+			await Dialog.alert('There was an error storing your image');
+		}
 	}
 
 	private openEditor = event => {

@@ -1,22 +1,39 @@
 import { combineEpics, ofType } from 'redux-observable';
-import { elvis, resolveElvis } from '../util';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { AddCryptoPasskeyAction } from '../types/ActionTypes';
-import { actions, MicroPadAction } from '../actions';
-import { Action } from 'redux-typescript-actions';
-import { EpicStore } from './index';
+import { EMPTY, from, Observable } from 'rxjs';
+import { catchError, concatMap, filter, map, withLatestFrom } from 'rxjs/operators';
+import { actions, MicroPadAction, MicroPadActions } from '../actions';
+import { EpicDeps, EpicStore } from './index';
+import { IStoreState } from '../types';
+import { noEmit } from '../util';
 
-export const encryptNotepad$ = (action$: Observable<MicroPadAction>, store: EpicStore) =>
+export const encryptNotepad$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
-		ofType<MicroPadAction, Action<string>>(actions.encryptNotepad.type),
-		map(action => ({
-			passkey: action.payload,
-			notepadTitle: resolveElvis(elvis(store.getState().notepads).notepad.item.title)
-		} as AddCryptoPasskeyAction)),
-		map(payload => actions.addCryptoPasskey(payload))
+		ofType(actions.encryptNotepad.type),
+		withLatestFrom(state$),
+		map(([action, state]) => actions.addCryptoPasskey({
+			passkey: (action as MicroPadActions['encryptNotepad']).payload,
+			notepadTitle: state.notepads.notepad?.item?.title,
+			remember: false
+		}))
 	);
 
-export const cryptoEpics$ = combineEpics(
-	encryptNotepad$
+export const rememberPasskey$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { getStorage }: EpicDeps) =>
+	action$.pipe(
+		ofType(actions.addCryptoPasskey.type),
+		map(action => action as MicroPadActions['addCryptoPasskey']),
+		filter(action => !!action.payload.notepadTitle && action.payload.remember),
+		concatMap(action =>
+			from(getStorage().cryptoPasskeysStorage.setItem(action.payload.notepadTitle!, action.payload.passkey)).pipe(
+				catchError(err => {
+					console.error(err);
+					return EMPTY;
+				})
+			)
+		),
+		noEmit()
+	);
+
+export const cryptoEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
+	encryptNotepad$,
+	rememberPasskey$
 );

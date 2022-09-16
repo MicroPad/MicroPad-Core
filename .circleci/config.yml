@@ -4,46 +4,9 @@
 #
 version: 2
 jobs:
-  test:
-    docker:
-      # specify the version you desire here
-      - image: circleci/rust:latest-node
-      
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-
-      - restore_cache:
-          name: Restore Yarn Package Cache
-          keys:
-            - yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
-            - yarn-packages-{{ .Branch }}
-            - yarn-packages-master
-            - yarn-packages-
-
-      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - run: cd app && yarn
-
-      - save_cache:
-          name: Save Yarn Package Cache
-          key: yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
-          paths:
-            - app/node_modules/
-        
-      # run tests!
-      - run: cd app && yarn typecheck
-      - run: cd app && yarn lint
-      - run: cd app && yarn test
-
   build:
     docker:
-      - image: circleci/rust:latest-node
+      - image: cimg/node:lts
     working_directory: ~/repo
     steps:
       - checkout
@@ -52,11 +15,7 @@ jobs:
           name: Restore Yarn Package Cache
           keys:
             - yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
-            - yarn-packages-{{ .Branch }}
-            - yarn-packages-master
-            - yarn-packages-
 
-      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: cd app && yarn
 
       - save_cache:
@@ -65,6 +24,11 @@ jobs:
           paths:
             - app/node_modules/
 
+      # Validate if we're building good code
+      - run: cd app && yarn typecheck
+      - run: cd app && yarn lint
+
+      # Actually build the code, and then persist the result
       - run: cd app && yarn build && tar cfJ micropad.tar.xz build/*
       - store_artifacts:
           path: app/micropad.tar.xz
@@ -75,9 +39,47 @@ jobs:
             - build/*
             - micropad.tar.xz
 
+  test:
+    docker:
+      # specify the version you desire here
+      - image: mcr.microsoft.com/playwright:focal
+      
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+
+    working_directory: ~/repo
+
+    environment:
+      NODE_ENV: development
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ .Branch }}-{{ checksum "app/yarn.lock" }}
+
+      - run: cd app && yarn
+
+      # Load in the built MicroPad to run an instance for testing
+      - attach_workspace:
+          at: /tmp/mp-build
+      - run:
+          command: python3 -m http.server 3000
+          working_directory: /tmp/mp-build/build
+          background: true
+
+      # Run the e2e integration tests
+      - run: cd app && yarn test --runInBand
+      - store_test_results:
+          path: app/.reports
+
   deploy:
     docker:
-      - image: circleci/rust:latest-node
+      - image: cimg/node:lts
 
     working_directory: ~/repo
 
@@ -89,14 +91,14 @@ jobs:
 
   canary-deploy:
     docker:
-      - image: circleci/rust:latest-node
+      - image: cimg/node:lts
 
     working_directory: ~/repo
 
     steps:
       - attach_workspace:
           at: ~/repo/app
-      - run: sudo apt install rsync
+      - run: sudo apt-get update && sudo apt-get install -y rsync
       - run: rsync -aue "ssh -p 1276 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" app/build/* $NEXT_SSH_PATH
 
   publish-github-release:
@@ -116,14 +118,10 @@ workflows:
   version: 2
   test-and-deploy:
     jobs:
+      - build
       - test:
-          filters:
-            tags:
-              only: /^v.*/
-      - build:
-          filters:
-            tags:
-              only: /^v.*/
+          requires:
+            - build
       - publish-github-release:
           requires:
             - test

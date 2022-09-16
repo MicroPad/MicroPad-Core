@@ -1,214 +1,160 @@
-import * as React from 'react';
-import { Collection, CollectionItem, Icon, Input, Modal, NavItem, Row } from 'react-materialize';
-import { debounceTime, shareReplay, takeUntil } from 'rxjs/operators';
-import { FlatNotepad } from 'upad-parse/dist';
-import { fromEvent, Subject, Subscription } from 'rxjs';
-import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../../types/ActionTypes';
-import { HashTagSearchResult, HashTagSearchResults } from '../../reducers/SearchReducer';
+import './SearchComponent.css';
+import React from 'react';
+import { Icon } from 'react-materialize';
+import { ConnectedProps } from 'react-redux';
+import { searchConnector } from './SearchContainer';
+import { DEFAULT_MODAL_OPTIONS } from '../../util';
+import Select, { GroupBase } from 'react-select';
+import { SearchResult } from '../../reducers/SearchReducer';
+import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
+import NavItem2 from '../NavItem';
 
-export interface ISearchComponentProps {
-	notepad?: FlatNotepad;
-	indices: SearchIndices;
-	hashTagResults: HashTagSearchResults;
-	query: string;
-	loadNote?: (ref: string) => void;
-	loadNoteFromHashTagResults?: (data: RestoreJsonNotepadAndLoadNoteAction) => void;
-	search?: (query: string) => void;
-}
+type Props = ConnectedProps<typeof searchConnector>;
 
-export default class SearchComponent extends React.Component<ISearchComponentProps> {
-	private searchInput: Input;
-	private results!: JSX.Element[];
-	private triggerClickedSub!: Subscription;
-	private readonly supportsDataElement = !!window['HTMLDataListElement'];
-	private readonly currentValue$: Subject<string> = new Subject<string>();
-	private readonly destroy$: Subject<void> = new Subject<void>();
+type SearchResultOption = {
+	label: string,
+	value: SearchResult & { notepadTitle: string }
+};
 
-	render() {
-		const { notepad, query, hashTagResults, indices } = this.props;
+export default class SearchComponent extends React.Component<Props, never> {
+	private selectEl: any | null = null;
 
-		this.results = [];
-
-		if (!!notepad) {
-			const index = indices.find(idx => idx.notepad.title === notepad.title);
-			if (!!index && query.charAt(0) !== '#') {
-				const results = new Set(
-					query.split(' ')
-						.filter(word => word.length > 0)
-						.map(word => notepad.search(index.trie, word))
-						.reduce((acc, val) => acc.concat(val), [])
-				);
-
-				this.results = Array.from(results)
-					.sort((a, b) => Math.abs(query.length - a.title.length) - Math.abs(query.length - b.title.length))
-					.map((note) => {
-						if (this.supportsDataElement) {
-							return (
-								<option key={note.internalRef} data-value={note.internalRef}>
-									{`${notepad.sections[note.parent as string].title.trim()} > ${note.title.trim()}`}
-								</option>
-							);
-						}
-
-						return (
-							<li key={note.internalRef} data-value={note.internalRef}>
-								<a href="#!" onClick={() => this.loadNoteFromInput(note.internalRef)}>
-									{`${notepad.sections[note.parent as string].title} > ${note.title}`}
-								</a>
-							</li>
-						);
-					});
-			}
-		}
+	override render() {
+		const results = [
+			...(this.props.notepad && this.props.results[this.props.notepad?.title ?? ''] ? [this.getSearchResultGroup([this.props.notepad.title, this.props.results[this.props.notepad.title]])] : []),
+			...Object.entries(this.props.results)
+				.filter(([notepadTitle]) => notepadTitle !== this.props.notepad?.title)
+				.map(this.getSearchResultGroup)
+		];
 
 		return (
-			<Modal
-				key={`search-${(notepad || { title: 'all' }).title}`}
+			<SingletonModalComponent
+				id="search-modal"
+				key={`search-${this.props.notepad?.title ?? 'all'}`}
 				header="Search"
-				trigger={<NavItem id={`search-button`} href="#!"><Icon left={true}>search</Icon> Search</NavItem>}>
-				<Row>
-					<Input
-						list="search-results"
-						ref={e => this.searchInput = e!}
-						s={12}
-						label={`Search by ${(!!notepad && `note title or a`) || ''} hashtag`}
-						onChange={(event, value) => {
-							this.currentValue$.next(value)
-						}}
-						value={query}
-						autoComplete="off"
-						data-lpignore="true" />
-
-					{
-						this.supportsDataElement
-						&& <datalist id="search-results" key={`results-${query}`}>
-							{this.results}
-						</datalist>
+				trigger={
+					<NavItem2 href="#!" className="header__top-level-item">
+						<Icon left={true}>search</Icon> Search
+					</NavItem2>
+				}
+				options={{
+					...DEFAULT_MODAL_OPTIONS,
+					onOpenEnd: modal => {
+						DEFAULT_MODAL_OPTIONS.onOpenEnd?.(modal);
+						setTimeout(() => this.selectEl?.focus(), 0);
 					}
-				</Row>
+				}}>
 
-				{
-					// General search results for browsers that don't support <datalist>
-					!this.supportsDataElement
-					&& <div>
-						<ul className="browser-default">{this.results}</ul>
-						<em>Searching in basic mode. You can try a more modern browser like <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer nofollow">Google Chrome</a> or <a href="https://www.mozilla.org/firefox/" target="_blank" rel="noopener noreferrer nofollow">Mozilla Firefox</a>.</em>
-					</div>
-				}
-
-				{
-					// Display results for the current notepad first
-					!!notepad
-					&& !!hashTagResults[notepad.title]
-					&& hashTagResults[notepad.title].length > 0
-					&& this.generateHashTagSearchResultList(notepad.title, hashTagResults[notepad.title])
-				}
-
-				{
-					// Display results for all the other notepads
-					Object.entries(hashTagResults)
-						.filter(([notepadTitle, results]: [string, HashTagSearchResult[]]) =>
-							!!results && results.length > 0 && (!notepad || notepadTitle !== notepad.title)
-						)
-						.map(([notepadTitle, results]: [string, HashTagSearchResult[]]) =>
-							this.generateHashTagSearchResultList(notepadTitle, results)
-						)
-				}
-			</Modal>
-		);
-	}
-
-	componentDidMount() {
-		const { search } = this.props;
-		if (!search) throw new Error('Missing search prop.');
-
-		this.currentValue$.pipe(
-			takeUntil(this.destroy$)
-		).subscribe(search);
-
-		this.currentValue$.pipe(
-			takeUntil(this.destroy$),
-			debounceTime(150)
-		).subscribe(value => this.onInput(value));
-
-		this.componentDidUpdate();
-	}
-
-	componentDidUpdate() {
-		const searchTrigger = document.querySelector(`#search-button > a`);
-		if (!searchTrigger) return;
-
-		if (!!this.triggerClickedSub) this.triggerClickedSub.unsubscribe();
-		this.triggerClickedSub = fromEvent(searchTrigger, 'click')
-			.pipe(
-				shareReplay()
-			)
-			.subscribe(() => {
-				const input = this.searchInput;
-				if (!input) return;
-
-				setTimeout(() => input.input.focus(), 0);
-			});
-	}
-
-	componentWillUnmount() {
-		this.destroy$.next();
-		this.triggerClickedSub.unsubscribe();
-	}
-
-	private onInput = (value: string) => {
-		let result;
-		if (this.supportsDataElement) {
-			result = this.results
-				.map(datalistElement => datalistElement.props)
-				.find(datalistElement => {
-					console.log(datalistElement);
-					console.log(value);
-					return datalistElement.children === value;
-				});
-		}
-
-		if (!!result) {
-			this.loadNoteFromInput(result['data-value']);
-			return;
-		}
-	}
-
-	private loadNoteFromInput = (ref: string) => {
-		const { loadNote, search } = this.props;
-		if (!loadNote || !search) return;
-
-		this.closeModal();
-		setTimeout(() => search(''), 10);
-		loadNote(ref);
-	}
-
-	private generateHashTagSearchResultList = (notepadTitle: string, results: HashTagSearchResult[]): JSX.Element | null => {
-		const { loadNoteFromHashTagResults } = this.props;
-		if (!loadNoteFromHashTagResults) return null;
-
-		return (
-			<div key={`res-collection-list-${notepadTitle}`}>
-				<h5 key={`res-collection-header-${notepadTitle}`}>{notepadTitle}</h5>
-				<Collection key={`res-collection-${notepadTitle}`}>{
-					results.map(result => (
-						<CollectionItem
-							key={`res-${notepadTitle}-${result.parentTitle}-${result.title}-item`}
-							href="#!"
-							onClick={() => {
-								loadNoteFromHashTagResults({ notepadTitle, noteRef: result.noteRef });
-								setTimeout(() => this.closeModal(), 0);
-							}}>
-							{result.parentTitle} {'>'} {result.title}
-						</CollectionItem>
-					))
-				}</Collection>
-			</div>
+				<Select
+					ref={el => this.selectEl = el}
+					className="search__autocomplete"
+					isSearchable={true}
+					menuIsOpen={this.props.showResults}
+					options={results}
+					filterOption={() => true}
+					placeholder={`Search by note title or a hashtag`}
+					noOptionsMessage={() => `No search results found`}
+					inputValue={this.props.query}
+					onInputChange={value => {
+						this.props.search(value);
+					}}
+					// @ts-expect-error TS-2322, the type definitions from the library are wrong, they say we get a
+					// group as `item` but we really get the option.
+					onChange={(item: SearchResultOption) => {
+						if (item) this.props.loadResult(this.props.notepad?.title, item.value);
+						this.closeModal();
+					}}
+					value={null}
+					onFocus={() => this.props.setSearchResultVisibility(true)}
+					onBlur={() => this.props.setSearchResultVisibility(false)}
+					styles={{
+						control: (styles, props) => ({
+							...styles,
+							backgroundColor: 'var(--mp-theme-chrome)',
+							borderColor: props.isFocused ? 'var(--mp-theme-accent)' : undefined,
+							boxShadow: props.isFocused ? '0 0 0 1px var(--mp-theme-accent)' : undefined,
+							'&:hover': {
+								borderColor: 'var(--mp-theme-accent)',
+								boxShadow: '0 0 0 1px var(--mp-theme-accent)'
+							}
+						}),
+						option: (styles, props) => ({
+							...styles,
+							backgroundColor: props.isFocused ? 'var(--mp-theme-accent)' : 'var(--mp-theme-chrome)',
+							color: props.isFocused ? 'var(--mp-theme-accentContent)' : 'var(--mp-theme-explorerContent)',
+							':active': {
+								backgroundColor: props.isFocused ? 'var(--mp-theme-accent)' : 'var(--mp-theme-chrome)',
+								color: props.isFocused ? 'var(--mp-theme-accentContent)' : 'var(--mp-theme-explorerContent)'
+							}
+						}),
+						group: (styles, props) => ({
+							...styles,
+							backgroundColor: 'var(--mp-theme-chrome)',
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						menuList: (styles, props) => ({
+							...styles,
+							backgroundColor: 'var(--mp-theme-chrome)',
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						noOptionsMessage: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						groupHeading: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						singleValue: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						placeholder: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						dropdownIndicator: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						clearIndicator: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						}),
+						input: (styles, props) => ({
+							...styles,
+							color: 'var(--mp-theme-explorerContent)'
+						})
+					}}
+				/>
+			</SingletonModalComponent>
 		);
 	}
 
 	private closeModal = () => {
 		const overlay: HTMLElement | null = document.querySelector('.modal-overlay');
 		if (!!overlay) overlay.click();
+	}
+
+	private getSearchResultGroup = ([notepadTitle, results]: [string, SearchResult[]]): GroupBase<SearchResultOption> => {
+		const seen = new Set<string>();
+
+		return {
+			label: notepadTitle,
+			options: results
+				.filter(result => {
+					if (seen.has(result.noteRef)) return false;
+					seen.add(result.noteRef);
+					return true;
+				})
+				.map(result => ({
+					label: `${result.parentTitle} > ${result.title}`,
+					value: {
+						...result,
+						notepadTitle
+					}
+				}))
+				.sort((a, b) => Math.abs(this.props.query.length - a.value.title.length) - Math.abs(this.props.query.length - b.value.title.length))
+		};
 	}
 }

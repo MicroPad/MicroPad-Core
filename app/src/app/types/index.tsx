@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { INotepadsStoreState } from './NotepadTypes';
 import { IExplorerState } from '../reducers/ExplorerReducer';
 import { ISearchState } from '../reducers/SearchReducer';
@@ -8,6 +8,8 @@ import { ISyncState } from '../reducers/SyncReducer';
 import { IAppStoreState } from '../reducers/AppReducer';
 import { IsExportingState } from '../reducers/IsExportingReducer';
 import { NotepadPasskeysState } from '../reducers/NotepadPasskeysReducer';
+import { EditorState } from '../reducers/EditorReducer';
+import { AppInfoState } from '../reducers/AppInfoReducer';
 
 export interface IStoreState {
 	readonly app: IAppStoreState;
@@ -19,16 +21,43 @@ export interface IStoreState {
 	readonly print: IPrintStoreState;
 	readonly sync: ISyncState;
 	readonly isExporting: IsExportingState;
+	readonly editor: EditorState;
+	readonly appInfo: AppInfoState;
 }
 
-export type IAppWindow = Window & typeof globalThis & {
-	isElectron: boolean
+export type MicroPadGlobals = {
+	currentModalId?: string,
+	isPersistenceAllowed?: boolean
 };
+declare global {
+	interface Window {
+		MicroPadGlobals: MicroPadGlobals
+		isElectron?: boolean,
+		isSupported: boolean,
+		toastEvent: (guid: string) => void,
+
+		/** This is just missing from TS typings */
+		crossOriginIsolated?: boolean
+	}
+
+	/**
+	 * Fake globals from the build process
+	 */
+	const build: {
+		defs: {
+			SYNC_WORKER_PATH: string,
+			SUPPORTED_BROWSERS_REGEX: string,
+			MONACO_WORKER_PATH: string,
+			FEND_WASM_PATH: string,
+			PHOTON_WASM_PATH: string
+		}
+	}
+}
 
 export const APP_NAME = 'µPad';
 export const SYNC_NAME = 'µSync';
 export const MICROPAD_URL = 'https://getmicropad.com';
-export const UNSUPPORTED_MESSAGE = 'Support for this type of content was removed in v3. You can go to https://getmicropad.com/web to access v2.';
+export const UNSUPPORTED_MESSAGE = 'Support for this type of content has been removed. You can go to https://getmicropad.com/web to access v2.';
 export const BAD_BROWSER_AUDIO = `If your web browser doesn't support this type of audio you can click here to download it.`;
 
 // Help messages

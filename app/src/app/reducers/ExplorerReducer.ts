@@ -1,6 +1,6 @@
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { Action } from 'redux';
-import { isType } from 'redux-typescript-actions';
+import { isType } from 'typescript-fsa';
 import { actions } from '../actions';
 import { Note } from 'upad-parse/dist';
 import { FlatSection } from 'upad-parse/dist/FlatNotepad';
@@ -9,16 +9,15 @@ export interface IExplorerState {
 	openSections: string[];
 }
 
-export class ExplorerReducer extends MicroPadReducer<IExplorerState> {
+export class ExplorerReducer extends AbstractReducer<IExplorerState> {
 	public readonly key = 'explorer';
 	public readonly initialState: IExplorerState = {
 		openSections: []
 	};
 
-	public reducer(state: IExplorerState, action: Action): IExplorerState {
-		if (isType(action, actions.parseNpx.done) || isType(action, actions.parseNpx.failed) || isType(action, actions.deleteNotepad)) {
-			return this.initialState;
-		} else if (isType(action, actions.expandSection)) {
+	public reducer(state: IExplorerState | undefined, action: Action): IExplorerState {
+		if (!state) state = this.initialState;
+		if (isType(action, actions.expandSection)) {
 			const guid: string = action.payload;
 
 			return {

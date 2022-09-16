@@ -1,7 +1,7 @@
 import { INotepadSharingData, SyncUser } from '../types/SyncTypes';
-import { MicroPadReducer } from '../types/ReducerType';
+import { AbstractReducer } from './AbstractReducer';
 import { Action } from 'redux';
-import { isType } from 'redux-typescript-actions';
+import { isType } from 'typescript-fsa';
 import { actions } from '../actions';
 
 export interface ISyncState {
@@ -10,18 +10,20 @@ export interface ISyncState {
 	isLoading: boolean;
 }
 
-export class SyncReducer extends MicroPadReducer<ISyncState> {
+export class SyncReducer extends AbstractReducer<ISyncState> {
 	public readonly key = 'sync';
 	public readonly initialState: ISyncState = {
 		isLoading: false
 	};
 
-	public reducer(state: ISyncState, action: Action): ISyncState {
+	public reducer(state: ISyncState | undefined, action: Action): ISyncState {
+		if (!state) state = this.initialState;
 		if (
 			isType(action, actions.syncLogin.started)
 			|| isType(action, actions.syncDownload.started)
 			|| isType(action, actions.syncUpload.started)
 			|| isType(action, actions.deleteFromSync.started)
+			|| isType(action, actions.addToSync.started)
 		) {
 			return {
 				...state,
@@ -34,6 +36,7 @@ export class SyncReducer extends MicroPadReducer<ISyncState> {
 			|| isType(action, actions.deleteFromSync.failed)
 			|| isType(action, actions.syncProError)
 			|| isType(action, actions.parseNpx.failed)
+			|| isType(action, actions.addToSync.failed)
 		) {
 			return {
 				...state,
@@ -42,6 +45,7 @@ export class SyncReducer extends MicroPadReducer<ISyncState> {
 		} else if (
 			isType(action, actions.syncDownload.done)
 			|| isType(action, actions.syncUpload.done)
+			|| isType(action, actions.addToSync.done)
 		) {
 			return {
 				...state,
@@ -71,6 +75,15 @@ export class SyncReducer extends MicroPadReducer<ISyncState> {
 			};
 		} else if (isType(action, actions.syncLogout)) {
 			return { ...this.initialState };
+		} else if (isType(action, actions.setSyncProStatus)) {
+			if (!state.user) return state;
+			return {
+				...state,
+				user: {
+					...state.user,
+					isPro: action.payload
+				}
+			}
 		}
 
 		return state;

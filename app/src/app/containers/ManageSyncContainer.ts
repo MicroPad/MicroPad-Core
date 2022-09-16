@@ -1,7 +1,7 @@
 import { IStoreState } from '../types';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
-import { default as ManageSyncComponent, IManageSyncComponentProps } from '../components/sync/ManageSyncComponent';
+import { default as ManageSyncComponent, IManageSyncComponentProps } from '../components/sync/manage-sync/ManageSyncComponent';
 import { actions } from '../actions';
 
 export function mapStateToProps({ sync }: IStoreState) {
@@ -12,7 +12,7 @@ export function mapStateToProps({ sync }: IStoreState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): Partial<IManageSyncComponentProps> {
 	return {
-		logout: () => dispatch(actions.syncLogout(undefined))
+		logout: () => dispatch(actions.syncLogout())
 	};
 }
 
