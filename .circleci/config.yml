@@ -103,7 +103,7 @@ jobs:
 
   publish-github-release:
     docker:
-      - image: cibuilds/github:0.12
+      - image: cibuilds/github:latest
 
     steps:
       - attach_workspace:
@@ -111,6 +111,7 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
+            apk add --update nodejs npm
             VERSION=$(npm pkg get version | sed 's/"//g')
             ghr -t ${GH_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ~/repo/app/micropad.tar.xz
 
