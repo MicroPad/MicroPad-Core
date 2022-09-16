@@ -111,7 +111,7 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            VERSION=${CIRCLE_TAG}
+            VERSION=$(npm pkg get version | sed 's/"//g')
             ghr -t ${GH_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ~/repo/app/micropad.tar.xz
 
 workflows:
@@ -127,10 +127,8 @@ workflows:
             - test
             - build
           filters:
-            tags:
-              only: /^v.*/
             branches:
-              ignore: /.*/
+              only: master
       - canary-deploy:
           requires:
             - test
