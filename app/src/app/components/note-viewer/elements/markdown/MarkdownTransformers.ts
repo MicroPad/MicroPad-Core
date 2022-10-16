@@ -55,7 +55,7 @@ export const mathsTransformer: () => MarkdownTransformer[] = () => {
 			listeners: {
 				'hashHTMLBlocks.after': (evtName, text) => {
 					let i = 0;
-					return text.replaceAll(/(===[^]+?===|''[^]+?''|;;[^]+?;;)/gi, match => {
+					return text.replaceAll(/(===[^]+?===|''[^]+?''|;;[^]+?;;|\$\$[^]+?\$\$|\$[^]+?\$)/gi, match => {
 						matches.push(match);
 						return '%MATHPLACEHOLDER' + i++ + 'ENDMATHPLACEHOLDER%';
 					});
