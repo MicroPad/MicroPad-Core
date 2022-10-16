@@ -54,7 +54,7 @@ async function renderNote({ npx, findNote }: Props): Promise<RenderedNote> {
 		return [
 			{
 				type: 'lang',
-				regex: /(===([^]+?)===|''([^]+?)''|;;([^]+?);;)/gi,
+				regex: /(===[^]+?===|''[^]+?''|;;[^]+?;;|\$\$[^]+?\$\$|\$[^]+?\$)/gi,
 				replace: function(s: string, match: string) {
 					matches.push('&lt;Maths won\'t display in this view. See the help notepad.&gt;<br />' + match);
 					let n = matches.length - 1;
