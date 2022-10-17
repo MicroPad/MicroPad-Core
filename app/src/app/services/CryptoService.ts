@@ -73,3 +73,7 @@ export async function hasEncryptedNotebooks(storage: LocalForage): Promise<boole
 		return undefined;
 	});
 }
+
+export async function hasSavedPasswords(storage: LocalForage): Promise<boolean> {
+	return await storage.length() > 0;
+}

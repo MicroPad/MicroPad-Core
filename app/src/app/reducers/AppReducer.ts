@@ -22,7 +22,7 @@ export interface IAppStoreState {
 	explorerWidth: string;
 	cursorPos: { x: number, y: number };
 	currentModalId?: ModalId;
-	hasEncryptedNotebooks: boolean;
+	hasEncryptedNotebooks: EncryptionStatus;
 }
 
 export interface IVersion {
@@ -31,6 +31,11 @@ export interface IVersion {
 	patch: number;
 	status: 'dev' | 'alpha' | 'beta' | 'stable';
 }
+
+export type EncryptionStatus = {
+	hasEncryptedNotebooks: boolean,
+	hasSavedPasswords: boolean
+};
 
 const { major, minor, patch } = parse(version) || { major: 0, minor: 0, patch: 0 };
 
@@ -50,7 +55,10 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 		theme: 'Classic',
 		explorerWidth: '270px',
 		cursorPos: { x: 0, y: 0 },
-		hasEncryptedNotebooks: false
+		hasEncryptedNotebooks: {
+			hasSavedPasswords: false,
+			hasEncryptedNotebooks: false
+		}
 	};
 
 	public reducer(state: IAppStoreState | undefined, action: Action): IAppStoreState {
