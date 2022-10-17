@@ -460,16 +460,9 @@ const autoFillNewNotepads$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		ofType(actions.newNotepad.type),
 		map(action => (action as MicroPadActions['newNotepad']).payload),
-		concatMap((notepad: FlatNotepad) => {
+		map((notepad: FlatNotepad) => {
 			const noteRef = Object.values(notepad.notes)[0].internalRef;
-			return [
-				actions.loadNote.started(noteRef),
-				actions.toggleInsertMenu({
-					enabled: true,
-					x: 10,
-					y: 10
-				})
-			];
+			return actions.loadNote.started(noteRef);
 		})
 	);
 
