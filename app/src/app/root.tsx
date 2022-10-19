@@ -43,7 +43,7 @@ import { createSentryReduxEnhancer } from '../sentry';
 import { createDynamicCss } from './DynamicAppCss';
 import { hasRequiredFeatures } from '../unsupported-page/feature-detect';
 import { showUnsupportedPage } from '../unsupported-page/show-page';
-import { hasEncryptedNotebooks, restoreSavedPasswords } from './services/CryptoService';
+import { hasEncryptedNotebooks, hasSavedPasswords, restoreSavedPasswords } from './services/CryptoService';
 import TopLevelModalsComponent from './components/TopLevelModalsComponent';
 import { rootEpic$ } from './epics/rootEpic';
 import InfoBannerComponent from './components/header/info-banner/InfoBannerContainer';
@@ -196,8 +196,11 @@ export function getStorage(): StorageMap {
 async function hydrateStoreFromLocalforage() {
 	await Promise.all(Object.values(getStorage()).map(storage => storage.ready()));
 
-	hasEncryptedNotebooks(NOTEPAD_STORAGE)
-		.then(hasEncryptedNotebooks => store.dispatch(actions.updateEncryptionStatus(hasEncryptedNotebooks)));
+	Promise.all([hasEncryptedNotebooks(NOTEPAD_STORAGE), hasSavedPasswords(CRYPTO_PASSKEYS_STORAGE)])
+		.then(([hasEncryptedNotebooks, hasSavedPasswords]) => store.dispatch(actions.updateEncryptionStatus({
+			hasEncryptedNotebooks,
+			hasSavedPasswords
+		})));
 	const restoreSavedPasswords$ = restoreSavedPasswords(store, CRYPTO_PASSKEYS_STORAGE);
 
 	const fontSize = await localforage.getItem<string>('font size');

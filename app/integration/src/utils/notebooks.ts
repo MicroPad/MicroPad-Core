@@ -10,6 +10,8 @@ export async function createNotebookUsingDropdown() {
 	await page.fill('input[name="vex"]', 'Test Notebook');
 	// Press Enter
 	await page.press('input[name="vex"]', 'Enter');
+	// Open the insert modal
+	await page.click('#note-viewer');
 	// Click text=edit Text (with markdown formatting)
 	await page.click('#insert-element a:nth-child(1)');
 	// Fill textarea

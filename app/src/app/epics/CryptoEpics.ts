@@ -1,6 +1,6 @@
 import { combineEpics, ofType } from 'redux-observable';
-import { EMPTY, from, Observable } from 'rxjs';
-import { catchError, concatMap, filter, map, withLatestFrom } from 'rxjs/operators';
+import { EMPTY, from, Observable, of } from 'rxjs';
+import { catchError, concatMap, filter, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { actions, MicroPadAction, MicroPadActions } from '../actions';
 import { EpicDeps, EpicStore } from './index';
 import { IStoreState } from '../types';
@@ -33,7 +33,20 @@ export const rememberPasskey$ = (action$: Observable<MicroPadAction>, state$: Ep
 		noEmit()
 	);
 
+export const forgetSavedPasswords$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { getStorage }: EpicDeps) =>
+	action$.pipe(
+		ofType(actions.forgetSavedPasswords.started.type),
+		switchMap(() => from(getStorage().cryptoPasskeysStorage.clear()).pipe(
+			map(() => actions.forgetSavedPasswords.done({})),
+			catchError(error => {
+				console.error(error);
+				return of(actions.forgetSavedPasswords.failed({ error }))
+			})
+		))
+	);
+
 export const cryptoEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	encryptNotepad$,
-	rememberPasskey$
+	rememberPasskey$,
+	forgetSavedPasswords$
 );

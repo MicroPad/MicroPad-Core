@@ -27,6 +27,7 @@ import { DueItem } from './services/DueDates';
 import { DrawMode } from './reducers/EditorReducer';
 import { AppInfoMessage } from './reducers/AppInfoReducer';
 import { ModalId } from './types/ModalIds';
+import { EncryptionStatus } from './reducers/AppReducer';
 
 export type MicroPadAction = ActionTypes[keyof ActionTypes];
 export type ActionNames = keyof ActionFactories;
@@ -76,6 +77,7 @@ export const actions = {
 	getDueDates: actionCreator.async<string[], DueItem[], Error>('GET_DUE_DATES'),
 	moveObjAcrossNotepads: actionCreator.async<MoveAcrossNotepadsAction, void, Error>('CROSS_NOTEPAD_MOVE'),
 	search: actionCreator.async<string, SearchResults, Error>('SEARCH'),
+	forgetSavedPasswords: actionCreator.async<void, void, unknown>('FORGET_SAVED_PASSWORDS'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
 	restoreJsonNotepadAndLoadNote: actionCreator<RestoreJsonNotepadAndLoadNoteAction>('PARSE_JSON_NOTEPAD_AND_LOAD_NOTE'),
@@ -140,7 +142,7 @@ export const actions = {
 	setInfoMessage: actionCreator<AppInfoMessage>('SET_INFO_MESSAGE'),
 	mouseMove: actionCreator<{ x: number, y: number }>('MOUSE_MOVE'),
 	filePasted: actionCreator<File>('FILE_PASTED'),
-	updateEncryptionStatus: actionCreator<boolean>('UPDATE_CRYPTO_STATUS'),
+	updateEncryptionStatus: actionCreator<EncryptionStatus>('UPDATE_CRYPTO_STATUS'),
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
