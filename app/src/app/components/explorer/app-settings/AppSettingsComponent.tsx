@@ -12,7 +12,8 @@ const AppSettingsComponent = (props: ConnectedProps<typeof appSettingsContainer>
 		<ul className="app-settings-component__action-list">
 			<li><QuickSwitchButton /></li>
 			<li><Button2 flat onClick={() => props.feelingLucky()}>I'm feeling lucky</Button2></li>
-			{props.hasEncryptedNotebooks && <li><Button2 flat onClick={() => props.clearOldData()}>Clear old/unused data</Button2></li>}
+			{props.cryptoStatus.hasEncryptedNotebooks && <li><Button2 flat onClick={() => props.clearOldData()}>Clear old/unused data</Button2></li>}
+			{props.cryptoStatus.hasSavedPasswords && <li><Button2 flat onClick={() => props.forgetSavedPasswords()}>Forget saved passwords</Button2></li>}
 		</ul>
 	</div>
 );
