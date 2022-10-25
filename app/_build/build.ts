@@ -241,12 +241,12 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 });
 
 async function copyWasm(): Promise<{ [originalName: string]: string }> {
-	const fendPath = join('node_modules', 'fend-wasm-web', 'fend_wasm_bg.wasm');
+	const fendPath = require.resolve('fend-wasm-web/fend_wasm_bg.wasm');
 	const fendHash = createHash('sha256').update(await readFile(fendPath)).digest('hex').substring(0,8);
 	const fendName = `fend_wasm_bg.${fendHash}.wasm`;
 	const fend$ = copyFile(fendPath, join(OUT_DIR, 'dist', fendName));
 
-	const photonPath = join('node_modules', '@nick_webster', 'photon', 'photon_rs_bg.wasm');
+	const photonPath = require.resolve('@nick_webster/photon/photon_rs_bg.wasm');
 	const photonHash = createHash('sha256').update(await readFile(photonPath)).digest('hex').substring(0,8);
 	const photonName = `photon_rs_bg.${photonHash}.wasm`;
 	const photon$ = copyFile(photonPath, join(OUT_DIR, 'dist', photonName));
