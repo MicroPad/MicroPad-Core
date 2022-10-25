@@ -22,8 +22,6 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 (async () => {
 	process.env.PUBLIC_URL ??= '';
 
-	await copyDir('node_modules/timers-browserify', 'node_modules/timers');
-
 	await rm(OUT_DIR, { recursive: true, force: true });
 	await copyDir('public', OUT_DIR);
 
