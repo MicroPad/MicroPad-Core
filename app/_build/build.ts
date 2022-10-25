@@ -94,7 +94,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 
 	const { metafile: monacoMetafile } = await build({
 		entryPoints: {
-			'monaco.worker': 'node_modules/monaco-editor/esm/vs/editor/editor.worker.js'
+			'monaco.worker': require.resolve('monaco-editor/esm/vs/editor/editor.worker.js')
 		},
 		entryNames: isDev ? '[name]' : '[name]-[hash]',
 		bundle: true,
@@ -128,7 +128,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		],
 	}).catch(() => process.exit(1));
 	const monacoWorkerJsPath: string | undefined = Object.entries(monacoMetafile.outputs)
-		.find(([, metadata]) => metadata.entryPoint === 'node_modules/monaco-editor/esm/vs/editor/editor.worker.js')?.[0]
+		.find(([, metadata]) => metadata.entryPoint?.endsWith('/monaco-editor/esm/vs/editor/editor.worker.js'))?.[0]
 		.replace(`${OUT_DIR}/`, '');
 	if (!monacoWorkerJsPath) throw new Error('Missing monaco.worker.js');
 
