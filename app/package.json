@@ -5,9 +5,9 @@
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py && ./get_precache_files.py > src/extraPrecacheFiles.ts",
     "prestart": "tsc -p _build/tsconfig.json",
-    "start": "NODE_ENV='' node _build/build.js",
+    "start": "yarn prestart && NODE_ENV='' node _build/build.js",
     "prebuild": "tsc -p _build/tsconfig.json",
-    "build": "NODE_ENV=production node _build/build.js",
+    "build": "yarn prebuild && NODE_ENV=production node _build/build.js",
     "test": "TZ=NZ jest",
     "typecheck": "tsc --noEmit --p ./tsconfig.json",
     "typecheck:watch": "tsc --noEmit --watch -p ./tsconfig.json",
@@ -185,5 +185,6 @@
     "@types/react": "^17",
     "react": "^17",
     "redux": "^4"
-  }
+  },
+  "packageManager": "yarn@3.2.4"
 }
