@@ -20,6 +20,7 @@ export const START_FEND$: Observable<void> = ajax<any>({
 			if (isNaN(rateF)) throw new Error(`Currency rate (${rate}) for ${currency} was NaN`);
 			currencies.set(currency, rateF);
 		});
+		currencies.set('EUR', 1.0);
 		return currencies;
 	}),
 	map(currencyData => initialiseWithHandlers(currencyData)),
