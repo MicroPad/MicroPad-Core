@@ -1,7 +1,7 @@
 import { Observable, of, shareReplay } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { catchError, map } from 'rxjs/operators';
-import { initialise, initialiseWithHandlers } from '../../../../../../dolly/fend/wasm/pkgweb';
+import { initialise, initialiseWithHandlers } from 'fend-wasm-web';
 
 export const START_FEND$: Observable<void> = ajax<any>({
 	url: 'https://getmicropad.com/cors-proxy/moolah.xml',

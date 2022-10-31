@@ -5307,10 +5307,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fend-wasm-web@npm:^1.0.5":
-  version: 1.0.5
-  resolution: "fend-wasm-web@npm:1.0.5"
-  checksum: 4277cdbfcacedd70c188157ab9030e1a3a42cf3abc874a1ab0465028efc1a9edec6dd73eaf659f4cf15a2f3235335d3cae70cd4a6d06eebe2c78709151b4a0c8
+"fend-wasm-web@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "fend-wasm-web@npm:1.1.2"
+  checksum: 19e27d88403e74d4560a836266b8973b2f8bab61d58723e21f6f5c7b2c4bb1eb6cc19673ec1858d68723f73807d2d04392b292333537766de100343dfaa601cf
   languageName: node
   linkType: hard
 
@@ -7731,7 +7731,7 @@ __metadata:
     eslint-plugin-react: ^7.20.3
     eslint-plugin-react-hooks: ^4.0.8
     expect-playwright: ^0.8.0
-    fend-wasm-web: ^1.0.5
+    fend-wasm-web: ^1.1.2
     html-minifier: ^4.0.0
     jest: ^27.2.0
     jest-circus: ^27.2.0
