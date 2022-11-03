@@ -14,7 +14,7 @@ import { Checkbox, Col, Row, TextInput } from 'react-materialize';
 import { Resizable } from 're-resizable';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../../../types/Themes';
-import { colourTransformer, fendTransformer, mathsTransformer } from './MarkdownTransformers';
+import { colourTransformer, fendTransformer, mathsTransformer, preTransform } from './MarkdownTransformers';
 import NoteElementModalComponent from '../../../note-element-modal/NoteElementModalComponent';
 import { BehaviorSubject } from 'rxjs';
 import { ConnectedProps } from 'react-redux';
@@ -216,8 +216,8 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 		const { element, isPrinting } = props;
 
 		if (!!this.iframe) {
-			this.iframe.onload = () => {
-				const html = this.generateHtml(element);
+			this.iframe.onload = async () => {
+				const html = await this.generateHtml(element);
 				this.sendMessage({
 					type: 'render',
 					id: element.args.id,
@@ -277,17 +277,20 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 
 		updateElement!(element.args.id, newElement);
 
-		this.sendMessage({
-			type: 'render',
-			id: element.args.id,
-			payload: {
-				...newElement,
-				content: this.generateHtml(newElement)
-			}
-		});
+		this.generateHtml(newElement).then(content =>
+			this.sendMessage({
+				type: 'render',
+				id: element.args.id,
+				payload: {
+					...newElement,
+					content
+				}
+			})
+		);
 	}
 
-	private generateHtml = (element: NoteElement): string => {
+	private generateHtml = async (element: NoteElement): Promise<string> => {
+		await preTransform();
 		const rawHtml = converter.makeHtml(element.content);
 		const res = this.props.enableCheckboxes(element.content, rawHtml);
 		this.progress$.next(res);
@@ -345,14 +348,16 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 						content: this.props.toggleMdCheckbox(element.content, message.payload)
 					};
 					this.props.updateElement!(element.args.id, newElement);
-					this.sendMessage({
-						type: 'render',
-						id: element.args.id,
-						payload: {
-							...element,
-							content: this.generateHtml(newElement)
-						}
-					});
+					this.generateHtml(newElement).then(content =>
+						this.sendMessage({
+							type: 'render',
+							id: element.args.id,
+							payload: {
+								...element,
+								content
+							}
+						})
+					);
 				})();
 				break;
 

@@ -3,7 +3,11 @@ import './NoteElementModalComponent.css';
 import { Converter, extension } from 'showdown';
 import { IShowdownOpts } from '../note-viewer/elements/markdown/MarkdownElementComponent';
 import { Translators } from 'upad-parse';
-import { colourTransformer, fendTransformer } from '../note-viewer/elements/markdown/MarkdownTransformers';
+import {
+	colourTransformer,
+	fendTransformer,
+	preTransform
+} from '../note-viewer/elements/markdown/MarkdownTransformers';
 import { DEFAULT_MODAL_OPTIONS } from '../../util';
 import { Note, Notepad } from 'upad-parse/dist';
 import SingletonModalComponent from '../singleton-modal/SingletonModalContainer';
@@ -76,6 +80,7 @@ async function renderNote({ npx, findNote }: Props): Promise<RenderedNote> {
 		];
 	});
 
+	await preTransform();
 	const html = new Converter({
 		parseImgDimensions: true,
 		simplifiedAutoLink: true,
