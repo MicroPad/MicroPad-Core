@@ -22,8 +22,6 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 (async () => {
 	process.env.PUBLIC_URL ??= '';
 
-	await copyDir('node_modules/timers-browserify', 'node_modules/timers');
-
 	await rm(OUT_DIR, { recursive: true, force: true });
 	await copyDir('public', OUT_DIR);
 
@@ -96,7 +94,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 
 	const { metafile: monacoMetafile } = await build({
 		entryPoints: {
-			'monaco.worker': 'node_modules/monaco-editor/esm/vs/editor/editor.worker.js'
+			'monaco.worker': require.resolve('monaco-editor/esm/vs/editor/editor.worker.js')
 		},
 		entryNames: isDev ? '[name]' : '[name]-[hash]',
 		bundle: true,
@@ -130,7 +128,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		],
 	}).catch(() => process.exit(1));
 	const monacoWorkerJsPath: string | undefined = Object.entries(monacoMetafile.outputs)
-		.find(([, metadata]) => metadata.entryPoint === 'node_modules/monaco-editor/esm/vs/editor/editor.worker.js')?.[0]
+		.find(([, metadata]) => metadata.entryPoint?.endsWith('/monaco-editor/esm/vs/editor/editor.worker.js'))?.[0]
 		.replace(`${OUT_DIR}/`, '');
 	if (!monacoWorkerJsPath) throw new Error('Missing monaco.worker.js');
 
@@ -241,12 +239,12 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 });
 
 async function copyWasm(): Promise<{ [originalName: string]: string }> {
-	const fendPath = join('node_modules', 'fend-wasm-web', 'fend_wasm_bg.wasm');
+	const fendPath = require.resolve('fend-wasm-web/fend_wasm_bg.wasm');
 	const fendHash = createHash('sha256').update(await readFile(fendPath)).digest('hex').substring(0,8);
 	const fendName = `fend_wasm_bg.${fendHash}.wasm`;
 	const fend$ = copyFile(fendPath, join(OUT_DIR, 'dist', fendName));
 
-	const photonPath = join('node_modules', '@nick_webster', 'photon', 'photon_rs_bg.wasm');
+	const photonPath = require.resolve('@nick_webster/photon/photon_rs_bg.wasm');
 	const photonHash = createHash('sha256').update(await readFile(photonPath)).digest('hex').substring(0,8);
 	const photonName = `photon_rs_bg.${photonHash}.wasm`;
 	const photon$ = copyFile(photonPath, join(OUT_DIR, 'dist', photonName));

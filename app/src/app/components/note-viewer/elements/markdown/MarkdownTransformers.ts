@@ -1,5 +1,7 @@
 import { ShowdownExtension } from 'showdown';
 import { substituteInlineFendExpressions } from 'fend-wasm-web';
+import { START_FEND$ } from '../../../../services/FendService';
+import { firstValueFrom } from 'rxjs';
 
 export type MarkdownTransformer = ShowdownExtension;
 
@@ -8,10 +10,19 @@ interface FendResponseComponent {
 	contents: string;
 }
 
+let HAS_STARTED_FEND: boolean = false;
+
+export async function preTransform() {
+	await firstValueFrom(START_FEND$);
+	HAS_STARTED_FEND = true;
+}
+
 export const fendTransformer: MarkdownTransformer = {
 	type: 'listener',
 	listeners: {
 		'hashHTMLBlocks.after': (evtName, text) => {
+			if (!HAS_STARTED_FEND) throw new Error(`fend has not been started. Make sure preTransform() has ran before running other markdown transformers.`);
+
 			// e.g. [[1+1]] -> 2
 			const components: FendResponseComponent[] = JSON.parse(substituteInlineFendExpressions(text, 500));
 			let result = '';
