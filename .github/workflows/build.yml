@@ -128,8 +128,9 @@ jobs:
         OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
         OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
         OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+        silent: false
       with:
-        command: os object sync -bn micropad-js-next --content-type auto --src-dir ./app/build
+        command: os object sync -bn micropad-js-next --content-type auto --src-dir app/build
   release:
     name: Publish Release on GitHub
     runs-on: ubuntu-latest
