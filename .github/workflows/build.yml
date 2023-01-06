@@ -135,9 +135,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, test]
     if: github.ref == 'refs/heads/master' && github.event_name != 'schedule'
-    on:
-      label:
-        types: [create]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
