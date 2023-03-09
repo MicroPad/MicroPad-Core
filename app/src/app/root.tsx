@@ -194,7 +194,7 @@ export function getStorage(): StorageMap {
 	});
 
 	const hideLoadingScreen = async () => {
-		if (!window.isElectron && !isDev(false)) {
+		if (!window.isElectron && !isDev(false) && 'serviceWorker' in navigator) {
 			await navigator.serviceWorker.ready;
 		}
 		window.loadingScreen.finish();
