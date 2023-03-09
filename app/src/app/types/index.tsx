@@ -24,10 +24,13 @@ export interface IStoreState {
 	readonly editor: EditorState;
 	readonly appInfo: AppInfoState;
 }
+export type PleaseWait = {
+	finish: () => void,
+};
 
 export type MicroPadGlobals = {
 	currentModalId?: string,
-	isPersistenceAllowed?: boolean
+	isPersistenceAllowed?: boolean,
 };
 declare global {
 	interface Window {
@@ -35,6 +38,7 @@ declare global {
 		isElectron?: boolean,
 		isSupported: boolean,
 		toastEvent: (guid: string) => void,
+		loadingScreen: PleaseWait,
 
 		/** This is just missing from TS typings */
 		crossOriginIsolated?: boolean
