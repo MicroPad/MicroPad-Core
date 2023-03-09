@@ -59,7 +59,7 @@
 	</div>
 	<script type="text/javascript" src="%PUBLIC_URL%/assets/please-wait/please-wait.min.js"></script>
 	<script type="text/javascript">
-		const loadingScreen = window.pleaseWait({
+		window.loadingScreen = window.pleaseWait({
 			logo: '%PUBLIC_URL%/assets/loading.gif',
 			backgroundColor: "#607d8b",
 			loadingHtml: "<p style='font-size: 2rem; color: white; font-weight: 300;'>We're just loading everything now&hellip;" +
@@ -67,10 +67,6 @@
 			"<br />Does <a target='_blank' rel='noopener noreferrer' style='color: white;' href='https://en.wikipedia.org/wiki/P_versus_NP_problem'>" +
 			"<em style='font-family: serif;'>P = NP</em></a>?</p>"
 		});
-
-		window.addEventListener('load', function () {
-			loadingScreen.finish();
-		}, false);
 	</script>
 </body>
 </html>

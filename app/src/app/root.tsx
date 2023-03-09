@@ -49,6 +49,7 @@ import { rootEpic$ } from './epics/rootEpic';
 import InfoBannerComponent from './components/header/info-banner/InfoBannerContainer';
 import { watchPastes } from './services/paste-watcher';
 import { configureStore } from '@reduxjs/toolkit';
+import { isDev } from './util';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -191,6 +192,14 @@ export function getStorage(): StorageMap {
 		const isSyncing = store.getState().sync.isLoading;
 		window.onbeforeunload = (isSyncing || isSaving) ? () => true : null;
 	});
+
+	const hideLoadingScreen = async () => {
+		if (!window.isElectron && !isDev(false)) {
+			await navigator.serviceWorker.ready;
+		}
+		window.loadingScreen.finish();
+	};
+	document.readyState === 'complete' ? await hideLoadingScreen() : window.addEventListener('load', hideLoadingScreen);
 })();
 
 async function hydrateStoreFromLocalforage() {
