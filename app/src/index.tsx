@@ -25,16 +25,15 @@ if (window.isSupported) {
 }
 
 function initMicroPad() {
-	// If you want your app to work offline and load faster, you can change
-	// unregister() to register() below. Note this comes with some pitfalls.
-	// Learn more about service workers: https://bit.ly/CRA-PWA
 	if (window.isElectron || isDev(false)) {
 		serviceWorker.unregister();
 	} else {
 		serviceWorker.register();
 	}
 
-	initWasm().then(() => import('./app/root'));
+	initWasm()
+		.then(() => import('./app/root'))
+		.then(root => root.init());
 }
 
 export {};

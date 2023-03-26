@@ -68,7 +68,7 @@ export const store = configureStore({
 		immutableCheck: false
 	}),
 	devTools: {
-		actionsBlacklist: [actions.mouseMove.type],
+		actionsDenylist: [actions.mouseMove.type],
 		actionSanitizer: action => {
 			switch (action.type) {
 				case actions.parseNpx.started.type:
@@ -79,8 +79,6 @@ export const store = configureStore({
 		}
 	}
 });
-
-epicMiddleware.run(rootEpic$);
 
 export type MicroPadStore = typeof store;
 
@@ -133,12 +131,14 @@ export function getStorage(): StorageMap {
 	};
 }
 
-(async function init() {
+export async function init() {
 	const shouldInit = await hasRequiredFeatures();
 	if (!shouldInit) {
 		showUnsupportedPage();
 		return;
 	}
+
+	epicMiddleware.run(rootEpic$);
 
 	await hydrateStoreFromLocalforage();
 	createDynamicCss(store);
@@ -195,12 +195,15 @@ export function getStorage(): StorageMap {
 
 	const hideLoadingScreen = async () => {
 		if (!window.isElectron && !isDev(false) && 'serviceWorker' in navigator) {
-			await navigator.serviceWorker.ready;
+			// if we have a service worker already installed, wait for it to update before doing anything
+			if (!!navigator.serviceWorker.controller?.state) {
+				await navigator.serviceWorker.ready;
+			}
 		}
 		window.loadingScreen.finish();
 	};
 	document.readyState === 'complete' ? await hideLoadingScreen() : window.addEventListener('load', hideLoadingScreen);
-})();
+}
 
 async function hydrateStoreFromLocalforage() {
 	await Promise.all(Object.values(getStorage()).map(storage => storage.ready()));
