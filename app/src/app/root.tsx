@@ -68,7 +68,7 @@ export const store = configureStore({
 		immutableCheck: false
 	}),
 	devTools: {
-		actionsBlacklist: [actions.mouseMove.type],
+		actionsDenylist: [actions.mouseMove.type],
 		actionSanitizer: action => {
 			switch (action.type) {
 				case actions.parseNpx.started.type:
@@ -193,13 +193,10 @@ export function getStorage(): StorageMap {
 		window.onbeforeunload = (isSyncing || isSaving) ? () => true : null;
 	});
 
-	const hideLoadingScreen = async () => {
-		if (!window.isElectron && !isDev(false) && 'serviceWorker' in navigator) {
-			await navigator.serviceWorker.ready;
-		}
+	const hideLoadingScreen = () => {
 		window.loadingScreen.finish();
 	};
-	document.readyState === 'complete' ? await hideLoadingScreen() : window.addEventListener('load', hideLoadingScreen);
+	document.readyState === 'complete' ? hideLoadingScreen() : window.addEventListener('load', hideLoadingScreen);
 })();
 
 async function hydrateStoreFromLocalforage() {
