@@ -225,7 +225,8 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 	await injectManifest({
 		swSrc: join(OUT_DIR, 'service-worker.js'),
 		swDest: join(OUT_DIR, 'service-worker.js'),
-		globDirectory: OUT_DIR
+		globDirectory: OUT_DIR,
+		maximumFileSizeToCacheInBytes: 10 * 1024 * 1024
 	});
 
 	console.log('Built!');
