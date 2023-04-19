@@ -4,10 +4,12 @@ import { join } from 'path';
 import { injectManifest } from 'workbox-build';
 import { minify as minifyHtml } from 'html-minifier';
 import { esbuildPluginBrowserslist } from 'esbuild-plugin-browserslist';
-import browserslist, { clearCaches as clearBrowserslistCache } from 'browserslist';
+import browserslist from 'browserslist';
 import servor from 'servor';
-import { getUserAgentRegExp } from 'browserslist-useragent-regexp';
+import { getUserAgentRegex } from 'browserslist-useragent-regexp';
 import { createHash } from 'crypto';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
 
 const OUT_DIR = 'build';
 const isDev = process.env.NODE_ENV !== 'production';
@@ -16,7 +18,7 @@ const PORT: number = (() => {
 	return !!port ? parseInt(port, 10) : 3000;
 })();
 
-clearBrowserslistCache();
+browserslist.clearCaches();
 const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'));
 
 (async () => {
@@ -39,7 +41,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		metafile: true,
 		watch: isDev,
 		define: {
-			'build.defs.SUPPORTED_BROWSERS_REGEX': `"${getUserAgentRegExp({ allowHigherVersions: true }).source.replaceAll('\\', '\\\\')}"`,
+			'build.defs.SUPPORTED_BROWSERS_REGEX': `"${getUserAgentRegex({ allowHigherVersions: true }).source.replaceAll('\\', '\\\\')}"`,
 			'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
