@@ -1,4 +1,4 @@
-build.js
+/_build/build.mjs
 *.tsbuildinfo
 .reports
 
