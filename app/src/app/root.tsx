@@ -146,7 +146,7 @@ export async function init() {
 	if (!window.MicroPadGlobals.isPersistenceAllowed) {
 		store.dispatch(actions.setInfoMessage({
 			text: `Failed to get permission for long-term storage. You may need to save your notebooks manually.`,
-			cta: 'https://example.org' // TODO
+			cta: 'https://github.com/MicroPad/MicroPad-Core/discussions/438'
 		}));
 	}
 
