@@ -9,6 +9,7 @@ import servor from 'servor';
 import { getUserAgentRegex } from 'browserslist-useragent-regexp';
 import { createHash } from 'crypto';
 import { sentryEsbuildPlugin } from '@sentry/esbuild-plugin';
+import { version } from '../package.json';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
@@ -28,9 +29,12 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 	await rm(OUT_DIR, { recursive: true, force: true });
 	await copyDir('public', OUT_DIR);
 
-	const sentryPlugin = sentryEsbuildPlugin({
+	const sentryPlugin = () => sentryEsbuildPlugin({
 		org: "nick-webster",
 		project: "micropad",
+		release: {
+			name: version
+		},
 		// Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
 		// and need `project:releases` and `org:read` scopes
 		authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -55,7 +59,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
 		assetNames: 'assets/[name].[hash]',
-		plugins: [sentryPlugin]
+		plugins: [sentryPlugin()]
 	}).catch(() => process.exit(1));
 
 	if (!browserCheckMetafile) throw new Error('Missing metafile');
@@ -96,7 +100,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		},
 		plugins: [
 			esbuildPluginBrowserslist(esBuildTargets),
-			sentryPlugin
+			sentryPlugin()
 		],
 	}).catch(() => process.exit(1));
 
@@ -182,7 +186,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		},
 		plugins: [
 			esbuildPluginBrowserslist(esBuildTargets),
-			sentryPlugin
+			sentryPlugin()
 		],
 	}).catch(() => process.exit(1));
 
@@ -232,7 +236,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		},
 		plugins: [
 			esbuildPluginBrowserslist(esBuildTargets),
-			sentryPlugin
+			sentryPlugin()
 		],
 	}).catch(() => process.exit(1));
 
