@@ -33,7 +33,8 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		org: "nick-webster",
 		project: "micropad",
 		release: {
-			name: packageJson.version
+			name: packageJson.version,
+			finalize: false
 		},
 		// Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
 		// and need `project:releases` and `org:read` scopes
