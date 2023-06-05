@@ -141,6 +141,7 @@
     "@babel/core": "^7.21.4",
     "@babel/plugin-syntax-flow": "^7.21.4",
     "@babel/plugin-transform-react-jsx": "^7.21.0",
+    "@sentry/esbuild-plugin": "^2.2.0",
     "@types/deep-freeze": "^0.1.2",
     "@types/html-minifier": "^4.0.2",
     "@types/jest": "^27.5.2",

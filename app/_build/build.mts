@@ -8,6 +8,7 @@ import browserslist from 'browserslist';
 import servor from 'servor';
 import { getUserAgentRegex } from 'browserslist-useragent-regexp';
 import { createHash } from 'crypto';
+import { sentryEsbuildPlugin } from '@sentry/esbuild-plugin';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
@@ -26,6 +27,14 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 
 	await rm(OUT_DIR, { recursive: true, force: true });
 	await copyDir('public', OUT_DIR);
+
+	const sentryPlugin = sentryEsbuildPlugin({
+		org: "nick-webster",
+		project: "micropad",
+		// Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
+		// and need `project:releases` and `org:read` scopes
+		authToken: process.env.SENTRY_AUTH_TOKEN,
+	});
 
 	const { metafile: browserCheckMetafile } = await build({
 		entryPoints: ['src/unsupported-page/index.ts'],
@@ -46,6 +55,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
 		assetNames: 'assets/[name].[hash]',
+		plugins: [sentryPlugin]
 	}).catch(() => process.exit(1));
 
 	if (!browserCheckMetafile) throw new Error('Missing metafile');
@@ -85,7 +95,8 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
 		plugins: [
-			esbuildPluginBrowserslist(esBuildTargets)
+			esbuildPluginBrowserslist(esBuildTargets),
+			sentryPlugin
 		],
 	}).catch(() => process.exit(1));
 
@@ -170,7 +181,8 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'build.defs.PHOTON_WASM_PATH': `'${wasmPaths['photon_rs_bg.wasm']}'`
 		},
 		plugins: [
-			esbuildPluginBrowserslist(esBuildTargets)
+			esbuildPluginBrowserslist(esBuildTargets),
+			sentryPlugin
 		],
 	}).catch(() => process.exit(1));
 
@@ -219,7 +231,8 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
 		plugins: [
-			esbuildPluginBrowserslist(esBuildTargets)
+			esbuildPluginBrowserslist(esBuildTargets),
+			sentryPlugin
 		],
 	}).catch(() => process.exit(1));
 

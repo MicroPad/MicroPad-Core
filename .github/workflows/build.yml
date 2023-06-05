@@ -39,6 +39,8 @@ jobs:
         yarn lint
     - name: Build
       working-directory: app
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       run: |
         yarn build
         tar cfJ micropad.tar.xz build/*
