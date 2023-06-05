@@ -14,7 +14,7 @@
     "lint": "eslint src/"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=17.1.0"
   },
   "dependencies": {
     "@fontsource/abeezee": "^4.5.10",

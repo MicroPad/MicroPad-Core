@@ -9,7 +9,7 @@ import servor from 'servor';
 import { getUserAgentRegex } from 'browserslist-useragent-regexp';
 import { createHash } from 'crypto';
 import { sentryEsbuildPlugin } from '@sentry/esbuild-plugin';
-import { version } from '../package.json';
+import packageJson from '../package.json' assert { type: 'json' };
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
@@ -33,7 +33,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		org: "nick-webster",
 		project: "micropad",
 		release: {
-			name: version
+			name: packageJson.version
 		},
 		// Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
 		// and need `project:releases` and `org:read` scopes
