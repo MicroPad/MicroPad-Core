@@ -1,6 +1,6 @@
 {
   "name": "micropad",
-  "version": "4.2.4",
+  "version": "4.2.5",
   "private": true,
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py && ./get_precache_files.py > src/extraPrecacheFiles.ts",
@@ -14,7 +14,7 @@
     "lint": "eslint src/"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=17.1.0"
   },
   "dependencies": {
     "@fontsource/abeezee": "^4.5.10",
@@ -141,6 +141,7 @@
     "@babel/core": "^7.21.4",
     "@babel/plugin-syntax-flow": "^7.21.4",
     "@babel/plugin-transform-react-jsx": "^7.21.0",
+    "@sentry/esbuild-plugin": "^2.2.0",
     "@types/deep-freeze": "^0.1.2",
     "@types/html-minifier": "^4.0.2",
     "@types/jest": "^27.5.2",
