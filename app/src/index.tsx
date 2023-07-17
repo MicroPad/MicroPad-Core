@@ -11,17 +11,22 @@ if (window.isSupported) {
 	const isInTest = params.has('integration');
 
 	if (!isInTest && navigator.storage && navigator.storage.persist) {
-		navigator.storage.persist().then(storageAllowed => {
-			window.MicroPadGlobals.isPersistenceAllowed = storageAllowed;
-			if (!storageAllowed) {
-				console.warn(`Failed to get permission for long-term storage. Notebooks may be removed from your device's storage under storage pressure.`);
-			}
-			initMicroPad();
+		navigator.storage.persist().then(handleStorageReq).catch(err => {
+			console.error(err);
+			handleStorageReq(false);
 		});
 	} else {
 		window.MicroPadGlobals.isPersistenceAllowed = true;
 		initMicroPad();
 	}
+}
+
+function handleStorageReq(isStorageAllowed: boolean) {
+	window.MicroPadGlobals.isPersistenceAllowed = isStorageAllowed;
+	if (!isStorageAllowed) {
+		console.warn(`Failed to get permission for long-term storage. Notebooks may be removed from your device's storage under storage pressure.`);
+	}
+	initMicroPad();
 }
 
 function initMicroPad() {
