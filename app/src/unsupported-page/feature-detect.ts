@@ -3,7 +3,7 @@ export async function hasRequiredFeatures(): Promise<boolean> {
 		return true;
 	}
 
-	return doesSupportSrcDoc() && hasUrlHelperClasses();
+	return doesSupportSrcDoc() && hasUrlHelperClasses() && supportsWebAssembly();
 }
 
 export function shouldIgnoreCompatibility(): boolean {
@@ -21,4 +21,8 @@ function hasUrlHelperClasses(): boolean {
 		const url = new URL('https://example.com');
 		return !!new URLSearchParams(url.search);
 	} catch (_) { return false; }
+}
+
+function supportsWebAssembly(): boolean {
+	return typeof WebAssembly === 'object' && typeof WebAssembly.instantiate === 'function';
 }
