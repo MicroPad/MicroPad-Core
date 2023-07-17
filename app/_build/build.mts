@@ -65,7 +65,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 
 	if (!browserCheckMetafile) throw new Error('Missing metafile');
 	const browserCheckJsPath: string | undefined = Object.entries(browserCheckMetafile.outputs)
-		.find(([, metadata]) => metadata.entryPoint === 'src/unsupported-page/index.ts')?.[0]
+		.find(([, metadata]) => metadata.entryPoint?.startsWith('src/unsupported-page/index.ts'))?.[0]
 		.replace(`${OUT_DIR}/`, '');
 	if (!browserCheckJsPath) throw new Error('Missing unsupported-page bundle');
 
@@ -107,7 +107,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 
 	if (!syncWorkerMetafile) throw new Error('Missing metafile');
 	const syncWorkerJsPath: string | undefined = Object.entries(syncWorkerMetafile.outputs)
-		.find(([, metadata]) => metadata.entryPoint === 'src/app/workers/sync-worker/sync.worker.ts')?.[0]
+		.find(([, metadata]) => metadata.entryPoint?.startsWith('src/app/workers/sync-worker/sync.worker.ts'))?.[0]
 		.replace(`${OUT_DIR}/`, '');
 
 	const { metafile: monacoMetafile } = await build({
@@ -193,7 +193,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 
 	if (!metafile) throw new Error('Missing metafile');
 	const indexJsPath: string | undefined = Object.entries(metafile.outputs)
-		.find(([, metadata]) => metadata.entryPoint === 'src/index.tsx')?.[0]
+		.find(([, metadata]) => metadata.entryPoint?.startsWith('src/index.tsx'))?.[0]
 		.replace(`${OUT_DIR}/`, '');
 	if (!indexJsPath) throw new Error('Missing index.js');
 
