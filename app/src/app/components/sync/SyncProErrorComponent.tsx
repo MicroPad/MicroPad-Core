@@ -17,7 +17,7 @@ export const SyncProErrorComponent = () => (
 
 			<p>
 				The bad news is that these notepads take up a lot more resources to keep in-sync.<br />
-				To sync this notepad you'll need to upgrade to {SYNC_NAME} Pro for less than the price of a cup of coffee:
+				To sync this notebook you'll need to upgrade to {SYNC_NAME} Pro for less than the price of a cup of coffee:
 			</p>
 
 			<Button2 className="accent-btn" waves="light" onClick={() => window.open(`${MICROPAD_URL}/sync/manage`, '_blank')}>Upgrade here</Button2>

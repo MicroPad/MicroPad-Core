@@ -36,7 +36,7 @@ export default class SyncOptionsComponent extends React.Component<ConnectedProps
 					paddingRight: '16px',
 					height: 'auto'
 				}} disabled={syncState.isLoading} onClick={() => addNotepad(syncState.user, notepad.title)}>
-					Start syncing this notepad
+					Start syncing this notebook
 				</Button2></span>}
 
 				{
