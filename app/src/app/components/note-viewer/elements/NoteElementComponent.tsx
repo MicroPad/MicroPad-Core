@@ -22,7 +22,6 @@ export interface INoteElementComponentProps extends Partial<INoteViewerComponent
 	noteAssets: object;
 	edit: (id: string) => void;
 	deleteElement?: (id: string) => void;
-	search?: (query: string) => void;
 	insert?: (element: NoteElement) => void;
 }
 
@@ -41,7 +40,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 	private isDragging = false;
 
 	render() {
-		const { element, noteAssets, theme, search, elementEditing, edit, updateElement } = this.props;
+		const { element, noteAssets, theme, elementEditing, edit, updateElement } = this.props;
 		if (!theme) return null;
 
 		const isEditing = element.args.id === elementEditing;
@@ -67,8 +66,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 					noteAssets={noteAssets}
 					theme={theme}
 					updateElement={updateElement}
-					edit={edit}
-					search={search!} />
+					edit={edit} />
 				);
 				break;
 

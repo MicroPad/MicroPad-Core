@@ -54,8 +54,7 @@ const saveNotepad$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	);
 
 const saveOnChanges$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
-	action$.pipe(
-		map(() => state$.value),
+	state$.pipe(
 		map((state: IStoreState) => state.notepads.notepad?.item),
 		filterTruthy(),
 		debounceTime(1000),

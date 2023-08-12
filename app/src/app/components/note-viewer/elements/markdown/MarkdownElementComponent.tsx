@@ -24,7 +24,6 @@ import Editor, { loader } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 
 export interface IMarkdownElementComponentProps extends INoteElementComponentProps {
-	search: (query: string) => void;
 	theme: ITheme;
 	isPrinting?: boolean;
 	onReady?: () => void;
@@ -298,7 +297,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 	}
 
 	private handleMessages = event => {
-		const { element, search, edit, onReady } = this.props;
+		const { element, edit, onReady } = this.props;
 		const message: IMarkdownViewMessage = event.data;
 		if (message.id !== element.args.id) return;
 
@@ -310,8 +309,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 				break;
 
 			case 'hashtag':
-				search(message.payload);
-				this.props.openModal('search-modal');
+				this.props.hashtagSearch(message.payload);
 				break;
 
 			case 'link':
