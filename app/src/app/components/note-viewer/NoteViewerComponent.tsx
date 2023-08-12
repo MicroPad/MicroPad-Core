@@ -9,9 +9,9 @@ import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';
 import * as FullScreenService from '../../services/FullscreenService';
-import { generateGuid } from '../../util';
 import { IInsertElementState } from '../../reducers/NoteReducer';
 import { TOAST_HANDLER } from '../../root';
+import { elementFromInteraction } from '../../services/quick-insert';
 
 export interface INoteViewerComponentProps {
 	isLoading: boolean;
@@ -258,24 +258,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		const { insert, note, updateElement } = this.props;
 		if (!insert || !note || !updateElement) return;
 
-		const type = file.type.startsWith('image/') ? 'image' : 'file';
-
-		const id = type + generateGuid();
-		const element: NoteElement = {
-			type,
-			content: 'AS',
-			args: {
-				id,
-				x: x + 'px',
-				y: y + 'px',
-				width: 'auto',
-				height: 'auto',
-				ext: generateGuid(),
-				filename: file.name
-			}
-		};
-
+		const element = elementFromInteraction(file, x, y);
 		insert(element);
-		updateElement(id, element, file);
+		updateElement(element.args.id, element, file);
 	}
 }

@@ -10,6 +10,7 @@ import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ASSET_STORAGE } from '../root';
 import { EpicDeps, EpicStore } from './index';
+import { elementFromInteraction } from '../services/quick-insert';
 
 const loadNote$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { notificationService }: EpicDeps) =>
 	action$.pipe(
@@ -181,7 +182,7 @@ const quickMarkdownInsert$ = (action$: Observable<MicroPadAction>, state$: EpicS
 		))
 	);
 
-const imagePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
+const filePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
 		ofType(actions.filePasted.type),
 		map(action => (action as MicroPadActions['filePasted']).payload),
@@ -189,22 +190,7 @@ const imagePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 			take(1),
 			filter(state => !!state.currentNote.ref.length),
 			concatMap(state => {
-				const type = file.type.startsWith('image/') ? 'image' : 'file';
-				const id = type + generateGuid();
-				const element: NoteElement = {
-					type,
-					content: 'AS',
-					args: {
-						id,
-						x: state.app.cursorPos.x + 'px',
-						y: state.app.cursorPos.y + 'px',
-						width: 'auto',
-						height: 'auto',
-						ext: generateGuid(),
-						filename: file.name
-					}
-				};
-
+				const element = elementFromInteraction(file, state.app.cursorPos.x, state.app.cursorPos.y);
 				return [
 					actions.insertElement({
 						noteRef: state.currentNote.ref,
@@ -213,7 +199,7 @@ const imagePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 					actions.updateElement({
 						element,
 						noteRef: state.currentNote.ref,
-						elementId: id,
+						elementId: element.args.id,
 						newAsset: file
 					})
 				];
@@ -240,7 +226,7 @@ export const noteEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreSta
 	closeNoteOnDeletedParent$,
 	loadNoteOnMove$,
 	quickMarkdownInsert$,
-	imagePasted$,
+	filePasted$,
 	restoreNoteOnOpen$
 );
 
