@@ -51,8 +51,7 @@ export default class PrintViewOrAppContainerComponent extends React.Component<IP
 					elementEditing=""
 					noteAssets={{}}
 					theme={ThemeValues.Classic}
-					edit={() => { return; }}
-					search={() => { return; }} />
+					edit={() => { return; }} />
 			</div>
 		);
 	}

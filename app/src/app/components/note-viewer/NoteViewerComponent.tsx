@@ -9,9 +9,9 @@ import { Note } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
 import { ITheme } from '../../types/Themes';
 import * as FullScreenService from '../../services/FullscreenService';
-import { generateGuid } from '../../util';
 import { IInsertElementState } from '../../reducers/NoteReducer';
 import { TOAST_HANDLER } from '../../root';
+import { elementFromInteraction } from '../../services/quick-insert';
 
 export interface INoteViewerComponentProps {
 	isLoading: boolean;
@@ -23,7 +23,6 @@ export interface INoteViewerComponentProps {
 	isNotepadOpen: boolean;
 	theme: ITheme;
 	edit?: (id: string) => void;
-	search?: (query: string) => void;
 	updateElement?: (id: string, changes: NoteElement, newAsset?: Blob) => void;
 	toggleInsertMenu?: (opts: Partial<IInsertElementState>) => void;
 	hideInsert?: () => void;
@@ -57,7 +56,6 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 			isFullscreen,
 			note,
 			noteAssets,
-			search,
 			elementEditing,
 			theme,
 			isNotepadOpen,
@@ -108,7 +106,6 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 				theme={theme}
 				edit={edit!}
 				deleteElement={deleteElement!}
-				search={search!}
 				updateElement={updateElement}
 				elementEditing={elementEditing}
 				insert={insert} />
@@ -258,24 +255,8 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		const { insert, note, updateElement } = this.props;
 		if (!insert || !note || !updateElement) return;
 
-		const type = file.type.startsWith('image/') ? 'image' : 'file';
-
-		const id = type + generateGuid();
-		const element: NoteElement = {
-			type,
-			content: 'AS',
-			args: {
-				id,
-				x: x + 'px',
-				y: y + 'px',
-				width: 'auto',
-				height: 'auto',
-				ext: generateGuid(),
-				filename: file.name
-			}
-		};
-
+		const element = elementFromInteraction(file, x, y);
 		insert(element);
-		updateElement(id, element, file);
+		updateElement(element.args.id, element, file);
 	}
 }

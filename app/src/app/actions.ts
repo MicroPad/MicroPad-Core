@@ -28,6 +28,7 @@ import { DrawMode } from './reducers/EditorReducer';
 import { AppInfoMessage } from './reducers/AppInfoReducer';
 import { ModalId } from './types/ModalIds';
 import { EncryptionStatus } from './reducers/AppReducer';
+import { hashtagSearchOrJump$ } from './epics/SearchEpics';
 
 export type MicroPadAction = ActionTypes[keyof ActionTypes];
 export type ActionNames = keyof ActionFactories;
@@ -143,6 +144,7 @@ export const actions = {
 	mouseMove: actionCreator<{ x: number, y: number }>('MOUSE_MOVE'),
 	filePasted: actionCreator<File>('FILE_PASTED'),
 	updateEncryptionStatus: actionCreator<EncryptionStatus>('UPDATE_CRYPTO_STATUS'),
+	hashtagSearchOrJump: actionCreator<string>('HASHTAG_SEARCH_OR_JUMP'),
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([
