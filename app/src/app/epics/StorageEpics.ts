@@ -57,8 +57,8 @@ const saveOnChanges$ = (action$: Observable<MicroPadAction>, state$: EpicStore) 
 	state$.pipe(
 		map((state: IStoreState) => state.notepads.notepad?.item),
 		filterTruthy(),
-		debounceTime(1000),
 		distinctUntilKeyChanged('lastModified'),
+		debounceTime(1000),
 		filter((notepad: FlatNotepad) => {
 			const condition = notepad.title === currentNotepadTitle;
 			currentNotepadTitle = notepad.title;
