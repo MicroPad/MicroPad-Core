@@ -53,7 +53,9 @@ jobs:
         name: micropad
     - name: Install node dependencies
       working-directory: app
-      run: bun install
+      run: |
+        bun install
+        bun run playwright install
     - name: Run Micropad in background for testing
       run: |
         mkdir micropad
