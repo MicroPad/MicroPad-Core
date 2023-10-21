@@ -8,7 +8,7 @@ There are a couple [GitHub Project boards](https://github.com/orgs/MicroPad/proj
 
 ## Building MicroPad
 You will need the following:  
-- [Yarn](https://classic.yarnpkg.com/lang/en/) classic
+- [Bun](https://bun.sh/)
 - [Node.js](https://nodejs.org/en/)
 - [Python 3](https://www.python.org/)
 
@@ -16,14 +16,14 @@ You will need the following:
 ```bash
 git clone https://github.com/MicroPad/MicroPad-Core.git micropad-core
 cd micropad-core/app
-yarn
+bun install
 ```
 
 ### Running a dev server
 ```bash
-yarn start
+bun run start
 ```
 ### Building for production
 ```bash
-yarn build
+bun run build
 ```
