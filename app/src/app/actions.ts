@@ -28,7 +28,6 @@ import { DrawMode } from './reducers/EditorReducer';
 import { AppInfoMessage } from './reducers/AppInfoReducer';
 import { ModalId } from './types/ModalIds';
 import { EncryptionStatus } from './reducers/AppReducer';
-import { hashtagSearchOrJump$ } from './epics/SearchEpics';
 
 export type MicroPadAction = ActionTypes[keyof ActionTypes];
 export type ActionNames = keyof ActionFactories;

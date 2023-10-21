@@ -4,9 +4,6 @@ import { IStoreState } from '../../../../types';
 import { actions } from '../../../../actions';
 import { IProgressValues } from './TodoListComponent';
 import { ModalId } from '../../../../types/ModalIds';
-import { store } from '../../../../root';
-import { search } from '../../../../services/SearchService';
-import { SearchResults } from '../../../../reducers/SearchReducer';
 
 export const MD_START_ATTR = 'data-md-start';
 export const MD_END_ATTR = 'data-md-end';

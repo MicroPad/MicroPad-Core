@@ -19,8 +19,8 @@ import './theme-styles/Purple.css';
 /* JS Imports */
 import React from 'react';
 import 'materialize-css/dist/js/materialize.js';
-import { IStoreState, MICROPAD_URL } from './types';
-import { applyMiddleware, Store } from 'redux';
+import { MICROPAD_URL } from './types';
+import { applyMiddleware } from 'redux';
 import { BaseReducer } from './reducers/BaseReducer';
 import { epicMiddleware } from './epics';
 import localforage from 'localforage';

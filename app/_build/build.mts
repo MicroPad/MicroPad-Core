@@ -26,20 +26,23 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 (async () => {
 	process.env.PUBLIC_URL ??= '';
 
+	await copyDir('node_modules/timers-browserify', 'node_modules/timers');
+
 	await rm(OUT_DIR, { recursive: true, force: true });
 	await copyDir('public', OUT_DIR);
 
-	const sentryPlugin = () => sentryEsbuildPlugin({
-		org: "nick-webster",
-		project: "micropad",
-		release: {
-			name: packageJson.version,
-			finalize: false
-		},
-		// Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
-		// and need `project:releases` and `org:read` scopes
-		authToken: process.env.SENTRY_AUTH_TOKEN,
-	});
+	// TODO: re-enable when I update esbuild
+	// const sentryPlugin = () => sentryEsbuildPlugin({
+	// 	org: "nick-webster",
+	// 	project: "micropad",
+	// 	release: {
+	// 		name: packageJson.version,
+	// 		finalize: false
+	// 	},
+	// 	// Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
+	// 	// and need `project:releases` and `org:read` scopes
+	// 	authToken: process.env.SENTRY_AUTH_TOKEN,
+	// });
 
 	const { metafile: browserCheckMetafile } = await build({
 		entryPoints: ['src/unsupported-page/index.ts'],
@@ -60,7 +63,7 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 			'process.env.PUBLIC_URL': `"${process.env.PUBLIC_URL}"`
 		},
 		assetNames: 'assets/[name].[hash]',
-		plugins: [sentryPlugin()]
+		plugins: []
 	}).catch(() => process.exit(1));
 
 	if (!browserCheckMetafile) throw new Error('Missing metafile');
@@ -101,7 +104,6 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		},
 		plugins: [
 			esbuildPluginBrowserslist(esBuildTargets),
-			sentryPlugin()
 		],
 	}).catch(() => process.exit(1));
 
@@ -187,7 +189,6 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		},
 		plugins: [
 			esbuildPluginBrowserslist(esBuildTargets),
-			sentryPlugin()
 		],
 	}).catch(() => process.exit(1));
 
@@ -237,7 +238,6 @@ const esBuildTargets = browserslist().filter(browser => !browser.endsWith('TP'))
 		},
 		plugins: [
 			esbuildPluginBrowserslist(esBuildTargets),
-			sentryPlugin()
 		],
 	}).catch(() => process.exit(1));
 

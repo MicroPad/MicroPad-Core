@@ -135,7 +135,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 			extensions: ['tex2jax.js', 'asciimath2jax.js'],
 			messageStyle: 'none',
 			tex2jax: {
-				inlineMath: [[';;', ';;'], ['$', '$']],
+				inlineMath: [[';;', ';;']],
 				displayMath: [['$$', '$$']]
 			},
 			asciimath2jax: {
