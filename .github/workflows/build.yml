@@ -16,33 +16,21 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: '18'
-    - name: Get yarn cache directory path
-      id: yarn-cache-dir-path
-      working-directory: app
-      run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-    - name: Cache Yarn Packages
-      id: yarn-cache
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: yarn-cache-folder-${{ hashFiles('app/yarn.lock', 'app/.yarnrc.yml') }}
-        restore-keys: |
-          yarn-cache-folder-
+    - uses: oven-sh/setup-bun@v1
     - name: Install node dependencies
       working-directory: app
-      run: |
-        yarn
+      run: bun install
     - name: Lint
       working-directory: app
       run: |
-        yarn typecheck
-        yarn lint
+        bun run typecheck
+        bun run lint
     - name: Build
       working-directory: app
       env:
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       run: |
-        yarn build
+        bun run build
         tar cfJ micropad.tar.xz build/*
     - name: Upload artifact
       uses: actions/upload-artifact@v3
@@ -59,25 +47,13 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: '18'
-    - name: Get yarn cache directory path
-      id: yarn-cache-dir-path
-      working-directory: app
-      run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-    - name: Cache Yarn Packages
-      id: yarn-cache
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: yarn-cache-folder-${{ hashFiles('app/yarn.lock', 'app/.yarnrc.yml') }}
-        restore-keys: |
-          yarn-cache-folder-
+    - uses: oven-sh/setup-bun@v1
     - uses: actions/download-artifact@v3
       with:
         name: micropad
     - name: Install node dependencies
       working-directory: app
-      run: |
-        yarn
+      run: bun install
     - name: Run Micropad in background for testing
       run: |
         mkdir micropad
@@ -86,8 +62,7 @@ jobs:
         python3 -m http.server 3000 &
     - name: Test
       working-directory: app
-      run: |
-        yarn test
+      run: bun run test
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
