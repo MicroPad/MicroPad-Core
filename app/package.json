@@ -5,9 +5,9 @@
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py && ./get_precache_files.py > src/extraPrecacheFiles.ts",
     "prestart": "tsc -p _build/tsconfig.json",
-    "start": "yarn prestart && NODE_ENV='' node --experimental-import-meta-resolve _build/build.mjs",
+    "start": "NODE_ENV='' node --experimental-import-meta-resolve _build/build.mjs",
     "prebuild": "tsc -p _build/tsconfig.json",
-    "build": "yarn prebuild && NODE_ENV=production node --experimental-import-meta-resolve _build/build.mjs",
+    "build": "NODE_ENV=production node --experimental-import-meta-resolve _build/build.mjs",
     "test": "TZ=NZ jest",
     "typecheck": "tsc --noEmit --p ./tsconfig.json",
     "typecheck:watch": "tsc --noEmit --watch -p ./tsconfig.json",
