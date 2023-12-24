@@ -188,8 +188,7 @@
     "@types/react": "^17",
     "react": "^17",
     "redux": "^4",
-    "rxjs": "^7.5.7",
-    "playwright-core": "^1.27.1"
+    "rxjs": "^7.5.7"
   },
   "packageManager": "yarn@3.5.0"
 }
