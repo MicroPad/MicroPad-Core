@@ -257,10 +257,10 @@ async function hydrateStoreFromLocalforage() {
 
 async function displayWhatsNew() {
 	// some clean up of an old item, can be removed in the future
-	localforage.removeItem('oldMinorVersion').catch(e => console.error(e));
+	localforage.removeItem(SettingsStorageKeys.OLD_MINOR_VERSION).catch(e => console.error(e));
 
 	const minorVersion = store.getState().app.version.minor;
-	const oldMinorVersion = await SETTINGS_STORAGE.getItem<number>('oldMinorVersion');
+	const oldMinorVersion = await SETTINGS_STORAGE.getItem<number>(SettingsStorageKeys.OLD_MINOR_VERSION);
 	if (minorVersion === oldMinorVersion) return;
 
 	// Open "What's New"
@@ -268,7 +268,7 @@ async function displayWhatsNew() {
 		store.dispatch(actions.openModal('whats-new-modal'));
 	}, 0);
 
-	SETTINGS_STORAGE.setItem<number>('oldMinorVersion', minorVersion).catch(e => console.error(e));
+	SETTINGS_STORAGE.setItem<number>(SettingsStorageKeys.OLD_MINOR_VERSION, minorVersion).catch(e => console.error(e));
 }
 
 function notepadDownloadHandler() {
