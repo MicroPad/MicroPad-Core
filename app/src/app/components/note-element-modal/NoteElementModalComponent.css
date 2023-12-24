@@ -48,10 +48,6 @@
 	opacity: 1;
 }
 
-#markdown-editor-label > div {
-	display: inline;
-}
-
 #markdown-help h1, #markdown-help h2, #markdown-help h3, #markdown-help h4, #markdown-help h5, #markdown-help h6 {
 	margin: 10px;
 }

@@ -104,7 +104,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 
 				{
 					isEditing &&
-					<Row style={{ marginBottom: 0, color: theme.text }}>
+					<Row style={{ marginBottom: 0, color: theme.text, width: minWidth }}>
 						<Col s={4}>
 							<TextInput
 								inputClassName="markdown-element__options-input"
