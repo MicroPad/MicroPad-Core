@@ -13,9 +13,10 @@ import { MicroPadAction, READ_ONLY_ACTIONS } from '../actions';
 import { Action, Reducer, ReducersMapObject } from 'redux';
 import { isReadOnlyNotebook } from '../ReadOnly';
 import deepFreeze from 'deep-freeze';
+import { combineReducers } from '@reduxjs/toolkit';
 import { appInfoSlice } from './AppInfoReducer';
 import { editorSlice } from './EditorReducer';
-import { combineReducers } from '@reduxjs/toolkit';
+import { dueDateSettingsSlice } from './DueDateSettingsReducer';
 
 interface ReduxReducer<S, A extends Action> {
 	reducer: Reducer<S, A>
@@ -35,7 +36,8 @@ const REDUCERS: Reducer<IStoreState, MicroPadAction> = (() => {
 		sync: new SyncReducer().reducer,
 		/* New reducers */
 		[editorSlice.name]: editorSlice.reducer,
-		[appInfoSlice.name]: appInfoSlice.reducer
+		[appInfoSlice.name]: appInfoSlice.reducer,
+		[dueDateSettingsSlice.name]: dueDateSettingsSlice.reducer,
 	};
 
 	return combineReducers(reducers);

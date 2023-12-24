@@ -10,6 +10,7 @@ import { IsExportingState } from '../reducers/IsExportingReducer';
 import { NotepadPasskeysState } from '../reducers/NotepadPasskeysReducer';
 import { EditorState } from '../reducers/EditorReducer';
 import { AppInfoState } from '../reducers/AppInfoReducer';
+import { DueDateSettingsState } from '../reducers/DueDateSettingsReducer';
 
 export interface IStoreState {
 	readonly app: IAppStoreState;
@@ -23,6 +24,7 @@ export interface IStoreState {
 	readonly isExporting: IsExportingState;
 	readonly editor: EditorState;
 	readonly appInfo: AppInfoState;
+	readonly dueDateSettings: DueDateSettingsState;
 }
 export type PleaseWait = {
 	finish: () => void,

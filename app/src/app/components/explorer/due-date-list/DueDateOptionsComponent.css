@@ -1,0 +1,3 @@
+.due-date-opts__content > * {
+	color: var(--mp-theme-explorerContent);
+}

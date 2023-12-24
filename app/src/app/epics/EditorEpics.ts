@@ -5,6 +5,7 @@ import { from, Observable } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { noEmit } from '../util';
 import { IStoreState } from '../types';
+import { SettingsStorageKeys } from '../storage/settings-storage-keys';
 
 export const persistSpellCheck$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { getStorage }: EpicDeps) =>
 	action$.pipe(
@@ -15,7 +16,7 @@ export const persistSpellCheck$ = (action$: Observable<MicroPadAction>, state$: 
 		switchMap(shouldSpellCheck => from(
 			getStorage()
 				.settingsStorage
-				.setItem('shouldSpellCheck', shouldSpellCheck)
+				.setItem(SettingsStorageKeys.SHOULD_SPELL_CHECK, shouldSpellCheck)
 				.catch(e => { console.error(e); })
 		)),
 		noEmit()
@@ -30,7 +31,7 @@ export const persistWordWrap$ = (action$: Observable<MicroPadAction>, state$: Ep
 		switchMap(shouldWordWrap => from(
 			getStorage()
 				.settingsStorage
-				.setItem('shouldWordWrap', shouldWordWrap)
+				.setItem(SettingsStorageKeys.SHOULD_WORD_WRAP, shouldWordWrap)
 				.catch(e => { console.error(e); })
 		)),
 		noEmit()

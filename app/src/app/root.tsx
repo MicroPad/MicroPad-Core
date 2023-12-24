@@ -50,6 +50,8 @@ import InfoBannerComponent from './components/header/info-banner/InfoBannerConta
 import { watchPastes } from './services/paste-watcher';
 import { configureStore } from '@reduxjs/toolkit';
 import { isDev } from './util';
+import { DueDateSettingsState } from './reducers/DueDateSettingsReducer';
+import { SettingsStorageKeys } from './storage/settings-storage-keys';
 
 try {
 	document.domain = MICROPAD_URL.split('//')[1];
@@ -233,7 +235,11 @@ async function hydrateStoreFromLocalforage() {
 	const theme = await localforage.getItem<ThemeName>('theme');
 	if (!!theme) store.dispatch(actions.selectTheme(theme));
 
-	await restoreSavedPasswords$;
+	const dueDateOpts$ = SETTINGS_STORAGE.getItem<DueDateSettingsState>(SettingsStorageKeys.DUE_DATE_OPTS)
+		.then(opts => store.dispatch(actions.setShowHistoricalDueDates(opts?.showHistoricalDueDates ?? false)));
+	await dueDateOpts$;
+
+	await Promise.all([dueDateOpts$, restoreSavedPasswords$]);
 
 	// Reopen the last notebook + note
 	const lastOpenedNotepad = await localforage.getItem<string | LastOpenedNotepad>('last opened notepad');

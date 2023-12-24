@@ -173,6 +173,16 @@ strong {
 	border-bottom: 2px solid var(--mp-theme-accentContent);
 }
 
+/* Same as above but for modals */
+.modal [type=checkbox].filled-in:checked+span:not(.lever):after, .vex [type=checkbox].filled-in:checked+span:not(.lever):after {
+	background-color: var(--mp-theme-accent);
+	border: 2px solid #5a5a5a;
+}
+.modal [type=checkbox].filled-in:checked+span:not(.lever):before, .vex [type=checkbox].filled-in:checked+span:not(.lever):before {
+	border-right: 2px solid var(--mp-theme-accentContent);
+	border-bottom: 2px solid var(--mp-theme-accentContent);
+}
+
 .btn:hover, .btn-flat:hover, .btn-large:hover, .btn-small:hover {
 	background-color: var(--mp-theme-accent);
 	color: var(--mp-theme-accentContent);

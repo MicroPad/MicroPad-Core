@@ -1,8 +1,10 @@
 import React from 'react';
-import { formatDistanceStrict } from 'date-fns';
+import { formatDistanceStrict, isAfter } from 'date-fns';
 import { generateGuid } from '../../../util';
 import { dueDateListConnector } from './DueDateListContainer';
 import { ConnectedProps } from 'react-redux';
+import DueDateOptionsComponent from './DueDateOptionsComponent';
+import './DueDateListComponent.css';
 
 type AllProps = ConnectedProps<typeof dueDateListConnector>;
 const DueDateListComponent = (props: AllProps) => {
@@ -11,8 +13,9 @@ const DueDateListComponent = (props: AllProps) => {
 
 	return (
 		<div className="due-date-list">
-				<span>
+				<span onContextMenu={handleOptsRightClick}>
 					<strong>Upcoming due dates</strong>
+					<DueDateOptionsComponent />
 					{isLoading ? <em>(Recalculating…)</em> : <React.Fragment />}
 				</span>
 			<ol>
@@ -29,7 +32,7 @@ const DueDateListComponent = (props: AllProps) => {
 								textDecoration: 'underline'
 							}}>
 							{item.note.title}
-						</a> ({formatDistanceStrict(item.date, new Date())})
+						</a> ({computeDistanceMessage(item.date)})
 						</li>
 					)
 				}
@@ -37,5 +40,19 @@ const DueDateListComponent = (props: AllProps) => {
 		</div>
 	);
 };
+
+function computeDistanceMessage(due: Date, currentDate: Date = new Date()): string {
+	const baseMsg = formatDistanceStrict(due, currentDate);
+	if (isAfter(due, currentDate)) {
+		return baseMsg;
+	}
+	return baseMsg + ' ago';
+}
+
+function handleOptsRightClick(e: React.MouseEvent<HTMLElement, MouseEvent>): boolean {
+	e.preventDefault();
+	(e.target as Node).parentElement?.querySelector<HTMLAnchorElement>('.due-date-opts-trigger')?.click();
+	return false;
+}
 
 export default DueDateListComponent;
