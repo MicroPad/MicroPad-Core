@@ -9,4 +9,5 @@ export type ModalId =
 	| `bib-modal-${string}-${string}`
 	| `formatting-help-modal-${string}`
 	| `notepad-edit-object-modal-${string}`
-	| `np-title-${string}`;
+	| `np-title-${string}`
+	| 'due-date-options-modal';

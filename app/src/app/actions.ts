@@ -144,6 +144,7 @@ export const actions = {
 	filePasted: actionCreator<File>('FILE_PASTED'),
 	updateEncryptionStatus: actionCreator<EncryptionStatus>('UPDATE_CRYPTO_STATUS'),
 	hashtagSearchOrJump: actionCreator<string>('HASHTAG_SEARCH_OR_JUMP'),
+	setShowHistoricalDueDates: actionCreator<boolean>('SET_SHOW_HISTORICAL_DUE_DATES'),
 };
 
 export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set<string>([

@@ -1,4 +1,5 @@
 import { FlatNotepad, Note } from 'upad-parse/dist';
+import { DueDateSettingsState } from '../reducers/DueDateSettingsReducer';
 
 export type DueItem = {
 	date: Date,
@@ -6,14 +7,17 @@ export type DueItem = {
 	notepadTitle: string
 };
 
-export function getDueDates(notepad: FlatNotepad): DueItem[] {
+export function getDueDates(notepad: FlatNotepad, opts: DueDateSettingsState): DueItem[] {
 	return Object.values(notepad.notes)
 		.map(note => {
 			const earliestDueDate = note.elements
 				.map(element => element.args.dueDate)
 				.filter((a?: string): a is string => !!a)
 				.map(dueDate => parseInt(dueDate!, 10))
-				.filter(due => due >= new Date().getTime())
+				.filter(due => {
+					if (opts.showHistoricalDueDates) { return true; }
+					return due >= new Date().getTime();
+				})
 				.sort()[0];
 
 			return {
