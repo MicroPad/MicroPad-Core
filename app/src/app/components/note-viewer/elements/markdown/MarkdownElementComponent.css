@@ -10,3 +10,11 @@
 .markdown-element__code-editor > * {
 	min-height: 400px;
 }
+
+#markdown-editor-label {
+	display: block;
+}
+
+#markdown-editor-label > div {
+	display: inline;
+}
