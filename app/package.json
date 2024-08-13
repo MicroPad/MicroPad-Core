@@ -190,5 +190,8 @@
     "redux": "^4",
     "rxjs": "^7.5.7"
   },
-  "packageManager": "yarn@3.5.0"
+  "packageManager": "yarn@3.5.0",
+  "trustedDependencies": [
+    "@sentry/cli"
+  ]
 }
