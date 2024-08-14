@@ -17,7 +17,7 @@ const loadNote$ = (action$: Observable<MicroPadAction>, state$: EpicStore, { not
 		ofType(actions.loadNote.started.type),
 		tap(() => notificationService.dismissToasts()),
 		withLatestFrom(state$),
-		map(([action, state]): [string, FlatNotepad] => [(action as MicroPadActions['loadNote']['started']).payload, state.notepads.notepad?.item!]),
+		map(([action, state]): [string, FlatNotepad] => [(action as MicroPadActions['loadNote']['started']).payload, state.notepads.notepad!.item!]),
 		filter(([ref, notepad]: [string, FlatNotepad]) => !!ref && !!notepad),
 		map(([ref, notepad]: [string, FlatNotepad]) => ({ ref: ref, note: notepad.notes[ref] })),
 		mergeMap(({ ref, note }: { ref: string, note: Note | undefined }) => {
@@ -44,10 +44,10 @@ const checkNoteAssets$ = (action$: Observable<MicroPadAction>, state$: EpicStore
 			from(getNoteAssets(elements))
 				.pipe(map((res): [string, NoteElement[], object] => [ref, res.elements, res.blobUrls]))
 		),
-		map(([ref, elements, blobUrls]: [string, NoteElement[], object]): [string, NoteElement[], object, FlatNotepad] => [ref, elements, blobUrls, state$.value.notepads.notepad?.item!]),
+		map(([ref, elements, blobUrls]: [string, NoteElement[], object]): [string, NoteElement[], object, FlatNotepad] => [ref, elements, blobUrls, state$.value.notepads.notepad!.item!]),
 		filter(([_ref, _elements, _blobUrls, notepad]: [string, NoteElement[], object, FlatNotepad]) => !!notepad),
 		mergeMap(([ref, elements, blobUrls, notepad]: [string, NoteElement[], object, FlatNotepad]) => {
-			let newNotepad = notepad.clone({
+			const newNotepad = notepad.clone({
 				notes: {
 					...notepad.notes,
 					[ref]: notepad.notes[ref].clone({ elements })
@@ -119,7 +119,7 @@ const reloadNote$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 const autoLoadNewNote$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 	action$.pipe(
 		ofType(actions.newNote.type),
-		map((action): [NewNotepadObjectAction, FlatNotepad] => [(action as MicroPadActions['newNote']).payload, state$.value.notepads.notepad?.item!]),
+		map((action): [NewNotepadObjectAction, FlatNotepad] => [(action as MicroPadActions['newNote']).payload, state$.value.notepads.notepad!.item!]),
 		filter(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!insertAction.parent && !!notepad),
 		map(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) =>
 			// Get a note with the new title that is in the expected parent
@@ -286,14 +286,14 @@ function getNoteAssets(elements: NoteElement[]): Promise<{ elements: NoteElement
 function dataURItoBlob(dataURI: string) {
 	// convert base64 to raw binary data held in a string
 	// doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-	let byteString = atob(dataURI.split(',')[1]);
+	const byteString = atob(dataURI.split(',')[1]);
 
 	// separate out the mime component
-	let mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+	const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
 	// write the bytes of the string to an ArrayBuffer
-	let ab = new ArrayBuffer(byteString.length);
-	let ia = new Uint8Array(ab);
+	const ab = new ArrayBuffer(byteString.length);
+	const ia = new Uint8Array(ab);
 	for (let i = 0; i < byteString.length; i++) {
 		ia[i] = byteString.charCodeAt(i);
 	}

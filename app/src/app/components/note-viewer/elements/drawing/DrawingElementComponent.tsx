@@ -1,5 +1,5 @@
 import './DrawingElementComponent.css';
-import React from 'react';
+import React, { Ref, RefCallback } from 'react';
 import { INoteElementComponentProps } from '../NoteElementComponent';
 import { trim } from './trim-canvas';
 import { Resizable } from 're-resizable';
@@ -82,8 +82,8 @@ export default class DrawingElementComponent extends React.Component<Props> {
 						}}
 						>
 						<DrawingCanvas
-							// @ts-expect-error
-							ref={(e: DrawingCanvas | undefined) => this.canvasElement = e?.inner ?? null}
+							// @ts-expect-error TypeScript gets confused with all the different ways to do a Ref in react.
+							ref={((e: DrawingCanvas | undefined) => this.canvasElement = e?.inner ?? null)}
 							key={`drawing-canvas-${this.props.element.args.id}`}
 							className="drawing-element__view"
 							width="500"
@@ -161,7 +161,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 			const isNewEditor = this.props.elementEditing !== prevProps?.elementEditing;
 			if (isNewEditor) {
 				// Restore saved image to canvas
-				let img: HTMLImageElement = new Image();
+				const img: HTMLImageElement = new Image();
 				img.onload = () => {
 					const canvasElement = this.canvasElement;
 					if (!canvasElement) return;

@@ -29,7 +29,7 @@ export const autoLoadNewSection$ = (action$: Observable<MicroPadAction>, state$:
 		withLatestFrom(state$),
 		map(([action, state]): [NewNotepadObjectAction, FlatNotepad] => [
 			(action as MicroPadActions['newSection']).payload,
-			state.notepads.notepad?.item!
+			state.notepads.notepad!.item!
 		]),
 		filter(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => !!insertAction && !!notepad),
 		map(([insertAction, notepad]: [NewNotepadObjectAction, FlatNotepad]) => {

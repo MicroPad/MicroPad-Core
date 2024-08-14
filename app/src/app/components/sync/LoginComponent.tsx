@@ -30,7 +30,7 @@ export default class LoginComponent extends React.Component<ILoginComponentProps
 				id="microsync-login-modal"
 				header={`Connect to ${SYNC_NAME}`}
 				actions={[
-					<React.Fragment>
+					<React.Fragment key="microsync-login-modal__actions">
 						<Button2 className="btn-flat modal-action" onClick={() => this.login()}>
 							Login
 						</Button2>

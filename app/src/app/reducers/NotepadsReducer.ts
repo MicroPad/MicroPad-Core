@@ -435,7 +435,7 @@ export class NotepadsReducer extends AbstractReducer<INotepadsStoreState> {
 			};
 		} else if (isType(action, actions.encryptNotepad)) {
 			if (!state.notepad || !state.notepad.item) return state;
-			let notepad = state.notepad.item;
+			const notepad = state.notepad.item;
 
 			return {
 				...state,

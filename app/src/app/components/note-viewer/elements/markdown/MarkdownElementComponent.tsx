@@ -1,5 +1,4 @@
-// @ts-expect-error
-// eslint-disable-next-line import/no-webpack-loader-syntax
+// @ts-expect-error TS2307
 import helpNpx from '../../../../assets/Help.npx';
 
 import './MarkdownElementComponent.css';
@@ -43,7 +42,7 @@ type Props = ConnectedProps<typeof markdownElementConnector> & IMarkdownElementC
 
 const converter = configureShowdown();
 
-// eslint-disable-next-line no-restricted-globals
+ 
 self.MonacoEnvironment = {
 	getWorkerUrl: (moduleId, label) => build.defs.MONACO_WORKER_PATH
 }

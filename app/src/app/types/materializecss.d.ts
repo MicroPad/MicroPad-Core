@@ -59,7 +59,7 @@ export type AutocompleteInstance = {
 	/** Index of the current selected option. */
 	activeIndex: number,
 	/** Instance of the dropdown plugin for this autocomplete. */
-	dropdown: any,
+	dropdown: unknown,
 
 	/** Open autocomplete dropdown. */
 	open(): void,

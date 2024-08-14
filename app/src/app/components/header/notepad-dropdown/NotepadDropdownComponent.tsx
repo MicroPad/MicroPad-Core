@@ -25,7 +25,7 @@ const NotepadDropdownComponent = React.memo((props: Props) => {
 	const { notepadTitles, syncState, downloadNotepad } = props;
 
 	const openNotepad = (event) => {
-		let title = event.currentTarget.textContent;
+		const title = event.currentTarget.textContent;
 		props.openNotepadFromStorage(title);
 	};
 
@@ -34,8 +34,8 @@ const NotepadDropdownComponent = React.memo((props: Props) => {
 		if (!title) return;
 
 		let notepad = new FlatNotepad(title);
-		let section = FlatNotepad.makeFlatSection('Unorganised Notes');
-		let note = new Note('Untitled Note').clone({ parent: section.internalRef });
+		const section = FlatNotepad.makeFlatSection('Unorganised Notes');
+		const note = new Note('Untitled Note').clone({ parent: section.internalRef });
 		notepad = notepad.addSection(section).addNote(note);
 
 		if (title) props.newNotepad!(notepad);
@@ -78,5 +78,6 @@ const NotepadDropdownComponent = React.memo((props: Props) => {
 		</Dropdown>
 	);
 });
+NotepadDropdownComponent.displayName = 'NotepadDropdownComponent';
 
 export default NotepadDropdownComponent;

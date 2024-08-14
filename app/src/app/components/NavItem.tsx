@@ -14,5 +14,6 @@ const NavItem2 = React.memo((props: NavItemProps) => {
 	// @ts-expect-error Adding an extra property that's not on the type (onTouchEnd). The real JS uses it.
 	return <NavItem {...props} onClick={IS_IOS ? undefined : props.onClick} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={IS_IOS ? onTouchEnd : undefined} />;
 });
+NavItem2.displayName = 'NavItem2';
 
 export default NavItem2;

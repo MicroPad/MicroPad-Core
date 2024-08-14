@@ -1,6 +1,5 @@
 /* Special Imports */
-// @ts-expect-error
-// eslint-disable-next-line import/no-webpack-loader-syntax
+// @ts-expect-error TS2307
 import helpNpx from './assets/Help.npx';
 /* CSS Imports */
 import '@fontsource/abeezee';
@@ -33,7 +32,7 @@ import NoteViewerComponent from './containers/NoteViewerContainer';
 import { enableKeyboardShortcuts } from './services/shortcuts';
 import PrintViewOrAppContainerComponent from './containers/PrintViewContainer';
 import NoteElementModalComponent from './components/note-element-modal/NoteElementModalComponent';
-import { SyncUser } from './types/SyncTypes';
+import { SyncLoginRequest, SyncUser } from './types/SyncTypes';
 import InsertElementComponent from './containers/InsertElementContainer';
 import { ThemeName } from './types/Themes';
 import AppBodyComponent from './containers/AppBodyContainer';
@@ -230,7 +229,7 @@ async function hydrateStoreFromLocalforage() {
 	if (shouldWordWrap !== null) store.dispatch(actions.toggleWordWrap(shouldWordWrap));
 
 	const syncUser: SyncUser | null = await SYNC_STORAGE.getItem<SyncUser>('sync user');
-	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as any, result: syncUser }));
+	if (!!syncUser && !!syncUser.token && !!syncUser.username) store.dispatch(actions.syncLogin.done({ params: {} as SyncLoginRequest, result: syncUser }));
 
 	const theme = await localforage.getItem<ThemeName>('theme');
 	if (!!theme) store.dispatch(actions.selectTheme(theme));
@@ -272,7 +271,7 @@ async function displayWhatsNew() {
 }
 
 function notepadDownloadHandler() {
-	// eslint-disable-next-line no-restricted-globals
+	 
 	const downloadNotepadUrl = new URLSearchParams(location.search).get('download');
 	if (!!downloadNotepadUrl) store.dispatch(actions.downloadNotepad.started(downloadNotepadUrl));
 }

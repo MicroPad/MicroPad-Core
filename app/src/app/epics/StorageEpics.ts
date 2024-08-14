@@ -201,7 +201,7 @@ const persistLastOpenedNote$ = (action$: Observable<MicroPadAction>, state$: Epi
 		ofType(actions.loadNote.done.type),
 		filter(() => !!state$.value.notepads.notepad?.item),
 		map((action): LastOpenedNotepad => ({
-			notepadTitle: state$.value.notepads.notepad?.item?.title!,
+			notepadTitle: state$.value.notepads.notepad!.item!.title!,
 			noteRef: (action as MicroPadActions['loadNote']['done']).payload.params
 		})),
 		tap(lastOpened =>

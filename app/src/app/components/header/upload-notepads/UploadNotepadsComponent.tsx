@@ -45,7 +45,7 @@ export default class UploadNotepadsComponent extends React.Component<IUploadNote
 						const zip = new JSZip();
 						zip.loadAsync(arrayBuffer)
 							.then(() => {
-								for (let name in zip.files) {
+								for (const name in zip.files) {
 									if (name.split('.').pop()!.toLowerCase() !== 'npx') continue;
 
 									zip.file(name)!.async('text')
