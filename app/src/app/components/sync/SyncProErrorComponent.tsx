@@ -5,7 +5,6 @@ import SingletonModalComponent from '../singleton-modal/SingletonModalContainer'
 import Button2 from '../Button';
 
 export const SyncProErrorComponent = () => (
-	/* eslint-disable jsx-a11y/anchor-has-content */
 	<SingletonModalComponent
 		id="sync-pro-error-modal"
 		header="Good and bad news"

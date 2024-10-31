@@ -204,7 +204,7 @@ export const upload$ = (action$: Observable<MicroPadAction>, state$: EpicStore, 
 					const blobs: Array<Blob | null> = await optimiseAssets(
 						getStorage().assetStorage,
 						orderedAssetList.map(([uuid]) => uuid),
-						state$.value.notepads.notepad?.item!
+						state$.value.notepads.notepad!.item!
 					);
 					orderedAssetList
 						.map(([, url]) => url)

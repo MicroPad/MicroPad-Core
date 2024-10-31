@@ -3,7 +3,7 @@ import { ajax } from 'rxjs/ajax';
 import { catchError, map } from 'rxjs/operators';
 import { initialise, initialiseWithHandlers } from 'fend-wasm-web';
 
-export const START_FEND$: Observable<void> = ajax<any>({
+export const START_FEND$: Observable<void> = ajax<string>({
 	url: 'https://getmicropad.com/cors-proxy/moolah.xml',
 	method: 'GET',
 	timeout: 3000,

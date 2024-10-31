@@ -77,7 +77,7 @@ export const mathsTransformer: () => MarkdownTransformer[] = () => {
 			type: 'output',
 			filter: text => {
 				for (let i = 0; i < matches.length; ++i) {
-					let pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
+					const pat = '%MATHPLACEHOLDER' + i + 'ENDMATHPLACEHOLDER%';
 					text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 				}
 

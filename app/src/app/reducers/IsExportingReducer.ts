@@ -27,7 +27,7 @@ export class IsExportingReducer extends AbstractReducer<IsExportingState> {
 		);
 
 		this.handle(
-			(state, action) => ({ isLoading: false, error: action.payload.error }),
+			(_state, action) => ({ isLoading: false, error: action.payload.error }),
 			actions.exportAll.failed,
 			actions.exportToMarkdown.failed
 		);

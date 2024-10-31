@@ -44,7 +44,5 @@ export function createSentryReduxEnhancer() {
 function getDevEnv(): SentryEnv {
 	if (!isDev()) return SentryEnv.PROD;
 
-	/* eslint-disable no-restricted-globals */
 	return location.hostname === 'next.getmicropad.com' ? SentryEnv.NEXT_DEV : SentryEnv.LOCAL;
-	/* eslint-enable no-restricted-globals */
 }

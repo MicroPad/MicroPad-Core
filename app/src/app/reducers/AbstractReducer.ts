@@ -23,7 +23,12 @@ export abstract class AbstractReducer<S> {
 		return !!this.handlers[action.type] ? this.handlers[action.type](state, action as MicroPadAction) : state;
 	}
 
-	protected handle<ActionPayload>(handler: ReducerHandler<S, ActionPayload>, ...actions: ActionCreator<ActionPayload>[]): void {
+	protected handle<ActionType>(handler: ReducerHandler<S, ActionType>, ...actions: ActionCreator<ActionType>[]): void {
+		actions.forEach(action => this.handlers[action.type] = handler);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	protected handleMany(handler: ReducerHandler<S, unknown>, ...actions: ActionCreator<any>[]): void {
 		actions.forEach(action => this.handlers[action.type] = handler);
 	}
 

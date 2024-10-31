@@ -1,8 +1,8 @@
 import 'vex-js/dist/css/vex.css';
 import 'vex-js/dist/css/vex-theme-top.css';
 
-const Vex = require('vex-js');
-const VexDialog = require('vex-dialog');
+import Vex from 'vex-js';
+import VexDialog from 'vex-dialog';
 
 Vex.registerPlugin(VexDialog);
 Vex.defaultOptions!.className = 'vex-theme-top';
@@ -75,10 +75,10 @@ export class Dialog {
 
 	private static ID_COUNT: number = 0;
 
-	private static loadVex<T>(vexFn: (opts: any) => void, opts: VexOpts): Promise<T> {
+	private static loadVex<T>(vexFn: (opts: unknown) => void, opts: VexOpts): Promise<T> {
 		return new Promise<T>(resolve => {
 			setTimeout(() => {
-				let modal = document.querySelector<HTMLDivElement>('.modal.open');
+				const modal = document.querySelector<HTMLDivElement>('.modal.open');
 				if (modal) modal.style.display = 'none';
 
 				vexFn.bind(Vex.dialog)({

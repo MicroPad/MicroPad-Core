@@ -32,7 +32,7 @@ const SingletonModalComponent = (props: Props) => {
 			fixedFooter={props.fixedFooter}
 			header={props.header}
 			trigger={props.trigger}
-			actions={props.actions ?? [<Button2 className="btn-flat modal-action modal-close">Close</Button2>]}
+			actions={props.actions ?? [<Button2 key="singleton-modal__close-btn" className="btn-flat modal-action modal-close">Close</Button2>]}
 			options={props.options ?? DEFAULT_MODAL_OPTIONS}>
 			{props.children}
 		</Modal>

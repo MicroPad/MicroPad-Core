@@ -1,5 +1,4 @@
-// @ts-expect-error
-// eslint-disable-next-line import/no-webpack-loader-syntax
+// @ts-expect-error TS2307
 import helpNpx from '../assets/Help.npx';
 
 import { createEpicMiddleware, StateObservable } from 'redux-observable';

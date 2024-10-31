@@ -331,7 +331,7 @@ const renameNotepad$ = (action$: Observable<MicroPadAction>, state$: EpicStore) 
 		ofType(actions.renameNotepad.started.type),
 		filter(() => !!state$.value.notepads.notepad?.item?.title),
 		switchMap(action => {
-			const oldTitle = state$.value.notepads.notepad?.item?.title!;
+			const oldTitle = state$.value.notepads.notepad!.item!.title!;
 
 			return from(NOTEPAD_STORAGE.removeItem(oldTitle))
 				.pipe(
@@ -447,9 +447,9 @@ const quickNotepad$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
 		ofType(actions.quickNotepad.type),
 		map(() => {
-			let notepad = new FlatNotepad(`Untitled Notepad (${format(new Date(), 'EEEE, d LLLL yyyy pp')})`);
-			let section = FlatNotepad.makeFlatSection('Unorganised Notes');
-			let note = new Note('Untitled Note').clone({ parent: section.internalRef });
+			const notepad = new FlatNotepad(`Untitled Notepad (${format(new Date(), 'EEEE, d LLLL yyyy pp')})`);
+			const section = FlatNotepad.makeFlatSection('Unorganised Notes');
+			const note = new Note('Untitled Note').clone({ parent: section.internalRef });
 
 			return notepad.addSection(section).addNote(note);
 		}),

@@ -91,7 +91,7 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 		const containerStyles = {
 			minWidth: '100%',
 			minHeight: '100%',
-			position: 'relative' as 'relative',
+			position: 'relative' as const,
 			transform: `scale(${zoom})`,
 			transformOrigin: '0 0',
 			WebkitTransformOrigin: '0 0'

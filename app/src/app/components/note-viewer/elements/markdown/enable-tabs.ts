@@ -32,14 +32,14 @@ export function enableTabs(el: HTMLTextAreaElement, event): boolean | void {
 
 	// Thanks to https://github.com/facebook/react/issues/10135#issuecomment-314441175
 	function setNativeValue(element, value) {
-		const valueSetter = Object.getOwnPropertyDescriptor(element, 'value')?.set!;
+		const valueSetter = Object.getOwnPropertyDescriptor(element, 'value')?.set;
 		const prototype = Object.getPrototypeOf(element);
-		const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set!;
+		const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
 
-		if (valueSetter && valueSetter !== prototypeValueSetter) {
+		if (valueSetter !== prototypeValueSetter && prototypeValueSetter) {
 			prototypeValueSetter.call(element, value);
 		} else {
-			valueSetter.call(element, value);
+			valueSetter!.call(element, value);
 		}
 	}
 }

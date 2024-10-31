@@ -14,9 +14,9 @@ import AppSettingsComponent from './app-settings/AppSettingsContainer';
 
 // @ts-expect-error TS2307
 import NewSectionVideo from '../../assets/instructions/new-section.mp4';
-// @ts-expect-error
+// @ts-expect-error TS2307
 import OpenNoteVideo from '../../assets/instructions/open-note.mp4';
-// @ts-expect-error
+// @ts-expect-error TS2307
 import OpenNotepadVideo from '../../assets/instructions/open-notepad.mp4';
 import { notepadExplorerConnector } from './NotepadExplorerContainer';
 import { ConnectedProps } from 'react-redux';

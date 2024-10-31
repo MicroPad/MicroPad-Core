@@ -46,7 +46,7 @@ export default class NoteElementComponent extends React.Component<INoteElementCo
 		const isEditing = element.args.id === elementEditing;
 
 		const containerStyles = {
-			zIndex: (isEditing) ? 5000 : 'auto' as 'auto'
+			zIndex: (isEditing) ? 5000 : 'auto' as const
 		};
 
 		const backgroundColour = theme.background === '#000000' ? ThemeValues.Midnight.background : theme.background;

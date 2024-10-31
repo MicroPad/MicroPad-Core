@@ -14,7 +14,7 @@ export const generateMarkdownForPrint$ = (action$: Observable<MicroPadAction>, s
 	action$.pipe(
 		ofType(actions.print.started.type),
 		withLatestFrom(state$),
-		map(([,state]): [FlatNotepad, string] => [state.notepads.notepad?.item!, state.currentNote.ref]),
+		map(([,state]): [FlatNotepad, string] => [state.notepads.notepad!.item!, state.currentNote.ref]),
 		filter(([notepad, noteRef]: [FlatNotepad, string]) => !!notepad && !!noteRef),
 		map(([notepad, noteRef]: [FlatNotepad, string]) => notepad.notes[noteRef]),
 		filterTruthy(),

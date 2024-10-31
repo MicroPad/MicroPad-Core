@@ -123,7 +123,7 @@ export default class PdfElementComponent extends React.Component<INoteElementCom
 	private openEditor = event => {
 		const { element, edit } = this.props;
 
-		let path = event.path || (event.composedPath && event.composedPath()) || [event.target];
+		const path = event.path || (event.composedPath && event.composedPath()) || [event.target];
 		if (path[0].tagName.toLowerCase() === 'button') return;
 
 		edit(element.args.id);

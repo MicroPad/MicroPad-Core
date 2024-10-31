@@ -61,7 +61,7 @@ async function renderNote({ npx, findNote }: Props): Promise<RenderedNote> {
 				regex: /(===[^]+?===|''[^]+?''|;;[^]+?;;|\$\$[^]+?\$\$|\$[^]+?\$)/gi,
 				replace: function(s: string, match: string) {
 					matches.push('&lt;Maths won\'t display in this view. See the help notepad.&gt;<br />' + match);
-					let n = matches.length - 1;
+					const n = matches.length - 1;
 					return '%ph' + n + 'ph%';
 				}
 			},
@@ -69,7 +69,7 @@ async function renderNote({ npx, findNote }: Props): Promise<RenderedNote> {
 				type: 'output',
 				filter: function(text: string) {
 					for (let i = 0; i < matches.length; ++i) {
-						let pat = '%ph' + i + 'ph%';
+						const pat = '%ph' + i + 'ph%';
 						text = text.replace(new RegExp(pat, 'gi'), matches[i]);
 					}
 					// reset array

@@ -1,6 +1,6 @@
 import { AbstractReducer } from './AbstractReducer';
 import { actions } from '../actions';
-import { SearchIndices } from '../types/ActionTypes';
+import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../types/ActionTypes';
 
 export interface ISearchState {
 	query: string;
@@ -30,7 +30,7 @@ export class SearchReducer extends AbstractReducer<ISearchState> {
 		super();
 
 		// Reset state on notepad close/update
-		this.handle<any>(() => this.initialState, actions.parseNpx.done, actions.parseNpx.failed, actions.deleteNotepad);
+		this.handleMany(() => this.initialState, actions.parseNpx.done, actions.parseNpx.failed, actions.deleteNotepad);
 
 		// Search query/results
 		this.handle(
@@ -53,7 +53,7 @@ export class SearchReducer extends AbstractReducer<ISearchState> {
 			indices: action.payload.result
 		}), actions.indexNotepads.done);
 
-		this.handle<any>(state => ({
+		this.handleMany(state => ({
 			...state,
 			query: this.initialState.query,
 			results: this.initialState.results

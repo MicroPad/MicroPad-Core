@@ -171,6 +171,5 @@ function callApi<T>(parent: string, endpoint: string, resource: string, payload?
 }
 
 function shouldUseDevApi(): boolean {
-	// eslint-disable-next-line no-restricted-globals
 	return !!new URLSearchParams(location.search).get('local');
 }

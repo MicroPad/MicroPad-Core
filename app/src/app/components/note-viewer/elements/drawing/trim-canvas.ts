@@ -1,18 +1,26 @@
 // MIT http://rem.mit-license.org
 
+type Bound = {
+	top: number | null,
+	left: number | null,
+	right: number | null,
+	bottom: number | null,
+}
+
 export function trim(c) {
-	let ctx = c.getContext('2d'),
-		copy = document.createElement('canvas').getContext('2d')!,
-		pixels = ctx.getImageData(0, 0, c.width, c.height),
-		l = pixels.data.length,
-		i,
-		bound = {
-			top: null,
-			left: null,
-			right: null,
-			bottom: null
-		},
-		x, y;
+	const ctx = c.getContext('2d');
+	const copy = document.createElement('canvas').getContext('2d')!;
+	const pixels = ctx.getImageData(0, 0, c.width, c.height);
+	const l = pixels.data.length;
+	const bound: Bound = {
+		top: null,
+		left: null,
+		right: null,
+		bottom: null
+	};
+	let i: number;
+	let x: number;
+	let y: number;
 
 	for (i = 0; i < l; i += 4) {
 		if (pixels.data[i + 3] !== 0) {
