@@ -50,7 +50,7 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 		explorerContent: '#ebdbb2',
 		accentContent: '#ebdbb2',
 		backgroundImage: filledBackground,
-		drawingBackground: '#282828',
+		drawingBackground: '#28282830',
 		instructionImages: {
 			notepad: instructionImageDark,
 			note: noteInstructionsDark,
