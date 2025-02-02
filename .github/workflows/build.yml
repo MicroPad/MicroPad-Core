@@ -33,7 +33,7 @@ jobs:
         bun run build
         tar cfJ micropad.tar.xz build/*
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: micropad
         path: 'app/micropad.tar.xz'
@@ -48,7 +48,7 @@ jobs:
       with:
         node-version: '18'
     - uses: oven-sh/setup-bun@v1
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
         name: micropad
     - name: Install node dependencies
@@ -74,7 +74,7 @@ jobs:
     needs: [build, test]
     if: github.ref == 'refs/heads/master' && github.repository == 'micropad/Micropad-Core'
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
         name: micropad
     - run: |
@@ -99,7 +99,7 @@ jobs:
     needs: [build, test]
     if: github.ref == 'refs/heads/next-dev' && github.repository == 'micropad/Micropad-Core'
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
         name: micropad
     - run: |
@@ -127,7 +127,7 @@ jobs:
       id: micropad-version
       working-directory: app
       run: echo "version=v$(npm pkg get version | sed 's/"//g')" >> $GITHUB_OUTPUT
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
         name: micropad
     - uses: dev-drprasad/delete-tag-and-release@v0.2.1
