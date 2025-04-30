@@ -15,7 +15,6 @@ const config: Linter.Config[] = [
 		},
 		settings: {
 			react: {
-				...react.configs.recommended.settings,
 				version: 'detect'
 			}
 		},
