@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="lint" type="js.build_tools.npm" nameIsGenerated="true">
-    <package-json value="$PROJECT_DIR$/package.json" />
+  <configuration default="false" name="typecheck" type="js.build_tools.npm" nameIsGenerated="true">
+    <package-json value="$PROJECT_DIR$/app/package.json" />
     <command value="run" />
     <scripts>
-      <script value="lint" />
+      <script value="typecheck" />
     </scripts>
     <node-interpreter value="project" />
     <envs />
