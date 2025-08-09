@@ -52,7 +52,7 @@ export class AppReducer extends AbstractReducer<IAppStoreState> {
 		defaultFontSize: '16px',
 		zoom: 1,
 		showHelp: true,
-		theme: 'Classic',
+		theme: 'Pastel',
 		explorerWidth: '270px',
 		cursorPos: { x: 0, y: 0 },
 		hasEncryptedNotebooks: {

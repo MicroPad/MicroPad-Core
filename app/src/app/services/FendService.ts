@@ -1,7 +1,7 @@
 import { Observable, of, shareReplay } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { catchError, map } from 'rxjs/operators';
-import { initialise, initialiseWithHandlers } from 'fend-wasm-web';
+import { initialiseWithHandlers } from 'fend-wasm-web';
 
 export const START_FEND$: Observable<void> = ajax<string>({
 	url: 'https://getmicropad.com/cors-proxy/moolah.xml',
@@ -26,7 +26,8 @@ export const START_FEND$: Observable<void> = ajax<string>({
 	map(currencyData => initialiseWithHandlers(currencyData)),
 	catchError(err => {
 		console.error('Caught an error getting currencies for fend', err);
-		return of(initialise());
+		initialiseWithHandlers(new Map());
+		return of(void 0);
 	}),
 	shareReplay(1)
 );

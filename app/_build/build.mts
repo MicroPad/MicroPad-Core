@@ -9,7 +9,7 @@ import servor from 'servor';
 import { getUserAgentRegex } from 'browserslist-useragent-regexp';
 import { createHash } from 'crypto';
 import { sentryEsbuildPlugin } from '@sentry/esbuild-plugin';
-import packageJson from '../package.json' assert { type: 'json' };
+import packageJson from '../package.json' with { type: 'json' };
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 

@@ -1,5 +1,6 @@
 // @ts-expect-error TS2306
 import MathJax from '../../../../assets/MathJax.raw.js';
+// @ts-expect-error not a module
 import hljs from '../../../../assets/highlight.js/highlight.min.raw.js';
 // @ts-expect-error TS2307
 import hljsCss from '../../../../assets/highlight.js/default.raw.css';
@@ -52,7 +53,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 
 		a {
 			color: ${theme.links};
-			text-decoration: none;
+			text-decoration: ${theme.linkUnderline ? 'underline' : 'none'};
 		}
 
 		h1, h2, h3, h4, h5, h6 {

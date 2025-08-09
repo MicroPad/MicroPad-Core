@@ -41,6 +41,23 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 			element: elementInstructionsDark
 		}
 	},
+	Gruvbox: {
+		background: '#282828',
+		accent: '#928374',
+		chrome: '#3c3836',
+		text: '#ebdbb2',
+		links: '#ebdbb2',
+		linkUnderline: true,
+		explorerContent: '#ebdbb2',
+		accentContent: '#ebdbb2',
+		backgroundImage: filledBackground,
+		drawingBackground: '#ffffff15',
+		instructionImages: {
+			notepad: instructionImageDark,
+			note: noteInstructionsDark,
+			element: elementInstructionsDark
+		}
+	},
 	Midnight: {
 		background: '#212121',
 		accent: '#424242',

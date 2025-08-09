@@ -155,9 +155,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 
 		const canvasElement = this.canvasElement;
 		if (!!canvasElement) {
-
-			this.initCanvas();
-
+			setTimeout(() => this.initCanvas(), 0);
 			const isNewEditor = this.props.elementEditing !== prevProps?.elementEditing;
 			if (isNewEditor) {
 				// Restore saved image to canvas

@@ -1,16 +1,16 @@
 {
   "name": "micropad",
-  "version": "4.5.2",
+  "version": "4.6.0",
   "private": true,
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py && ./get_precache_files.py > src/extraPrecacheFiles.ts",
-    "prestart": "tsc -p _build/tsconfig.json",
+    "prestart": "tsgo -p _build/tsconfig.json",
     "start": "NODE_ENV='' node --experimental-import-meta-resolve _build/build.mjs",
-    "prebuild": "tsc -p _build/tsconfig.json",
+    "prebuild": "tsgo -p _build/tsconfig.json",
     "build": "NODE_ENV=production node --experimental-import-meta-resolve _build/build.mjs",
     "test": "TZ=NZ jest",
-    "typecheck": "tsc --noEmit --p ./tsconfig.json",
-    "typecheck:watch": "tsc --noEmit --watch -p ./tsconfig.json",
+    "typecheck": "tsgo --noEmit --p ./tsconfig.json",
+    "typecheck:watch": "tsgo --noEmit --watch -p ./tsconfig.json",
     "lint": "eslint --flag unstable_ts_config src/",
     "lint:fix": "eslint --flag unstable_ts_config --fix src/"
   },
@@ -66,63 +66,6 @@
     "workbox-routing": "^6.6.1",
     "workbox-strategies": "^6.6.1"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "plugin:jest-playwright/recommended"
-    ],
-    "ignorePatterns": [
-      "*.js"
-    ],
-    "overrides": [
-      {
-        "files": [
-          "**/*.ts?(x)"
-        ],
-        "rules": {
-          "@typescript-eslint/no-use-before-define": "off",
-          "eqeqeq": [
-            "error",
-            "smart"
-          ],
-          "no-multi-spaces": "error",
-          "array-bracket-spacing": [
-            "error",
-            "never"
-          ],
-          "object-curly-spacing": [
-            "error",
-            "always"
-          ],
-          "key-spacing": "error",
-          "@typescript-eslint/prefer-ts-expect-error": "warn",
-          "no-debugger": "error",
-          "quotes": [
-            "error",
-            "single",
-            {
-              "allowTemplateLiterals": true
-            }
-          ],
-          "jsx-quotes": [
-            "error",
-            "prefer-double"
-          ],
-          "no-script-url": "error",
-          "no-eval": "error",
-          "no-console": [
-            "error",
-            {
-              "allow": [
-                "warn",
-                "error"
-              ]
-            }
-          ]
-        }
-      }
-    ]
-  },
   "browserslist": {
     "production": [
       "chrome >= 84",
@@ -154,7 +97,7 @@
     "@types/json-stringify-safe": "^5.0.3",
     "@types/mousetrap": "^1.6.15",
     "@types/node": "^18.19.44",
-    "@types/react": "^17.0.80",
+    "@types/react": "^17",
     "@types/react-dom": "^17.0.25",
     "@types/semver": "^7.5.8",
     "@types/showdown": "^1.9.4",
@@ -166,6 +109,7 @@
     "eslint": "^9.9.0",
     "eslint-plugin-react": "^7.35.0",
     "expect-playwright": "^0.8.0",
+    "globals": "^16.0.0",
     "html-minifier": "^4.0.0",
     "jest": "^27.5.1",
     "jest-circus": "^27.5.1",
@@ -174,12 +118,13 @@
     "jest-junit": "^13.2.0",
     "jest-playwright-preset": "^1.7.2",
     "jest-runner": "^27.5.1",
-    "jiti": "^1.21.6",
+    "jiti": "^2.4.2",
     "playwright": "^1.46.0",
     "servor": "^4.0.2",
     "ts-jest": "^27.1.5",
     "typescript-eslint": "^8.1.0",
-    "workbox-build": "^6.6.1"
+    "workbox-build": "^6.6.1",
+	"@typescript/native-preview": "7.0.0-dev.20250809.1"
   },
   "resolutions": {
     "@types/react": "^17",

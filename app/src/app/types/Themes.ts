@@ -1,4 +1,4 @@
-export type ThemeName = 'Classic' | 'Solarized' | 'Midnight' | 'Void' | 'Peach' | 'Pastel' | 'Wellington' | 'Purple' | 'IanPad';
+export type ThemeName = 'Classic' | 'Solarized' | 'Gruvbox' | 'Midnight' | 'Void' | 'Peach' | 'Pastel' | 'Wellington' | 'Purple' | 'IanPad';
 
 export interface ITheme {
 	background: string;
@@ -6,6 +6,8 @@ export interface ITheme {
 	accent: string;
 	text: string;
 	links: string;
+	/** Should links be underlined? Defaults to 'no'. */
+	linkUnderline?: boolean;
 	explorerContent: string;
 	accentContent: string;
 	instructionImages: {

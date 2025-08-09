@@ -64,7 +64,7 @@ export function getAsBase64(blob: Blob): Promise<string> {
 	});
 }
 
-export function getBytes(blob: Blob): Promise<ArrayBuffer> {
+export function getBytes(blob: Blob): Promise<ArrayBuffer | Uint8Array> {
 	return new Promise(resolve => {
 		try {
 			const reader = new FileReader();
