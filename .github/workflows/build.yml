@@ -45,7 +45,7 @@ jobs:
         working-directory: ./app
         # Start the server in the background and then run tests
         run: |
-          cd app/build
+          cd build
           python3 -m http.server 3000 &
           cd ..
           yarn test
