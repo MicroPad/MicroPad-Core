@@ -1,4 +1,4 @@
-import { EMPTY, Observable, of, shareReplay } from 'rxjs';
+import { Observable, of, shareReplay } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { catchError, map } from 'rxjs/operators';
 import { initialiseWithHandlers } from 'fend-wasm-web';

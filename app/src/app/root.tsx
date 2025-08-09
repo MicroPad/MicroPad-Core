@@ -9,6 +9,7 @@ import './root.css';
 import './ScrollbarPatch.css';
 /* Themes */
 import './theme-styles/Solarized.css';
+import './theme-styles/Gruvbox.css';
 import './theme-styles/Midnight.css';
 import './theme-styles/Void.css';
 import './theme-styles/Wellington.css';

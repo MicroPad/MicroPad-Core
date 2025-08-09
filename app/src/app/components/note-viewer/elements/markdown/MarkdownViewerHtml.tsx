@@ -53,7 +53,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 
 		a {
 			color: ${theme.links};
-			text-decoration: none;
+			text-decoration: ${theme.linkUnderline ? 'underline' : 'none'};
 		}
 
 		h1, h2, h3, h4, h5, h6 {

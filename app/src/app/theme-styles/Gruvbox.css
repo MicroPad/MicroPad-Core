@@ -1,0 +1,11 @@
+.theme-Gruvbox a {
+	color: #ebdbb2;
+}
+
+.theme-Gruvbox .btn-flat {
+	color: #ebdbb2;
+}
+
+.theme-Gruvbox .btn:hover, .theme-Gruvbox .btn-large:hover {
+	background-color: #928374;
+}

@@ -6,6 +6,8 @@ export interface ITheme {
 	accent: string;
 	text: string;
 	links: string;
+	/** Should links be underlined? Defaults to 'no'. */
+	linkUnderline?: boolean;
 	explorerContent: string;
 	accentContent: string;
 	instructionImages: {
