@@ -88,6 +88,7 @@ jobs:
     - name: Test
       working-directory: app
       run: |
+        yarn playwright install
         yarn test
   deploy:
     name: Deploy
