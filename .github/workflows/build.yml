@@ -74,9 +74,10 @@ jobs:
         with:
           name: micropad
 
-      - run: |
-          mkdir -p app/build
-          tar xf micropad.tar.xz -C app/build
+      - name: Unpack artifact for deployment
+        run: |
+          mkdir app
+          tar xf micropad.tar.xz -C app
 
       - name: Upload files
         uses: oracle-actions/run-oci-cli-command@v1.1
@@ -102,9 +103,10 @@ jobs:
         with:
           name: micropad
 
-      - run: |
-          mkdir -p app/build
-          tar xf micropad.tar.xz -C app/build
+      - name: Unpack artifact for deployment
+        run: |
+          mkdir app
+          tar xf micropad.tar.xz -C app
 
       - name: Upload files
         uses: oracle-actions/run-oci-cli-command@v1.1
