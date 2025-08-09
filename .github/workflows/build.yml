@@ -46,7 +46,7 @@ jobs:
         # Start the server in the background and then run tests
         run: |
           cd build
-          python3 -m http.server 3000 &
+          python3 -m http.server 3000 > /dev/null &
           cd ..
           yarn test
 
