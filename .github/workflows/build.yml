@@ -47,7 +47,7 @@ jobs:
         run: |
           cd app/build
           python3 -m http.server 3000 &
-          cd cd ..
+          cd ..
           yarn test
 
       - name: Package build artifact
