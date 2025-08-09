@@ -45,10 +45,11 @@ jobs:
         yarn build
         tar cfJ micropad.tar.xz build/*
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: micropad
         path: 'app/micropad.tar.xz'
+        overwrite: true
   test:
     name: Test
     runs-on: ubuntu-latest
