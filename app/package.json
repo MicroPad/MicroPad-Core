@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "preinstall": "python3 ../libs/build-libs.py && ./get_precache_files.py > src/extraPrecacheFiles.ts",
-    "prestart": "tsc -p _build/tsconfig.json",
+    "prestart": "tsgo -p _build/tsconfig.json",
     "start": "NODE_ENV='' node --experimental-import-meta-resolve _build/build.mjs",
-    "prebuild": "tsc -p _build/tsconfig.json",
+    "prebuild": "tsgo -p _build/tsconfig.json",
     "build": "NODE_ENV=production node --experimental-import-meta-resolve _build/build.mjs",
     "test": "TZ=NZ jest",
-    "typecheck": "tsc --noEmit --p ./tsconfig.json",
-    "typecheck:watch": "tsc --noEmit --watch -p ./tsconfig.json",
+    "typecheck": "tsgo --noEmit --p ./tsconfig.json",
+    "typecheck:watch": "tsgo --noEmit --watch -p ./tsconfig.json",
     "lint": "eslint --flag unstable_ts_config src/",
     "lint:fix": "eslint --flag unstable_ts_config --fix src/"
   },
@@ -123,7 +123,8 @@
     "servor": "^4.0.2",
     "ts-jest": "^27.1.5",
     "typescript-eslint": "^8.1.0",
-    "workbox-build": "^6.6.1"
+    "workbox-build": "^6.6.1",
+	"@typescript/native-preview": "7.0.0-dev.20250809.1"
   },
   "resolutions": {
     "@types/react": "^17",
