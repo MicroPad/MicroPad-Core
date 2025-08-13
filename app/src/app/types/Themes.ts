@@ -1,4 +1,15 @@
-export type ThemeName = 'Classic' | 'Solarized' | 'Gruvbox' | 'Midnight' | 'Void' | 'Peach' | 'Pastel' | 'Wellington' | 'Purple' | 'IanPad';
+export type ThemeName =
+	| 'Classic'
+	| 'Solarized'
+	| 'Gruvbox'
+	| 'Midnight'
+	| 'Void'
+	| 'Peach'
+	| 'Pastel'
+	| 'Wellington'
+	| 'Grandma'
+	| 'Purple'
+	| 'IanPad';
 
 export interface ITheme {
 	background: string;
