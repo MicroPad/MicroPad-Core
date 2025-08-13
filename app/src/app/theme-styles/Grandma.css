@@ -1,0 +1,11 @@
+.theme-Grandma a {
+	color: #333;
+}
+
+.theme-Grandma .notepad-explorer a {
+	color: #231e23;
+}
+
+#breadcrumb-holder > nav.Grandma {
+	background-color: #fdc3a4;
+}

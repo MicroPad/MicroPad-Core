@@ -135,6 +135,21 @@ export const ThemeValues: { [K in ThemeName]: ITheme } = {
 			element: elementInstructionsLight
 		}
 	},
+	Grandma: {
+		background: '#fbcbd4',
+		accent: '#f8e3fd',
+		chrome: '#f79cad',
+		text: '#000000',
+		links: '#444444',
+		explorerContent: '#333333',
+		accentContent: '#333333',
+		backgroundImage: filledBackground,
+		instructionImages: {
+			notepad: instructionImageLight,
+			note: noteInstructionsLight,
+			element: elementInstructionsLight
+		}
+	},
 	Purple: {
 		background: '#ffffff',
 		accent: '#ffcc00',

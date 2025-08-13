@@ -16,6 +16,7 @@ import './theme-styles/Wellington.css';
 import './theme-styles/Peach.css';
 import './theme-styles/Pastel.css';
 import './theme-styles/Purple.css';
+import './theme-styles/Grandma.css';
 /* JS Imports */
 import React from 'react';
 import 'materialize-css/dist/js/materialize.js';
