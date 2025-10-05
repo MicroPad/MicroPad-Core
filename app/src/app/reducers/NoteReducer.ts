@@ -29,7 +29,7 @@ export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
 			x: 0,
 			y: 0,
 			enabled: false
-		}
+		},
 	};
 
 	public reducer(state: ICurrentNoteState | undefined, action: Action): ICurrentNoteState {
@@ -95,7 +95,6 @@ export class NoteReducer extends AbstractReducer<ICurrentNoteState> {
 				insertElement: { ...state.insertElement, enabled: false }
 			}
 		}
-
 		return state;
 	}
 

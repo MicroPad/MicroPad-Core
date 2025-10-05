@@ -41,6 +41,57 @@ export default class DrawingElementComponent extends React.Component<Props> {
 	private canvasImage?: Blob | null;
 
 	private rainbowIndex = 0;
+	private undoStack: string[] = [];
+	private redoStack: string[] = [];
+	private maxHistory = 50; 
+
+private pushUndo = () => {
+    if (!this.canvasElement) return;
+    const snapshot = this.canvasElement.toDataURL();
+    if (this.undoStack.length === 0 || this.undoStack[this.undoStack.length - 1] !== snapshot) {
+        this.undoStack.push(snapshot);
+        if (this.undoStack.length > this.maxHistory) this.undoStack.shift();
+    }
+    this.redoStack = [];
+};
+
+
+private undo = () => {
+		    if (this.undoStack.length < 2 || !this.canvasElement) return;
+    const current = this.undoStack.pop(); // discard current state
+    this.redoStack.push(current!);
+    const prev = this.undoStack[this.undoStack.length - 1];
+    this.restoreCanvas(prev);
+	};
+
+	private redo = () => {
+		   if (this.redoStack.length === 0 || !this.canvasElement) return;
+    const snapshot = this.redoStack.pop()!;
+    this.undoStack.push(snapshot);
+    this.restoreCanvas(snapshot);
+	};
+
+    private restoreCanvas = (snapshot: string) => {
+        if (!this.canvasElement) return;
+        const img = new Image();
+        img.onload = () => {
+            this.ctx.clearRect(0, 0, this.canvasElement!.width, this.canvasElement!.height);
+            this.ctx.drawImage(img, 0, 0);
+        };
+        img.src = snapshot;
+    }
+
+	private handleKeyDown = (e: KeyboardEvent) => {
+		if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+			e.preventDefault();
+			this.undo();
+		} else if (e.ctrlKey && e.key.toLowerCase() === 'y') {
+			e.preventDefault();
+			this.redo();
+		}
+	};
+
+
 
 	render() {
 		const { element, elementEditing, theme } = this.props;
@@ -146,7 +197,13 @@ export default class DrawingElementComponent extends React.Component<Props> {
 
 	componentDidMount() {
 		this.componentDidUpdate();
+		window.addEventListener('keydown', this.handleKeyDown, true);
+    };
+
+	componentWillUnmount() {
+		window.removeEventListener('keydown', this.handleKeyDown);
 	}
+
 
 	componentDidUpdate(prevProps?: Readonly<Props>) {
 		const { element, noteAssets } = this.props;
@@ -155,22 +212,23 @@ export default class DrawingElementComponent extends React.Component<Props> {
 
 		const canvasElement = this.canvasElement;
 		if (!!canvasElement) {
-			setTimeout(() => this.initCanvas(), 0);
+
+			// setTimeout(() => this.initCanvas(), 0); 
+			this.initCanvas();
 			const isNewEditor = this.props.elementEditing !== prevProps?.elementEditing;
 			if (isNewEditor) {
-				// Restore saved image to canvas
-				const img: HTMLImageElement = new Image();
-				img.onload = () => {
-					const canvasElement = this.canvasElement;
-					if (!canvasElement) return;
-					canvasElement.width = img.naturalWidth;
-					canvasElement.height = img.naturalHeight;
-					this.ctx.drawImage(img, 0, 0);
-				};
-				img.src = noteAssets[element.args.ext!];
-			}
-			return;
+            const img: HTMLImageElement = new Image();
+            img.onload = () => {
+                const canvasElement = this.canvasElement;
+                if (!canvasElement) return;
+                canvasElement.width = img.naturalWidth;
+                canvasElement.height = img.naturalHeight;
+                this.ctx.drawImage(img, 0, 0);
+            };
+            img.src = noteAssets[element.args.ext!];
 		}
+		return;
+	}
 
 		let img: HTMLImageElement = new Image();
 		img.onload = () => {
@@ -215,6 +273,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 		}
 
 		this.ctx = canvasElement.getContext('2d')!;
+		 this.pushUndo();
 
 		canvasElement.onpointerdown = event => {
 			this.ongoingTouches.setTouch(event);
@@ -267,6 +326,7 @@ export default class DrawingElementComponent extends React.Component<Props> {
 			this.ctx.lineTo(pos.x, pos.y);
 
 			this.ongoingTouches.deleteTouch(event.pointerId);
+			  this.pushUndo();
 		};
 
 		canvasElement.onpointercancel = event => {

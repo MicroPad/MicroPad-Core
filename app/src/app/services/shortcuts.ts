@@ -76,4 +76,14 @@ export function enableKeyboardShortcuts(store: Store<IStoreState, MicroPadAction
 			store.dispatch(actions.quickNotepad());
 		}
 	});
+
+  mousetrap.bind('mod+z', e => {
+    e.preventDefault();
+    store.dispatch(actions.undoDrawing());
+  });
+
+  mousetrap.bind('mod+y', e => {
+    e.preventDefault();
+    store.dispatch(actions.redoDrawing());
+  });
 }
