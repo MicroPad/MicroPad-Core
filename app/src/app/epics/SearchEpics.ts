@@ -4,8 +4,10 @@ import { from, Observable, of } from 'rxjs';
 import { actions, MicroPadAction, MicroPadActions } from '../actions';
 import { EpicDeps, EpicStore } from './index';
 import { indexNotepads, search } from '../services/SearchService';
+import { searchNoteElements } from '../services/NoteSearch';
 import { IStoreState } from '../types';
 import { SearchResult } from '../reducers/SearchReducer';
+import Note from 'upad-parse/dist/Note';
 
 export const refreshIndices$ = (action$: Observable<MicroPadAction>) =>
 	action$.pipe(
@@ -37,7 +39,10 @@ export const search$ = (action$: Observable<MicroPadAction>, state$: EpicStore) 
 		withLatestFrom(state$),
 		map(([query, state]) => actions.search.done({
 			params: query,
-			result: search(query, state.search.indices)
+			result: {
+				noteResults: search(query, state.search.indices),
+				elementResults: searchNoteElements(query, getCurrentNote(state))
+			}
 		}))
 	);
 
@@ -63,11 +68,23 @@ export const hashtagSearchOrJump$ = (action$: Observable<MicroPadAction>, state$
 			}
 
 			return [
-				actions.search.done({ params: query, result: rawResults }),
+				actions.search.done({
+					params: query,
+					result: {
+						noteResults: rawResults,
+						elementResults: searchNoteElements(query, getCurrentNote(state))
+					}
+				}),
 				actions.openModal('search-modal')
 			];
 		})
 	);
+
+function getCurrentNote(state: IStoreState): Note | undefined {
+	const ref = state.currentNote.ref;
+	if (!ref.length) return undefined;
+	return state.notepads.notepad?.item?.notes[ref];
+}
 
 export const searchEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreState, EpicDeps>(
 	refreshIndices$,

@@ -5,6 +5,7 @@ import { Action, Dispatch } from 'redux';
 import { actions } from '../../actions';
 import { FlatNotepad, Note, Notepad } from 'upad-parse/dist';
 import { ThemeValues } from '../../ThemeValues';
+import { MoveNotepadObjectAction } from '../../types/ActionTypes';
 
 let notepad: FlatNotepad | undefined;
 let memoisedFullNotepad: Notepad | undefined;
@@ -41,6 +42,7 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>) {
 		collapseAll: () => dispatch(actions.collapseAllExplorer()),
 		newSection: obj => dispatch(actions.newSection(obj)),
 		newNote: obj => dispatch(actions.newNote(obj)),
+		moveObj: (payload: MoveNotepadObjectAction) => dispatch(actions.moveNotepadObject(payload)),
 		expandFromNote: note => {
 			if (!notepad) return;
 			dispatch(actions.expandFromNote({

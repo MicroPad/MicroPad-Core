@@ -3,7 +3,7 @@ import { concatMap, filter, map, mergeMap, switchMap, take, tap, withLatestFrom 
 import { from, Observable } from 'rxjs';
 import { actions, MicroPadAction, MicroPadActions } from '../actions';
 import { INotepadStoreState } from '../types/NotepadTypes';
-import { filterTruthy, generateGuid } from '../util';
+import { filterTruthy, generateGuid, noEmit } from '../util';
 import { MoveNotepadObjectAction, NewNotepadObjectAction, UpdateElementAction } from '../types/ActionTypes';
 import { IStoreState } from '../types';
 import { Asset, FlatNotepad, Note } from 'upad-parse/dist/index';
@@ -207,6 +207,35 @@ const filePasted$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
 		))
 	);
 
+const jumpToNoteElement$ = (action$: Observable<MicroPadAction>, state$: EpicStore) =>
+	action$.pipe(
+		ofType(actions.jumpToNoteElement.type),
+		map(action => (action as MicroPadActions['jumpToNoteElement']).payload),
+		withLatestFrom(state$),
+		tap(([elementId, state]) => {
+			const note = state.notepads.notepad?.item?.notes[state.currentNote.ref];
+			const element = note?.elements.find(el => el.args.id === elementId);
+			const viewer = document.getElementById('note-viewer');
+			if (!element || !viewer) return;
+
+			// Element coords are unscaled canvas px; #note-container is scaled by zoom with origin 0 0.
+			const zoom = state.app.zoom;
+			const margin = 50;
+			const left = Math.max(0, parseInt(element.args.x, 10) * zoom - margin);
+			const top = Math.max(0, parseInt(element.args.y, 10) * zoom - margin);
+			// Instant scroll: smooth scrolling can be deferred indefinitely on this container in Chrome
+			viewer.scrollTo(left, top);
+
+			const container = document.querySelector<HTMLDivElement>(`.noteElement[data-el-id="${elementId}"]`);
+			if (!container) return;
+			container.classList.remove('noteElement--flash');
+			void container.offsetWidth; // force a reflow so a repeat jump restarts the animation
+			container.classList.add('noteElement--flash');
+			setTimeout(() => container.classList.remove('noteElement--flash'), 1600);
+		}),
+		noEmit()
+	);
+
 export const restoreNoteOnOpen$ = (action$: Observable<MicroPadAction>, state$: EpicStore) => action$.pipe(
 	ofType<MicroPadAction, MicroPadActions['parseNpx']['done']['type'], MicroPadActions['parseNpx']['done']>(actions.parseNpx.done.type),
 	switchMap(action => state$.pipe(
@@ -227,6 +256,7 @@ export const noteEpics$ = combineEpics<MicroPadAction, MicroPadAction, IStoreSta
 	loadNoteOnMove$,
 	quickMarkdownInsert$,
 	filePasted$,
+	jumpToNoteElement$,
 	restoreNoteOnOpen$
 );
 

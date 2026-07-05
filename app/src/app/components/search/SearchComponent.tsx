@@ -11,16 +11,24 @@ import NavItem2 from '../NavItem';
 
 type Props = ConnectedProps<typeof searchConnector>;
 
-type SearchResultOption = {
+type NoteResultOption = {
 	label: string,
-	value: SearchResult & { notepadTitle: string }
+	value: SearchResult & { notepadTitle: string, kind: 'note' }
 };
+
+type ElementResultOption = {
+	label: string,
+	value: { kind: 'element', elementId: string }
+};
+
+type SearchResultOption = NoteResultOption | ElementResultOption;
 
 export default class SearchComponent extends React.Component<Props, never> {
 	private selectEl: any | null = null;
 
 	override render() {
-		const results = [
+		const results: GroupBase<SearchResultOption>[] = [
+			...(this.props.elementResults.length > 0 ? [this.getElementResultGroup()] : []),
 			...(this.props.notepad && this.props.results[this.props.notepad?.title ?? ''] ? [this.getSearchResultGroup([this.props.notepad.title, this.props.results[this.props.notepad.title]])] : []),
 			...Object.entries(this.props.results)
 				.filter(([notepadTitle]) => notepadTitle !== this.props.notepad?.title)
@@ -52,7 +60,7 @@ export default class SearchComponent extends React.Component<Props, never> {
 					menuIsOpen={this.props.showResults}
 					options={results}
 					filterOption={() => true}
-					placeholder={`Search by note title or a hashtag`}
+					placeholder={`Search by note title, hashtag, or text in this note`}
 					noOptionsMessage={() => `No search results found`}
 					inputValue={this.props.query}
 					onInputChange={value => {
@@ -61,7 +69,13 @@ export default class SearchComponent extends React.Component<Props, never> {
 					// @ts-expect-error TS-2322, the type definitions from the library are wrong, they say we get a
 					// group as `item` but we really get the option.
 					onChange={(item: SearchResultOption) => {
-						if (item) this.props.loadResult(this.props.notepad?.title, item.value);
+						if (item) {
+							if (item.value.kind === 'element') {
+								this.props.jumpToElement(item.value.elementId);
+							} else {
+								this.props.loadResult(this.props.notepad?.title, item.value);
+							}
+						}
 						this.closeModal();
 					}}
 					value={null}
@@ -136,6 +150,14 @@ export default class SearchComponent extends React.Component<Props, never> {
 		if (!!overlay) overlay.click();
 	}
 
+	private getElementResultGroup = (): GroupBase<SearchResultOption> => ({
+		label: 'In this note',
+		options: this.props.elementResults.map(result => ({
+			label: result.matchCount > 1 ? `${result.snippet} (${result.matchCount} matches)` : result.snippet,
+			value: { kind: 'element' as const, elementId: result.elementId }
+		}))
+	});
+
 	private getSearchResultGroup = ([notepadTitle, results]: [string, SearchResult[]]): GroupBase<SearchResultOption> => {
 		const seen = new Set<string>();
 
@@ -151,7 +173,8 @@ export default class SearchComponent extends React.Component<Props, never> {
 					label: `${result.parentTitle} > ${result.title}`,
 					value: {
 						...result,
-						notepadTitle
+						notepadTitle,
+						kind: 'note' as const
 					}
 				}))
 				.sort((a, b) => Math.abs(this.props.query.length - a.value.title.length) - Math.abs(this.props.query.length - b.value.title.length))

@@ -21,7 +21,7 @@ import { IInsertElementState } from './reducers/NoteReducer';
 import { CombinedNotepadSyncList, SyncLoginRequest, SyncUser } from './types/SyncTypes';
 import { FlatNotepad, Notepad, Translators } from 'upad-parse/dist';
 import { NoteElement } from 'upad-parse/dist/Note';
-import { SearchResults } from './reducers/SearchReducer';
+import { SearchResultsPayload } from './reducers/SearchReducer';
 import { ThemeName } from './types/Themes';
 import { DueItem } from './services/DueDates';
 import { DrawMode } from './reducers/EditorReducer';
@@ -76,7 +76,7 @@ export const actions = {
 	getHelp: actionCreator.async<void, void, Error>('GET_HELP'),
 	getDueDates: actionCreator.async<string[], DueItem[], Error>('GET_DUE_DATES'),
 	moveObjAcrossNotepads: actionCreator.async<MoveAcrossNotepadsAction, void, Error>('CROSS_NOTEPAD_MOVE'),
-	search: actionCreator.async<string, SearchResults, Error>('SEARCH'),
+	search: actionCreator.async<string, SearchResultsPayload, Error>('SEARCH'),
 	forgetSavedPasswords: actionCreator.async<void, void, unknown>('FORGET_SAVED_PASSWORDS'),
 
 	restoreJsonNotepad: actionCreator<string>('PARSE_JSON_NOTEPAD'),
@@ -144,6 +144,7 @@ export const actions = {
 	filePasted: actionCreator<File>('FILE_PASTED'),
 	updateEncryptionStatus: actionCreator<EncryptionStatus>('UPDATE_CRYPTO_STATUS'),
 	hashtagSearchOrJump: actionCreator<string>('HASHTAG_SEARCH_OR_JUMP'),
+	jumpToNoteElement: actionCreator<string>('JUMP_TO_NOTE_ELEMENT'),
 	setShowHistoricalDueDates: actionCreator<boolean>('SET_SHOW_HISTORICAL_DUE_DATES'),
 };
 

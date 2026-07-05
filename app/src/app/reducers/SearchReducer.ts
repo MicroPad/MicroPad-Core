@@ -1,10 +1,12 @@
 import { AbstractReducer } from './AbstractReducer';
 import { actions } from '../actions';
 import { RestoreJsonNotepadAndLoadNoteAction, SearchIndices } from '../types/ActionTypes';
+import { ElementSearchResult } from '../services/NoteSearch';
 
 export interface ISearchState {
 	query: string;
 	results: SearchResults;
+	elementResults: ElementSearchResult[];
 	indices: SearchIndices;
 	shouldShowResults: boolean;
 }
@@ -17,10 +19,16 @@ export type SearchResult = {
 
 export type SearchResults = { [notepadTitle: string]: SearchResult[] };
 
+export type SearchResultsPayload = {
+	noteResults: SearchResults;
+	elementResults: ElementSearchResult[];
+};
+
 export class SearchReducer extends AbstractReducer<ISearchState> {
 	public readonly key = 'search';
 	public readonly initialState: ISearchState = {
 		results: {},
+		elementResults: [],
 		query: '',
 		indices: [],
 		shouldShowResults: false
@@ -39,7 +47,8 @@ export class SearchReducer extends AbstractReducer<ISearchState> {
 		);
 		this.handle((state, action) => ({
 			...state,
-			results: action.payload.result
+			results: action.payload.result.noteResults,
+			elementResults: action.payload.result.elementResults
 		}), actions.search.done);
 
 		this.handle((state, action) => ({
@@ -56,8 +65,9 @@ export class SearchReducer extends AbstractReducer<ISearchState> {
 		this.handleMany(state => ({
 			...state,
 			query: this.initialState.query,
-			results: this.initialState.results
-		}), actions.loadNote.started, actions.restoreJsonNotepadAndLoadNote)
+			results: this.initialState.results,
+			elementResults: this.initialState.elementResults
+		}), actions.loadNote.started, actions.restoreJsonNotepadAndLoadNote, actions.jumpToNoteElement)
 	}
 
 

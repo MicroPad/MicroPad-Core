@@ -140,3 +140,35 @@
 	width: 100%;
 	white-space: nowrap;
 }
+
+/* Drag-and-drop move/reorder */
+
+.explorer-section-label {
+	display: inline-block;
+}
+
+/* Insertion indicators use box-shadow/outline instead of borders so nothing shifts mid-drag */
+.explorer-drop--before {
+	box-shadow: inset 0 3px 0 0 var(--mp-theme-accent);
+}
+
+.explorer-drop--after {
+	box-shadow: inset 0 -3px 0 0 var(--mp-theme-accent);
+}
+
+.explorer-drop--into {
+	outline: 2px dashed var(--mp-theme-accent);
+	outline-offset: -2px;
+	border-radius: 2px;
+}
+
+.explorer-drag-source {
+	opacity: 0.45;
+}
+
+/* While dragging, child elements must not steal dragenter/dragleave from their row,
+   or the drop indicators flicker. Scoped to the drag so normal clicks are unaffected. */
+.notepad-explorer--dragging .explorer-note *,
+.notepad-explorer--dragging .explorer-section-label * {
+	pointer-events: none;
+}

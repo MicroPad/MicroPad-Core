@@ -64,6 +64,13 @@ export type MoveNotepadObjectAction = {
 	type: 'section' | 'note';
 	objectRef: string;
 	newParent: string;
+	/**
+	 * Placement among the new siblings:
+	 * - undefined: keep the object's current flat-map position (legacy "Move" dropdown behaviour)
+	 * - 'end': append as the last sibling of its kind
+	 * - { beforeRef }: insert immediately before this sibling of the same kind
+	 */
+	position?: 'end' | { beforeRef: string };
 };
 
 export type EncryptNotepadAction = {

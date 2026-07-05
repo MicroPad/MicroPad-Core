@@ -17,6 +17,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 	<meta charset="UTF-8">
 	<style>${theme.text === '#000000' ? hljsCss : hljsCssDark}</style>
 	<link href="${isDev() ? 'https://fonts.googleapis.com/css?family=Open+Sans' : 'assets/open-sans/index.css'}" rel="stylesheet" as="font">
+	<link href="assets/opendyslexic/index.css" rel="stylesheet" as="font">
 	<style>
 		html, body, #content {
 			margin: 0;
@@ -33,7 +34,7 @@ export const getHtml = (id: string, theme: ITheme, fontSize: string = '16px'): s
 			min-width: 170px;
 			min-height: 50px;
 			padding: 5px;
-			font-family: "Open Sans", "Ubuntu", "Roboto", sans-serif;
+			font-family: "OpenDyslexic", "Open Sans", "Ubuntu", "Roboto", sans-serif;
 			line-height: 1.5;
 			color: ${theme.text}
 		}

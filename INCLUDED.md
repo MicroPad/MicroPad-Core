@@ -3829,6 +3829,11 @@
 - Licence: MIT
 - https://github.com/sindresorhus/opn
 
+## OpenDyslexic
+- Published By: Abbie Gonzalez
+- Licence: SIL Open Font License 1.1
+- https://github.com/antijingoist/opendyslexic
+
 ## optimist@0.6.1
 - Published By: James Halliday
 - Licence: MIT*

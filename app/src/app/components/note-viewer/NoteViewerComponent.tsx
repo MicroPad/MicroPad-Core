@@ -12,6 +12,7 @@ import * as FullScreenService from '../../services/FullscreenService';
 import { IInsertElementState } from '../../reducers/NoteReducer';
 import { TOAST_HANDLER } from '../../root';
 import { elementFromInteraction } from '../../services/quick-insert';
+import { EXPLORER_DRAG_MIME } from '../explorer/explorer-drag';
 
 export interface INoteViewerComponentProps {
 	isLoading: boolean;
@@ -221,6 +222,9 @@ export default class NoteViewerComponent extends React.Component<INoteViewerComp
 
 	private handleFileDrop = (event: DragEvent) => {
 		event.preventDefault();
+
+		// Sections/notes dragged from the explorer are not file drops
+		if (event.dataTransfer?.types.includes(EXPLORER_DRAG_MIME)) return;
 
 		const { note, isFullscreen } = this.props;
 		if (!note) return;

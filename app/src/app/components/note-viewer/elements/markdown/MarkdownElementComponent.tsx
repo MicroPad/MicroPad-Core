@@ -174,6 +174,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 									height: '400px',
 									backgroundColor: theme.background,
 									color: theme.text,
+									fontFamily: '"OpenDyslexic", sans-serif',
 									whiteSpace: this.props.shouldWordWrap ? 'break-spaces' : 'pre',
 									overflowWrap: 'normal',
 									overflowX: 'auto'
@@ -197,6 +198,7 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 								theme="micropad"
 								options={{
 									automaticLayout: true,
+									fontFamily: '"OpenDyslexic", sans-serif',
 									minimap: { enabled: false },
 									wordWrap: this.props.shouldWordWrap ? 'on' : 'off',
 									wrappingIndent: 'same',
@@ -232,6 +234,9 @@ export default class MarkdownElementComponent extends React.Component<Props> {
 	componentDidMount() {
 		this.componentDidUpdate(this.props);
 		window.addEventListener('message', this.handleMessages);
+
+		// Monaco measures glyph sizes on startup, which can happen before OpenDyslexic has loaded
+		document.fonts.load('1em OpenDyslexic').then(() => monaco.editor.remeasureFonts());
 	}
 
 	componentWillUnmount() {

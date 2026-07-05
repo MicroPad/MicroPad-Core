@@ -378,9 +378,61 @@ export class NotepadsReducer extends AbstractReducer<INotepadsStoreState> {
 		} else if (isType(action, actions.moveNotepadObject)) {
 			if (!state.notepad || !state.notepad.item) return state;
 
-			const { objectRef, newParent } = action.payload;
+			const { objectRef, newParent, position } = action.payload;
 			const type: 'sections' | 'notes' = action.payload.type + 's' as 'sections' | 'notes';
 			const notepad = state.notepad.item;
+
+			const obj: FlatSection | Note | undefined = notepad[type][objectRef];
+			if (!obj) return state;
+			if (type === 'notes' && newParent === 'notepad') return state;
+			if (newParent !== 'notepad' && !notepad.sections[newParent]) return state;
+
+			// Reject moving a section into itself or any of its descendants: walk up from the
+			// target parent via parentRef and reject if the chain passes through the moved section.
+			if (type === 'sections' && newParent !== 'notepad') {
+				let cursor: FlatSection | undefined = notepad.sections[newParent];
+				while (cursor) {
+					if (cursor.internalRef === objectRef) return state;
+					cursor = cursor.parentRef !== undefined ? notepad.sections[cursor.parentRef] : undefined;
+				}
+			}
+
+			if (typeof position === 'object' && position.beforeRef === objectRef) return state;
+
+			const movedItem: FlatSection | Note =
+				newParent === 'notepad' ? { ...(obj as FlatSection), parentRef: undefined }
+				: !!(obj as Note).clone ? (obj as Note).clone({ parent: newParent })
+				: { ...(obj as FlatSection), parentRef: newParent };
+
+			// Sibling order is the flat map's key insertion order (preserved by toNotepad() and
+			// the save format), so reordering means rebuilding the map with the moved entry in
+			// its new slot.
+			const allEntries = Object.entries(notepad[type]) as [string, FlatSection | Note][];
+			const originalIndex = allEntries.findIndex(([ref]) => ref === objectRef);
+			const without = allEntries.filter(([ref]) => ref !== objectRef);
+
+			let newEntries: [string, FlatSection | Note][];
+			if (position === undefined) {
+				// Legacy behaviour: same map slot, only the parent pointer changes
+				newEntries = [...without.slice(0, originalIndex), [objectRef, movedItem], ...without.slice(originalIndex)];
+			} else if (position === 'end') {
+				newEntries = [...without, [objectRef, movedItem]];
+			} else {
+				const beforeIdx = without.findIndex(([ref]) => ref === position.beforeRef);
+				newEntries = beforeIdx === -1
+					? [...without, [objectRef, movedItem]]
+					: [...without.slice(0, beforeIdx), [objectRef, movedItem], ...without.slice(beforeIdx)];
+			}
+
+			// No-op detection: if neither the parent nor the visible sibling order changed, don't
+			// bump lastModified (it would trigger a pointless autosave/sync).
+			const parentOf = (item: FlatSection | Note): string =>
+				type === 'notes' ? (item as Note).parent as string : ((item as FlatSection).parentRef ?? 'notepad');
+			if (parentOf(obj) === parentOf(movedItem)) {
+				const siblingSeq = (entries: [string, FlatSection | Note][]) =>
+					entries.filter(([, item]) => parentOf(item) === parentOf(movedItem)).map(([ref]) => ref).join(' ');
+				if (siblingSeq(allEntries) === siblingSeq(newEntries)) return state;
+			}
 
 			return {
 				...state,
@@ -388,19 +440,9 @@ export class NotepadsReducer extends AbstractReducer<INotepadsStoreState> {
 					...state.notepad,
 					item: notepad.clone({
 						lastModified: new Date(),
-						[type]: Object.values(notepad[type])
-							.map((item: FlatSection | Note) => {
-								if (item.internalRef !== objectRef) return item;
-
-								// Handle sections being moved to the root (directly under the notepad)
-								if (newParent === 'notepad') return { ...item, parentRef: undefined };
-
-								// Change the parent on the item if it's the one we're moving
-								return !!(item as Note).clone ? (item as Note).clone({ parent: newParent }) : { ...item, parentRef: newParent };
-							})
-							// Convert back to the object from an array of FlatSections/Notes
-							.reduce((items: { [uuid: string]: FlatSection | Note }, item: FlatSection | Note) => {
-								items[item.internalRef] = item;
+						[type]: newEntries
+							.reduce((items: { [uuid: string]: FlatSection | Note }, [ref, item]) => {
+								items[ref] = item;
 								return items;
 							}, {})
 					})

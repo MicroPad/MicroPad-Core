@@ -11,6 +11,7 @@ export const searchConnector = connect(
 			notepad: notepads.notepad?.item,
 			query: search.query,
 			results: search.results,
+			elementResults: search.elementResults,
 			showResults: search.shouldShowResults
 		};
 	},
@@ -23,6 +24,7 @@ export const searchConnector = connect(
 				dispatch(actions.restoreJsonNotepadAndLoadNote(result));
 			}
 		},
+		jumpToElement: (elementId: string) => dispatch(actions.jumpToNoteElement(elementId)),
 		setSearchResultVisibility: (visibility: boolean) => dispatch(actions.setSearchResultVisibility(visibility))
 	})
 );
